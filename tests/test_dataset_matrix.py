@@ -35,7 +35,7 @@ def test_scope_and_metrics():
     assert all(r["performance"]["num_prompts"] == 160 for r in frontier)
     assert all(len(r["quality"]) == 2 for r in frontier)
     hle = [r for r in rows if r["dataset"] == "hle-verified"]
-    assert len(hle) == 10
+    assert len(hle) == 14
     bs_hle = [r for r in hle if r["solution"] == "betterscale"]
     assert len(bs_hle) == 4
     assert all(r["performance"]["input_token_accounting_verified"] for r in bs_hle)
@@ -309,3 +309,59 @@ def test_controller_uses_existing_dataset_rows_and_preserves_matching_baseline()
         < native["performance"]["output_throughput"]
     )
     assert native["configuration_label"] == "本轮配对基线"
+
+
+def test_controller_gold_uses_existing_row_with_matched_modality_performance():
+    data = module.build()
+    dataset = next(d for d in data["datasets"] if d["id"] == "hle-verified")
+    gold = next(p for p in dataset["parts"] if p["id"] == "gold")
+    assert gold["scores"]["native"]["correct"] == 156
+    score = gold["scores"]["request-throttling-controller"]
+    assert (score["correct"], score["total"], score["audit"]["unresolved"]) == (
+        159,
+        668,
+        25,
+    )
+    assert (
+        "request-throttling-controller"
+        not in next(p for p in dataset["parts"] if p["id"] == "revision")["scores"]
+    )
+    rows = [
+        r
+        for r in data["records"]
+        if r["id"].startswith("hle-gold-controller-20261018-")
+    ]
+    assert len(rows) == 4
+    assert (
+        sum(r["quality"][0]["correct"] for r in rows if r["solution"] == "native")
+        == 164
+    )
+    assert (
+        sum(
+            r["quality"][0]["correct"]
+            for r in rows
+            if r["solution"] == "request-throttling-controller"
+        )
+        == 159
+    )
+    for row in rows:
+        perf = row["performance"]
+        assert perf["repetitions"] == 3 and len(perf["formal_runs"]) == 3
+        assert all(
+            p["repetition"] != "warmup" and p["failed"] == 0
+            for p in perf["formal_runs"]
+        )
+        assert row["configuration"]["prefix_caching"] is False
+        assert row["protocol"]["quality_budget"]["passed"] is False
+
+
+def test_controller_gold_public_report_has_no_private_payload():
+    import re
+
+    body = (
+        ROOT / "data/request-throttling-dataset-matrix-20261018/hle-gold.json"
+    ).read_text()
+    assert not re.search(
+        r'10\.244\.|192\.168\.|Bearer\s|"(?:base_url|raw_response|prompt_token_ids)"\s*:',
+        body,
+    )
