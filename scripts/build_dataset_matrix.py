@@ -287,6 +287,97 @@ def append_controller_dataset_profiles(root, solutions, datasets, records, sourc
         )
 
 
+def append_controller_gold_profile(root, datasets, records, sources):
+    """Use the existing Gold row and text/image detail format."""
+    path = "data/request-throttling-dataset-matrix-20261018/hle-gold.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    assert report["status"] == "DATASET_PAIR_COMPLETE"
+    assert report["quality_pair"]["pair_input_check"][
+        "all_contract_fields_equal_except_solver_base_url"
+    ]
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    dataset = next(d for d in datasets if d["id"] == "hle-verified")
+    gold = next(p for p in dataset["parts"] if p["id"] == "gold")
+    audit = report["quality_pair"]["arms"]["controller"]["summary"]["tracks"]["gold"]
+    assert (
+        audit["total"] == 668 and "request-throttling-controller" not in gold["scores"]
+    )
+    gold["scores"]["request-throttling-controller"] = {
+        "label": "Gold",
+        "correct": audit["successes"],
+        "total": audit["total"],
+        "value": audit["accuracy"],
+        "audit": audit,
+    }
+    performance = report["performance"]
+    assert performance["state"] == "THREE_REPEAT_PERFORMANCE_COMPLETE"
+    for arm, sid in [
+        ("native", "native"),
+        ("controller", "request-throttling-controller"),
+    ]:
+        for modality, count in [("text", 200), ("image", 93)]:
+            points = [
+                r
+                for r in performance["records"]
+                if r["arm"] == arm
+                and r["modality"] == modality
+                and r["repetition"] != "warmup"
+            ]
+            assert len(points) == 3 and {r["repetition"] for r in points} == {1, 2, 3}
+            assert all(r["completed"] == count and r["failed"] == 0 for r in points)
+            aggregate = performance["aggregate"][modality][arm]
+            for key, value in aggregate.items():
+                assert statistics.median(r[key] for r in points) == value
+            quality = report["quality_pair"]["arms"][arm]["summary"]["groups"][
+                f"gold/{modality}"
+            ]
+            records.append(
+                {
+                    "id": f"hle-gold-controller-20261018-{sid}-{modality}",
+                    "dataset": "hle-verified",
+                    "solution": sid,
+                    "scope": f"gold-{modality}",
+                    "measured_at": "2026-10-18",
+                    "configuration_label": "本轮配对基线"
+                    if arm == "native"
+                    else "本轮评测",
+                    "configuration_label_en": "Matched baseline"
+                    if arm == "native"
+                    else "Current evaluation",
+                    "quality": [
+                        {
+                            "label": f"Gold · {modality}",
+                            "correct": quality["successes"],
+                            "total": quality["total"],
+                            "value": quality["accuracy"],
+                            "audit": quality,
+                        }
+                    ],
+                    "performance": dict(
+                        aggregate,
+                        completed=count,
+                        failed=0,
+                        num_prompts=count,
+                        repetitions=3,
+                        aggregation="median of three formal values per metric",
+                        formal_runs=points,
+                    ),
+                    "configuration": report["configuration"],
+                    "report": path,
+                    "protocol": {
+                        "quality": "One complete Gold668 pass; strict JSON Qwen substitute judge; all unresolved retained",
+                        "performance": f"Separate {modality} test: {count} prompts; output cap256; natural EOS; temperature0; seed0; rate inf; no client cap; one warmup plus three formal runs per arm",
+                        "source": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/1d1a287/reports/request-throttling-controller/dataset-matrix-20261018-r2/hle-gold",
+                        "quality_budget": report["quality_budget"],
+                    },
+                    "limitations": report["limitations"],
+                }
+            )
+
+
 def build(root=ROOT):
     sources = {}
 
@@ -546,6 +637,7 @@ def build(root=ROOT):
     append_trajectory(root, solutions, datasets, records, sources)
     append_offline_window(root, solutions, datasets, records, sources)
     append_controller_dataset_profiles(root, solutions, datasets, records, sources)
+    append_controller_gold_profile(root, datasets, records, sources)
     return {
         "schema": 1,
         "cohort": {
