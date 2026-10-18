@@ -31,7 +31,7 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-matrix-v1.html")
             page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(8)
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
             expect(page.locator("#matrix-table table")).to_have_count(1)
             assert "+91.7%" in page.locator(".matrix-overview").inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
