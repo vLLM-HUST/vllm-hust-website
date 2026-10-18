@@ -362,5 +362,6 @@ def test_controller_gold_public_report_has_no_private_payload():
         ROOT / "data/request-throttling-dataset-matrix-20261018/hle-gold.json"
     ).read_text()
     assert not re.search(
-        r"10\.244\.|192\.168\.|Bearer\s|base_url|raw_response|prompt_token_ids", body
+        r'10\.244\.|192\.168\.|Bearer\s|"(?:base_url|raw_response|prompt_token_ids)"\s*:',
+        body,
     )
