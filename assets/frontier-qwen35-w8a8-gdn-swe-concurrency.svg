@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" role="img" aria-labelledby="title desc">
+<title id="title">Qwen3.5-35B-A3B W8A8 (GDN W8A16) SWE concurrency speed-throughput tradeoff</title>
+<desc id="desc">Only client concurrency changes within the new-recipe real-MTP2 series. Every point is one 900s closed-loop observation on two Ascend 910B3 chips at max-num-seqs 16.</desc>
+<rect width="1000" height="580" fill="#fff"/>
+<g font-family="system-ui,sans-serif" fill="#172033">
+<text x="60" y="40" font-size="23" font-weight="700">Qwen3.5-35B-A3B W8A8-GDN · SWE prefix reuse</text>
+<text x="60" y="68" font-size="15">TP2 · 2×910B3 · FULL_DECODE_ONLY · MNS16 · real MTP2 · W8A8 + linear_attn W8A16 · BF16 KV · 900s/point</text>
+<path d="M90.00 120V440 M90 440.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="90.00" y="464" text-anchor="middle" font-size="13">0</text>
+<text x="78" y="444.00" text-anchor="end" font-size="13">0</text>
+<path d="M252.00 120V440 M90 376.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="252.00" y="464" text-anchor="middle" font-size="13">20</text>
+<text x="78" y="380.00" text-anchor="end" font-size="13">40</text>
+<path d="M414.00 120V440 M90 312.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="414.00" y="464" text-anchor="middle" font-size="13">40</text>
+<text x="78" y="316.00" text-anchor="end" font-size="13">80</text>
+<path d="M576.00 120V440 M90 248.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="576.00" y="464" text-anchor="middle" font-size="13">60</text>
+<text x="78" y="252.00" text-anchor="end" font-size="13">120</text>
+<path d="M738.00 120V440 M90 184.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="738.00" y="464" text-anchor="middle" font-size="13">80</text>
+<text x="78" y="188.00" text-anchor="end" font-size="13">160</text>
+<path d="M900.00 120V440 M90 120.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="900.00" y="464" text-anchor="middle" font-size="13">100</text>
+<text x="78" y="124.00" text-anchor="end" font-size="13">200</text>
+<polyline points="861.94,371.68 750.27,336.84 640.20,283.97 561.82,200.56 395.71,121.88" fill="none" stroke="#0f766e" stroke-width="2.5"/>
+<circle data-point="qwen35-sweprefix-w8a8-gdn-ascend-tp2-mtp2-c1-20261016" cx="861.94" cy="371.68" r="5" fill="#0f766e"><title>W8A8-GDN + real MTP2 C1: P90 95.30 tokens/s; 42.70 tokens/s/chip</title></circle>
+<text x="870.94" y="359.68" fill="#0f766e" font-size="14">C1</text>
+<circle data-point="qwen35-sweprefix-w8a8-gdn-ascend-tp2-mtp2-c2-20261016" cx="750.27" cy="336.84" r="5" fill="#0f766e"><title>W8A8-GDN + real MTP2 C2: P90 81.51 tokens/s; 64.48 tokens/s/chip</title></circle>
+<text x="759.27" y="324.84" fill="#0f766e" font-size="14">C2</text>
+<circle data-point="qwen35-sweprefix-w8a8-gdn-ascend-tp2-mtp2-c4-20261016" cx="640.20" cy="283.97" r="5" fill="#0f766e"><title>W8A8-GDN + real MTP2 C4: P90 67.93 tokens/s; 97.52 tokens/s/chip</title></circle>
+<text x="649.20" y="271.97" fill="#0f766e" font-size="14">C4</text>
+<circle data-point="qwen35-sweprefix-w8a8-gdn-ascend-tp2-mtp2-c8-20261016" cx="561.82" cy="200.56" r="5" fill="#0f766e"><title>W8A8-GDN + real MTP2 C8: P90 58.25 tokens/s; 149.65 tokens/s/chip</title></circle>
+<text x="570.82" y="188.56" fill="#0f766e" font-size="14">C8</text>
+<circle data-point="qwen35-sweprefix-w8a8-gdn-ascend-tp2-mtp2-c16-20261016" cx="395.71" cy="121.88" r="5" fill="#0f766e"><title>W8A8-GDN + real MTP2 C16: P90 37.74 tokens/s; 198.82 tokens/s/chip</title></circle>
+<text x="404.71" y="109.88" fill="#0f766e" font-size="14">C16</text>
+<text x="90" y="99" fill="#0f766e" font-size="15">W8A8-GDN + real MTP2 · int8 W/A + linear_attn W8A16 · bf16 KV</text>
+<text x="495" y="496" text-anchor="middle" font-size="16">P90 request decode speed · output tokens/s</text>
+<text transform="translate(25 280) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
+<text x="60" y="532" font-size="13">The line connects all five measured client C levels (C1/C2/C4/C8/C16); it is not a fitted curve or a cross-setting Pareto envelope.</text>
+<text x="60" y="554" font-size="13">One server instance for the line; max-num-seqs 16 equals the C16 offered load, so C16 is the saturation seat count, not beyond-capacity. Two things differ from the published W8A8 line, not one: the GDN linear_attn projection precision (W8A16 vs BF16) and the chip pair used, so this line makes no cross-recipe speedup claim.</text>
+</g></svg>
