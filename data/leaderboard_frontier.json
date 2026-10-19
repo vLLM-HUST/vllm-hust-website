@@ -969,6 +969,70 @@
           "display_scope": "本 cohort 自有曲线: 单条 real-MTP2 线 (C1..C16), 五点在同一个服务实例内串行测得。不与已发布 W8A8 cohort 或 BF16 cohort 的曲线混画: 量化口径不同, 混画会引入非并发变量。每卡吞吐可与已发布 W8A8 TP2 曲线逐点对照阅读 (同 workload/协议/服务口径, 仅配方不同)。"
         }
       }
+    },
+    {
+      "id": "qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1",
+      "model": {
+        "id": "qwen35-35b-a3b-712cf743",
+        "label": "Qwen3.5-35B-A3B",
+        "revision": "712cf74392b05026a6db2bf213d343747d1f6d45"
+      },
+      "precision": {
+        "id": "w4a8-expert-int4-weights-compute-bf16-kv",
+        "label": "W4A8 专家层 int4 (其余 int8) weights · int8 activations · BF16 KV",
+        "note": "msModelSlim ascendv1 离线量化: MLP 专家层 (gate/up/down_proj) int4 权重 + int8 激活; self_attn 等其余量化层仍为 int8 权重/int8 激活 (在 int8 配方基线上只把 *mlp.experts* 换成 int4/ssz)。产物 quant_model_description.json 实测: W4A8_DYNAMIC 122880 / W8A8_DYNAMIC 91 / FLOAT 1701, 无 W8A16。权重沿原始输出维两两打包 (低半字节=偶数输出索引), 反量化 = w_int4 * scale (weight_offset 恒零)。KV cache 未量化, 保持 bf16 (kv_cache_dtype=auto)。"
+      },
+      "context_tokens": 262144,
+      "workload": {
+        "id": "sweprefix-qwen35-w4a8-tp1-900s-v1",
+        "label": "SWE prefix reuse · 900 s fixed window · single chip (TP1)",
+        "contract": {
+          "profile": "smoke",
+          "measurement_seconds": 900,
+          "repository_url": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "source_pool": {
+            "dataset": "nvidia/Open-SWE-Traces",
+            "revision": "fb0c0dccc7a5cce79b3f6de891848acdede36685",
+            "sessions": 8,
+            "assistant_turns": 360,
+            "bundle_sha256": "a31abfc7dea176a8b4bf339ff8b104194040f29244577eab9ba4ca951a01739b",
+            "selection": "8 evenly spaced size ranks among first 32 rows, after conservative credential-like-content exclusion"
+          },
+          "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "chat_template": "Qwen3.5 thinking-enabled; tokenize fixed input deltas and original assistant bodies independently; structural closing delimiters are fixed input",
+          "history": "Actual generated token IDs, then next source input delta; no generated-text retokenization or history rerendering",
+          "output_policy": "Exact source-derived per-turn token budget, greedy ignore_eos; native real MTP accept/reject (draft tokens are proposed and rejected by the real sampler path); never forced synthetic acceptance",
+          "arrival": "Closed-loop C continuously replenished HTTP request lanes, at most one in-flight request per lane; no original tool/human delays. The member set holds only 8 source sessions and the client assigns them by a global round-robin with a per-lane cache salt, so the C16 member (offered load equal to max-num-seqs 16) runs 16 real in-flight lanes in which two lanes replay each source trace under different salts and therefore do not share prefix cache.",
+          "cache": "Unique salt and sticky routing identity per play; preserved within session; cross-session common-prefix reuse deliberately excluded",
+          "warmup": "Separate short protocol/cache qualification before measured traffic. Measured sessions start with fresh salts, no primers. No one-hour formal window.",
+          "aggregation": "One unpooled 900s observation per point; count actual output tokens received inside window, drain only already in-flight requests; no post-window token credit",
+          "x_axis": "P90 across fully completed in-window requests of (N-1)/(last-token-time-first-token-time); grouped SSE token times, not inverse P90 TPOT",
+          "y_axis": "In-window generated tokens / 900 seconds / every allocated chip",
+          "acceptance": "All exact prompt-ID echoes, budget/usage/DONE checks pass; no request errors, verified prefix reuse (server /metrics prefix-cache counters observed during the window) and owned-resource release. Not answer-quality or peak-capacity certification.",
+          "context_scope": "262144 configured capacity; eight full shapes end at 15494..141269 tokens. Short-window observed prompt lengths are recorded per point; no claim that each run reaches full 256K.",
+          "limitations": "Single-chip TP1 curve: C1/C2/C4/C8/C16, five single 900-second observations on one server instance, tuning incomplete, not SWE task solving. The single-chip KV budget (32.55 GiB, set explicitly for this artifact) admits 5.31 concurrent 262144-token lanes, so throughput keeps rising and C16 is the peak of this cohort. W4A8 特有: 专家层 int4 使权重为 23.38 GiB; 本 cohort 的 KV 预算按该产物的显存占用显式设定 (32.55 GiB, 262144 上下文下 5.31 路并发, 实测 GPU KV cache 1391235 token), 权重 + KV ≈ 55.9 GiB, 落在 64 GB 单卡 gpu_memory_utilization=0.95 的预算内。该预算是部署选择, 不是 int4 自带的加速: 本页不构成 int4 算子更快或更慢的结论 —— 本工作区另跑了同权重的 KV 对照臂 (权重同为 int4, KV 收紧到 18.85 GiB) 分离这两个量, 结论是 C16 档的差异在同一权重位宽下即可复现; 该对照臂不作为 Frontier 条目提交。 W4A8 特有: engine 树含一处本地改动 (compiler_interface.py 的 npugraph_ex 属性 stand-in); 其生效条件是编译图中存在 npu.npu_weight_quant_batchmatmul (W8A16) 节点, 而本产物的 quant_model_description 里 零个 W8A16 条目, 故对本模型为惰性, 见 point 的 mod_activation。",
+          "status": "W4A8 (专家 int4) real-MTP2 单卡 (TP1) 并发曲线 C1/C2/C4/C8/C16; 五点各为一次 900 秒固定窗口观测, 同一服务实例内串行完成; tuning incomplete; 非 SWE 解题能力评测",
+          "prepared_workload_variants": [
+            {
+              "sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+              "transformers": "5.17.0",
+              "tokenizer_path": "/data/jxd/Qwen3.5-35B-A3B"
+            }
+          ],
+          "prepared_workload_equivalence": "Same source bundle and same tokenizer as the published set: all 8/8 sessions accepted with per-session max_context_tokens identical to the published collection (15494..141269) and the same tokenizer fingerprint. File differences are limited to the local tokenizer path and transformers version metadata.",
+          "client_versions": "本 cohort 全部 5 点使用 swe-prefix-reuse 0.1.2 (commit 6861242dbd9f17b707003191e4200b7752911d7c): 沿用 0.1.1 的 cache_salt + X-Correlation-ID 粘性路由, 无 session rotation 扩展 (rotation depth 恒为 1)。",
+          "concurrency_curves_url": "./assets/frontier-qwen35-w4a8-tp1-swe-concurrency.svg?v=qwen35-w4a8-tp1-swe-curves-20261016",
+          "session_rotation": {
+            "policy": "per-lane-round-robin",
+            "depth_field": "load.session_rotation_depth",
+            "status": "measured",
+            "semantics": "C lanes, D independent session slots per lane; at most one in-flight request per lane. Advance one turn per slot, without cross-lane barriers; replace finished sessions in their own slots. D=1 is the original consecutive-turn workload.",
+            "measurement_scope": "本曲线只测 D=1, 覆盖 C1/C2/C4/C8/C16; 不包含 D>=2 或其他 engine 的观测。"
+          },
+          "display_scope": "W4A8 cohort 自有曲线: 单条 real-MTP2 线 (C1..C16), 五点在同一个服务实例内串行测得。服务端为本产物显式指定 KV 预算 (32.55 GiB, 见 caliber_note); 该预算是一个部署选择, 本 cohort 只报自己的观测, 不与他 cohort 混画、不作跨精度加速声明。"
+        }
+      }
     }
   ],
   "points": [
@@ -89217,6 +89281,616 @@
           "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
           "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
           "campaign": "qwen35-w8a8-gdn-tp2-swe-curves-20261016"
+        },
+        "sampling_date_utc": "2026-10-16",
+        "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-w4a8-ascend-tp1-mtp2-c1-20261016",
+      "cohort_id": "qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1",
+      "label": "W4A8 · TP1 / C1 · SWE 900 s · real MTP2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143+gf18cf803c / 0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+        "mods": [
+          "ascend-mtp-contract-2patch",
+          "ascend-npugraph-ex-attr-shim"
+        ],
+        "hardware": {
+          "label": "Ascend 910B3",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "quantization": "ascend",
+          "weight_precision": "int4 (MLP 专家层 gate/up/down_proj, msModelSlim ascendv1 离线量化, 6 个 quant_model_weights 分片); 其余量化层 int8",
+          "activation_precision": "int8 (动态 per-token)",
+          "kv_cache_dtype": "auto (bf16; KV 未量化)",
+          "max_model_len": 262144,
+          "prefix_caching": true,
+          "enable_chunked_prefill": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "cudagraph_mode": "FULL_DECODE_ONLY (请求 FULL, 平台因 AscendGDNAttentionBackend 仅支持 UNIFORM_BATCH 而降级)",
+          "max_cudagraph_capture_size": 256,
+          "graph_note": "VLLM_USE_BREAKABLE_CUDAGRAPH=0 (Ascend ACL graph, 默认开启)",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_base_commits": {
+            "vllm": "f18cf803c5f63625e2c71253ddaf8b0bad0bad1a",
+            "vllm-ascend": "74f0c0a272376412b51e1c1864803d5f3a0f1b5f"
+          },
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "torch": "2.13.0+cpu",
+            "torch_npu": "2.13.0.rc1",
+            "transformers_server": "5.14.1",
+            "cann": "Ascend CANN 9.1.0 (逐进程临时环境: /data/jxd/Ascend-9.1.0/{ascend-toolkit,nnal/atb}; 系统自带 /usr/local/Ascend CANN 8.5.0 未改动、未覆盖), ATB CXX ABI=1",
+            "driver": "25.3.rc1"
+          },
+          "mods": [
+            "ascend-mtp-contract-2patch",
+            "ascend-npugraph-ex-attr-shim"
+          ],
+          "mod_activation": "三个本地最小改动 (相对上游 vllm-ascend HEAD 74f0c0a272376412b51e1c1864803d5f3a0f1b5f): (1) vllm_ascend/platform.py NPUPlatform.check_runner_kv_caches_multi_layer() 新增 no-op 声明 (md5 d5d882ed6a6868b778528a30e65daad9); (2) vllm_ascend/worker/model_runner_v1.py:898 改传 self._get_mamba_state_copy_funcs() (dict, 0.28.1 契约) (md5 4d4ec2b2b544e4054f133dab7e0d3f0b); (3) vllm_ascend/compilation/compiler_interface.py npugraph_ex 的 _gen_compiled_gm() 在本 torch_npu 构建上会读 CompilerConfig.experimental_config, 该属性不存在 -> AttributeError 杀死 worker; 补一个最小 stand-in (md5 c5069206b4af71f6155f0d5d697f46e9)。(1)(2) 是 0.28.1 运行时契约所需的两处补丁; (3) 的 mtime 为 2026-10-16, 是本次新增的一处。(3) 对本模型为惰性: 其生效条件是编译图中存在 npu.npu_weight_quant_batchmatmul (W8A16) 节点, 而本产物的 quant_model_description 里不含任何 W8A16 条目 (实测 FLOAT/W8A8_DYNAMIC/W4A8_DYNAMIC), 服务端日志中 w8a16/experimental_config 零次出现; 且它只 object.__setattr__ 一个不在 _fixed_attrs 里的属性, 不会被 as_dict() 序列化进交给编译器的 options。MTP2 为真实接受/拒绝, 无 synthetic sampler 覆盖。",
+          "weight_artifacts": {
+            "quant_model_description.json.sha256": "eb9a3ea871cefd0870d8a6a696d9e3444477c37e6999680d24be4e11d3d4453f",
+            "quant_model_weights.safetensors.index.json.sha256": "f76730c2ac6919e569d176aba42c9df35404ab33dd3a5dcff3becedbabb825a5"
+          },
+          "weight_revision_note": "本地固定量化产物 (23.38 GiB, quant_model_description.json + quant_model_weights-00001..00006-of-00006.safetensors, 含 mtp.layers.0.*)",
+          "base_checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "server_command": "ASCEND_RT_VISIBLE_DEVICES=7 TP=1 PORT=8200 MAX_MODEL_LEN=262144 GPU_MEM_UTIL=0.95 LABEL=ab-w4a8max EXTRA_SERVER_ARGS='--max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}' ./run_swe_server_ab.sh\n# /proc/460989/cmdline 实测: /data/jxd/envs/vllm-hust-v1-cann91/bin/python /data/jxd/envs/vllm-hust-v1-cann91/bin/vllm serve /data/gcy/Qwen3.5-35B-A3B-W4A8 --served-model-name qwen35-a3b-w4a8 --tensor-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.95 --trust-remote-code --host 127.0.0.1 --port 8200 --quantization ascend --max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}",
+          "execution_host": "local",
+          "physical_devices": [
+            7
+          ],
+          "transport": "客户端与服务端同机回环 (http://127.0.0.1:8200)",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 1,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "observed_max_prompt_tokens": 52505,
+          "measured_mean_client_inflight": 0.9995055654414723,
+          "full_client_concurrency_fraction": 0.9995055654414723,
+          "comparison_scope": "W4A8 cohort 内 real-MTP2 并发曲线单点 (C1)。本 cohort 的 KV 预算由本产物显式设定 (32.55 GiB); 本页只报本 cohort 自身的观测, 不跨 cohort 画线, 不作跨精度或跨 KV 的加速声明。",
+          "max_num_seqs": 16,
+          "kv_cache_memory_bytes": 34953463839,
+          "max_num_batched_tokens": 4096,
+          "caliber_note": "单卡 TP1 服务口径: gpu_memory_utilization=0.95 / kv_cache_memory_bytes=34953463839 (32.55 GiB) / max_num_batched_tokens=4096 / max_num_seqs=16。实测 GPU KV cache 1391235 token, 262144 上下文下最大并发 5.31x。该预算按本产物的显存占用显式设定: 权重 23.38 GiB + KV 32.55 GiB ≈ 55.9 GiB, 落在 64 GB 单卡的 0.95 预算内。",
+          "mtp_mean_acceptance_length": 2.908804,
+          "mtp_acceptance_samples": 92
+        }
+      },
+      "load": {
+        "concurrency": 1,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-w4a8-tp1-20261016-mtp2",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "decode_p90_tps": 98.6657777102622,
+        "output_tps": 87.4011111111111,
+        "ttft_p95_ms": 752.5349671370351,
+        "completed_requests": 143
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-W4A8-TP1-SWE-PREFIX.md",
+        "run_ids": [
+          "5b5d35933b2f44698a8c6b5b887ceb54"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation at client C1 (real MTP2) on one Ascend 910B3; count actual output tokens received inside the window, drain only already in-flight requests; no post-window token credit",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "qwen35-w4a8-tp1-swe-curves-20261016"
+        },
+        "sampling_date_utc": "2026-10-16",
+        "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-w4a8-ascend-tp1-mtp2-c2-20261016",
+      "cohort_id": "qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1",
+      "label": "W4A8 · TP1 / C2 · SWE 900 s · real MTP2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143+gf18cf803c / 0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+        "mods": [
+          "ascend-mtp-contract-2patch",
+          "ascend-npugraph-ex-attr-shim"
+        ],
+        "hardware": {
+          "label": "Ascend 910B3",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "quantization": "ascend",
+          "weight_precision": "int4 (MLP 专家层 gate/up/down_proj, msModelSlim ascendv1 离线量化, 6 个 quant_model_weights 分片); 其余量化层 int8",
+          "activation_precision": "int8 (动态 per-token)",
+          "kv_cache_dtype": "auto (bf16; KV 未量化)",
+          "max_model_len": 262144,
+          "prefix_caching": true,
+          "enable_chunked_prefill": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "cudagraph_mode": "FULL_DECODE_ONLY (请求 FULL, 平台因 AscendGDNAttentionBackend 仅支持 UNIFORM_BATCH 而降级)",
+          "max_cudagraph_capture_size": 256,
+          "graph_note": "VLLM_USE_BREAKABLE_CUDAGRAPH=0 (Ascend ACL graph, 默认开启)",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_base_commits": {
+            "vllm": "f18cf803c5f63625e2c71253ddaf8b0bad0bad1a",
+            "vllm-ascend": "74f0c0a272376412b51e1c1864803d5f3a0f1b5f"
+          },
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "torch": "2.13.0+cpu",
+            "torch_npu": "2.13.0.rc1",
+            "transformers_server": "5.14.1",
+            "cann": "Ascend CANN 9.1.0 (逐进程临时环境: /data/jxd/Ascend-9.1.0/{ascend-toolkit,nnal/atb}; 系统自带 /usr/local/Ascend CANN 8.5.0 未改动、未覆盖), ATB CXX ABI=1",
+            "driver": "25.3.rc1"
+          },
+          "mods": [
+            "ascend-mtp-contract-2patch",
+            "ascend-npugraph-ex-attr-shim"
+          ],
+          "mod_activation": "三个本地最小改动 (相对上游 vllm-ascend HEAD 74f0c0a272376412b51e1c1864803d5f3a0f1b5f): (1) vllm_ascend/platform.py NPUPlatform.check_runner_kv_caches_multi_layer() 新增 no-op 声明 (md5 d5d882ed6a6868b778528a30e65daad9); (2) vllm_ascend/worker/model_runner_v1.py:898 改传 self._get_mamba_state_copy_funcs() (dict, 0.28.1 契约) (md5 4d4ec2b2b544e4054f133dab7e0d3f0b); (3) vllm_ascend/compilation/compiler_interface.py npugraph_ex 的 _gen_compiled_gm() 在本 torch_npu 构建上会读 CompilerConfig.experimental_config, 该属性不存在 -> AttributeError 杀死 worker; 补一个最小 stand-in (md5 c5069206b4af71f6155f0d5d697f46e9)。(1)(2) 是 0.28.1 运行时契约所需的两处补丁; (3) 的 mtime 为 2026-10-16, 是本次新增的一处。(3) 对本模型为惰性: 其生效条件是编译图中存在 npu.npu_weight_quant_batchmatmul (W8A16) 节点, 而本产物的 quant_model_description 里不含任何 W8A16 条目 (实测 FLOAT/W8A8_DYNAMIC/W4A8_DYNAMIC), 服务端日志中 w8a16/experimental_config 零次出现; 且它只 object.__setattr__ 一个不在 _fixed_attrs 里的属性, 不会被 as_dict() 序列化进交给编译器的 options。MTP2 为真实接受/拒绝, 无 synthetic sampler 覆盖。",
+          "weight_artifacts": {
+            "quant_model_description.json.sha256": "eb9a3ea871cefd0870d8a6a696d9e3444477c37e6999680d24be4e11d3d4453f",
+            "quant_model_weights.safetensors.index.json.sha256": "f76730c2ac6919e569d176aba42c9df35404ab33dd3a5dcff3becedbabb825a5"
+          },
+          "weight_revision_note": "本地固定量化产物 (23.38 GiB, quant_model_description.json + quant_model_weights-00001..00006-of-00006.safetensors, 含 mtp.layers.0.*)",
+          "base_checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "server_command": "ASCEND_RT_VISIBLE_DEVICES=7 TP=1 PORT=8200 MAX_MODEL_LEN=262144 GPU_MEM_UTIL=0.95 LABEL=ab-w4a8max EXTRA_SERVER_ARGS='--max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}' ./run_swe_server_ab.sh\n# /proc/460989/cmdline 实测: /data/jxd/envs/vllm-hust-v1-cann91/bin/python /data/jxd/envs/vllm-hust-v1-cann91/bin/vllm serve /data/gcy/Qwen3.5-35B-A3B-W4A8 --served-model-name qwen35-a3b-w4a8 --tensor-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.95 --trust-remote-code --host 127.0.0.1 --port 8200 --quantization ascend --max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}",
+          "execution_host": "local",
+          "physical_devices": [
+            7
+          ],
+          "transport": "客户端与服务端同机回环 (http://127.0.0.1:8200)",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 2,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "observed_max_prompt_tokens": 71846,
+          "measured_mean_client_inflight": 1.9988761046272703,
+          "full_client_concurrency_fraction": 0.9988762306617314,
+          "comparison_scope": "W4A8 cohort 内 real-MTP2 并发曲线单点 (C2)。本 cohort 的 KV 预算由本产物显式设定 (32.55 GiB); 本页只报本 cohort 自身的观测, 不跨 cohort 画线, 不作跨精度或跨 KV 的加速声明。",
+          "max_num_seqs": 16,
+          "kv_cache_memory_bytes": 34953463839,
+          "max_num_batched_tokens": 4096,
+          "caliber_note": "单卡 TP1 服务口径: gpu_memory_utilization=0.95 / kv_cache_memory_bytes=34953463839 (32.55 GiB) / max_num_batched_tokens=4096 / max_num_seqs=16。实测 GPU KV cache 1391235 token, 262144 上下文下最大并发 5.31x。该预算按本产物的显存占用显式设定: 权重 23.38 GiB + KV 32.55 GiB ≈ 55.9 GiB, 落在 64 GB 单卡的 0.95 预算内。",
+          "mtp_mean_acceptance_length": 2.908333,
+          "mtp_acceptance_samples": 90
+        }
+      },
+      "load": {
+        "concurrency": 2,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-w4a8-tp1-20261016-mtp2",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "decode_p90_tps": 91.6977628303425,
+        "output_tps": 150.87444444444444,
+        "ttft_p95_ms": 1041.120649781078,
+        "completed_requests": 209
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-W4A8-TP1-SWE-PREFIX.md",
+        "run_ids": [
+          "9a4e817972004dd783819e98a7428aa0"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation at client C2 (real MTP2) on one Ascend 910B3; count actual output tokens received inside the window, drain only already in-flight requests; no post-window token credit",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "qwen35-w4a8-tp1-swe-curves-20261016"
+        },
+        "sampling_date_utc": "2026-10-16",
+        "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-w4a8-ascend-tp1-mtp2-c4-20261016",
+      "cohort_id": "qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1",
+      "label": "W4A8 · TP1 / C4 · SWE 900 s · real MTP2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143+gf18cf803c / 0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+        "mods": [
+          "ascend-mtp-contract-2patch",
+          "ascend-npugraph-ex-attr-shim"
+        ],
+        "hardware": {
+          "label": "Ascend 910B3",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "quantization": "ascend",
+          "weight_precision": "int4 (MLP 专家层 gate/up/down_proj, msModelSlim ascendv1 离线量化, 6 个 quant_model_weights 分片); 其余量化层 int8",
+          "activation_precision": "int8 (动态 per-token)",
+          "kv_cache_dtype": "auto (bf16; KV 未量化)",
+          "max_model_len": 262144,
+          "prefix_caching": true,
+          "enable_chunked_prefill": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "cudagraph_mode": "FULL_DECODE_ONLY (请求 FULL, 平台因 AscendGDNAttentionBackend 仅支持 UNIFORM_BATCH 而降级)",
+          "max_cudagraph_capture_size": 256,
+          "graph_note": "VLLM_USE_BREAKABLE_CUDAGRAPH=0 (Ascend ACL graph, 默认开启)",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_base_commits": {
+            "vllm": "f18cf803c5f63625e2c71253ddaf8b0bad0bad1a",
+            "vllm-ascend": "74f0c0a272376412b51e1c1864803d5f3a0f1b5f"
+          },
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "torch": "2.13.0+cpu",
+            "torch_npu": "2.13.0.rc1",
+            "transformers_server": "5.14.1",
+            "cann": "Ascend CANN 9.1.0 (逐进程临时环境: /data/jxd/Ascend-9.1.0/{ascend-toolkit,nnal/atb}; 系统自带 /usr/local/Ascend CANN 8.5.0 未改动、未覆盖), ATB CXX ABI=1",
+            "driver": "25.3.rc1"
+          },
+          "mods": [
+            "ascend-mtp-contract-2patch",
+            "ascend-npugraph-ex-attr-shim"
+          ],
+          "mod_activation": "三个本地最小改动 (相对上游 vllm-ascend HEAD 74f0c0a272376412b51e1c1864803d5f3a0f1b5f): (1) vllm_ascend/platform.py NPUPlatform.check_runner_kv_caches_multi_layer() 新增 no-op 声明 (md5 d5d882ed6a6868b778528a30e65daad9); (2) vllm_ascend/worker/model_runner_v1.py:898 改传 self._get_mamba_state_copy_funcs() (dict, 0.28.1 契约) (md5 4d4ec2b2b544e4054f133dab7e0d3f0b); (3) vllm_ascend/compilation/compiler_interface.py npugraph_ex 的 _gen_compiled_gm() 在本 torch_npu 构建上会读 CompilerConfig.experimental_config, 该属性不存在 -> AttributeError 杀死 worker; 补一个最小 stand-in (md5 c5069206b4af71f6155f0d5d697f46e9)。(1)(2) 是 0.28.1 运行时契约所需的两处补丁; (3) 的 mtime 为 2026-10-16, 是本次新增的一处。(3) 对本模型为惰性: 其生效条件是编译图中存在 npu.npu_weight_quant_batchmatmul (W8A16) 节点, 而本产物的 quant_model_description 里不含任何 W8A16 条目 (实测 FLOAT/W8A8_DYNAMIC/W4A8_DYNAMIC), 服务端日志中 w8a16/experimental_config 零次出现; 且它只 object.__setattr__ 一个不在 _fixed_attrs 里的属性, 不会被 as_dict() 序列化进交给编译器的 options。MTP2 为真实接受/拒绝, 无 synthetic sampler 覆盖。",
+          "weight_artifacts": {
+            "quant_model_description.json.sha256": "eb9a3ea871cefd0870d8a6a696d9e3444477c37e6999680d24be4e11d3d4453f",
+            "quant_model_weights.safetensors.index.json.sha256": "f76730c2ac6919e569d176aba42c9df35404ab33dd3a5dcff3becedbabb825a5"
+          },
+          "weight_revision_note": "本地固定量化产物 (23.38 GiB, quant_model_description.json + quant_model_weights-00001..00006-of-00006.safetensors, 含 mtp.layers.0.*)",
+          "base_checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "server_command": "ASCEND_RT_VISIBLE_DEVICES=7 TP=1 PORT=8200 MAX_MODEL_LEN=262144 GPU_MEM_UTIL=0.95 LABEL=ab-w4a8max EXTRA_SERVER_ARGS='--max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}' ./run_swe_server_ab.sh\n# /proc/460989/cmdline 实测: /data/jxd/envs/vllm-hust-v1-cann91/bin/python /data/jxd/envs/vllm-hust-v1-cann91/bin/vllm serve /data/gcy/Qwen3.5-35B-A3B-W4A8 --served-model-name qwen35-a3b-w4a8 --tensor-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.95 --trust-remote-code --host 127.0.0.1 --port 8200 --quantization ascend --max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}",
+          "execution_host": "local",
+          "physical_devices": [
+            7
+          ],
+          "transport": "客户端与服务端同机回环 (http://127.0.0.1:8200)",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 4,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "observed_max_prompt_tokens": 67073,
+          "measured_mean_client_inflight": 3.9985071489372705,
+          "full_client_concurrency_fraction": 0.9985106422895721,
+          "comparison_scope": "W4A8 cohort 内 real-MTP2 并发曲线单点 (C4)。本 cohort 的 KV 预算由本产物显式设定 (32.55 GiB); 本页只报本 cohort 自身的观测, 不跨 cohort 画线, 不作跨精度或跨 KV 的加速声明。",
+          "max_num_seqs": 16,
+          "kv_cache_memory_bytes": 34953463839,
+          "max_num_batched_tokens": 4096,
+          "caliber_note": "单卡 TP1 服务口径: gpu_memory_utilization=0.95 / kv_cache_memory_bytes=34953463839 (32.55 GiB) / max_num_batched_tokens=4096 / max_num_seqs=16。实测 GPU KV cache 1391235 token, 262144 上下文下最大并发 5.31x。该预算按本产物的显存占用显式设定: 权重 23.38 GiB + KV 32.55 GiB ≈ 55.9 GiB, 落在 64 GB 单卡的 0.95 预算内。",
+          "mtp_mean_acceptance_length": 2.897692,
+          "mtp_acceptance_samples": 91
+        }
+      },
+      "load": {
+        "concurrency": 4,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-w4a8-tp1-20261016-mtp2",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "decode_p90_tps": 65.62017914330418,
+        "output_tps": 202.13888888888889,
+        "ttft_p95_ms": 1566.2342412397265,
+        "completed_requests": 286
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-W4A8-TP1-SWE-PREFIX.md",
+        "run_ids": [
+          "11411e908eaa46619ab6e3ddedb3764e"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation at client C4 (real MTP2) on one Ascend 910B3; count actual output tokens received inside the window, drain only already in-flight requests; no post-window token credit",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "qwen35-w4a8-tp1-swe-curves-20261016"
+        },
+        "sampling_date_utc": "2026-10-16",
+        "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-w4a8-ascend-tp1-mtp2-c8-20261016",
+      "cohort_id": "qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1",
+      "label": "W4A8 · TP1 / C8 · SWE 900 s · real MTP2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143+gf18cf803c / 0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+        "mods": [
+          "ascend-mtp-contract-2patch",
+          "ascend-npugraph-ex-attr-shim"
+        ],
+        "hardware": {
+          "label": "Ascend 910B3",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "quantization": "ascend",
+          "weight_precision": "int4 (MLP 专家层 gate/up/down_proj, msModelSlim ascendv1 离线量化, 6 个 quant_model_weights 分片); 其余量化层 int8",
+          "activation_precision": "int8 (动态 per-token)",
+          "kv_cache_dtype": "auto (bf16; KV 未量化)",
+          "max_model_len": 262144,
+          "prefix_caching": true,
+          "enable_chunked_prefill": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "cudagraph_mode": "FULL_DECODE_ONLY (请求 FULL, 平台因 AscendGDNAttentionBackend 仅支持 UNIFORM_BATCH 而降级)",
+          "max_cudagraph_capture_size": 256,
+          "graph_note": "VLLM_USE_BREAKABLE_CUDAGRAPH=0 (Ascend ACL graph, 默认开启)",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_base_commits": {
+            "vllm": "f18cf803c5f63625e2c71253ddaf8b0bad0bad1a",
+            "vllm-ascend": "74f0c0a272376412b51e1c1864803d5f3a0f1b5f"
+          },
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "torch": "2.13.0+cpu",
+            "torch_npu": "2.13.0.rc1",
+            "transformers_server": "5.14.1",
+            "cann": "Ascend CANN 9.1.0 (逐进程临时环境: /data/jxd/Ascend-9.1.0/{ascend-toolkit,nnal/atb}; 系统自带 /usr/local/Ascend CANN 8.5.0 未改动、未覆盖), ATB CXX ABI=1",
+            "driver": "25.3.rc1"
+          },
+          "mods": [
+            "ascend-mtp-contract-2patch",
+            "ascend-npugraph-ex-attr-shim"
+          ],
+          "mod_activation": "三个本地最小改动 (相对上游 vllm-ascend HEAD 74f0c0a272376412b51e1c1864803d5f3a0f1b5f): (1) vllm_ascend/platform.py NPUPlatform.check_runner_kv_caches_multi_layer() 新增 no-op 声明 (md5 d5d882ed6a6868b778528a30e65daad9); (2) vllm_ascend/worker/model_runner_v1.py:898 改传 self._get_mamba_state_copy_funcs() (dict, 0.28.1 契约) (md5 4d4ec2b2b544e4054f133dab7e0d3f0b); (3) vllm_ascend/compilation/compiler_interface.py npugraph_ex 的 _gen_compiled_gm() 在本 torch_npu 构建上会读 CompilerConfig.experimental_config, 该属性不存在 -> AttributeError 杀死 worker; 补一个最小 stand-in (md5 c5069206b4af71f6155f0d5d697f46e9)。(1)(2) 是 0.28.1 运行时契约所需的两处补丁; (3) 的 mtime 为 2026-10-16, 是本次新增的一处。(3) 对本模型为惰性: 其生效条件是编译图中存在 npu.npu_weight_quant_batchmatmul (W8A16) 节点, 而本产物的 quant_model_description 里不含任何 W8A16 条目 (实测 FLOAT/W8A8_DYNAMIC/W4A8_DYNAMIC), 服务端日志中 w8a16/experimental_config 零次出现; 且它只 object.__setattr__ 一个不在 _fixed_attrs 里的属性, 不会被 as_dict() 序列化进交给编译器的 options。MTP2 为真实接受/拒绝, 无 synthetic sampler 覆盖。",
+          "weight_artifacts": {
+            "quant_model_description.json.sha256": "eb9a3ea871cefd0870d8a6a696d9e3444477c37e6999680d24be4e11d3d4453f",
+            "quant_model_weights.safetensors.index.json.sha256": "f76730c2ac6919e569d176aba42c9df35404ab33dd3a5dcff3becedbabb825a5"
+          },
+          "weight_revision_note": "本地固定量化产物 (23.38 GiB, quant_model_description.json + quant_model_weights-00001..00006-of-00006.safetensors, 含 mtp.layers.0.*)",
+          "base_checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "server_command": "ASCEND_RT_VISIBLE_DEVICES=7 TP=1 PORT=8200 MAX_MODEL_LEN=262144 GPU_MEM_UTIL=0.95 LABEL=ab-w4a8max EXTRA_SERVER_ARGS='--max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}' ./run_swe_server_ab.sh\n# /proc/460989/cmdline 实测: /data/jxd/envs/vllm-hust-v1-cann91/bin/python /data/jxd/envs/vllm-hust-v1-cann91/bin/vllm serve /data/gcy/Qwen3.5-35B-A3B-W4A8 --served-model-name qwen35-a3b-w4a8 --tensor-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.95 --trust-remote-code --host 127.0.0.1 --port 8200 --quantization ascend --max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}",
+          "execution_host": "local",
+          "physical_devices": [
+            7
+          ],
+          "transport": "客户端与服务端同机回环 (http://127.0.0.1:8200)",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 8,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "observed_max_prompt_tokens": 80104,
+          "measured_mean_client_inflight": 7.9975566152321536,
+          "full_client_concurrency_fraction": 0.9975763959587655,
+          "comparison_scope": "W4A8 cohort 内 real-MTP2 并发曲线单点 (C8)。本 cohort 的 KV 预算由本产物显式设定 (32.55 GiB); 本页只报本 cohort 自身的观测, 不跨 cohort 画线, 不作跨精度或跨 KV 的加速声明。",
+          "max_num_seqs": 16,
+          "kv_cache_memory_bytes": 34953463839,
+          "max_num_batched_tokens": 4096,
+          "caliber_note": "单卡 TP1 服务口径: gpu_memory_utilization=0.95 / kv_cache_memory_bytes=34953463839 (32.55 GiB) / max_num_batched_tokens=4096 / max_num_seqs=16。实测 GPU KV cache 1391235 token, 262144 上下文下最大并发 5.31x。该预算按本产物的显存占用显式设定: 权重 23.38 GiB + KV 32.55 GiB ≈ 55.9 GiB, 落在 64 GB 单卡的 0.95 预算内。",
+          "mtp_mean_acceptance_length": 2.909789,
+          "mtp_acceptance_samples": 95
+        }
+      },
+      "load": {
+        "concurrency": 8,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-w4a8-tp1-20261016-mtp2",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "decode_p90_tps": 56.126918664568336,
+        "output_tps": 313.3722222222222,
+        "ttft_p95_ms": 1728.7264994112775,
+        "completed_requests": 457
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-W4A8-TP1-SWE-PREFIX.md",
+        "run_ids": [
+          "718876384df642df8e2d6cf65ca3e766"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation at client C8 (real MTP2) on one Ascend 910B3; count actual output tokens received inside the window, drain only already in-flight requests; no post-window token credit",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "qwen35-w4a8-tp1-swe-curves-20261016"
+        },
+        "sampling_date_utc": "2026-10-16",
+        "sampling_date_source": "SWE client.started_at_unix"
+      }
+    },
+    {
+      "id": "qwen35-sweprefix-w4a8-ascend-tp1-mtp2-c16-20261016",
+      "cohort_id": "qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1",
+      "label": "W4A8 · TP1 / C16 · SWE 900 s · real MTP2",
+      "configuration": {
+        "engine": "vLLM + vLLM-Ascend",
+        "engine_version": "0.28.1.post1.dev143+gf18cf803c / 0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+        "mods": [
+          "ascend-mtp-contract-2patch",
+          "ascend-npugraph-ex-attr-shim"
+        ],
+        "hardware": {
+          "label": "Ascend 910B3",
+          "accelerator_count": 1
+        },
+        "context_capacity_tokens": 262144,
+        "parameters": {
+          "tensor_parallel_size": 1,
+          "pipeline_parallel_size": 1,
+          "data_parallel_size": 1,
+          "expert_parallel": false,
+          "quantization": "ascend",
+          "weight_precision": "int4 (MLP 专家层 gate/up/down_proj, msModelSlim ascendv1 离线量化, 6 个 quant_model_weights 分片); 其余量化层 int8",
+          "activation_precision": "int8 (动态 per-token)",
+          "kv_cache_dtype": "auto (bf16; KV 未量化)",
+          "max_model_len": 262144,
+          "prefix_caching": true,
+          "enable_chunked_prefill": true,
+          "mamba_cache_mode": "align",
+          "gpu_memory_utilization": 0.95,
+          "cudagraph_mode": "FULL_DECODE_ONLY (请求 FULL, 平台因 AscendGDNAttentionBackend 仅支持 UNIFORM_BATCH 而降级)",
+          "max_cudagraph_capture_size": 256,
+          "graph_note": "VLLM_USE_BREAKABLE_CUDAGRAPH=0 (Ascend ACL graph, 默认开启)",
+          "mtp_draft_tokens": 2,
+          "thinking": true,
+          "generation_temperature": 0,
+          "runtime_base_commits": {
+            "vllm": "f18cf803c5f63625e2c71253ddaf8b0bad0bad1a",
+            "vllm-ascend": "74f0c0a272376412b51e1c1864803d5f3a0f1b5f"
+          },
+          "runtime_versions": {
+            "vllm": "0.28.1.post1.dev143+gf18cf803c",
+            "vllm-ascend": "0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27",
+            "torch": "2.13.0+cpu",
+            "torch_npu": "2.13.0.rc1",
+            "transformers_server": "5.14.1",
+            "cann": "Ascend CANN 9.1.0 (逐进程临时环境: /data/jxd/Ascend-9.1.0/{ascend-toolkit,nnal/atb}; 系统自带 /usr/local/Ascend CANN 8.5.0 未改动、未覆盖), ATB CXX ABI=1",
+            "driver": "25.3.rc1"
+          },
+          "mods": [
+            "ascend-mtp-contract-2patch",
+            "ascend-npugraph-ex-attr-shim"
+          ],
+          "mod_activation": "三个本地最小改动 (相对上游 vllm-ascend HEAD 74f0c0a272376412b51e1c1864803d5f3a0f1b5f): (1) vllm_ascend/platform.py NPUPlatform.check_runner_kv_caches_multi_layer() 新增 no-op 声明 (md5 d5d882ed6a6868b778528a30e65daad9); (2) vllm_ascend/worker/model_runner_v1.py:898 改传 self._get_mamba_state_copy_funcs() (dict, 0.28.1 契约) (md5 4d4ec2b2b544e4054f133dab7e0d3f0b); (3) vllm_ascend/compilation/compiler_interface.py npugraph_ex 的 _gen_compiled_gm() 在本 torch_npu 构建上会读 CompilerConfig.experimental_config, 该属性不存在 -> AttributeError 杀死 worker; 补一个最小 stand-in (md5 c5069206b4af71f6155f0d5d697f46e9)。(1)(2) 是 0.28.1 运行时契约所需的两处补丁; (3) 的 mtime 为 2026-10-16, 是本次新增的一处。(3) 对本模型为惰性: 其生效条件是编译图中存在 npu.npu_weight_quant_batchmatmul (W8A16) 节点, 而本产物的 quant_model_description 里不含任何 W8A16 条目 (实测 FLOAT/W8A8_DYNAMIC/W4A8_DYNAMIC), 服务端日志中 w8a16/experimental_config 零次出现; 且它只 object.__setattr__ 一个不在 _fixed_attrs 里的属性, 不会被 as_dict() 序列化进交给编译器的 options。MTP2 为真实接受/拒绝, 无 synthetic sampler 覆盖。",
+          "weight_artifacts": {
+            "quant_model_description.json.sha256": "eb9a3ea871cefd0870d8a6a696d9e3444477c37e6999680d24be4e11d3d4453f",
+            "quant_model_weights.safetensors.index.json.sha256": "f76730c2ac6919e569d176aba42c9df35404ab33dd3a5dcff3becedbabb825a5"
+          },
+          "weight_revision_note": "本地固定量化产物 (23.38 GiB, quant_model_description.json + quant_model_weights-00001..00006-of-00006.safetensors, 含 mtp.layers.0.*)",
+          "base_checkpoint_revision": "712cf74392b05026a6db2bf213d343747d1f6d45",
+          "benchmark_repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "benchmark_revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "server_command": "ASCEND_RT_VISIBLE_DEVICES=7 TP=1 PORT=8200 MAX_MODEL_LEN=262144 GPU_MEM_UTIL=0.95 LABEL=ab-w4a8max EXTRA_SERVER_ARGS='--max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}' ./run_swe_server_ab.sh\n# /proc/460989/cmdline 实测: /data/jxd/envs/vllm-hust-v1-cann91/bin/python /data/jxd/envs/vllm-hust-v1-cann91/bin/vllm serve /data/gcy/Qwen3.5-35B-A3B-W4A8 --served-model-name qwen35-a3b-w4a8 --tensor-parallel-size 1 --max-model-len 262144 --gpu-memory-utilization 0.95 --trust-remote-code --host 127.0.0.1 --port 8200 --quantization ascend --max-num-seqs 16 --kv-cache-memory-bytes 34953463839 --max-num-batched-tokens 4096 --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":2} --compilation-config {\"max_cudagraph_capture_size\":256,\"cudagraph_mode\":\"FULL\"}",
+          "execution_host": "local",
+          "physical_devices": [
+            7
+          ],
+          "transport": "客户端与服务端同机回环 (http://127.0.0.1:8200)",
+          "warmup_policy": "Separate protocol qualification; fresh salt/cold measured sessions; no measured-session primer",
+          "prefix_cache_scope": "Within session only; unique cache_salt/X-Correlation-ID per play",
+          "qualification": {
+            "concurrency": 16,
+            "measurement_seconds": 60,
+            "fresh_measured_session_salts": true,
+            "capacity_gate": false
+          },
+          "observed_max_prompt_tokens": 59957,
+          "measured_mean_client_inflight": 15.997550663386807,
+          "full_client_concurrency_fraction": 0.9976459510542918,
+          "comparison_scope": "W4A8 cohort 内 real-MTP2 并发曲线单点 (C16)。本 cohort 的 KV 预算由本产物显式设定 (32.55 GiB); 本页只报本 cohort 自身的观测, 不跨 cohort 画线, 不作跨精度或跨 KV 的加速声明。",
+          "max_num_seqs": 16,
+          "kv_cache_memory_bytes": 34953463839,
+          "max_num_batched_tokens": 4096,
+          "caliber_note": "单卡 TP1 服务口径: gpu_memory_utilization=0.95 / kv_cache_memory_bytes=34953463839 (32.55 GiB) / max_num_batched_tokens=4096 / max_num_seqs=16。实测 GPU KV cache 1391235 token, 262144 上下文下最大并发 5.31x。该预算按本产物的显存占用显式设定: 权重 23.38 GiB + KV 32.55 GiB ≈ 55.9 GiB, 落在 64 GB 单卡的 0.95 预算内。",
+          "mtp_mean_acceptance_length": 2.897374,
+          "mtp_acceptance_samples": 99
+        }
+      },
+      "load": {
+        "concurrency": 16,
+        "unit": "continuously replenished in-flight HTTP request lanes",
+        "concurrency_series": "swe-w4a8-tp1-20261016-mtp2",
+        "session_rotation_depth": 1
+      },
+      "metrics": {
+        "decode_p90_tps": 34.89461362874608,
+        "output_tps": 394.3377777777778,
+        "ttft_p95_ms": 2624.421415233518,
+        "completed_requests": 603
+      },
+      "evidence": {
+        "status": "measured",
+        "profile": "smoke",
+        "measurement_seconds": 900,
+        "tuning_complete": false,
+        "url": "https://github.com/vLLM-HUST/vllm-hust-website/blob/main/docs/FRONTIER-QWEN35-W4A8-TP1-SWE-PREFIX.md",
+        "run_ids": [
+          "62cad876975a4984bfe488b6d70560db"
+        ],
+        "aggregation": "One unpooled 900s closed-loop SWE observation at client C16 (real MTP2) on one Ascend 910B3; count actual output tokens received inside the window, drain only already in-flight requests; no post-window token credit",
+        "benchmark_protocol": {
+          "protocol_id": "swe-prefix-reuse/v1",
+          "repository": "https://github.com/vLLM-HUST/swe-prefix-reuse",
+          "revision": "6861242dbd9f17b707003191e4200b7752911d7c",
+          "prepared_workload_sha256": "ac1fbf9885076c369fd25c5525d1163ff8b7945972cdf4c0c6d2d523ab7c1172",
+          "tokenizer_fingerprint": "3f9ca78537850303ee04bfa6640c020be89723c62f37121c0f27a4c0babc53e0",
+          "campaign": "qwen35-w4a8-tp1-swe-curves-20261016"
         },
         "sampling_date_utc": "2026-10-16",
         "sampling_date_source": "SWE client.started_at_unix"

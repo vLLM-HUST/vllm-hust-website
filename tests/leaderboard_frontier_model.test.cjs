@@ -529,6 +529,37 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(run.validation.campaign_finished_ok,true);
             assert.ok(Object.keys(run.runtime_evidence.prefix_cache_counters).length);
             assert.equal(run.client.chips,2);
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-w4a8-tp1-swe-curves-20261016'){
+            // W4A8 TP1 SWE 前缀复用曲线。本臂的要点有三处: 专家层权重位宽
+            // (int4)、据此显式设定的 KV 预算、以及本次测量固定使用的卡 7。
+            const params=p.configuration.parameters;
+            assert.deepEqual(p.configuration.mods,['ascend-mtp-contract-2patch','ascend-npugraph-ex-attr-shim']);
+            assert.deepEqual(params.mods,['ascend-mtp-contract-2patch','ascend-npugraph-ex-attr-shim']);
+            assert.equal(params.quantization,'ascend');
+            assert.ok(String(params.weight_precision).startsWith('int4'));
+            assert.equal(params.mtp_draft_tokens,2);
+            assert.equal(params.max_num_seqs,16);
+            assert.equal(params.gpu_memory_utilization,0.95);
+            assert.equal(params.kv_cache_memory_bytes,34953463839);
+            assert.equal(params.max_num_batched_tokens,4096);
+            assert.equal(params.pipeline_parallel_size,1);
+            assert.equal(params.tensor_parallel_size,1);
+            assert.equal(p.configuration.hardware.accelerator_count,1);
+            assert.deepEqual(params.physical_devices,[7]);
+            assert.equal(p.load.session_rotation_depth,1);
+            assert.equal(run.client.session_rotation_depth,undefined);
+            assert.equal(p.load.concurrency_series,'swe-w4a8-tp1-20261016-mtp2');
+            assert.equal(params.qualification.concurrency,p.load.concurrency);
+            assert.equal(params.qualification.measurement_seconds,60);
+            assert.equal(run.qualification_run.concurrency,p.load.concurrency);
+            assert.equal(run.qualification_run.duration,60);
+            assert.equal(run.qualification_run.summary.failed_requests,0);
+            assert.equal(run.validation.protocol_qualification_run_id,run.qualification_run.run_id);
+            assert.equal(run.validation.protocol_qualification_passed,true);
+            assert.equal(run.validation.measured_seconds_matches_plan,true);
+            assert.equal(run.validation.prefix_cache_observed,true);
+            assert.equal(run.validation.campaign_finished_ok,true);
+            assert.ok(Object.keys(run.runtime_evidence.prefix_cache_counters).length);
         } else if(p.evidence.benchmark_protocol.campaign==='qwen35-v018-native-text-only-20261001'){
             assert.deepEqual(p.configuration.mods,[]);
             assert.equal(p.configuration.official_baseline_id,data.official_baseline.id);
@@ -1134,7 +1165,7 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const allQwen35=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.equal(allQwen35.length,7);
+    assert.equal(allQwen35.length,8);
     const cohorts=allQwen35.filter(c=>c.precision.id==='bf16-weights-compute-kv');
     assert.equal(cohorts.length,4);
     assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='configuration-study').length,3);
@@ -1161,6 +1192,11 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     assert.equal(w8a8gdn[0].workload.contract.prepared_workload_sha256,w8a8[0].workload.contract.prepared_workload_sha256);
     assert.equal(w8a8gdn[0].context_tokens,w8a8[0].context_tokens);
     assert.notEqual(w8a8gdn[0].precision.id,w8a8[0].precision.id);
+    const w4a8=allQwen35.filter(c=>c.precision.id==='w4a8-expert-int4-weights-compute-bf16-kv');
+    assert.equal(w4a8.length,1);
+    assert.equal(w4a8[0].id,'qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1');
+    assert.doesNotMatch(w4a8[0].id,/smoke|historical/i);
+    assert.doesNotMatch(w4a8[0].workload.label,/smoke|historical/i);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
