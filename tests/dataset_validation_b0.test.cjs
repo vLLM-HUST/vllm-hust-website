@@ -77,10 +77,10 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /id="validation-model-select"/);
     assert.match(page, /Measured scenarios remain available as supplementary material/);
     assert.equal(index.program_url, './data/dataset_program_v1.json');
-    assert.equal(index.scenarios.length, 7);
+    assert.equal(index.scenarios.length, 8);
     assert.equal(index.default_scenario_id, 'qwen35-35b-a3b-bf16-tp2-pp1-dp1-ep-off-ctx262k-apc-on-mtp2-full-piecewise-sweprefix-900s');
     const visible = index.scenarios.filter((scenario) => scenario.selector_visible !== false);
-    assert.equal(visible.length, 6);
+    assert.equal(visible.length, 7);
     assert.deepEqual(visible.slice(0, 4).map((scenario) => scenario.data_url), [
         './data/dataset_validation_qwen35_frontier_unified_900s.json',
         './data/dataset_validation_qwen35_frontier_betterscale_900s.json',
@@ -88,10 +88,12 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
         './data/dataset_validation_qwen35_bidkv.json',
     ]);
     assert.ok(visible.slice(0, 4).every((scenario) => scenario.label.startsWith('Paired B0/B1')));
-    assert.ok(visible[4].label.startsWith('B0 only'));
-    assert.ok(visible[5].label.startsWith('Partial B0/B1'));
-    assert.equal(index.scenarios[6].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
-    assert.equal(index.scenarios[6].selector_visible, false);
+    assert.ok(visible[4].label.startsWith('Paired B0/B1'));
+    assert.match(visible[4].label, /MMLU-Pro/);
+    assert.ok(visible[5].label.startsWith('B0 only'));
+    assert.ok(visible[6].label.startsWith('Partial B0/B1'));
+    assert.equal(index.scenarios[7].data_url, './data/dataset_validation_qwen35_tp2_matrix.json');
+    assert.equal(index.scenarios[7].selector_visible, false);
 });
 
 test('remaining declared Frontier pairs keep their own Native and regressions', () => {

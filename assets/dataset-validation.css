@@ -632,12 +632,15 @@ body[data-page="dataset-validation"] main.site-shell {
 
 .validation-candidate > div:first-child {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
 }
 
 .validation-candidate > div:first-child span {
+    flex-shrink: 0;
+    white-space: nowrap;
     color: #166534;
     font-size: 0.68rem;
     font-weight: 900;
