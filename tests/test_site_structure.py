@@ -972,7 +972,7 @@ def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
     page_cache_keys = {
         "leaderboard.html": "version-scoped-baseline-20261010",
         "leaderboard-runs.html": "preserved-evidence-20261010",
-        "dataset-validation.html": "data-freshness-20261009",
+        "dataset-validation.html": "mmlu-candidates-20261019",
         "members.html": "data-freshness-20261009",
         "news.html": "data-freshness-20261009",
         "plugins.html": "taxonomy-v2-20261012",

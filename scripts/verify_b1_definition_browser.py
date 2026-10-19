@@ -14,6 +14,9 @@ def main():
     parser.add_argument("--url")
     parser.add_argument("--browser", help="Optional installed Chromium executable")
     parser.add_argument(
+        "--scenario", help="Also verify a measured scenario and its candidate details"
+    )
+    parser.add_argument(
         "--output", type=Path, default=Path("/tmp/b1-definition-browser")
     )
     args = parser.parse_args()
@@ -45,7 +48,8 @@ def main():
                         page = context.new_page()
                         errors = []
                         page.on("pageerror", lambda error: errors.append(str(error)))
-                        page.goto(args.url + "/dataset-validation.html")
+                        suffix = f"?model={args.scenario}" if args.scenario else ""
+                        page.goto(args.url + "/dataset-validation.html" + suffix)
                         legend = page.locator("#validation-legend-b1")
                         expect(legend).to_have_text(
                             "当前已实测最优的vLLM-HUST优化方案"
@@ -57,6 +61,28 @@ def main():
                             "e => e.getBoundingClientRect().right <= innerWidth"
                         )
                         assert not errors, errors
+                        if args.scenario:
+                            expect(
+                                page.locator("#validation-model-select")
+                            ).to_have_value(args.scenario)
+                            cell = page.locator(
+                                '[data-cell="mmlu-pro:output_token_throughput"]'
+                            )
+                            expect(cell).to_be_visible()
+                            cell.click()
+                            expect(
+                                page.locator(".validation-candidate--selected")
+                            ).to_have_count(1)
+                            expect(
+                                page.locator("#validation-detail-meta")
+                            ).to_contain_text(
+                                "未重评任务正确率"
+                                if lang == "zh"
+                                else "Task accuracy was not rescored"
+                            )
+                            page.locator(
+                                "#validation-detail"
+                            ).scroll_into_view_if_needed()
                         page.screenshot(
                             path=str(args.output / f"b1-{width}-{lang}-{theme}.png")
                         )
