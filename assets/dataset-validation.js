@@ -386,7 +386,7 @@
     function renderDatasetControls() {
         const groupSelect = $('validation-group-filter');
         $('validation-legend-b0').textContent = lang() === 'zh' ? '基线' : 'Baseline';
-        $('validation-legend-b1').textContent = lang() === 'zh' ? '优化后' : 'Optimized';
+        $('validation-legend-b1').textContent = lang() === 'zh' ? '当前已实测最优的vLLM-HUST优化方案' : 'Currently best measured vLLM-HUST optimization solution';
         $('validation-legend-improved').textContent = lang() === 'zh' ? '性能提升' : 'Improved';
         $('validation-legend-regressed').textContent = lang() === 'zh' ? '性能回退' : 'Regressed';
         $('validation-group-label').textContent = lang() === 'zh' ? '分组' : 'Group';

@@ -27,6 +27,7 @@ jobs:
       - name: Run JS data and Frontier tests
         run: >-
           node --test tests/loader_publication_identity.test.cjs tests/snapshot_status.test.cjs
+          tests/b1_definition.test.cjs
           tests/mmlu_pro_handoff.test.cjs tests/frontierscience_handoff.test.cjs tests/hle_verified_handoff.test.cjs
           tests/serving_plan.test.mjs tests/leaderboard_frontier_model.test.cjs tests/leaderboard_910c_native.test.cjs tests/leaderboard_tiering_evidence.test.cjs tests/leaderboard_mooncake_evidence.test.cjs tests/plugin_performance.test.cjs
       - name: Validate engine_version vs. git_commit consistency
@@ -58,6 +59,7 @@ jobs:
           website_server_pid=$!
           trap 'kill "$website_server_pid"' EXIT
           python scripts/verify_dataset_matrix_browser.py --url http://127.0.0.1:8769
+          python scripts/verify_b1_definition_browser.py --url http://127.0.0.1:8769 --output output/playwright/b1-definition
           python scripts/verify_capability_coverage_browser.py --url http://127.0.0.1:8769
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_betterscale_browser.py --url http://127.0.0.1:8769
@@ -69,6 +71,7 @@ jobs:
           name: website-browser-evidence
           path: |
             output/playwright/dataset-matrix/
+            output/playwright/b1-definition/
             output/playwright/site-repair/
             output/playwright/betterscale/
             output/playwright/traceloom/
