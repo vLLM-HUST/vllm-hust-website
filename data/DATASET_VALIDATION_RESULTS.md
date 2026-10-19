@@ -12,6 +12,13 @@ its cells are never appended to the Qwen2.5 artifact.
 
 ## Contract
 
+B1 means **currently best measured vLLM-HUST optimization solution** （当前已实测最优的vLLM-HUST优化方案）.
+Eligible candidates may use any compatible MOD or combination. Engine optimization settings are
+candidate variables; model, precision, hardware resource budget, input, offered workload and quality
+constraints remain matched. Each cell keeps its selected configuration and evidence; optima from
+different configurations are not one jointly measured deployment. Unconfirmed candidates remain
+candidates, not selected B1 values.
+
 The first frontend contract is `dataset-validation-v1`. A result document contains:
 
 - `source`: producer service, source repository, commit, run id, and an optional immutable artifact
