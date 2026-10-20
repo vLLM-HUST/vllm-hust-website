@@ -16,7 +16,8 @@ def test_primary_navigation_separates_publications_from_performance_data() -> No
     assert "label: 'navPerformance'" in SITE_JS
     assert (
         "pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', "
-        "'dataset-matrix-v1', 'capability-coverage', 'serving-plan']" in SITE_JS
+        "'dataset-matrix-v1', 'dataset-introductions', 'capability-coverage', 'serving-plan']"
+        in SITE_JS
     )
     assert (
         "['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves']"
@@ -26,6 +27,10 @@ def test_primary_navigation_separates_publications_from_performance_data() -> No
     assert (
         "['dataset-validation', './dataset-validation.html', "
         "'navDatasetValidation']" in SITE_JS
+    )
+    assert (
+        "['dataset-introductions', './dataset-introductions.html', 'navDatasetIntroductions']"
+        in SITE_JS
     )
     assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
     assert "pages: ['resources', 'versions', 'issues']" in SITE_JS
