@@ -1,88 +1,11 @@
 <!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="hf-repo" content="intellistream/vllm-hust-benchmark-results" />
-  <meta name="hf-branch" content="main" />
-  <title>Datasets - vLLM-HUST</title>
-  <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-introductions.html" />
-  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
-  <link rel="preconnect" href="https://hf-mirror.com" crossorigin />
-  <link rel="preconnect" href="https://huggingface.co" crossorigin />
-  <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png" />
-  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
-  <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
-  <link rel="stylesheet" href="./assets/leaderboard-runs.css?v=nav-wrap-20260924-2" />
-  <link rel="stylesheet" href="./assets/dataset-matrix-v1.css?v=20261016-campaign-5" />
-  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
-  <link rel="stylesheet" href="./assets/dataset-introductions.css?v=20261020-1" />
+  <meta http-equiv="refresh" content="0;url=./dataset-matrix-v1.html" />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-matrix-v1.html" />
+  <title>Dataset matrix v1 - vLLM-HUST</title>
 </head>
-
-<body data-page="dataset-introductions">
-  <nav class="site-nav">
-    <div class="site-shell site-nav-inner">
-      <a class="brand-link" href="./index.html">
-        <span class="brand-mark">V</span>
-        <span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span>
-      </a>
-      <div class="nav-links">
-        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
-        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Ecosystem</a>
-        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
-        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
-        <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
-        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
-        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
-        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
-        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
-      </div>
-    </div>
-  </nav>
-  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
-
-  <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
-
-  <main class="site-shell runs-shell matrix-shell dataset-guide">
-    <nav class="benchmark-tabs" aria-label="Benchmark views">
-      <a href="./dataset-matrix-v1.html"><span data-dataset-lang="zh">数据集矩阵 v1</span><span data-dataset-lang="en">Dataset matrix v1</span></a>
-      <a class="active" aria-current="page" href="./dataset-introductions.html"><span data-dataset-lang="zh">数据集介绍</span><span data-dataset-lang="en">Dataset introductions</span></a>
-      <a href="./capability-coverage.html"><span data-dataset-lang="zh">能力与场景覆盖表</span><span data-dataset-lang="en">Capability coverage</span></a>
-    </nav>
-    <header class="matrix-heading">
-      <h1><span data-dataset-lang="zh">数据集介绍</span><span data-dataset-lang="en">Dataset introductions</span></h1>
-      <p><span data-dataset-lang="zh">了解任务、评测方式，以及如何在自己的模型服务上复用。</span><span data-dataset-lang="en">Understand each workload, its evaluation, and how to try it with your model service.</span></p>
-    </header>
-    <article id="swe-bench-pro" class="dataset-description" aria-labelledby="swe-bench-pro-title">
-      <h2 id="swe-bench-pro-title">SWE-bench Pro</h2>
-      <p class="runs-note">Software engineering · <span data-dataset-lang="zh">真实 Agent · 当前复用范围：V1 / ARM64</span><span data-dataset-lang="en">Real Agent · Current reusable scope: V1 / ARM64</span></p>
-      <h3><span data-dataset-lang="zh">它测什么？</span><span data-dataset-lang="en">What does it evaluate?</span></h3>
-      <p><span data-dataset-lang="zh">面向真实软件仓库的代码修复任务。Agent 根据问题描述，在指定代码起点上读取文件、修改代码、运行测试并提交补丁；独立评分器通过测试结果判断修复是否成功。</span><span data-dataset-lang="en">Code-repair tasks in real software repositories. An Agent reads and changes code, runs tests, and submits a patch from a specified starting commit. A separate evaluator uses tests to determine whether the repair succeeds.</span></p>
-      <h3><span data-dataset-lang="zh">一次运行如何进行？</span><span data-dataset-lang="en">How does a run work?</span></h3>
-      <ol>
-        <li><span data-dataset-lang="zh">锁定 V1 数据、官方 Agent 源码、任务代码起点和 ARM 容器镜像。</span><span data-dataset-lang="en">Pin V1 inputs, official Agent sources, starting commits, and ARM container images.</span></li>
-        <li><span data-dataset-lang="zh">从 benchmark 入口启动一个独立 Agent，通过已有模型 API 生成动作，在独立容器中执行工具。</span><span data-dataset-lang="en">Launch an independent Agent from the benchmark entry. It calls an existing model API and executes tools in an isolated container.</span></li>
-        <li><span data-dataset-lang="zh">保留逐步轨迹、工具输出、补丁和退出原因；在模型计时之外独立评分。</span><span data-dataset-lang="en">Retain the step trace, tool outputs, patch, and exit reason; evaluate the patch separately from model timing.</span></li>
-      </ol>
-      <h3><span data-dataset-lang="zh">当前能复用到什么程度？</span><span data-dataset-lang="en">What is currently reusable?</span></h3>
-      <p><span data-dataset-lang="zh">通用环境、运行入口和用户文档位于 vllm-hust-benchmark。无需安装 Controller；只需已有兼容模型 API 和 ARM Docker 环境。当前锁定清单覆盖 8 道 NodeBB V1 任务，示例从其中 1 道、1 个 Agent 开始。它不是全量 V1/V2 的质量验收。</span><span data-dataset-lang="en">The environment, runner, and user guide live in vllm-hust-benchmark. Controller is optional; an existing compatible model API and ARM Docker environment are sufficient. The current lock covers eight NodeBB V1 tasks, and the example starts with one task and one Agent. This is not full V1/V2 quality acceptance.</span></p>
-      <p class="runs-note"><span data-dataset-lang="zh">独立入口已通过真实 Agent 执行验证，但环境验收不等于修题成功。Submitted 只表示提交了补丁；只有独立评分输出完整，才能报告修复成绩。上下文超限、预算耗尽和未评分均须保留，不填成零分。</span><span data-dataset-lang="en">The independent entry has been exercised by a real Agent. Environment acceptance does not prove a successful repair. Submitted means a patch was produced; a repair score requires complete independent evaluation. Context limits, exhausted budgets, and ungraded results remain explicit rather than becoming zero scores.</span></p>
-      <h3><span data-dataset-lang="zh">它与 SWE-smith 有什么区别？</span><span data-dataset-lang="en">How is this different from SWE-smith?</span></h3>
-      <p><span data-dataset-lang="zh">这里运行的是根据新模型回复持续行动的真实 Agent。矩阵中的 SWE-smith 轨迹回放使用已保存的调用序列；回放吞吐或 program 完成率不能当作 SWE-bench Pro 的修题成功率，也不能相互替代。</span><span data-dataset-lang="en">This workload runs a live Agent whose next action depends on new model responses. The matrix's SWE-smith trajectory replay uses saved call sequences. Replay throughput or program completion rate is not SWE-bench Pro repair success.</span></p>
-      <nav class="dataset-links" aria-label="SWE-bench Pro resources">
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span data-dataset-lang="zh">运行仓库</span><span data-dataset-lang="en">Benchmark repository</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/docs/SWE_BENCH_PRO.zh-CN.md"><span data-dataset-lang="zh">用户指南与单 Agent 命令</span><span data-dataset-lang="en">User guide and single-Agent commands</span></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/reports/swe-bench-pro-environment-migration-20261020"><span data-dataset-lang="zh">环境验收记录</span><span data-dataset-lang="en">Environment acceptance</span></a>
-        <a href="./docs/datasets/SWE_BENCH_PRO.md"><span data-dataset-lang="zh">介绍 Markdown</span><span data-dataset-lang="en">Introduction Markdown</span></a>
-        <a href="https://huggingface.co/datasets/ScaleAI/SWE-bench_Pro"><span data-dataset-lang="zh">官方数据集</span><span data-dataset-lang="en">Official dataset</span></a>
-        <a href="https://github.com/scaleapi/SWE-bench_Pro-os"><span data-dataset-lang="zh">官方评测代码</span><span data-dataset-lang="en">Official evaluator</span></a>
-      </nav>
-    </article>
-  </main>
-  <footer class="site-footer"><strong>vLLM-HUST</strong> · Evidence before rankings.</footer>
-  <script src="./assets/site.js?v=dataset-introductions-20261020"></script>
-</body>
+<body><p><a href="./dataset-matrix-v1.html">Dataset matrix v1 / 数据集矩阵 v1</a></p></body>
 </html>

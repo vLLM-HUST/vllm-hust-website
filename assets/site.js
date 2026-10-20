@@ -7,7 +7,6 @@
             navFixedTarget: 'Fixed-target registry',
             navDatasetValidation: 'Dataset matrix',
             navDatasetMatrixV1: 'Dataset matrix v1',
-            navDatasetIntroductions: 'Dataset introductions',
             navCapabilityCoverage: 'Capability coverage',
             navAchievements: 'Papers & achievements',
             navServingPlan: 'Serving Plan',
@@ -47,7 +46,6 @@
             navFixedTarget: '固定目标注册表',
             navDatasetValidation: '数据集矩阵',
             navDatasetMatrixV1: '数据集矩阵 v1',
-            navDatasetIntroductions: '数据集介绍',
             navCapabilityCoverage: '能力覆盖表',
             navAchievements: '论文与成果',
             navServingPlan: '产能与成本',
@@ -181,13 +179,12 @@
         {
             id: 'performance',
             label: 'navPerformance',
-            pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'dataset-matrix-v1', 'dataset-introductions', 'capability-coverage', 'serving-plan'],
+            pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', 'dataset-matrix-v1', 'capability-coverage', 'serving-plan'],
             links: [
                 ['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves'],
                 ['leaderboard', './leaderboard.html', 'navFixedTarget'],
                 ['dataset-validation', './dataset-validation.html', 'navDatasetValidation'],
                 ['dataset-matrix-v1', './dataset-matrix-v1.html', 'navDatasetMatrixV1'],
-                ['dataset-introductions', './dataset-introductions.html', 'navDatasetIntroductions'],
                 ['capability-coverage', './capability-coverage.html', 'navCapabilityCoverage'],
                 ['serving-plan', './serving-plan.html', 'navServingPlan'],
             ],
@@ -319,7 +316,7 @@
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
-                    <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance curves</a><a href="./leaderboard.html" data-i18n-common="navFixedTarget">Fixed-target registry</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset matrix</a><a href="./dataset-matrix-v1.html" data-i18n-common="navDatasetMatrixV1">Dataset matrix v1</a><a href="./dataset-introductions.html" data-i18n-common="navDatasetIntroductions">Dataset introductions</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Serving Plan</a></div>
+                    <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance curves</a><a href="./leaderboard.html" data-i18n-common="navFixedTarget">Fixed-target registry</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset matrix</a><a href="./dataset-matrix-v1.html" data-i18n-common="navDatasetMatrixV1">Dataset matrix v1</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Serving Plan</a></div>
                     <div><strong data-i18n-common="footerPublications">Papers & news</strong><a href="./achievements.html" data-i18n-common="navAchievements">Papers & achievements</a><a href="./news.html" data-i18n-common="navNews">News</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
                     <div><strong data-i18n-common="navResources">Resources</strong><a href="./resources.html" data-i18n-common="navComputeResources">910B2 compute clusters</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
