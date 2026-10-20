@@ -76,16 +76,43 @@ def main():
                             expect(
                                 page.locator("#validation-detail-meta")
                             ).to_contain_text(
+                                "截断提取命中"
+                                if lang == "zh"
+                                else "Separate out8192 quality regression"
+                            )
+                            expect(
+                                page.locator("#validation-detail-meta")
+                            ).not_to_contain_text(
                                 "未重评任务正确率"
                                 if lang == "zh"
                                 else "Task accuracy was not rescored"
                             )
-                            page.locator(
-                                "#validation-detail"
-                            ).scroll_into_view_if_needed()
+                            page.locator("#validation-detail").evaluate(
+                                "e => e.scrollIntoView({block: 'start', behavior: 'instant'})"
+                            )
+                            assert page.locator("#validation-detail h3").evaluate(
+                                "e => e.getBoundingClientRect().top >= "
+                                "document.querySelector('.site-nav').getBoundingClientRect().bottom"
+                            )
                         page.screenshot(
                             path=str(args.output / f"b1-{width}-{lang}-{theme}.png")
                         )
+                        if args.scenario:
+                            meta = page.locator("#validation-detail-meta > dd").filter(
+                                has_text="out8192"
+                            )
+                            meta.evaluate(
+                                "e => e.scrollIntoView({block: 'start', behavior: 'instant'})"
+                            )
+                            page.evaluate("scrollBy(0, -88)")
+                            assert meta.evaluate(
+                                "e => e.getBoundingClientRect().right <= innerWidth"
+                            )
+                            page.screenshot(
+                                path=str(
+                                    args.output / f"quality-{width}-{lang}-{theme}.png"
+                                )
+                            )
                         context.close()
             browser.close()
     finally:
