@@ -25,6 +25,9 @@ test('MMLU local-argmax screen is visible without replacing a better B1', () => 
         const values = cell.candidate_values.map(row => row.value);
         const select = cell.comparison.direction === 'higher_is_better' ? Math.max : Math.min;
         assert.equal(cell.value, select(...values));
-        assert.ok(cell.note.includes('Task accuracy was not rescored'));
+        assert.ok(cell.note.includes('Separate out8192 quality regression'));
+        assert.ok(!cell.note.includes('Task accuracy was not rescored'));
+        assert.equal(data.scenario.accuracy_evaluated, false);
+        assert.ok(cell.note_zh.includes('截断提取命中'));
     }
 });

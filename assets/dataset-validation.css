@@ -566,6 +566,7 @@ body[data-page="dataset-validation"] main.site-shell {
 }
 
 .validation-detail {
+    scroll-margin-top: 88px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
     gap: 18px;
