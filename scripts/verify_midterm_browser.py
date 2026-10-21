@@ -250,6 +250,15 @@ def main():
                             path=output
                             / f"{filename}-{width}-{lang}-{scheme}-runtime.png"
                         )
+                        trace_qualification.scroll_into_view_if_needed()
+                        expect(trace_qualification).to_be_visible()
+                        assert trace_qualification.evaluate(
+                            "e => e.getBoundingClientRect().right <= innerWidth + 1"
+                        )
+                        page.screenshot(
+                            path=output
+                            / f"{filename}-{width}-{lang}-{scheme}-trace.png"
+                        )
                     print(filename, width, lang, "PASS", flush=True)
                     page.close()
         for filename in ("betterscale.html", "traceloom.html", "serving-plan.html"):
