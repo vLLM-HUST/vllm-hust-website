@@ -78,7 +78,13 @@ test('Dataset Validation loads the model index rather than a fixed artifact', ()
     assert.match(page, /Measured scenarios remain available as supplementary material/);
     assert.equal(index.program_url, './data/dataset_program_v1.json');
     assert.equal(index.scenarios.length, 8);
-    assert.equal(index.default_scenario_id, 'qwen35-35b-a3b-bf16-tp2-pp1-dp1-ep-off-ctx262k-apc-on-mtp2-full-piecewise-sweprefix-900s');
+    const defaults = index.scenarios.filter((scenario) => scenario.id === index.default_scenario_id);
+    assert.equal(defaults.length, 1, 'The publication must identify exactly one default scenario');
+    assert.notEqual(defaults[0].selector_visible, false, 'The default scenario must be visible');
+    assert.match(defaults[0].data_url, /^\.\/data\/dataset_validation_[a-z0-9_]+\.json$/);
+    const defaultData = JSON.parse(fs.readFileSync(path.join(ROOT, defaults[0].data_url), 'utf8'));
+    assert.equal(defaultData.contract_version, 'dataset-validation-v1');
+    assert.equal(defaultData.scenario.id, index.default_scenario_id);
     const visible = index.scenarios.filter((scenario) => scenario.selector_visible !== false);
     assert.equal(visible.length, 7);
     assert.deepEqual(visible.slice(0, 4).map((scenario) => scenario.data_url), [
