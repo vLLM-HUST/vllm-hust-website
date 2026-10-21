@@ -22,11 +22,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v052.json")
+        response = context.request.get(f"{args.url}/data/midterm-v053.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.52"
+        assert report["version"] == "V0.53"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -35,7 +35,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v052.json"
+            if f["website_path"] == "data/midterm-v053.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -78,7 +78,7 @@ def main():
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.goto(f"{args.url}/{filename}", wait_until="domcontentloaded")
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.52", timeout=30000
+                        "data-loaded", "V0.53", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     for ident in (
@@ -90,6 +90,7 @@ def main():
                         "m01",
                         "runtime-recovery",
                         "state-commit",
+                        "model-runtime",
                     ):
                         section = page.locator(f"#midterm-{ident}")
                         section.scroll_into_view_if_needed()
@@ -128,7 +129,13 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.52"
+                        "V0.53"
+                    )
+                    expect(page.locator("#midterm-model-runtime")).to_contain_text(
+                        "100.000000%"
+                    )
+                    expect(page.locator("#midterm-model-runtime")).to_contain_text(
+                        "200 / 0"
                     )
                     expect(page.locator("#midterm-kv-audit")).to_contain_text(
                         "不能排除"
@@ -157,6 +164,19 @@ def main():
                     assert not errors, errors
                     page.locator("#midterm-quality").scroll_into_view_if_needed()
                     page.screenshot(path=output / f"{filename}-{width}-{lang}.png")
+                    for scheme in ("light", "dark"):
+                        page.emulate_media(color_scheme=scheme)
+                        recovered = page.locator("#midterm-model-runtime")
+                        recovered.scroll_into_view_if_needed()
+                        expect(recovered).to_be_visible()
+                        expect(recovered).to_contain_text("100.000000%")
+                        assert recovered.evaluate(
+                            "e => e.getBoundingClientRect().right <= innerWidth + 1"
+                        )
+                        page.screenshot(
+                            path=output
+                            / f"{filename}-{width}-{lang}-{scheme}-runtime.png"
+                        )
                     print(filename, width, lang, "PASS", flush=True)
                     page.close()
         for filename in ("betterscale.html", "traceloom.html", "serving-plan.html"):
@@ -179,7 +199,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v052.json",
+            "**/data/midterm-v053.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
