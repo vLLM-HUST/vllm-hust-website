@@ -22,11 +22,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v058.json")
+        response = context.request.get(f"{args.url}/data/midterm-v059.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.58"
+        assert report["version"] == "V0.59"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -35,7 +35,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v058.json"
+            if f["website_path"] == "data/midterm-v059.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -80,13 +80,14 @@ def main():
                     expect(
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
-                        "src", "./assets/midterm-report.js?v=midterm-v058-20261021"
+                        "src", "./assets/midterm-report.js?v=midterm-v059-20261021"
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.58", timeout=30000
+                        "data-loaded", "V0.59", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     for ident in (
+                        "paired-lifecycle",
                         "candidates",
                         "quality",
                         "recovered-quality",
@@ -134,6 +135,17 @@ def main():
                     expect(recovered_quality).to_contain_text("147/200")
                     expect(recovered_quality).to_contain_text("149/200")
                     expect(recovered_quality).to_contain_text("原评分器")
+                    paired = page.locator("#midterm-paired-lifecycle")
+                    expect(paired.locator("tbody tr")).to_have_count(10)
+                    for value in (
+                        "477.258648",
+                        "616.624727",
+                        "+29.20%",
+                        "+57.13%",
+                        "+121.48%",
+                    ):
+                        expect(paired).to_contain_text(value)
+                    expect(paired).to_contain_text("文件页缓存未全局清空")
                     native_quality = page.locator("#midterm-native-paired-quality")
                     expect(native_quality.locator("tbody tr")).to_have_count(2)
                     expect(native_quality).to_contain_text("147/200")
@@ -158,7 +170,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.58"
+                        "V0.59"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -243,7 +255,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v058.json",
+            "**/data/midterm-v059.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
