@@ -151,7 +151,11 @@ def main():
             # Keep the active wide matrix inside its own keyboard-scrollable region
             # instead of treating hidden content width as viewport overflow.
             assert page.locator(".runs-table-scroll").first.evaluate(
-                "el => el.scrollWidth > el.clientWidth && getComputedStyle(el).overflowX === 'auto'"
+                """el => {
+                    const rect = el.getBoundingClientRect();
+                    return getComputedStyle(el).overflowX === 'auto'
+                        && rect.left >= -1 && rect.right <= innerWidth + 1;
+                }"""
             )
             assert page.evaluate(
                 "getComputedStyle(document.body).overflowX === 'hidden'"
