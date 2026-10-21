@@ -39,15 +39,24 @@ def main():
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
-        evidence_urls = {
-            f"https://github.com/vLLM-HUST/vllm-hust-benchmark/{e['kind']}/"
-            f"{manifest['commit']}/{e['path']}"
-            for section in report["sections"]
-            for e in section["evidence"]
-        }
-        for url in sorted(evidence_urls):
-            response = context.request.head(url, timeout=60000)
-            assert response.ok, (url, response.status)
+        # Validate every destination against one immutable Git tree. Repeated
+        # github.com HEAD requests trigger web rate limiting even for valid URLs.
+        headers = {"Accept": "application/vnd.github+json"}
+        if os.environ.get("GH_TOKEN"):
+            headers["Authorization"] = f"Bearer {os.environ['GH_TOKEN']}"
+        response = context.request.get(
+            "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/"
+            f"git/trees/{manifest['commit']}?recursive=1",
+            headers=headers,
+            timeout=60000,
+        )
+        assert response.ok, response.status
+        tree = response.json()
+        assert not tree["truncated"], "Evidence tree must be complete"
+        paths = {item["path"]: item["type"] for item in tree["tree"]}
+        for section in report["sections"]:
+            for evidence in section["evidence"]:
+                assert paths.get(evidence["path"]) == evidence["kind"], evidence
         (output / "publication-identity.json").write_text(
             json.dumps(
                 {
