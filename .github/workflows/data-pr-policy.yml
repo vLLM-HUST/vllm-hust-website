@@ -29,3 +29,14 @@ jobs:
         env:
           FILE_COUNT: ${{ github.event.pull_request.changed_files }}
         run: python scripts/check_data_pr_policy.py /tmp/pr-files.json --expected-count "$FILE_COUNT"
+      - name: Load pinned organization custody policy
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/.github
+          ref: 515ee65aa02999628aae5cc6fa1dd7d815b19512 # pragma: allowlist secret
+          path: .trusted-custody-policy
+          persist-credentials: false
+      - name: Check renamed data and measurement-like prose additions
+        env:
+          FILE_COUNT: ${{ github.event.pull_request.changed_files }}
+        run: python .trusted-custody-policy/scripts/benchmark_data_policy.py pr --files /tmp/pr-files.json --expected "$FILE_COUNT"
