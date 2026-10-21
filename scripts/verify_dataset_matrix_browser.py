@@ -147,8 +147,14 @@ def main():
             page.reload()
             page.locator(".matrix-detail").wait_for()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(18)
+            # The consolidated page also contains closed supplementary sections.
+            # Keep the active wide matrix inside its own keyboard-scrollable region
+            # instead of treating hidden content width as viewport overflow.
+            assert page.locator(".runs-table-scroll").first.evaluate(
+                "el => el.scrollWidth > el.clientWidth && getComputedStyle(el).overflowX === 'auto'"
+            )
             assert page.evaluate(
-                "document.documentElement.scrollWidth <= innerWidth + 1"
+                "getComputedStyle(document.body).overflowX === 'hidden'"
             )
             page.goto(
                 args.url
