@@ -22,11 +22,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v054.json")
+        response = context.request.get(f"{args.url}/data/midterm-v055.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.54"
+        assert report["version"] == "V0.55"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -35,7 +35,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v054.json"
+            if f["website_path"] == "data/midterm-v055.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -80,10 +80,10 @@ def main():
                     expect(
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
-                        "src", "./assets/midterm-report.js?v=midterm-v054-20261021"
+                        "src", "./assets/midterm-report.js?v=midterm-v055-20261021"
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.54", timeout=30000
+                        "data-loaded", "V0.55", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     for ident in (
@@ -97,9 +97,10 @@ def main():
                         "state-commit",
                         "model-runtime",
                         "preprocess-publication",
+                        "projection-references",
                     ):
                         section = page.locator(f"#midterm-{ident}")
-                        section.scroll_into_view_if_needed()
+                        section.evaluate("el => el.scrollIntoView({block: 'start'})")
                         expect(section).to_be_visible()
                         assert section.locator("h3").evaluate(
                             "e => getComputedStyle(e).color === 'rgb(23, 33, 43)'"
@@ -135,7 +136,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.54"
+                        "V0.55"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -147,6 +148,11 @@ def main():
                     expect(publication).to_contain_text("64")
                     expect(publication).to_contain_text("560")
                     expect(publication).to_contain_text("完整有效F和M01仍未判定")
+                    projections = page.locator("#midterm-projection-references")
+                    expect(projections.locator("tbody tr")).to_have_count(10)
+                    expect(projections).to_contain_text("6372.136")
+                    expect(projections).to_contain_text("5389.571")
+                    expect(projections).to_contain_text("图填充运算不冒充有效F")
                     expect(page.locator("#midterm-kv-audit")).to_contain_text(
                         "不能排除"
                     )
@@ -209,7 +215,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v054.json",
+            "**/data/midterm-v055.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
