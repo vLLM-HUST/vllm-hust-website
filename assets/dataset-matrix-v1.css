@@ -1,5 +1,6 @@
 /* Reuse the result table's palette, borders, metric cells and configuration rows. */
 .matrix-shell { padding-top: 28px; }
+.matrix-shell .runs-table-scroll { width: 100%; max-width: 100%; overflow-x: auto; }
 .matrix-heading { margin: 30px 0 24px; }
 .matrix-heading h1 { font-size: clamp(24px, 4vw, 34px); margin: 0 0 8px; color: #f1f5ff; }
 .matrix-heading p { color: #b4c2d6; margin: 0 0 18px; font-size: 14px; }
