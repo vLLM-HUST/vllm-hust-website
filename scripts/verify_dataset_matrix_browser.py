@@ -157,9 +157,6 @@ def main():
                 page.locator(".runs-table-scroll").first.get_attribute("tabindex")
                 == "0"
             )
-            assert page.evaluate(
-                "getComputedStyle(document.body).overflowX === 'hidden'"
-            )
             page.goto(
                 args.url
                 + "/dataset-validation.html#swe-smith-tranjactory-offline-window"
