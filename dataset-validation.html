@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dataset matrix - vllm-hust</title>
-  <meta name="description" content="Dataset validation results produced by the independent vLLM-HUST validation service." />
-  <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-validation.html" />
-  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
-  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
-  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901" />
-  <link rel="stylesheet" href="./assets/dataset-validation.css?v=quality-regression-20261020" />
-  <link rel="stylesheet" href="./assets/mmlu-pro-handoff.css?v=20261013-runtime" />
-  <link rel="stylesheet" href="./assets/frontierscience-handoff.css?v=20261013" />
-  <link rel="stylesheet" href="./assets/hle-verified-handoff.css?v=20261015" />
-</head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dataset evaluation - vLLM-HUST</title>
+  <meta name="description" content="Dataset validation results produced by the independent vLLM-HUST validation service.">
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-validation.html">
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003">
+  <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901">
+  <link rel="stylesheet" href="./assets/dataset-validation.css?v=quality-regression-20261020">
+  <link rel="stylesheet" href="./assets/mmlu-pro-handoff.css?v=20261013-runtime">
+  <link rel="stylesheet" href="./assets/frontierscience-handoff.css?v=20261013">
+  <link rel="stylesheet" href="./assets/hle-verified-handoff.css?v=20261015">
+<link href="./assets/dataset-matrix-v1.css?v=consolidated-20261020" rel="stylesheet"><link href="./assets/capability-coverage.css?v=consolidated-20261020" rel="stylesheet"></head>
 <body data-page="dataset-validation" data-result-contract="dataset-validation-v1">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
     <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
@@ -32,13 +32,16 @@
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
   <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
   <main class="site-shell">
-    <nav class="benchmark-tabs" aria-label="Benchmark views">
-      <a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance curves</a>
-      <a href="./leaderboard.html" data-i18n-common="navFixedTarget">Fixed-target registry</a>
-      <a class="active" aria-current="page" href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset matrix</a>
-      <a href="./dataset-matrix-v1.html" data-i18n-common="navDatasetMatrixV1">Dataset matrix v1</a>
-    </nav>
-    <section class="page-hero"><div class="content-panel">
+    <nav class="benchmark-tabs"><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance tests</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation" aria-current="page" class="active">Dataset evaluation</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></nav><section id="dataset-results" class="matrix-shell"><p id="matrix-loading" class="runs-note" role="status">Loading / 正在加载…</p>
+    <div id="matrix-content" hidden>
+      <header class="matrix-heading"><h1 id="matrix-title">Dataset matrix v1</h1><p id="matrix-subtitle"></p><div id="matrix-cohort" class="matrix-cohort"></div></header>
+      <nav id="matrix-breadcrumb" class="matrix-breadcrumb" aria-label="Dataset views" tabindex="-1"></nav>
+      <div id="matrix-table"></div>
+      <p id="matrix-swe-bench-pro" class="runs-note"></p>
+      <p id="matrix-note" class="runs-note"></p>
+      <details class="matrix-methods"><summary id="matrix-method-label">Methods &amp; sources</summary><div id="matrix-methods"></div></details>
+    </div>
+  </section><section class="page-hero"><div class="content-panel">
       <span id="validation-eyebrow" class="eyebrow">Independent validation</span>
       <h1 id="validation-title" style="margin-top: 16px">Dataset matrix</h1>
       <p id="validation-lede" class="hero-lede">Results published by the fixed-machine validation service, organized as a dataset by metric matrix.</p>
@@ -76,7 +79,7 @@
           <div class="validation-stat"><span id="validation-stat-failed-label">Failed</span><strong id="validation-stat-failed">0</strong></div>
           <div class="validation-stat"><span id="validation-stat-not-applicable-label">Not applicable</span><strong id="validation-stat-not-applicable">0</strong></div>
         </div>
-        <div class="validation-toolbar"><div class="validation-filters"><div class="validation-filter"><label id="validation-status-label" for="validation-status-filter">Status</label><select id="validation-status-filter"><option value="all">All statuses</option></select></div><div class="validation-filter"><label id="validation-group-label" for="validation-group-filter">Group</label><select id="validation-group-filter"><option value="all">All datasets</option></select></div><div class="validation-filter validation-filter--search"><label id="validation-search-label" for="validation-dataset-search">Dataset</label><input id="validation-dataset-search" type="search" placeholder="Search datasets" autocomplete="off" /></div><span id="validation-dataset-count" class="validation-dataset-count">0 / 0</span></div><div class="validation-source"><span id="validation-source-label">Source</span><br /><strong id="validation-source">Awaiting validation service artifact</strong><div id="validation-freshness" class="validation-freshness" data-state="unknown">Timestamp unavailable</div></div></div>
+        <div class="validation-toolbar"><div class="validation-filters"><div class="validation-filter"><label id="validation-status-label" for="validation-status-filter">Status</label><select id="validation-status-filter"><option value="all">All statuses</option></select></div><div class="validation-filter"><label id="validation-group-label" for="validation-group-filter">Group</label><select id="validation-group-filter"><option value="all">All datasets</option></select></div><div class="validation-filter validation-filter--search"><label id="validation-search-label" for="validation-dataset-search">Dataset</label><input id="validation-dataset-search" type="search" placeholder="Search datasets" autocomplete="off"></div><span id="validation-dataset-count" class="validation-dataset-count">0 / 0</span></div><div class="validation-source"><span id="validation-source-label">Source</span><br><strong id="validation-source">Awaiting validation service artifact</strong><div id="validation-freshness" class="validation-freshness" data-state="unknown">Timestamp unavailable</div></div></div>
         <div class="validation-legend" aria-label="Comparison legend"><span><strong>B0</strong> <span id="validation-legend-b0">Baseline</span></span><span><strong>B1</strong> <span id="validation-legend-b1">Currently best measured vLLM-HUST optimization solution</span></span><span id="validation-legend-improved" class="validation-legend-improved">Improved</span><span id="validation-legend-regressed" class="validation-legend-regressed">Regressed</span></div>
         <div class="validation-table-wrap"><table class="validation-table"><thead><tr id="validation-table-head"></tr></thead><tbody id="validation-table-body"></tbody></table></div>
         <div id="validation-pagination" class="validation-pagination" aria-label="Dataset pages"></div>
@@ -84,18 +87,1125 @@
         <div id="validation-empty" class="validation-empty"><h3 id="validation-empty-title">No dataset results yet</h3><p id="validation-empty-body">The validation service has not published a result for this scenario. The matrix stays hidden until measured results exist.</p></div>
       </div>
     </section>
-  </main>
+  <details id="coverage"><summary>覆盖与缺口 / Coverage and gaps</summary><div id="coverage-content"><header class="intro">
+<p class="eyebrow">标准交付测试方案 V5.8 · 2026.10.16</p>
+<h1>核心能力 × 测试数据集</h1>
+<p class="lead">纵向看验收要求，横向看各数据集能够提供什么证据。</p>
+<p>点击符号展开说明，再点收起。“覆盖”表示能提供相应能力的证据，不代表已通过验收。</p>
+</header>
+<div class="coverage-legend" aria-label="覆盖关系图例">
+<span>● 直接覆盖</span>
+<span>◐ 覆盖其中一部分</span>
+<span>— 不覆盖</span>
+</div>
+<div class="coverage-controls" role="group" aria-label="批量展开说明">
+<span>文字说明</span>
+<button type="button" data-expand="none">收起全部</button>
+<button type="button" data-expand="covered">展开有覆盖的（● / ◐）</button>
+<button type="button" data-expand="all">展开全部</button>
+</div>
+<div class="table-scroll" role="region" aria-label="能力与数据集关联总表" tabindex="0">
+<table>
+<thead>
+<tr>
+<th scope="col">分项</th>
+<th scope="col">能力与验收要求</th>
+<th scope="col">MMLU-Pro</th>
+<th scope="col">FrontierScience</th>
+<th scope="col">HLE-Verified</th>
+<th scope="col">SWE-bench-Pro</th>
+<th scope="col">TerminalBench 2.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="rowgroup" rowspan="2" class="group">A1</th>
+<th scope="row" class="requirement">有效算力达到实测 BF16 峰值的 90% 以上</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项测试，点击展开说明" title="需专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项测试</span>
+</summary>
+<p>答题吞吐不能直接证明有效算力；需使用 A1 固定形状与峰值测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项测试，点击展开说明" title="需专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项测试</span>
+</summary>
+<p>答题吞吐不能直接证明有效算力；需使用 A1 固定形状与峰值测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项测试，点击展开说明" title="需专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项测试</span>
+</summary>
+<p>答题吞吐不能直接证明有效算力；需使用 A1 固定形状与峰值测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项测试，点击展开说明" title="需专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项测试</span>
+</summary>
+<p>答题吞吐不能直接证明有效算力；需使用 A1 固定形状与峰值测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项测试，点击展开说明" title="需专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项测试</span>
+</summary>
+<p>答题吞吐不能直接证明有效算力；需使用 A1 固定形状与峰值测量。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">有效算量核对误差 ≤ 3%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项核验，点击展开说明" title="需专项核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项核验</span>
+</summary>
+<p>数据集评分不覆盖算量核对；需 effective_compute_spec v1 与 msprof 交叉核验。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项核验，点击展开说明" title="需专项核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项核验</span>
+</summary>
+<p>数据集评分不覆盖算量核对；需 effective_compute_spec v1 与 msprof 交叉核验。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项核验，点击展开说明" title="需专项核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项核验</span>
+</summary>
+<p>数据集评分不覆盖算量核对；需 effective_compute_spec v1 与 msprof 交叉核验。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项核验，点击展开说明" title="需专项核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项核验</span>
+</summary>
+<p>数据集评分不覆盖算量核对；需 effective_compute_spec v1 与 msprof 交叉核验。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项核验，点击展开说明" title="需专项核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项核验</span>
+</summary>
+<p>数据集评分不覆盖算量核对；需 effective_compute_spec v1 与 msprof 交叉核验。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="rowgroup" rowspan="10" class="group">A2</th>
+<th scope="row" class="requirement">通用问答 / 多轮：质量记录</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="部分覆盖，点击展开说明" title="部分覆盖">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">部分覆盖</span>
+</summary>
+<p>可提供知识问答的逐题质量结果；不覆盖多轮交互过程。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="部分覆盖，点击展开说明" title="部分覆盖">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">部分覆盖</span>
+</summary>
+<p>可提供科学问答结果；不能单凭答题成绩证明多轮服务。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="部分覆盖，点击展开说明" title="部分覆盖">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">部分覆盖</span>
+</summary>
+<p>可提供高难度问答结果；文本、图像及 Gold / Revision 分开记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不直接覆盖，点击展开说明" title="不直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不直接覆盖</span>
+</summary>
+<p>任务完成分数不是通用问答或多轮服务的直接验收记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不直接覆盖，点击展开说明" title="不直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不直接覆盖</span>
+</summary>
+<p>终端任务完成分数不是通用问答或多轮服务的直接验收记录。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">问答 / 多轮、工具调用：最大合规吞吐 ≥ B0 的 2 倍；共同负载平均 TTFT、TPOT 各改善 ≥ 20%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需容量压测，点击展开说明" title="需容量压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需容量压测</span>
+</summary>
+<p>问答请求可用于容量扫描；现有裸吞吐须先核验 SLO、负载点与测量时长。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需容量压测，点击展开说明" title="需容量压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需容量压测</span>
+</summary>
+<p>若纳入问答场景，可基于固定请求协议测容量与时延；原答题速率不等于最大合规吞吐。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需容量压测，点击展开说明" title="需容量压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需容量压测</span>
+</summary>
+<p>问答负载可测容量与时延；文本、图像分别统计，不能直接拿现有吞吐比判定。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需任务映射与压测，点击展开说明" title="需任务映射与压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需任务映射与压测</span>
+</summary>
+<p>若具体任务纳入工具调用场景，需保留工具请求并单独执行容量扫描；任务耗时不能替代。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需任务映射与压测，点击展开说明" title="需任务映射与压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需任务映射与压测</span>
+</summary>
+<p>若具体任务纳入工具调用场景，需保留终端工具请求并单独执行容量扫描；任务耗时不能替代。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">推理质量较 B0 下降 ≤ 1 个百分点</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需任务映射，点击展开说明" title="需任务映射">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需任务映射</span>
+</summary>
+<p>可提供知识题的答案正确率；是否归入推理场景按冻结任务清单确认。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="直接覆盖，点击展开说明" title="直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">●</span>
+<span class="coverage-label">直接覆盖</span>
+</summary>
+<p>科学推理的直接质量证据；Olympiad、Research 分别评分，判分未决单列。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="直接覆盖，点击展开说明" title="直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">●</span>
+<span class="coverage-label">直接覆盖</span>
+</summary>
+<p>高难度推理的质量证据；保留文本 / 图像及 Gold / Revision 分项和判分未决。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不直接覆盖，点击展开说明" title="不直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不直接覆盖</span>
+</summary>
+<p>代码任务成功不能直接替代冻结推理任务的质量验收。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不直接覆盖，点击展开说明" title="不直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不直接覆盖</span>
+</summary>
+<p>终端任务成功不能直接替代冻结推理任务的质量验收。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">工具调用质量下降 ≤ 1 个百分点；任务成功率 ≥ 95%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>普通答题协议不覆盖工具选择、参数和执行成功。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>普通答题协议不覆盖工具选择、参数和执行成功。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>普通答题协议不覆盖工具选择、参数和执行成功。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="部分覆盖，点击展开说明" title="部分覆盖">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">部分覆盖</span>
+</summary>
+<p>可关联使用工具的修复任务；仍需冻结工具定义、解析器及成功判据，不能把修复通过率直接当工具成功率。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="部分覆盖，点击展开说明" title="部分覆盖">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">部分覆盖</span>
+</summary>
+<p>可关联终端工具交互任务；仍需保存调用轨迹、参数与成功判据，任务总分不能直接替代工具专项验收。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">结构化输出质量下降 ≤ 1 个百分点；任务成功率 ≥ 95%；Schema 合法率 100%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>答案提取不是 Schema 验收；现有答题协议未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>评分输出格式不是受测模型的 Schema 验收；现有协议未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>评分输出格式不是受测模型的 Schema 验收；现有协议未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="待确认任务，点击展开说明" title="待确认任务">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">待确认任务</span>
+</summary>
+<p>仅当冻结任务明确包含 JSON Schema、字段与任务判据时才能关联；现有清单未给出该映射。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="待确认任务，点击展开说明" title="待确认任务">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">待确认任务</span>
+</summary>
+<p>仅当冻结任务明确包含 JSON Schema、字段与任务判据时才能关联；现有清单未给出该映射。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">长上下文质量较 B0 下降 ≤ 1 个百分点</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>题目答对不能证明指定长上下文能力；需冻结长度与长文本任务。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需长度与任务确认，点击展开说明" title="需长度与任务确认">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需长度与任务确认</span>
+</summary>
+<p>长题目可作为候选，但需任务级 token 长度与长上下文任务定义，不能按数据集名称判定。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需长度与任务确认，点击展开说明" title="需长度与任务确认">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需长度与任务确认</span>
+</summary>
+<p>长题目可作为候选，但需任务级 token 长度与长上下文任务定义，不能按数据集名称判定。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需长度与任务确认，点击展开说明" title="需长度与任务确认">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需长度与任务确认</span>
+</summary>
+<p>仓库上下文可作为候选；需冻结输入长度与任务清单后比较质量，不能由修复总分推定。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需长度与任务确认，点击展开说明" title="需长度与任务确认">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需长度与任务确认</span>
+</summary>
+<p>长交互上下文可作为候选；需冻结长度与任务清单后比较质量，不能由任务总分推定。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">代码质量较 B0 下降 ≤ 1 个百分点</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>普通选择题不覆盖代码运行与测试通过。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>科学问答分数不覆盖代码执行验收。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不直接覆盖，点击展开说明" title="不直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不直接覆盖</span>
+</summary>
+<p>即使包含代码相关题，答案评分也不能替代冻结沙箱中的代码测试。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="直接覆盖，点击展开说明" title="直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">●</span>
+<span class="coverage-label">直接覆盖</span>
+</summary>
+<p>代码修复任务可直接提供逐题得分、测试通过及失败分类；固定 split、沙箱与 scorer。清单快照暂无质量结果。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="部分覆盖，点击展开说明" title="部分覆盖">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">部分覆盖</span>
+</summary>
+<p>其中代码任务可提供执行与测试结果；先按任务标识筛选并冻结评分环境。清单快照暂无质量结果。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">通用场景绝对 SLO：TTFT mean/p95/p99 ≤ 1/2/4 s；TPOT ≤ 40/60/80 ms</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需独立压测，点击展开说明" title="需独立压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需独立压测</span>
+</summary>
+<p>问答请求另行压测，按逐请求时延验收；全量质量答题不套压测门槛。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需独立压测，点击展开说明" title="需独立压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需独立压测</span>
+</summary>
+<p>推理 / 问答请求另行压测，不能把单题答题时间当 TTFT 或 TPOT。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需独立压测，点击展开说明" title="需独立压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需独立压测</span>
+</summary>
+<p>按文本、图像请求协议分别保留逐请求时延；质量答题与压测分开。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需独立压测，点击展开说明" title="需独立压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需独立压测</span>
+</summary>
+<p>对关联的代码 / 工具服务请求另行压测；沙箱及工具执行总耗时不是推理时延。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需独立压测，点击展开说明" title="需独立压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需独立压测</span>
+</summary>
+<p>对关联的代码 / 工具服务请求另行压测；终端任务总耗时不是推理时延。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">长上下文 SLO：8K TTFT ≤ 8/12/16 s；16K ≤ 16/24/32 s；TPOT ≤ 40/60/80 ms</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需定长压测，点击展开说明" title="需定长压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需定长压测</span>
+</summary>
+<p>需另行冻结 8192 / 16384 token 请求；普通数据集成绩未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需定长压测，点击展开说明" title="需定长压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需定长压测</span>
+</summary>
+<p>需另行冻结 8192 / 16384 token 请求；普通数据集成绩未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需定长压测，点击展开说明" title="需定长压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需定长压测</span>
+</summary>
+<p>需另行冻结 8192 / 16384 token 请求；普通数据集成绩未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需定长压测，点击展开说明" title="需定长压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需定长压测</span>
+</summary>
+<p>需另行冻结 8192 / 16384 token 请求；普通数据集成绩未覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需定长压测，点击展开说明" title="需定长压测">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需定长压测</span>
+</summary>
+<p>需另行冻结 8192 / 16384 token 请求；普通数据集成绩未覆盖。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">容量点 600 s；完成量 ≥ 预设上限 99%；不足 1000 样本零失败，否则错误率 ≤ 0.1%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需压测记录核验，点击展开说明" title="需压测记录核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需压测记录核验</span>
+</summary>
+<p>须核对独立压测的预设速率、请求上限、时长和错误；质量评测题量不能替代。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需压测记录核验，点击展开说明" title="需压测记录核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需压测记录核验</span>
+</summary>
+<p>须核对独立压测的预设速率、请求上限、时长和错误；质量评测题量不能替代。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需压测记录核验，点击展开说明" title="需压测记录核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需压测记录核验</span>
+</summary>
+<p>须核对独立压测的预设速率、请求上限、时长和错误；质量评测题量不能替代。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需压测记录核验，点击展开说明" title="需压测记录核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需压测记录核验</span>
+</summary>
+<p>须核对独立压测的预设速率、请求上限、时长和错误；质量评测题量不能替代。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需压测记录核验，点击展开说明" title="需压测记录核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需压测记录核验</span>
+</summary>
+<p>须核对独立压测的预设速率、请求上限、时长和错误；质量评测题量不能替代。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="rowgroup" rowspan="1" class="group">A2-V</th>
+<th scope="row" class="requirement">图像协议及模态适用性；不单独判通过</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>现有文本题评测不覆盖图像协议。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="不覆盖，点击展开说明" title="不覆盖">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">不覆盖</span>
+</summary>
+<p>现有科学问答评测不作为图像适用性证据。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="直接覆盖，点击展开说明" title="直接覆盖">
+<span class="coverage-symbol" aria-hidden="true">●</span>
+<span class="coverage-label">直接覆盖</span>
+</summary>
+<p>图像题可提供直接证据：核验模型协议与图像资产，文本 / 图像分别报告；不能用总分替代图像分项。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="待确认任务，点击展开说明" title="待确认任务">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">待确认任务</span>
+</summary>
+<p>现有清单未指定图像任务；不据任务名称推定覆盖。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="待确认任务，点击展开说明" title="待确认任务">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">待确认任务</span>
+</summary>
+<p>现有清单未指定图像任务；不据任务名称推定覆盖。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="rowgroup" rowspan="4" class="group">A3</th>
+<th scope="row" class="requirement">32K 连续服务无失败、OOM、死锁、退出或静默截断</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需 32K 专项测试，点击展开说明" title="需 32K 专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需 32K 专项测试</span>
+</summary>
+<p>现有答题运行不等于 A3：需 30720 输入 + 2048 输出、并发 1 的专门连续服务记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需 32K 专项测试，点击展开说明" title="需 32K 专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需 32K 专项测试</span>
+</summary>
+<p>现有答题运行不等于 A3：需 30720 输入 + 2048 输出、并发 1 的专门连续服务记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需 32K 专项测试，点击展开说明" title="需 32K 专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需 32K 专项测试</span>
+</summary>
+<p>现有答题运行不等于 A3：需 30720 输入 + 2048 输出、并发 1 的专门连续服务记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需 32K 专项测试，点击展开说明" title="需 32K 专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需 32K 专项测试</span>
+</summary>
+<p>现有答题运行不等于 A3：需 30720 输入 + 2048 输出、并发 1 的专门连续服务记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需 32K 专项测试，点击展开说明" title="需 32K 专项测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需 32K 专项测试</span>
+</summary>
+<p>现有答题运行不等于 A3：需 30720 输入 + 2048 输出、并发 1 的专门连续服务记录。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">吞吐 CV ≤ 5%；相对 W1 中位时延漂移 ≤ 10%、p99 漂移 ≤ 20%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需窗口统计，点击展开说明" title="需窗口统计">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需窗口统计</span>
+</summary>
+<p>数据集汇总成绩未覆盖窗口稳定性；需连续 30 分钟、六个 5 分钟窗口及逐请求记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需窗口统计，点击展开说明" title="需窗口统计">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需窗口统计</span>
+</summary>
+<p>数据集汇总成绩未覆盖窗口稳定性；需连续 30 分钟、六个 5 分钟窗口及逐请求记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需窗口统计，点击展开说明" title="需窗口统计">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需窗口统计</span>
+</summary>
+<p>数据集汇总成绩未覆盖窗口稳定性；需连续 30 分钟、六个 5 分钟窗口及逐请求记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需窗口统计，点击展开说明" title="需窗口统计">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需窗口统计</span>
+</summary>
+<p>数据集汇总成绩未覆盖窗口稳定性；需连续 30 分钟、六个 5 分钟窗口及逐请求记录。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需窗口统计，点击展开说明" title="需窗口统计">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需窗口统计</span>
+</summary>
+<p>数据集汇总成绩未覆盖窗口稳定性；需连续 30 分钟、六个 5 分钟窗口及逐请求记录。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">全区间与每窗口：TTFT ≤ 30/45/60 s；TPOT ≤ 40/60/80 ms</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需逐窗口验收，点击展开说明" title="需逐窗口验收">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需逐窗口验收</span>
+</summary>
+<p>普通评测的整体时延不能替代 A3 逐窗口 SLO；需专门 32K 连续测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需逐窗口验收，点击展开说明" title="需逐窗口验收">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需逐窗口验收</span>
+</summary>
+<p>普通评测的整体时延不能替代 A3 逐窗口 SLO；需专门 32K 连续测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需逐窗口验收，点击展开说明" title="需逐窗口验收">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需逐窗口验收</span>
+</summary>
+<p>普通评测的整体时延不能替代 A3 逐窗口 SLO；需专门 32K 连续测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需逐窗口验收，点击展开说明" title="需逐窗口验收">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需逐窗口验收</span>
+</summary>
+<p>普通评测的整体时延不能替代 A3 逐窗口 SLO；需专门 32K 连续测量。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需逐窗口验收，点击展开说明" title="需逐窗口验收">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需逐窗口验收</span>
+</summary>
+<p>普通评测的整体时延不能替代 A3 逐窗口 SLO；需专门 32K 连续测量。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">三次有效独立运行及完整监控</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项运行记录，点击展开说明" title="需专项运行记录">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项运行记录</span>
+</summary>
+<p>需复核或补齐 A3 专项记录：预热 5 分钟，测量 30 分钟；24–64 请求，每窗口至少 3 条；监控缺失 ≤ 0.1%，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项运行记录，点击展开说明" title="需专项运行记录">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项运行记录</span>
+</summary>
+<p>需复核或补齐 A3 专项记录：预热 5 分钟，测量 30 分钟；24–64 请求，每窗口至少 3 条；监控缺失 ≤ 0.1%，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项运行记录，点击展开说明" title="需专项运行记录">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项运行记录</span>
+</summary>
+<p>需复核或补齐 A3 专项记录：预热 5 分钟，测量 30 分钟；24–64 请求，每窗口至少 3 条；监控缺失 ≤ 0.1%，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项运行记录，点击展开说明" title="需专项运行记录">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项运行记录</span>
+</summary>
+<p>需复核或补齐 A3 专项记录：预热 5 分钟，测量 30 分钟；24–64 请求，每窗口至少 3 条；监控缺失 ≤ 0.1%，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项运行记录，点击展开说明" title="需专项运行记录">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项运行记录</span>
+</summary>
+<p>需复核或补齐 A3 专项记录：预热 5 分钟，测量 30 分钟；24–64 请求，每窗口至少 3 条；监控缺失 ≤ 0.1%，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="rowgroup" rowspan="5" class="group">A4</th>
+<th scope="row" class="requirement">单位合规输出 token 成本较 B0 降低 ≥ 30%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>单数据集吞吐不能证明多租户成本；需五类租户混合运行的全生命周期成本与合规输出 token。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>单数据集吞吐不能证明多租户成本；需五类租户混合运行的全生命周期成本与合规输出 token。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>单数据集吞吐不能证明多租户成本；需五类租户混合运行的全生命周期成本与合规输出 token。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>单数据集吞吐不能证明多租户成本；需五类租户混合运行的全生命周期成本与合规输出 token。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>单数据集吞吐不能证明多租户成本；需五类租户混合运行的全生命周期成本与合规输出 token。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">Jain ≥ 0.90；租户份额相对 20% 的偏差 ≤ 10%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="候选问答负载，点击展开说明" title="候选问答负载">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">候选问答负载</span>
+</summary>
+<p>可作为问答租户的候选请求来源；单独运行不能覆盖公平性。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="候选推理负载，点击展开说明" title="候选推理负载">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">候选推理负载</span>
+</summary>
+<p>可作为推理租户的候选请求来源；单独运行不能覆盖公平性。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="候选问答 / 推理负载，点击展开说明" title="候选问答 / 推理负载">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">候选问答 / 推理负载</span>
+</summary>
+<p>可按任务归入问答或推理租户；单独运行不能覆盖公平性。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="候选代码 / 工具负载，点击展开说明" title="候选代码 / 工具负载">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">候选代码 / 工具负载</span>
+</summary>
+<p>可按具体任务关联代码或工具租户；单独运行不能覆盖公平性。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="候选工具 / 代码负载，点击展开说明" title="候选工具 / 代码负载">
+<span class="coverage-symbol" aria-hidden="true">◐</span>
+<span class="coverage-label">候选工具 / 代码负载</span>
+</summary>
+<p>可按具体任务关联工具或代码租户；单独运行不能覆盖公平性。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">逐租户 TTFT、TPOT p99 ≤ 隔离 B0 的 1.25 倍</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需混合与隔离对照，点击展开说明" title="需混合与隔离对照">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需混合与隔离对照</span>
+</summary>
+<p>需与其他租户混合运行并对比同时间长度的隔离 B0；单数据集成绩不覆盖隔离效果。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需混合与隔离对照，点击展开说明" title="需混合与隔离对照">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需混合与隔离对照</span>
+</summary>
+<p>需与其他租户混合运行并对比同时间长度的隔离 B0；单数据集成绩不覆盖隔离效果。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需混合与隔离对照，点击展开说明" title="需混合与隔离对照">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需混合与隔离对照</span>
+</summary>
+<p>需与其他租户混合运行并对比同时间长度的隔离 B0；单数据集成绩不覆盖隔离效果。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需混合与隔离对照，点击展开说明" title="需混合与隔离对照">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需混合与隔离对照</span>
+</summary>
+<p>需与其他租户混合运行并对比同时间长度的隔离 B0；单数据集成绩不覆盖隔离效果。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需混合与隔离对照，点击展开说明" title="需混合与隔离对照">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需混合与隔离对照</span>
+</summary>
+<p>需与其他租户混合运行并对比同时间长度的隔离 B0；单数据集成绩不覆盖隔离效果。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">双卡平均利用率 ≥ 60%；逐租户 SLO 合规请求 ≥ 99%</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>需五租户混合运行与同期监控；逐租户 TTFT ≤ 1/2/4 s、TPOT ≤ 40/60/80 ms，不足 1000 样本零失败。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>需五租户混合运行与同期监控；逐租户 TTFT ≤ 1/2/4 s、TPOT ≤ 40/60/80 ms，不足 1000 样本零失败。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>需五租户混合运行与同期监控；逐租户 TTFT ≤ 1/2/4 s、TPOT ≤ 40/60/80 ms，不足 1000 样本零失败。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>需五租户混合运行与同期监控；逐租户 TTFT ≤ 1/2/4 s、TPOT ≤ 40/60/80 ms，不足 1000 样本零失败。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需多租户测试，点击展开说明" title="需多租户测试">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需多租户测试</span>
+</summary>
+<p>需五租户混合运行与同期监控；逐租户 TTFT ≤ 1/2/4 s、TPOT ≤ 40/60/80 ms，不足 1000 样本零失败。</p>
+</details>
+</td>
+</tr>
+<tr>
+<th scope="row" class="requirement">正式负载、连续区间与投递有效性</th>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项协议核验，点击展开说明" title="需专项协议核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项协议核验</span>
+</summary>
+<p>需 A4 专项协议：B0 三次有效扫描决定负载，预热 5 分钟、连续 30 分钟；监控缺失 ≤ 0.1%，发送滞后 p99 ≤ 1 s，末窗口在飞 ≤ 16，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项协议核验，点击展开说明" title="需专项协议核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项协议核验</span>
+</summary>
+<p>需 A4 专项协议：B0 三次有效扫描决定负载，预热 5 分钟、连续 30 分钟；监控缺失 ≤ 0.1%，发送滞后 p99 ≤ 1 s，末窗口在飞 ≤ 16，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项协议核验，点击展开说明" title="需专项协议核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项协议核验</span>
+</summary>
+<p>需 A4 专项协议：B0 三次有效扫描决定负载，预热 5 分钟、连续 30 分钟；监控缺失 ≤ 0.1%，发送滞后 p99 ≤ 1 s，末窗口在飞 ≤ 16，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项协议核验，点击展开说明" title="需专项协议核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项协议核验</span>
+</summary>
+<p>需 A4 专项协议：B0 三次有效扫描决定负载，预热 5 分钟、连续 30 分钟；监控缺失 ≤ 0.1%，发送滞后 p99 ≤ 1 s，末窗口在飞 ≤ 16，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+<td>
+<details class="coverage-cell">
+<summary aria-label="需专项协议核验，点击展开说明" title="需专项协议核验">
+<span class="coverage-symbol" aria-hidden="true">—</span>
+<span class="coverage-label">需专项协议核验</span>
+</summary>
+<p>需 A4 专项协议：B0 三次有效扫描决定负载，预热 5 分钟、连续 30 分钟；监控缺失 ≤ 0.1%，发送滞后 p99 ≤ 1 s，末窗口在飞 ≤ 16，无重启、新增图捕获或图回退。</p>
+</details>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<section class="conclusion">
+<h2>从这张表能直接看到的缺口</h2>
+<p>五个数据集能够承接问答、科学推理、高难度推理，以及部分代码和工具任务的质量证据；多轮过程、结构化输出和固定长度长上下文，还需要在已有任务清单中落实具体对应关系。</p>
+<p>A1 算力核验、A3 连续服务、A4 多租户成本与公平性，不能靠这五个数据集的常规成绩替代，仍由原方案中的专项测试承接。这里不增加新能力或新批次：先复核已有记录，只补缺口。</p>
+</section>
+<section class="sources">
+<h2>依据</h2>
+<p>《vLLM-HUST标准交付测试方案_V5.8.docx》§4.1–4.4；《vLLM-HUST已有评测结果与补充测试清单_20261016.docx》。数据集与任务类别的候选关联是本表的分析，最终以冻结的任务标识、协议与原始记录确认。</p>
+<p>统一验收对象：Qwen3.5-35B-A3B、Ascend 910B2 双卡、TP=2、BF16。B0 为确认的基础部署，B1 为正式交付部署。阈值及完整实施条件以原方案为准。</p>
+</section>
+</div></details></main>
   <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="validation-footer">Dataset results are read-only website data.</span></footer>
   <script>
     window.vllmHustDatasetValidationConfig = { indexUrl: './data/dataset_validation_index_v1.json' };
-    window.vllmHustPageDict = { en: { title: 'Dataset matrix - vllm-hust', 'validation-eyebrow': 'Independent validation', 'validation-title': 'Dataset matrix', 'validation-lede': 'Results published by the fixed-machine validation service, organized as a dataset by metric matrix.', 'validation-scenario-kicker': 'Scenario', 'validation-description': 'B0 and current values remain visible together for auditability.', 'validation-loading': 'Loading validation artifact...', 'validation-error-title': 'Validation artifact unavailable', 'validation-error-body': 'The result document could not be loaded.', 'validation-stat-total-label': 'Matrix cells', 'validation-stat-baseline-label': 'B0 measured', 'validation-stat-paired-label': 'Paired B0/B1', 'validation-stat-awaiting-label': 'Awaiting measurement', 'validation-stat-failed-label': 'Failed', 'validation-stat-not-applicable-label': 'Not applicable', 'validation-status-label': 'Status', 'validation-source-label': 'Source', 'validation-detail-close': 'Close', 'validation-empty-title': 'No dataset results yet', 'validation-empty-body': 'The validation service has not published a result for this scenario. The matrix stays hidden until measured results exist.', 'validation-footer': 'Dataset results are read-only website data.' }, zh: { title: '数据集矩阵 - vllm-hust', 'validation-eyebrow': '独立验证', 'validation-title': '数据集矩阵', 'validation-lede': '展示固定机器验证服务发布的结果，并按数据集与指标组成矩阵。', 'validation-scenario-kicker': '验证场景', 'validation-description': '同时保留 B0 与当前值，便于核查。', 'validation-loading': '正在加载验证产物...', 'validation-error-title': '验证产物不可用', 'validation-error-body': '无法加载结果文档。', 'validation-stat-total-label': '矩阵单元格', 'validation-stat-baseline-label': 'B0 已测', 'validation-stat-paired-label': 'B0/B1 已配对', 'validation-stat-awaiting-label': '等待测量', 'validation-stat-failed-label': '失败', 'validation-stat-not-applicable-label': '不适用', 'validation-status-label': '状态', 'validation-source-label': '来源', 'validation-detail-close': '关闭', 'validation-empty-title': '当前还没有数据集结果', 'validation-empty-body': '验证服务尚未发布该场景的实测结果；在有结果前不展示空矩阵。', 'validation-footer': '数据集结果为网站只读数据。' } };
+    window.vllmHustPageDict = { en: { title: 'Dataset evaluation - vllm-hust', 'validation-eyebrow': 'Independent validation', 'validation-title': 'Dataset evaluation', 'validation-lede': 'Results published by the fixed-machine validation service, organized as a dataset by metric matrix.', 'validation-scenario-kicker': 'Scenario', 'validation-description': 'B0 and current values remain visible together for auditability.', 'validation-loading': 'Loading validation artifact...', 'validation-error-title': 'Validation artifact unavailable', 'validation-error-body': 'The result document could not be loaded.', 'validation-stat-total-label': 'Matrix cells', 'validation-stat-baseline-label': 'B0 measured', 'validation-stat-paired-label': 'Paired B0/B1', 'validation-stat-awaiting-label': 'Awaiting measurement', 'validation-stat-failed-label': 'Failed', 'validation-stat-not-applicable-label': 'Not applicable', 'validation-status-label': 'Status', 'validation-source-label': 'Source', 'validation-detail-close': 'Close', 'validation-empty-title': 'No dataset results yet', 'validation-empty-body': 'The validation service has not published a result for this scenario. The matrix stays hidden until measured results exist.', 'validation-footer': 'Dataset results are read-only website data.' }, zh: { title: '数据集评测 - vllm-hust', 'validation-eyebrow': '独立验证', 'validation-title': '数据集评测', 'validation-lede': '展示固定机器验证服务发布的结果，并按数据集与指标组成矩阵。', 'validation-scenario-kicker': '验证场景', 'validation-description': '同时保留 B0 与当前值，便于核查。', 'validation-loading': '正在加载验证产物...', 'validation-error-title': '验证产物不可用', 'validation-error-body': '无法加载结果文档。', 'validation-stat-total-label': '矩阵单元格', 'validation-stat-baseline-label': 'B0 已测', 'validation-stat-paired-label': 'B0/B1 已配对', 'validation-stat-awaiting-label': '等待测量', 'validation-stat-failed-label': '失败', 'validation-stat-not-applicable-label': '不适用', 'validation-status-label': '状态', 'validation-source-label': '来源', 'validation-detail-close': '关闭', 'validation-empty-title': '当前还没有数据集结果', 'validation-empty-body': '验证服务尚未发布该场景的实测结果；在有结果前不展示空矩阵。', 'validation-footer': '数据集结果为网站只读数据。' } };
     Object.assign(window.vllmHustPageDict.en, { 'dataset-program-kicker': 'Pujiang-specified scope', 'dataset-program-title': 'Pujiang-specified datasets', 'dataset-program-lede': 'The five source snapshots are revision- and checksum-frozen; task manifests, scorers, runtime images, and license gates remain separate execution contracts.', 'dataset-supplementary-title': 'Supplementary material', 'dataset-supplementary-copy': 'Every other registered or planned dataset remains available as supplementary material. Existing measurements are preserved below.', 'validation-scenario-kicker': 'Supplementary evidence', 'validation-description': 'Measured scenarios remain available as supplementary material. B0 and B1 retain their exact configuration and evidence.', 'validation-model-label': 'Measured configuration' });
     Object.assign(window.vllmHustPageDict.zh, { 'dataset-program-kicker': '浦江指定范围', 'dataset-program-title': '浦江指定数据集', 'dataset-program-lede': '五项源数据快照已按 revision 与校验和冻结；任务清单、评分器、运行镜像和许可门禁仍属于各自执行合同。', 'dataset-supplementary-title': '补充材料', 'dataset-supplementary-copy': '其他所有已注册或已规划的数据集均作为补充材料保留，已有实测证据继续在下方展示。', 'validation-scenario-kicker': '补充实测证据', 'validation-description': '各实测场景作为补充材料继续保留；B0、B1 均保留精确配置和证据。', 'validation-model-label': '实测配置' });
   </script>
-  <script src="./assets/site.js?v=coverage-20261016"></script>
+  <link rel="stylesheet" href="./assets/current-measurements.css?v=20261020">
+  <script src="./assets/site.js?v=performance-20261020"></script>
+  <script src="./assets/current-measurements.js?v=20261020"></script>
   <script src="./assets/dataset-validation.js?v=b1-measured-best-20261019"></script>
   <script src="./assets/mmlu-pro-handoff.js?v=20261013-runtime"></script>
   <script src="./assets/frontierscience-handoff.js?v=20261013"></script>
   <script src="./assets/hle-verified-handoff.js?v=20261015"></script>
-</body>
+<script src="./assets/leaderboard-runs-model.js?v=consolidated-20261020"></script><script src="./assets/dataset-matrix-v1.js?v=consolidated-20261020"></script><script src="./assets/capability-coverage.js?v=consolidated-20261020"></script><script src="./assets/benchmark-source.js?v=20261020"></script></body>
 </html>

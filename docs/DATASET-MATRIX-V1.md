@@ -1,6 +1,6 @@
 # Dataset matrix v1
 
-`dataset-matrix-v1.html` is an additive entry under Performance data. The original
+`dataset-validation.html` is an additive entry under Performance data. The original
 `dataset-validation.html` and its canonical validation snapshots remain unchanged.
 
 The overview compares task quality: dataset/split rows, solution columns. Dataset links switch to

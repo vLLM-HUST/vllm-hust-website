@@ -29,7 +29,7 @@ def main():
             page = context.new_page()
             errors = []
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
-            page.goto(args.url + "/dataset-matrix-v1.html")
+            page.goto(args.url + "/dataset-validation.html")
             page.locator(".matrix-overview").wait_for()
             expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
             expect(page.locator("#matrix-table table")).to_have_count(1)
@@ -148,7 +148,7 @@ def main():
             )
             page.goto(
                 args.url
-                + "/dataset-matrix-v1.html#swe-smith-tranjactory-offline-window"
+                + "/dataset-validation.html#swe-smith-tranjactory-offline-window"
             )
             page.locator(
                 '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
@@ -177,7 +177,8 @@ def main():
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
             page.goto(
-                args.url + "/dataset-matrix-v1.html#frontierscience-controller-20261018"
+                args.url
+                + "/dataset-validation.html#frontierscience-controller-20261018"
             )
             expect(page.locator(".matrix-detail .run-row")).to_have_count(5)
             for value in ["474.13", "432.14", "58.00%", "6.67%", "2026-10-18"]:

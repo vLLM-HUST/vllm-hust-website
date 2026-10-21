@@ -87,9 +87,9 @@ def main():
                 page.locator('.site-nav a[href="./dataset-validation.html"]').count()
                 == 1
             )
-            assert page.locator('.site-nav a[href="./leaderboard.html"]').count() == 1
+            assert page.locator('.site-nav a[href="./serving-plan.html"]').count() == 1
             assert nav.text_content().strip() == (
-                "性能曲线" if language == "zh" else "Performance curves"
+                "性能测试" if language == "zh" else "Performance tests"
             )
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")

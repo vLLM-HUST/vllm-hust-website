@@ -42,7 +42,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--url",
         default=os.environ.get(
-            "OFFICIAL_TARGET_URL", "http://127.0.0.1:8090/leaderboard.html"
+            "OFFICIAL_TARGET_URL",
+            "http://127.0.0.1:8090/leaderboard-runs.html#fixed-targets",
         ),
         help="Leaderboard page URL (default: local server on port 8090).",
     )

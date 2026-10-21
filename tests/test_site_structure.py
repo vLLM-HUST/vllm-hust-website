@@ -17,7 +17,7 @@ def test_required_entry_files_exist() -> None:
     root = Path(__file__).resolve().parents[1]
     required = [
         root / "index.html",
-        root / "leaderboard.html",
+        root / "leaderboard-runs.html",
         root / "dataset-validation.html",
         root / "achievements.html",
         root / "contributors.html",
@@ -111,7 +111,7 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
     assert icon.stat().st_size > 1000
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "news.html",
         "contributors.html",
@@ -925,9 +925,9 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     assert "--check" in script
     assert "leaderboard-data/dataset-validation" in workflow
     assert "python scripts/sync_dataset_validation_snapshots.py" in workflow
-    assert "id: create-pull-request" in workflow
-    assert "gh pr merge" in workflow
-    assert "--auto" in workflow
+    assert "actions/upload-artifact@v4" in workflow
+    assert "create-pull-request" not in workflow
+    assert "gh pr merge" not in workflow
     assert "group: ${{ github.workflow }}" in workflow
 
 
@@ -970,16 +970,19 @@ def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
         assert re.search(r"cache\s*:\s*['\"]no-cache", text), name
 
     page_cache_keys = {
-        "leaderboard.html": "version-scoped-baseline-20261010",
-        "leaderboard-runs.html": "preserved-evidence-20261010",
-        "dataset-validation.html": "quality-regression-20261020",
-        "members.html": "data-freshness-20261009",
-        "news.html": "data-freshness-20261009",
-        "plugins.html": "taxonomy-v2-20261012",
+        "leaderboard-runs.html": (
+            "version-scoped-baseline-20261010",
+            "preserved-evidence-20261010",
+        ),
+        "dataset-validation.html": ("quality-regression-20261020",),
+        "members.html": ("data-freshness-20261009",),
+        "news.html": ("data-freshness-20261009",),
+        "plugins.html": ("taxonomy-v2-20261012",),
     }
-    for name, cache_key in page_cache_keys.items():
+    for name, cache_keys in page_cache_keys.items():
         text = (root / name).read_text(encoding="utf-8")
-        assert cache_key in text, name
+        for cache_key in cache_keys:
+            assert cache_key in text, name
 
 
 def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
@@ -1027,7 +1030,7 @@ def test_public_files_do_not_expose_internal_environment_identifiers() -> None:
 
 def test_index_cache_busts_leaderboard_script() -> None:
     root = Path(__file__).resolve().parents[1]
-    text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
 
     assert re.search(r'\.\/assets\/hf-data-loader\.js\?v=[^"\']+', text)
     assert re.search(r'\.\/assets\/leaderboard\.js\?v=[^"\']+', text)
@@ -1092,7 +1095,7 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
 
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "courses.html",
@@ -1116,7 +1119,7 @@ def test_courses_page_exposes_course_materials_and_project_pointers() -> None:
 
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "conferences.html",
@@ -1148,7 +1151,7 @@ def test_language_toggle_is_integrated_into_the_enhanced_navigation() -> None:
 
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "conferences.html",
@@ -1186,7 +1189,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
 
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "conferences.html",
@@ -1194,7 +1197,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=coverage-20261016" in text
+        assert "assets/site.js?v=performance-20261020" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1321,7 +1324,7 @@ def test_subpages_use_shared_ecosystem_visual_system() -> None:
     css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
     for name in (
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "conferences.html",
@@ -1350,7 +1353,7 @@ def test_cosmic_background_uses_scrollbar_safe_viewport_width() -> None:
 
 def test_leaderboard_model_column_and_timestamp_fallback_are_deployable() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
 
@@ -1478,7 +1481,7 @@ def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract()
     None
 ):
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
     assert html_text.index("assets/leaderboard.css") < html_text.index(
@@ -1514,7 +1517,7 @@ def test_leaderboard_summary_cards_have_complete_light_theme_contrast_contract()
 
 def test_leaderboard_failure_state_has_bilingual_aa_contrast_contract() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "subpages.css").read_text(encoding="utf-8")
 
     assert "site-structure-20260816" in html_text
@@ -1957,7 +1960,7 @@ def test_leaderboard_overview_compare_scope_includes_precision() -> None:
 
 def test_leaderboard_renders_interactive_trend_chart() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
     css_text = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
 
@@ -2797,7 +2800,7 @@ def test_contributor_profile_cards_have_readable_light_theme_colors() -> None:
 def test_leaderboard_uses_one_metric_state_contract_across_views() -> None:
     root = Path(__file__).resolve().parents[1]
     js_text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
-    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
 
     assert "function getMetricState(entry, metricKey)" in js_text
     assert "function getMeasuredMetricValue(entry, metricKey)" in js_text
@@ -2829,7 +2832,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=coverage-20261016" in html_text
+    assert "assets/site.js?v=performance-20261020" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js
@@ -2870,7 +2873,7 @@ def test_all_pages_have_issues_nav_link() -> None:
 
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "conferences.html",
@@ -2978,7 +2981,7 @@ def test_trend_coverage_contract_fields_are_consumed() -> None:
 def test_trend_view_toggle_is_present_in_html() -> None:
     """Issue #150: the leaderboard exposes a checkpoint vs targeted view toggle."""
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html_text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
 
     assert 'data-trend-view="checkpoint"' in html_text
     assert 'data-trend-view="targeted"' in html_text
@@ -3243,7 +3246,7 @@ def test_leaderboard_has_official_target_card_markup() -> None:
     its renderer, but must not hard-code the target configuration.
     """
     root = Path(__file__).resolve().parents[1]
-    text = (root / "leaderboard.html").read_text(encoding="utf-8")
+    text = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
 
     assert 'id="official-target-card"' in text
     assert 'id="official-target-eyebrow"' in text
@@ -3255,14 +3258,14 @@ def test_leaderboard_has_official_target_card_markup() -> None:
     # hard-coding config in the frontend).
     for forbidden in ("910B2", "Qwen", "0.18.0", "32768", "0.6"):
         assert not re.search(rf"\b{re.escape(forbidden)}\b", text), (
-            f"leaderboard.html must not hard-code target config: {forbidden}"
+            f"leaderboard-runs.html must not hard-code target config: {forbidden}"
         )
 
 
 def test_fixed_target_registry_is_plural_and_consistent_sitewide() -> None:
     """No page may present one registry row as the universal official target."""
     root = Path(__file__).resolve().parents[1]
-    leaderboard = (root / "leaderboard.html").read_text(encoding="utf-8")
+    leaderboard = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
     renderer = (root / "assets" / "official-targets.js").read_text(encoding="utf-8")
     styles = (root / "assets" / "leaderboard.css").read_text(encoding="utf-8")
@@ -3987,7 +3990,7 @@ def test_specialty_hardware_series_identity_encoded_in_source() -> None:
     """
     root = Path(__file__).resolve().parents[1]
     text = (root / "assets" / "leaderboard.js").read_text(encoding="utf-8")
-    html = (root / "leaderboard.html").read_text(encoding="utf-8")
+    html = (root / "leaderboard-runs.html").read_text(encoding="utf-8")
 
     # Dedicated specialty view button + admission gate.
     assert 'data-trend-view="specialty"' in html

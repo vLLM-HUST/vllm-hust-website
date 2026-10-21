@@ -14,15 +14,16 @@ def test_primary_navigation_separates_publications_from_performance_data() -> No
     assert "label: 'navPublications'" in SITE_JS
     assert "pages: ['achievements', 'news']" in SITE_JS
     assert "label: 'navPerformance'" in SITE_JS
-    assert (
-        "pages: ['leaderboard', 'leaderboard-v2', 'dataset-validation', "
-        "'dataset-matrix-v1', 'capability-coverage', 'serving-plan']" in SITE_JS
-    )
+    assert "pages: ['leaderboard-v2', 'dataset-validation', 'serving-plan']" in SITE_JS
     assert (
         "['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves']"
         in SITE_JS
     )
-    assert "['leaderboard', './leaderboard.html', 'navFixedTarget']" in SITE_JS
+    assert "['serving-plan', './serving-plan.html', 'navServingPlan']" in SITE_JS
+    performance = SITE_JS.split("id: 'performance',", 1)[1].split(
+        "id: 'community',", 1
+    )[0]
+    assert performance.count("['") == 4  # Page membership plus three links.
     assert (
         "['dataset-validation', './dataset-validation.html', "
         "'navDatasetValidation']" in SITE_JS
@@ -61,22 +62,21 @@ def test_published_dataset_validation_is_in_shared_navigation() -> None:
     )
     assert "navLeaderboard: 'Benchmarks'" in SITE_JS
     assert "navLeaderboard: '评测'" in SITE_JS
-    assert "navDatasetValidation: 'Dataset matrix'" in SITE_JS
-    assert "navDatasetValidation: '数据集矩阵'" in SITE_JS
+    assert "navDatasetValidation: 'Dataset evaluation'" in SITE_JS
+    assert "navDatasetValidation: '数据集评测'" in SITE_JS
     assert "navLeaderboardV2" not in SITE_JS
 
 
 def test_benchmark_pages_share_plain_language_subnavigation() -> None:
     pages = {
         "leaderboard-runs.html": "navPerformanceCurves",
-        "leaderboard.html": "navFixedTarget",
         "dataset-validation.html": "navDatasetValidation",
     }
     for name, active_key in pages.items():
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'class="benchmark-tabs"' in text
+        assert 'href="./serving-plan.html"' in text
         assert 'href="./leaderboard-runs.html"' in text
-        assert 'href="./leaderboard.html"' in text
         assert 'href="./dataset-validation.html"' in text
         assert f'data-i18n-common="{active_key}"' in text
         assert 'aria-current="page"' in text
@@ -85,7 +85,7 @@ def test_benchmark_pages_share_plain_language_subnavigation() -> None:
 def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() -> None:
     for name in (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
         "members.html",
@@ -98,7 +98,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">Ecosystem</a>' in text, name
-        assert "assets/site.js?v=coverage-20261016" in text, name
+        assert "assets/site.js?v=performance-20261020" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -138,14 +138,14 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=benchmarks-ia-20261003" in versions
-    assert "assets/site.js?v=coverage-20261016" in versions
+    assert "assets/site.js?v=performance-20261020" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
 def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     pages = (
         "index.html",
-        "leaderboard.html",
+        "leaderboard-runs.html",
         "achievements.html",
         "news.html",
         "contributors.html",
@@ -160,7 +160,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=coverage-20261016" in text
+        assert "assets/site.js?v=performance-20261020" in text
         if name not in ("index.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 

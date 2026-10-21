@@ -1,6 +1,7 @@
 (() => {
-    const cells = [...document.querySelectorAll('.coverage-cell')];
-    document.querySelectorAll('[data-expand]').forEach((button) => {
+    const root = document.getElementById('coverage-content') || document;
+    const cells = [...root.querySelectorAll('.coverage-cell')];
+    root.querySelectorAll('[data-expand]').forEach((button) => {
         button.addEventListener('click', () => {
             const mode = button.dataset.expand;
             cells.forEach((cell) => {
