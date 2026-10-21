@@ -38,6 +38,10 @@
         .then(value => {
             if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.50' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
+            // Adjacent source tables can retain Markdown separators in a row.
+            for (const section of value.sections) for (const table of section.tables) {
+                table.rows = table.rows.filter(row => !row.every(cell => /^:?-+:?$/.test(cell.trim())));
+            }
             data = value; render();
         })
         .catch(() => { failed = true; render(); });

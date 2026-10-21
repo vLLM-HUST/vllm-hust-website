@@ -41,6 +41,13 @@ def main():
                         section = page.locator(f"#midterm-{ident}")
                         section.scroll_into_view_if_needed()
                         expect(section).to_be_visible()
+                        assert section.locator("h3").evaluate(
+                            "e => getComputedStyle(e).color === 'rgb(23, 33, 43)'"
+                        )
+                        assert section.locator("tbody tr").evaluate_all(
+                            "rows => rows.every(row => ![...row.cells].every("
+                            "cell => /^:?-+:?$/.test(cell.textContent.trim())))"
+                        )
                         assert section.locator("tbody tr").count() > 0
                         page.screenshot(
                             path=output / f"{filename}-{width}-{lang}-{ident}.png"
