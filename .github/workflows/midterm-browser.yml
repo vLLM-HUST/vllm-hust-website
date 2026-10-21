@@ -2,6 +2,11 @@ name: Midterm publication browser
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      url:
+        description: Optional deployed site URL for post-deploy verification
+        required: false
+        default: ''
 permissions:
   contents: read
 jobs:
@@ -29,11 +34,13 @@ jobs:
           python -m pytest tests/test_benchmark_publication.py -q
           python -m playwright install --with-deps chromium
       - name: Verify default scenario, report sections, languages and mobile layout
+        env:
+          VERIFY_URL: ${{ inputs.url || 'http://127.0.0.1:8769' }}
         run: |
           python -m http.server 8769 --bind 127.0.0.1 > /tmp/midterm-server.log 2>&1 &
           website_server_pid=$!
           trap 'kill "$website_server_pid"' EXIT
-          python scripts/verify_midterm_browser.py
+          python scripts/verify_midterm_browser.py --url "$VERIFY_URL"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

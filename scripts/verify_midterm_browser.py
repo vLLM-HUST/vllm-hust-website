@@ -34,6 +34,7 @@ def main():
                         "candidates",
                         "quality",
                         "long-context",
+                        "long-diagnostic",
                         "resources",
                         "m01",
                     ):
@@ -41,6 +42,9 @@ def main():
                         section.scroll_into_view_if_needed()
                         expect(section).to_be_visible()
                         assert section.locator("tbody tr").count() > 0
+                        page.screenshot(
+                            path=output / f"{filename}-{width}-{lang}-{ident}.png"
+                        )
                     expect(page.locator("#midterm-quality")).to_contain_text("147/200")
                     expect(page.locator("#midterm-quality")).to_contain_text("152/200")
                     expect(page.locator("#midterm-resources")).to_contain_text("2.68%")
@@ -69,6 +73,7 @@ def main():
                     print(filename, width, lang, "PASS", flush=True)
                     page.close()
         page = browser.new_page()
+        page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
             "**/data/midterm-v050.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
