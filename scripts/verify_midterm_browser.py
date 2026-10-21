@@ -77,6 +77,11 @@ def main():
                     errors = []
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.goto(f"{args.url}/{filename}", wait_until="domcontentloaded")
+                    expect(
+                        page.locator('script[src*="midterm-report.js"]')
+                    ).to_have_attribute(
+                        "src", "./assets/midterm-report.js?v=midterm-v053-20261021"
+                    )
                     expect(page.locator("#midterm-report")).to_have_attribute(
                         "data-loaded", "V0.53", timeout=30000
                     )

@@ -31,6 +31,7 @@ class Elements(HTMLParser):
         super().__init__()
         self.ids = []
         self.links = []
+        self.scripts = []
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
@@ -38,6 +39,19 @@ class Elements(HTMLParser):
             self.ids.append(attrs["id"])
         if tag == "a":
             self.links.append(attrs.get("href", ""))
+        if tag == "script":
+            self.scripts.append(attrs.get("src", ""))
+
+
+def test_midterm_loader_cache_key_matches_publication_version():
+    loader = (ROOT / "assets/midterm-report.js").read_text()
+    assert "./data/midterm-v053.json" in loader
+    for filename in ("dataset-validation.html", "leaderboard-runs.html"):
+        parser = Elements()
+        parser.feed((ROOT / filename).read_text())
+        assert [src for src in parser.scripts if "midterm-report.js" in src] == [
+            "./assets/midterm-report.js?v=midterm-v053-20261021"
+        ]
 
 
 def test_three_destinations_preserve_sections_without_duplicate_ids():
