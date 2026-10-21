@@ -15,6 +15,19 @@
   const number = value => Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—';
   let data;
   let failed = false;
+  const original = id => {
+    const paths = { baseline: ['blob', 'aligned-mmlu-b0.tar.gz'],
+      'e16-r36': ['blob', 'aligned-mmlu-b1.tar.gz'], e32: ['blob', 'b1-e32-screen-evidence.tar.gz'],
+      e24: ['blob', 'b1-e24-screen-evidence.tar.gz'], kvmat: ['blob', 'b1-kvmat-screen-evidence.tar.gz'],
+      'kvmat-e24': ['blob', 'b1-kvmat-e24-screen-evidence.tar.gz'],
+      'microflow-fa-median': ['tree', 'microflow-school028'],
+      'vspec-argmax-median': ['tree', 'vspec-school028'] };
+    const source = paths[id];
+    if (!source || !/^[a-f0-9]{40}$/.test(data?.source?.commit || '')) return null;
+    return `https://github.com/vLLM-HUST/vllm-hust-benchmark/${source[0]}/${data.source.commit}/reports/vllm-hust-midterm-20261019/${source[1]}`;
+  };
+  const linkedNumber = (value, id) => original(id)
+    ? `<a class="raw-evidence" href="${original(id)}" title="原始测试数据 / Original test data">${number(value)}</a>` : number(value);
   function render() {
     const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
     const title = zh ? 'MMLU-Pro · 当前实测 B0 / B1' : 'MMLU-Pro · Current measured B0 / B1';
@@ -30,15 +43,15 @@
     const rows = data.results.map(result => {
       const metric = data.metrics.find(item => item.id === result.metric_id);
       const candidate = result.candidate_values?.find(item => item.candidate_id === result.selected_candidate_id);
-      return `<tr><th scope="row">${escape(labels[result.metric_id] || result.metric_id)}</th><td>${number(result.baseline_value)}</td><td>${number(result.value)}</td><td>${escape(metric?.unit || '')}</td><td>${escape(candidate?.label || result.selected_candidate_id || '')}</td></tr>`;
+      return `<tr><th scope="row">${escape(labels[result.metric_id] || result.metric_id)}</th><td>${linkedNumber(result.baseline_value, 'baseline')}</td><td>${linkedNumber(result.value, result.selected_candidate_id)}</td><td>${escape(metric?.unit || '')}</td><td>${escape(candidate?.label || result.selected_candidate_id || '')}</td></tr>`;
     }).join('');
     const throughput = data.results.find(item => item.metric_id === 'output_token_throughput');
     const points = throughput ? [
-      { label: 'B0 Native', value: throughput.baseline_value },
+      { label: 'B0 Native', value: throughput.baseline_value, candidate_id: 'baseline' },
       ...(throughput.candidate_values || [])
     ].filter(item => Number.isFinite(item.value) && item.value >= 0) : [];
     const maximum = Math.max(1, ...points.map(item => item.value));
-    const bars = points.map(item => `<li><span>${escape(item.label || item.candidate_id)}</span><div class="measurement-bar-track"><div class="measurement-bar" style="width:${item.value / maximum * 100}%"></div></div><strong>${number(item.value)}</strong></li>`).join('');
+    const bars = points.map(item => `<li><span>${escape(item.label || item.candidate_id)}</span><div class="measurement-bar-track"><div class="measurement-bar" style="width:${item.value / maximum * 100}%"></div></div><strong>${linkedNumber(item.value, item.candidate_id)}</strong></li>`).join('');
     const report = data.source?.report_url;
     const safeReport = typeof report === 'string' && report.startsWith('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/');
     section.innerHTML = `<h2>${title}</h2>
