@@ -67,7 +67,11 @@ def main():
             )
             expect(page.locator(".matrix-missing")).to_have_count(missing)
             expect(page.locator(".matrix-status")).to_have_count(statuses)
-            expect(page.locator('[data-nav-page="dataset-matrix-v1"]')).to_have_count(1)
+            expect(
+                page.locator(
+                    '[data-nav-group="performance"] a[href="./dataset-validation.html"]'
+                )
+            ).to_have_count(1)
             page.screenshot(
                 path=str(args.output / f"overview-{width}-{lang}.png"), full_page=True
             )
