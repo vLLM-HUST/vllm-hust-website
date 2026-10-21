@@ -23,7 +23,7 @@
         const table = item => `<div class="measurement-table-scroll" tabindex="0" role="region" aria-label="${escape(item.headers.join(' / '))}"><table><thead><tr>${item.headers.map(h => `<th scope="col">${escape(h)}</th>`).join('')}</tr></thead><tbody>${item.rows.map(row => `<tr>${row.map((cell, i) => i === 0 ? `<th scope="row">${escape(cell)}</th>` : `<td>${escape(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
         panel.innerHTML = `<h2>${title} ${escape(data.version)}</h2>
             <p>${zh ? '下列数值与口径来自中文报告；核心B0/B1在上方，完整候选及验收边界在下方。' : 'Values and scope below retain the Chinese source report wording. Core B0/B1 metrics appear above; candidates and qualification limits follow.'}</p>
-            <p><a href="${escape(data.report_url)}">${zh ? '阅读完整 V0.50 报告' : 'Read the complete V0.50 report'}</a></p>
+            <p><a href="${escape(data.report_url)}">${zh ? `阅读完整 ${escape(data.version)} 报告` : `Read the complete ${escape(data.version)} report`}</a></p>
             <nav aria-label="${title}">${data.sections.map(s => `<a href="#midterm-${escape(s.id)}">${escape(s.title.split(' / ')[zh ? 0 : 1])}</a>`).join(' · ')}</nav>
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
             <p>${escape(data.kv_audit.scope)}</p>
@@ -33,10 +33,10 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    fetch('./data/midterm-v050.json', { cache: 'no-cache' })
+    fetch('./data/midterm-v052.json', { cache: 'no-cache' })
         .then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })
         .then(value => {
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.50' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.52' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             // Adjacent source tables can retain Markdown separators in a row.
             for (const section of value.sections) for (const table of section.tables) {
