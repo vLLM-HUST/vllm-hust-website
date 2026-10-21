@@ -1,0 +1,73 @@
+name: Deploy Pages From Benchmark
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [benchmark-publication]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: benchmark-pages-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout website presentation
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: website
+          persist-credentials: false
+      - name: Checkout merged benchmark publication
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: main
+          path: benchmark
+          persist-credentials: false
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate committed benchmark data and source manifest
+        run: |
+          benchmark_commit=$(git -C benchmark rev-parse HEAD)
+          python benchmark/scripts/sync_website_publication.py publish \
+            --revision "$benchmark_commit" --website website
+          python benchmark/scripts/sync_website_publication.py check \
+            --revision "$benchmark_commit" --website website
+      - name: Validate publication and presentation
+        working-directory: website
+        run: |
+          python -m pip install pytest
+          python -m pytest -q tests/test_benchmark_publication.py
+          node --test tests/loader_publication_identity.test.cjs tests/b1_definition.test.cjs tests/mmlu_pro_handoff.test.cjs tests/dataset_validation_b0.test.cjs
+      - name: Upload assembled site without committing generated data
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy validated artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

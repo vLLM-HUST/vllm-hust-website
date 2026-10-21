@@ -37,11 +37,19 @@ does not claim that every historical measurement has completed methodological or
 1. Reconcile any measurements updated by ongoing report work into the benchmark publication source;
    verify embedded original provenance.
 1. Commit and merge the benchmark publication source and sync tool.
-1. Run `publish --revision <full-merged-commit> --website <website-checkout>`.
-1. Run the website source-manifest test, full pytest, Node tests, and
-   `scripts/verify_performance_navigation.py`.
-1. Commit and merge the website changes, wait for Pages, then compare production files against the
-   committed manifest and inspect all three entries.
+1. Trigger `Deploy Pages From Benchmark` (`deploy-benchmark-pages.yml`) on website `main`, or send a
+   `benchmark-publication` repository dispatch. Website code merges also trigger this workflow.
+1. The workflow checks out benchmark `main`, resolves its exact commit, and runs
+   `publish --revision <full-merged-commit>` into a temporary website checkout. It verifies the
+   manifest and runs publication and presentation tests before uploading the Pages artifact.
+1. Deploy that artifact with GitHub Pages Actions, without committing generated `data/` files or
+   opening a website data PR. Pages must use the Actions build source, not legacy branch builds.
+1. Compare production files against the generated manifest and inspect all three entries. The
+   manifest's commit is the authoritative data version; website code and data commits may differ.
+
+The `Prepare Benchmark Data Artifact` workflow is a preview-only diagnostic and does not deploy. Do
+not bypass the website data-PR policy to publish generated files. Changes to benchmark data are
+released through the deployment workflow above after merging the benchmark PR.
 
 Tests for this migration verify navigation, preserved sections, unique DOM IDs, calculation behavior
 and publication bytes. They do not substitute for a methodological audit of every historical
