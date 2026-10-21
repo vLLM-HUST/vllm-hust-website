@@ -12,7 +12,7 @@ body .current-measurements a { color: #086b60; }
 .current-measurements td:last-child { min-width: 220px; overflow-wrap: anywhere; }
 .current-measurements details { margin-top: 16px; }
 .midterm-report section { margin-top: 32px; scroll-margin-top: 90px; }
-.midterm-report h3 { color: #17212b; font-size: 19px; letter-spacing: normal; }
+body #midterm-report h3 { color: #17212b; -webkit-text-fill-color: #17212b; font-size: 19px; letter-spacing: normal; }
 .midterm-report nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
 .midterm-report .midterm-audit { padding: 16px; border: 1px solid #a26a19; background: #fff8e8; margin-top: 20px; }
 .midterm-report .midterm-caption { font-size: 12px; }
