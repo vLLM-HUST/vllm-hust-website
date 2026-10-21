@@ -9,8 +9,8 @@
 ## Product boundary
 
 Experimental datasets, measurements and raw evidence use the
-[canonical benchmark sources](EVIDENCE_SOURCES.md). Software packages remain
-in their implementation Releases; those are not experimental data copies.
+[canonical benchmark sources](EVIDENCE_SOURCES.md). Software packages remain in their implementation
+Releases; those are not experimental data copies.
 
 vLLM-HUST Extension Manager (`vllm-hust-ext`) provides discovery, compatibility evidence,
 configuration, enablement intent, state projection, conflict checks, and delegation. It is not a
