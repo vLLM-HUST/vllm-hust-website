@@ -2,8 +2,7 @@
 
 ## 数据提交规则
 
-**本仓库不接受数据 PR。数据必须 PR 到
-[vllm-hust-benchmark](https://github.com/vLLM-HUST/vllm-hust-benchmark)。**
+**本仓库不接受数据 PR。数据必须 PR 到 [vllm-hust-benchmark](https://github.com/vLLM-HUST/vllm-hust-benchmark)。**
 
 - 网站 PR 只修改展示、交互、代码、测试或文档。
 - 实测结果、曲线点、矩阵单元格、基线、价格依据、实验元数据和原始证据均提交到 benchmark。

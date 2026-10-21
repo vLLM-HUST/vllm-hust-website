@@ -1,8 +1,8 @@
 # vllm-hust-website (Website Demo Kit)
 
-**数据提交规则：本仓库不接受数据 PR。** 实验结果、曲线、矩阵、基线、价格依据、元数据与证据
-必须 PR 到 [vllm-hust-benchmark](https://github.com/vLLM-HUST/vllm-hust-benchmark)。
-网站只接收展示和代码变更。详见 [贡献规则](CONTRIBUTING.md)。
+**数据提交规则：本仓库不接受数据 PR。** 实验结果、曲线、矩阵、基线、价格依据、元数据与证据 必须 PR 到
+[vllm-hust-benchmark](https://github.com/vLLM-HUST/vllm-hust-benchmark)。 网站只接收展示和代码变更。详见
+[贡献规则](CONTRIBUTING.md)。
 
 <!-- BEGIN:VERSION_META -->
 

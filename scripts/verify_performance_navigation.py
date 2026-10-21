@@ -1,5 +1,6 @@
 """Local browser acceptance for the consolidated three-entry navigation."""
 
+import os
 import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -8,7 +9,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-BROWSER = "/root/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux-arm64/chrome-headless-shell"
+OUTPUT = ROOT / "output/playwright/performance-navigation"
 
 
 class QuietHandler(SimpleHTTPRequestHandler):
@@ -23,8 +24,13 @@ def main():
     threading.Thread(target=server.serve_forever, daemon=True).start()
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(executable_path=BROWSER, args=["--no-sandbox"])
+            launch = {"args": ["--no-sandbox"]}
+            executable = os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
+            if executable:
+                launch["executable_path"] = executable
+            browser = p.chromium.launch(**launch)
             try:
+                OUTPUT.mkdir(parents=True, exist_ok=True)
                 for width in (390, 1440):
                     for language in ("zh", "en"):
                         for filename in (
@@ -89,7 +95,8 @@ def main():
                             }""")
                             assert not errors, errors
                             page.screenshot(
-                                path=f"/tmp/performance-navigation-{filename}-{width}-{language}.png"
+                                path=OUTPUT
+                                / f"{filename.removesuffix('.html')}-{width}-{language}.png"
                             )
                             print(filename, width, language, "PASS", flush=True)
                             page.close()
