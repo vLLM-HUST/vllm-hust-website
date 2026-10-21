@@ -1,6 +1,8 @@
 """Verify the assembled benchmark publication in real desktop/mobile browsers."""
 
 import argparse
+import hashlib
+import json
 import os
 from pathlib import Path
 
@@ -19,6 +21,37 @@ def main():
         browser = p.chromium.launch(
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
+        context = browser.new_context()
+        response = context.request.get(f"{args.url}/data/midterm-v052.json")
+        assert response.ok
+        raw = response.body()
+        report = json.loads(raw)
+        assert report["version"] == "V0.52"
+        manifest_response = context.request.get(
+            f"{args.url}/data/benchmark-source-manifest.json"
+        )
+        assert manifest_response.ok
+        manifest = manifest_response.json()
+        entry = next(
+            f
+            for f in manifest["files"]
+            if f["website_path"] == "data/midterm-v052.json"
+        )
+        assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
+        assert len(raw) == entry["bytes"]
+        (output / "publication-identity.json").write_text(
+            json.dumps(
+                {
+                    "url": args.url,
+                    "benchmark_commit": manifest["commit"],
+                    "report_url": report["report_url"],
+                    "file": entry,
+                },
+                indent=2,
+            )
+            + "\n"
+        )
+        context.close()
         for width in (390, 1440):
             for lang in ("zh", "en"):
                 for filename in ("dataset-validation.html", "leaderboard-runs.html"):
@@ -27,7 +60,7 @@ def main():
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.goto(f"{args.url}/{filename}", wait_until="domcontentloaded")
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.50", timeout=30000
+                        "data-loaded", "V0.52", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     for ident in (
@@ -37,6 +70,8 @@ def main():
                         "long-diagnostic",
                         "resources",
                         "m01",
+                        "runtime-recovery",
+                        "state-commit",
                     ):
                         section = page.locator(f"#midterm-{ident}")
                         section.scroll_into_view_if_needed()
@@ -56,6 +91,18 @@ def main():
                     expect(page.locator("#midterm-quality")).to_contain_text("152/200")
                     expect(page.locator("#midterm-resources")).to_contain_text("2.68%")
                     expect(page.locator("#midterm-m01")).to_contain_text("未判定")
+                    expect(page.locator("#midterm-runtime-recovery")).to_contain_text(
+                        "每卡36项变输入检查通过"
+                    )
+                    expect(page.locator("#midterm-state-commit")).to_contain_text(
+                        "r1/r2导入失败原样保留"
+                    )
+                    expect(page.locator("#midterm-state-commit")).to_contain_text(
+                        "不能排除完整模型跨轮状态污染"
+                    )
+                    expect(page.locator("#midterm-report > p a")).to_contain_text(
+                        "V0.52"
+                    )
                     expect(page.locator("#midterm-kv-audit")).to_contain_text(
                         "不能排除"
                     )
@@ -82,7 +129,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v050.json",
+            "**/data/midterm-v052.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
