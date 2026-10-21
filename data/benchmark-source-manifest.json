@@ -1,7 +1,7 @@
 {
   "schema": "benchmark-website-publication/v1",
   "repository": "vLLM-HUST/vllm-hust-benchmark",
-  "commit": "62981c81f9a40951bd1557b4ffa4d8b0e86c5918",
+  "commit": "4d70edff438e57b4357f7b74fa26bdbf4c497e7e",
   "status": "published-source",
   "scope": "Website data files; original experiment provenance is retained inside each artifact.",
   "files": [
@@ -190,8 +190,8 @@
     {
       "website_path": "data/dataset_validation_qwen35_mmlu_school028_inf_out256.json",
       "benchmark_path": "website-publication/data/dataset_validation_qwen35_mmlu_school028_inf_out256.json",
-      "sha256": "ac4553e778ae720c020bc86c55d5f6425dadeac43db1ab3c9e237b65fdc63ceb",
-      "source_sha256": "ac4553e778ae720c020bc86c55d5f6425dadeac43db1ab3c9e237b65fdc63ceb",
+      "sha256": "5219c73c56899b927afee6123594f95fbcf2da69bf44b6f0b773eac9df219ec5",
+      "source_sha256": "5219c73c56899b927afee6123594f95fbcf2da69bf44b6f0b773eac9df219ec5",
       "bytes": 27435
     },
     {
