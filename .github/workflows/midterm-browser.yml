@@ -36,6 +36,7 @@ jobs:
       - name: Verify default scenario, report sections, languages and mobile layout
         env:
           VERIFY_URL: ${{ inputs.url || 'http://127.0.0.1:8769' }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           python -m http.server 8769 --bind 127.0.0.1 > /tmp/midterm-server.log 2>&1 &
           website_server_pid=$!

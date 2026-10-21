@@ -18,6 +18,7 @@ body #midterm-report h3 { color: #17212b; -webkit-text-fill-color: #17212b; font
 .midterm-report .midterm-caption { font-size: 12px; }
 .midterm-report .measurement-table-scroll:focus { outline: 2px solid #086b60; }
 .midterm-report { min-width: 0; max-width: 100%; }
+.midterm-report .midterm-evidence { overflow-wrap: anywhere; font-size: 13px; }
 .current-measurements summary { cursor: pointer; }
 .measurement-bars { padding: 0; list-style: none; }
 .measurement-bars li { display: grid; grid-template-columns: minmax(0, 3fr) minmax(40px, 2fr) 70px; gap: 12px; align-items: center; padding: 8px 0; font-size: 13px; }

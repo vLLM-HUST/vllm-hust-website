@@ -39,6 +39,24 @@ def main():
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
+        # Validate every destination against one immutable Git tree. Repeated
+        # github.com HEAD requests trigger web rate limiting even for valid URLs.
+        headers = {"Accept": "application/vnd.github+json"}
+        if os.environ.get("GH_TOKEN"):
+            headers["Authorization"] = f"Bearer {os.environ['GH_TOKEN']}"
+        response = context.request.get(
+            "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/"
+            f"git/trees/{manifest['commit']}?recursive=1",
+            headers=headers,
+            timeout=60000,
+        )
+        assert response.ok, response.status
+        tree = response.json()
+        assert not tree["truncated"], "Evidence tree must be complete"
+        paths = {item["path"]: item["type"] for item in tree["tree"]}
+        for section in report["sections"]:
+            for evidence in section["evidence"]:
+                assert paths.get(evidence["path"]) == evidence["kind"], evidence
         (output / "publication-identity.json").write_text(
             json.dumps(
                 {
@@ -84,6 +102,15 @@ def main():
                             "cell => /^:?-+:?$/.test(cell.textContent.trim())))"
                         )
                         assert section.locator("tbody tr").count() > 0
+                        links = section.locator("tbody tr a.raw-evidence")
+                        assert links.count() > 0
+                        assert links.evaluate_all(
+                            "(links, commit) => links.every(a => a.href.startsWith("
+                            "'https://github.com/vLLM-HUST/vllm-hust-benchmark/') && "
+                            "a.href.includes('/' + commit + '/reports/'))",
+                            manifest["commit"],
+                        )
+                        assert section.locator(".midterm-evidence a").count() > 0
                         page.screenshot(
                             path=output / f"{filename}-{width}-{lang}-{ident}.png"
                         )
@@ -106,6 +133,12 @@ def main():
                     expect(page.locator("#midterm-kv-audit")).to_contain_text(
                         "不能排除"
                     )
+                    assert (
+                        page.locator(
+                            ".current-measurements:not(#midterm-report) table a.raw-evidence"
+                        ).count()
+                        == 6
+                    )
                     if filename == "dataset-validation.html":
                         expect(page.locator("#validation-model-select")).to_have_value(
                             SCENARIO
@@ -126,6 +159,23 @@ def main():
                     page.screenshot(path=output / f"{filename}-{width}-{lang}.png")
                     print(filename, width, lang, "PASS", flush=True)
                     page.close()
+        for filename in ("betterscale.html", "traceloom.html", "serving-plan.html"):
+            page = browser.new_page(viewport={"width": 390, "height": 1000})
+            page.goto(f"{args.url}/{filename}", wait_until="domcontentloaded")
+            expect(page.locator("a.benchmark-publication-link").first).to_be_attached(
+                timeout=30000
+            )
+            assert (
+                page.locator("a[data-benchmark-linked]").count()
+                == page.locator("a.benchmark-publication-link").count()
+            )
+            assert page.locator("a.benchmark-publication-link").evaluate_all(
+                "(links, commit) => links.every(a => a.href.startsWith("
+                "'https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/' + commit + '/'))",
+                manifest["commit"],
+            )
+            print(filename, "canonical source links PASS", flush=True)
+            page.close()
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
