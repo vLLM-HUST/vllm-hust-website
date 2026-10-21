@@ -11,6 +11,13 @@ body .current-measurements a { color: #086b60; }
 .current-measurements th, .current-measurements td { padding: 10px; border-bottom: 1px solid #8886; text-align: left; vertical-align: top; min-width: 85px; }
 .current-measurements td:last-child { min-width: 220px; overflow-wrap: anywhere; }
 .current-measurements details { margin-top: 16px; }
+.midterm-report section { margin-top: 32px; scroll-margin-top: 90px; }
+body #midterm-report h3 { color: #17212b; -webkit-text-fill-color: #17212b; font-size: 19px; letter-spacing: normal; }
+.midterm-report nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.midterm-report .midterm-audit { padding: 16px; border: 1px solid #a26a19; background: #fff8e8; margin-top: 20px; }
+.midterm-report .midterm-caption { font-size: 12px; }
+.midterm-report .measurement-table-scroll:focus { outline: 2px solid #086b60; }
+.midterm-report { min-width: 0; max-width: 100%; }
 .current-measurements summary { cursor: pointer; }
 .measurement-bars { padding: 0; list-style: none; }
 .measurement-bars li { display: grid; grid-template-columns: minmax(0, 3fr) minmax(40px, 2fr) 70px; gap: 12px; align-items: center; padding: 8px 0; font-size: 13px; }

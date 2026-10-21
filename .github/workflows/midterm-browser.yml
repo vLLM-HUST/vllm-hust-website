@@ -1,0 +1,48 @@
+name: Midterm publication browser
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Optional deployed site URL for post-deploy verification
+        required: false
+        default: ''
+permissions:
+  contents: read
+jobs:
+  midterm-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: main
+          path: _benchmark
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Assemble benchmark publication
+        run: |
+          python _benchmark/scripts/sync_website_publication.py publish --revision "$(git -C _benchmark rev-parse HEAD)" --website .
+          python -m pip install playwright pytest
+          python -m pytest tests/test_benchmark_publication.py -q
+          python -m playwright install --with-deps chromium
+      - name: Verify default scenario, report sections, languages and mobile layout
+        env:
+          VERIFY_URL: ${{ inputs.url || 'http://127.0.0.1:8769' }}
+        run: |
+          python -m http.server 8769 --bind 127.0.0.1 > /tmp/midterm-server.log 2>&1 &
+          website_server_pid=$!
+          trap 'kill "$website_server_pid"' EXIT
+          python scripts/verify_midterm_browser.py --url "$VERIFY_URL"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: midterm-browser-evidence
+          path: output/playwright/midterm/
