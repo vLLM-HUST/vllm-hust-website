@@ -1,6 +1,6 @@
 # SWE-bench Pro：真实软件工程 Agent 数据集
 
-[前端介绍页](../../dataset-introductions.html#swe-bench-pro) · [数据集矩阵](../../dataset-matrix-v1.html)
+[前端介绍页](../../dataset-introductions.html#swe-bench-pro) · [数据集矩阵](../../dataset-validation.html)
 
 ## 任务是什么
 

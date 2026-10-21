@@ -65,6 +65,7 @@ jobs:
           python scripts/verify_betterscale_browser.py --url http://127.0.0.1:8769
           python scripts/verify_traceloom_browser.py --url http://127.0.0.1:8769
           python scripts/verify_incubation_delisting.py --url http://127.0.0.1:8769
+          python scripts/verify_performance_navigation.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -76,6 +77,7 @@ jobs:
             output/playwright/betterscale/
             output/playwright/traceloom/
             output/playwright/incubation-delisting/
+            output/playwright/performance-navigation/
 
   betterscale-package:
     permissions:

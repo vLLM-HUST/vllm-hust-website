@@ -1,4 +1,4 @@
-name: Sync Leaderboard Data
+name: Prepare Benchmark Data Artifact
 
 on:
   repository_dispatch:
@@ -16,8 +16,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
       - name: Checkout website repo
         uses: actions/checkout@v4
@@ -74,24 +73,12 @@ jobs:
             --source-dir _benchmark/leaderboard-data/dataset-validation \
             --target-dir data
 
-      - name: Create pull request
-        id: create-pull-request
-        uses: peter-evans/create-pull-request@v7
+      - name: Save benchmark-derived preview artifact (never a website data PR)
+        uses: actions/upload-artifact@v4
         with:
-          branch: automation/sync-leaderboard-data
-          commit-message: 'data: sync benchmark publications from benchmark repo'
-          title: 'data: sync benchmark publications'
-          body-path: /tmp/leaderboard-sync-pr-body.md
-          delete-branch: true
-
-      - name: Enable merge after required checks
-        if: steps.create-pull-request.outputs.pull-request-number != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh pr merge
-          "${{ steps.create-pull-request.outputs.pull-request-number }}"
-          --repo "${{ github.repository }}"
-          --auto
-          --squash
-          --delete-branch
+          name: benchmark-data-preview-${{ steps.benchmark-source.outputs.commit }}
+          path: |
+            data/
+            /tmp/leaderboard-sync-pr-body.md
+          retention-days: 7
+          if-no-files-found: error

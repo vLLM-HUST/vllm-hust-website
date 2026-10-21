@@ -62,7 +62,7 @@
     function render() {
         if (!data) return;
         const d = dataset(), c = data.cohort;
-        $('matrix-title').textContent = t('数据集矩阵 v1', 'Dataset matrix v1');
+        $('matrix-title').textContent = t('数据集成绩与性能', 'Dataset quality and performance');
         $('matrix-subtitle').textContent = t('先看任务成绩，再看每个数据集上的服务性能。', 'Task quality first. Serving performance, one dataset at a time.');
         $('matrix-cohort').textContent = `${c.model} · ${c.precision} · ${c.hardware} · ${c.parallel}`;
         $('matrix-breadcrumb').innerHTML = d ? `<a href="#overview">← ${t('全部数据集', 'All datasets')}</a><span>/</span><strong>${escape(d.name)}</strong>` : `<strong>${t('全部数据集', 'All datasets')}</strong><span>${t('点击行标题查看性能 →', 'Select a dataset to inspect performance →')}</span>`;

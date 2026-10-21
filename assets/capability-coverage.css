@@ -1,4 +1,7 @@
-:root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: #1d2939; background: #fafbfc; line-height: 1.75; }
+#coverage-content { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: #1d2939; background: #fafbfc; line-height: 1.75; padding: 20px; }
+#coverage-content :is(h1, h2, h3) { color: #1d2939; letter-spacing: 0; }
+#coverage-content h1 { font-size: 24px; }
+@scope (#coverage-content) {
 * { box-sizing: border-box; }
 body { margin: 0; }
 a { color: #285aa8; text-underline-offset: 4px; }
@@ -71,3 +74,4 @@ td:has(.coverage-cell) { padding: 0; }
 .coverage-controls button:hover { background: #edf2f8; }
 .coverage-controls button:focus-visible { outline: 2px solid #507cbb; outline-offset: 2px; }
 @media print { .coverage-controls { display: none; } }
+}

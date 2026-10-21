@@ -1,0 +1,24 @@
+.current-measurements { padding: 24px 16px; border-bottom: 1px solid #8886; margin-bottom: 24px; background: #fff; color: #17212b; }
+#fixed-targets > summary, #coverage > summary { padding: 16px; color: #f8fafc; background: #101a20; cursor: pointer; }
+body .current-measurements h2, body .current-measurements p, body .current-measurements th,
+body .current-measurements td, body .current-measurements summary,
+body .current-measurements span, body .current-measurements strong { color: #17212b; }
+body .current-measurements a { color: #086b60; }
+.current-measurements h2 { font-size: 22px; letter-spacing: 0; }
+.current-measurements p { overflow-wrap: anywhere; }
+.measurement-table-scroll { overflow-x: auto; }
+.current-measurements table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.current-measurements th, .current-measurements td { padding: 10px; border-bottom: 1px solid #8886; text-align: left; vertical-align: top; min-width: 85px; }
+.current-measurements td:last-child { min-width: 220px; overflow-wrap: anywhere; }
+.current-measurements details { margin-top: 16px; }
+.current-measurements summary { cursor: pointer; }
+.measurement-bars { padding: 0; list-style: none; }
+.measurement-bars li { display: grid; grid-template-columns: minmax(0, 3fr) minmax(40px, 2fr) 70px; gap: 12px; align-items: center; padding: 8px 0; font-size: 13px; }
+.measurement-bars li > span { overflow-wrap: anywhere; }
+.measurement-bars strong { text-align: right; }
+.measurement-bar-track { background: #8882; height: 12px; }
+.measurement-bar { height: 12px; background: #188979; }
+@media (max-width: 480px) {
+  .measurement-bars li { grid-template-columns: minmax(0, 1fr) 70px; }
+  .measurement-bars li > span { grid-column: 1 / -1; }
+}

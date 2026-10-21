@@ -87,9 +87,9 @@ def main():
                 page.locator('.site-nav a[href="./dataset-validation.html"]').count()
                 == 1
             )
-            assert page.locator('.site-nav a[href="./leaderboard.html"]').count() == 1
+            assert page.locator('.site-nav a[href="./serving-plan.html"]').count() == 1
             assert nav.text_content().strip() == (
-                "性能曲线" if language == "zh" else "Performance curves"
+                "性能测试" if language == "zh" else "Performance tests"
             )
             assert nav.get_attribute("href") == "./leaderboard-runs.html"
             assert "active" in nav.get_attribute("class")
@@ -235,13 +235,13 @@ def main():
             assert "Agent Research" in selected.inner_text()
             assert page.locator("#tasks-panel").is_visible()
             assert page.locator("#runs-panel").is_hidden()
-            assert page.locator("table:visible").count() == 1
+            assert page.locator("#tasks-panel table:visible").count() == 1
             page.screenshot(
                 path=str(args.output / f"tasks-{width}-{language}-{scheme}.png")
             )
             page.locator("#view-runs").click()
             assert page.locator("#tasks-panel").is_hidden()
-            assert page.locator("table:visible").count() == 1
+            assert page.locator("#runs-panel table:visible").count() == 1
             # Exact-value multi-selection, cancel, search, and numeric ordering.
             page.locator('[data-column="mod"]').click()
             assert page.locator("#column-menu").is_visible()

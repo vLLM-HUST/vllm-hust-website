@@ -1,0 +1,31 @@
+name: Website Data PR Policy
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  no-data-pr:
+    name: No data PRs in website
+    runs-on: ubuntu-latest
+    steps:
+      # Execute only the trusted base policy, never code from the PR.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Read complete PR file list
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --paginate --slurp \
+            "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" > /tmp/pr-files.json
+      - name: Enforce benchmark-only data submissions
+        env:
+          FILE_COUNT: ${{ github.event.pull_request.changed_files }}
+        run: python scripts/check_data_pr_policy.py /tmp/pr-files.json --expected-count "$FILE_COUNT"

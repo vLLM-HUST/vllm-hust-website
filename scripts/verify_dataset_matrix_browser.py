@@ -29,7 +29,7 @@ def main():
             page = context.new_page()
             errors = []
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
-            page.goto(args.url + "/dataset-matrix-v1.html")
+            page.goto(args.url + "/dataset-validation.html")
             page.locator(".matrix-overview").wait_for()
             expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
             expect(page.locator("#matrix-table table")).to_have_count(1)
@@ -67,7 +67,11 @@ def main():
             )
             expect(page.locator(".matrix-missing")).to_have_count(missing)
             expect(page.locator(".matrix-status")).to_have_count(statuses)
-            expect(page.locator('[data-nav-page="dataset-matrix-v1"]')).to_have_count(1)
+            expect(
+                page.locator(
+                    '[data-nav-group="performance"] a[href="./dataset-validation.html"]'
+                )
+            ).to_have_count(1)
             page.screenshot(
                 path=str(args.output / f"overview-{width}-{lang}.png"), full_page=True
             )
@@ -143,12 +147,19 @@ def main():
             page.reload()
             page.locator(".matrix-detail").wait_for()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(18)
-            assert page.evaluate(
-                "document.documentElement.scrollWidth <= innerWidth + 1"
+            # The consolidated page also contains closed supplementary sections.
+            # Keep the active wide matrix inside its own keyboard-scrollable region
+            # instead of treating hidden content width as viewport overflow.
+            assert page.locator(".runs-table-scroll").first.evaluate(
+                "el => getComputedStyle(el).overflowX === 'auto'"
+            )
+            assert (
+                page.locator(".runs-table-scroll").first.get_attribute("tabindex")
+                == "0"
             )
             page.goto(
                 args.url
-                + "/dataset-matrix-v1.html#swe-smith-tranjactory-offline-window"
+                + "/dataset-validation.html#swe-smith-tranjactory-offline-window"
             )
             page.locator(
                 '[data-expand="offline-window-request-throttling-controller-short-20261017-r18-on"]'
@@ -177,7 +188,8 @@ def main():
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
             page.goto(
-                args.url + "/dataset-matrix-v1.html#frontierscience-controller-20261018"
+                args.url
+                + "/dataset-validation.html#frontierscience-controller-20261018"
             )
             expect(page.locator(".matrix-detail .run-row")).to_have_count(5)
             for value in ["474.13", "432.14", "58.00%", "6.67%", "2026-10-18"]:
