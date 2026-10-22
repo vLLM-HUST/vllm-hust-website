@@ -241,6 +241,19 @@ def main():
                         expect(inventory).to_contain_text(score)
                     expect(inventory).to_contain_text("当前B1组合配对为空")
                     expect(inventory.locator("tbody tr")).to_have_count(4)
+                    for index, dataset in enumerate(
+                        ("hle-verified-20261015",) * 2
+                        + ("frontierscience-20261013",) * 2
+                    ):
+                        href = (
+                            inventory.locator("tbody tr")
+                            .nth(index)
+                            .locator("a")
+                            .first.get_attribute("href")
+                        )
+                        assert href.endswith(
+                            f"/website-publication/data/{dataset}/report.json"
+                        )
                     publication = page.locator("#midterm-preprocess-publication")
                     expect(publication).to_contain_text("64")
                     expect(publication).to_contain_text("560")
