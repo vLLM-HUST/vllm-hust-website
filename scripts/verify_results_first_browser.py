@@ -117,6 +117,20 @@ def main():
                         )
                         print(name, "PASS", flush=True)
                         context.close()
+        for filename in ("dataset-validation.html", "leaderboard-runs.html"):
+            page = browser.new_page(viewport={"width": 320, "height": 1000})
+            page.goto(f"{args.url}/{filename}", wait_until="networkidle")
+            expect(page.locator("#current-workload")).to_have_attribute(
+                "data-loaded", "true"
+            )
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= innerWidth + 1"
+            )
+            assert page.locator(".result-pair a").evaluate_all(
+                "aa => aa.every(a => a.getBoundingClientRect().right <= innerWidth)"
+            )
+            page.screenshot(path=output / f"{filename}-320.png")
+            page.close()
         browser.close()
     (output / "receipt.json").write_text(json.dumps(receipts, indent=2) + "\n")
 
