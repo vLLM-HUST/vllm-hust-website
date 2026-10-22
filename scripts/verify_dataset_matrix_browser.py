@@ -213,6 +213,7 @@ def main():
             )
             page.goto(args.url + "/dataset-validation.html#swe-bench-pro")
             expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
+            expect(page.locator("#matrix-breadcrumb")).to_be_in_viewport()
             expect(page.locator(".matrix-detail thead th")).to_have_count(7)
             for value in [
                 "151.45",
