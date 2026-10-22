@@ -88,6 +88,8 @@ jobs:
           python -m pip install playwright
           python -m playwright install --with-deps chromium
       - name: Verify rendered desktop and mobile pages
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python -m http.server 8769 --bind 127.0.0.1 > /tmp/website-browser-server.log 2>&1 &
           website_server_pid=$!
@@ -101,7 +103,7 @@ jobs:
           python scripts/verify_incubation_delisting.py --url http://127.0.0.1:8769
           python scripts/verify_performance_navigation.py
           python scripts/verify_evidence_links_browser.py --url http://127.0.0.1:8769
-          python scripts/audit_evidence_links_browser.py --url http://127.0.0.1:8769 --output output/playwright/all-page-links
+          python scripts/audit_evidence_links_browser.py --url http://127.0.0.1:8769 --output output/playwright/all-page-links --verify-targets
       - uses: actions/upload-artifact@v4
         if: always()
         with:

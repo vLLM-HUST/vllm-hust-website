@@ -3,9 +3,60 @@
 import argparse
 import asyncio
 import json
+import os
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 from playwright.async_api import async_playwright
+
+
+async def verify_targets(request, urls):
+    """Resolve file/directory links against complete Git trees, not rate-limited HTML."""
+    headers = {"Accept": "application/vnd.github+json"}
+    if os.environ.get("GH_TOKEN"):
+        headers["Authorization"] = f"Bearer {os.environ['GH_TOKEN']}"
+    trees, releases, checked = {}, {}, []
+    api = "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark"
+    for url in sorted(urls):
+        parsed = urlsplit(url)
+        parts = unquote(parsed.path).split("/")
+        if (
+            parsed.hostname != "github.com"
+            or parts[1:3] != ["vLLM-HUST", "vllm-hust-benchmark"]
+            or len(parts) < 6
+        ):
+            continue
+        if parts[3] in ("blob", "tree", "raw"):
+            revision, path = parts[4], "/".join(parts[5:])
+            if revision not in trees:
+                response = await request.get(
+                    f"{api}/git/trees/{revision}?recursive=1",
+                    headers=headers,
+                    timeout=60000,
+                )
+                assert response.ok, (revision, response.status)
+                tree = await response.json()
+                assert not tree["truncated"], revision
+                trees[revision] = {item["path"]: item["type"] for item in tree["tree"]}
+            kind = "tree" if parts[3] == "tree" else "blob"
+            assert trees[revision].get(path) == kind, url
+        elif parts[3] == "releases" and parts[4] in ("tag", "download"):
+            tag = parts[5]
+            if tag not in releases:
+                response = await request.get(
+                    f"{api}/releases/tags/{tag}", headers=headers, timeout=60000
+                )
+                assert response.ok, (tag, response.status)
+                releases[tag] = await response.json()
+            if parts[4] == "download":
+                assert any(
+                    a["name"] == "/".join(parts[6:]) and a["state"] == "uploaded"
+                    for a in releases[tag]["assets"]
+                ), url
+        else:
+            continue
+        checked.append(url)
+    return checked
 
 
 async def run(args):
@@ -67,6 +118,18 @@ async def run(args):
                 await context.close()
 
         await asyncio.gather(*(inspect(p) for p in pages))
+        if args.verify_targets:
+            context = await browser.new_context()
+            urls = {link["href"] for row in results for link in row.get("links", [])}
+            checked = await verify_targets(context.request, urls)
+            (output / "verified-targets.json").write_text(
+                json.dumps(checked, indent=2) + "\n"
+            )
+            print(
+                f"Verified {len(checked)} benchmark Git/Release destinations",
+                flush=True,
+            )
+            await context.close()
         await browser.close()
     (output / "links.json").write_text(
         json.dumps(
@@ -90,4 +153,5 @@ if __name__ == "__main__":
     parser.add_argument("--url", required=True)
     parser.add_argument("--browser")
     parser.add_argument("--output", required=True)
+    parser.add_argument("--verify-targets", action="store_true")
     asyncio.run(run(parser.parse_args()))
