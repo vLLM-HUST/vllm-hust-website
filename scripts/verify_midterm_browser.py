@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from urllib.parse import quote
 
 from playwright.sync_api import expect, sync_playwright
 
@@ -22,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v065.json")
+        response = context.request.get(f"{args.url}/data/midterm-v066.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.65"
+        assert report["version"] == "V0.66"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -35,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v065.json"
+            if f["website_path"] == "data/midterm-v066.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -80,10 +81,10 @@ def main():
                     expect(
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
-                        "src", "./assets/midterm-report.js?v=midterm-v065-20261022"
+                        "src", "./assets/midterm-report.js?v=midterm-v066-20261022"
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.65", timeout=30000
+                        "data-loaded", "V0.66", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     if filename == "dataset-validation.html":
@@ -99,6 +100,7 @@ def main():
                             mmlu.locator('a[href="#midterm-native-paired-quality"]')
                         ).to_have_count(1)
                     for ident in (
+                        "dataset-quality-inventory",
                         "reference-closure",
                         "worker-model",
                         "fenced-model",
@@ -135,11 +137,19 @@ def main():
                         assert section.locator("tbody tr").count() > 0
                         links = section.locator("tbody tr a.raw-evidence")
                         assert links.count() > 0
+                        evidence = next(
+                            item["evidence"]
+                            for item in report["sections"]
+                            if item["id"] == ident
+                        )
+                        allowed_links = [
+                            "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
+                            f"{item['kind']}/{manifest['commit']}/{quote(item['path'])}"
+                            for item in evidence
+                        ]
                         assert links.evaluate_all(
-                            "(links, commit) => links.every(a => a.href.startsWith("
-                            "'https://github.com/vLLM-HUST/vllm-hust-benchmark/') && "
-                            "a.href.includes('/' + commit + '/reports/'))",
-                            manifest["commit"],
+                            "(links, allowed) => links.every(a => allowed.includes(a.href))",
+                            allowed_links,
                         )
                         assert section.locator(".midterm-evidence a").count() > 0
                         page.screenshot(
@@ -227,7 +237,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.65"
+                        "V0.66"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -235,6 +245,24 @@ def main():
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "200 / 0"
                     )
+                    inventory = page.locator("#midterm-dataset-quality-inventory")
+                    for score in ("156 / 668", "313 / 1143", "57 / 100", "5 / 60"):
+                        expect(inventory).to_contain_text(score)
+                    expect(inventory).to_contain_text("当前B1组合配对为空")
+                    expect(inventory.locator("tbody tr")).to_have_count(4)
+                    for index, dataset in enumerate(
+                        ("hle-verified-20261015",) * 2
+                        + ("frontierscience-20261013",) * 2
+                    ):
+                        href = (
+                            inventory.locator("tbody tr")
+                            .nth(index)
+                            .locator("a")
+                            .first.get_attribute("href")
+                        )
+                        assert href.endswith(
+                            f"/website-publication/data/{dataset}/report.json"
+                        )
                     publication = page.locator("#midterm-preprocess-publication")
                     expect(publication).to_contain_text("64")
                     expect(publication).to_contain_text("560")
@@ -368,7 +396,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v065.json",
+            "**/data/midterm-v066.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
