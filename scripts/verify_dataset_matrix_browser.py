@@ -79,7 +79,7 @@ def main():
             assert "25.90%" in page.locator(".matrix-overview").inner_text()
             assert "27.65%" in page.locator(".matrix-overview").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(7)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             assert "631.59" in page.locator(".matrix-detail").inner_text()
             for value in ["360.53", "337.20", "2026-10-18"]:
                 assert value in page.locator(".matrix-detail").inner_text()
@@ -108,7 +108,7 @@ def main():
             page.locator("#langToggle").click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
             page.locator("#matrix-reset").click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(7)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             page.screenshot(
                 path=str(args.output / f"detail-{width}-{lang}.png"), full_page=True
             )
@@ -207,6 +207,36 @@ def main():
             page.screenshot(
                 path=str(args.output / f"controller-frontier-{width}-{lang}.png"),
                 full_page=True,
+            )
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= innerWidth + 1"
+            )
+            page.goto(args.url + "/dataset-validation.html#swe-bench-pro")
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
+            expect(page.locator(".matrix-detail thead th")).to_have_count(7)
+            for value in [
+                "151.45",
+                "197.78",
+                "213.32",
+                "40.85%",
+                "7.86%",
+                "411.27",
+                "963.34",
+            ]:
+                assert value in page.locator("#matrix-table").inner_text()
+            assert "P95/P99" in page.locator("#matrix-table").inner_text()
+            page.locator(
+                '[data-expand="swe-pro-real-hour-controller_original"]'
+            ).click()
+            detail = page.locator("#evidence-swe-pro-real-hour-controller_original")
+            expect(detail).to_be_visible()
+            assert '"quality_gate": false' in detail.inner_text()
+            assert '"pending": 122' in detail.inner_text()
+            page.locator(
+                '[data-expand="swe-pro-real-hour-controller_original"]'
+            ).click()
+            page.screenshot(
+                path=str(args.output / f"real-agent-{width}-{lang}.png"), full_page=True
             )
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"
