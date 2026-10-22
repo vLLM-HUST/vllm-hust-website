@@ -86,6 +86,18 @@ def main():
                         "data-loaded", "V0.65", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
+                    if filename == "dataset-validation.html":
+                        mmlu = page.locator("#dataset-program-list article").first
+                        expect(mmlu).to_contain_text(
+                            "子集质量已实测"
+                            if lang == "zh"
+                            else "Subset quality measured"
+                        )
+                        for value in ("147/200", "146/200", "19/22"):
+                            expect(mmlu).to_contain_text(value)
+                        expect(
+                            mmlu.locator('a[href="#midterm-native-paired-quality"]')
+                        ).to_have_count(1)
                     for ident in (
                         "reference-closure",
                         "worker-model",

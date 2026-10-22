@@ -99,8 +99,8 @@
     function renderProgram() {
         if (!state.program) return;
         const statusText = {
-            en: { 'serving-evidence-only': 'Serving evidence only', 'contract-pending': 'Contract pending', ready: 'Ready', running: 'Running', measured: 'Measured' },
-            zh: { 'serving-evidence-only': '仅有服务侧证据', 'contract-pending': '合同待冻结', ready: '可执行', running: '执行中', measured: '已实测' },
+            en: { 'serving-evidence-only': 'Serving evidence only', 'subset-measured': 'Subset quality measured', 'contract-pending': 'Contract pending', ready: 'Ready', running: 'Running', measured: 'Measured' },
+            zh: { 'serving-evidence-only': '仅有服务侧证据', 'subset-measured': '子集质量已实测', 'contract-pending': '合同待冻结', ready: '可执行', running: '执行中', measured: '已实测' },
         };
         const classText = {
             en: { 'knowledge-reasoning': 'Knowledge & reasoning', 'agentic-engineering': 'Agentic engineering', 'scientific-reasoning': 'Scientific reasoning' },
@@ -123,13 +123,13 @@
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
             let note = lang() === 'zh' ? dataset.note_zh : dataset.note;
             const handoff = dataset.id === 'mmlu-pro'
-                ? `<p><a href="#mmlu-pro-handoff">${lang() === 'zh' ? '查看 10 月 12 日新增准确率与性能实测（非正式验收）' : 'View October 12 accuracy and performance measurements (not formal acceptance)'}</a></p>`
+                ? `<p><a href="#midterm-native-paired-quality">${lang() === 'zh' ? '查看同环境200题B0/B1质量配对及原始证据' : 'View matched 200-task B0/B1 quality results and evidence'}</a></p><p><a href="#mmlu-pro-handoff">${lang() === 'zh' ? '查看 10 月 12 日准确率与性能实测（非正式验收）' : 'View October 12 accuracy and performance measurements (not formal acceptance)'}</a></p>`
                 : dataset.id === 'hle-verified'
                     ? '<p><a href="#hle-verified-handoff">' + (lang() === 'zh' ? '查看 Gold、Revision 与图文压测实测（非正式验收）' : 'View Gold, Revision and text/image load tests (not formal acceptance)') + '</a></p>'
                 : dataset.id === 'frontierscience'
                     ? '<p><a href="#frontierscience-handoff">' + (lang() === 'zh' ? '查看 10 月 13 日 Olympiad、Research 与性能实测（非正式验收）' : 'View October 13 Olympiad, Research and performance measurements (not formal acceptance)') + '</a></p>'
                     : '';
-            if (handoff) note = (lang() === 'zh' ? '正式计划登记状态（不含下方新增实测）：' : 'Formal program record (excluding the new handoff below): ') + note;
+            if (handoff && dataset.status !== 'subset-measured') note = (lang() === 'zh' ? '正式计划登记状态（不含下方新增实测）：' : 'Formal program record (excluding the new handoff below): ') + note;
             const metric = lang() === 'zh' ? dataset.primary_metric_zh : dataset.primary_metric;
             const contractStatus = statusText[lang()][dataset.status] || dataset.status;
             const currentReadiness = readinessText[lang()][dataset.readiness.status] || dataset.readiness.status;
