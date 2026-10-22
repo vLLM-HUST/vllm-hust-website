@@ -45,14 +45,30 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v069.json" in loader
-    payload = json.loads((ROOT / "data/midterm-v069.json").read_text())
-    assert payload["version"] == "V0.69"
+    assert "./data/midterm-v070.json" in loader
+    payload = json.loads((ROOT / "data/midterm-v070.json").read_text())
+    assert payload["version"] == "V0.70"
+    inventory = next(
+        section
+        for section in payload["sections"]
+        if section["id"] == "dataset-quality-inventory"
+    )
+    assert len(inventory["tables"]) == 6
+    assert sum(len(table["rows"]) for table in inventory["tables"]) == 24
+    assert [row[1] for row in inventory["tables"][-1]["rows"]] == [
+        "151 / 200",
+        "152 / 200",
+        "149 / 200",
+        "146 / 200",
+    ]
+    assert (
+        "reports/mmlu-quality018-20261022/quality018-completed-audit-r1.json" in loader
+    )
     for filename in ("dataset-validation.html", "leaderboard-runs.html"):
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v069-20261022"
+            "./assets/midterm-report.js?v=midterm-v070-20261022"
         ]
 
 

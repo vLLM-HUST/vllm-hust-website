@@ -20,13 +20,14 @@
         'website-publication/data/betterscale-school-runtime-20261016/report.json',
         'reports/frontierscience-combination-quality-20261022/summary.json',
         'reports/native-version-recovery-20261022/version-mapping.json',
+        'reports/mmlu-quality018-20261022/quality018-completed-audit-r1.json',
         ...['mmlu-pro', 'frontierscience', 'hle-gold', 'hle-revision'].map(name =>
             `website-publication/data/request-throttling-dataset-matrix-20261018/${name}.json`)
     ]);
     const rowSources = (section, tableIndex) => {
         if (section.id === 'candidates') return section.evidence;
         if (section.id === 'dataset-quality-inventory') {
-            const indices = [[0, 0, 1, 1], [2, 4, 3, 3, 5, 5], [4, 4, 4, 4], [7, 8, 6, 6], [9, 9]];
+            const indices = [[0, 0, 1, 1], [2, 4, 3, 3, 5, 5], [4, 4, 4, 4], [7, 8, 6, 6], [9, 9], [11, 11, 11, 11]];
             return indices[tableIndex].map(index => section.evidence[index]);
         }
         return [section.evidence[0]];
@@ -47,7 +48,7 @@
             return `<tr>${row.map((cell, i) => i === 0 ? `<th scope="row">${cellText(cell)}</th>` : `<td>${cellText(cell)}</td>`).join('')}</tr>`;
         }).join('')}</tbody></table></div>`;
         panel.innerHTML = `<h2>${title} ${escape(data.version)}</h2>
-            <p>${zh ? '指定基线为 vLLM 0.18 / vLLM-Ascend 0.18。主性能与200题回归配对采用 0.28.1 / Ascend 0.25.1rc2 开发栈；Controller 质量配对采用 0.23 / 0.23。各项改善仅对应其实际比较对象，0.18 系列结果按工况单独列出。' : 'The designated baseline is vLLM 0.18 / vLLM-Ascend 0.18. Main performance and 200-task regression pairs use the 0.28.1 / Ascend 0.25.1rc2 development stack; Controller quality pairs use 0.23 / 0.23. Gains apply only to their actual comparisons. The 0.18 results are listed separately by workload.'}</p>
+            <p>${zh ? '指定基线为 vLLM 0.18 / vLLM-Ascend 0.18，MMLU-Pro 固定200题判对151题；同题已测 KV物化、Microflow、恢复组合分别判对152、149、146题。主性能与恢复配对采用 0.28.1 / Ascend 0.25.1rc2 开发栈，Controller 配对采用 0.23 / 0.23。各运行栈和配置分别列示，改善仅对应实际比较对象。' : 'The designated vLLM 0.18 / vLLM-Ascend 0.18 baseline scored 151/200 on the fixed MMLU-Pro subset. Reused KV materialization, Microflow and recovered-combination results scored 152, 149 and 146 on identical requests. Main performance and recovery pairs use the 0.28.1 / Ascend 0.25.1rc2 development stack; Controller pairs use 0.23 / 0.23. Runtime stacks and configurations remain explicit; gains apply only to their actual comparisons.'}</p>
             <p><a href="${escape(data.report_url)}">${zh ? `阅读完整 ${escape(data.version)} 报告` : `Read the complete ${escape(data.version)} report`}</a></p>
             <nav aria-label="${title}">${data.sections.map(s => `<a href="#midterm-${escape(s.id)}">${escape(s.title.split(' / ')[zh ? 0 : 1])}</a>`).join(' · ')}</nav>
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
@@ -58,12 +59,12 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v069.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v070.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.69' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.70' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             for (const section of value.sections) {
                 if (!section.evidence?.length) throw Error('Missing original evidence');
