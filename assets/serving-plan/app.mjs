@@ -149,6 +149,7 @@ function initialize() {
     label.htmlFor = check.id;
     const source = element("a", `${p.name} ↗`, "plan-source");
     source.href = p.source;
+    source.dataset.benchmarkPlan = p.id;
     source.target = "_blank";
     source.rel = "noreferrer";
     source.title = "查看方案测量来源";
