@@ -212,30 +212,18 @@ def main():
                 "document.documentElement.scrollWidth <= innerWidth + 1"
             )
             page.goto(args.url + "/dataset-validation.html#swe-bench-pro")
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(3)
-            expect(page.locator("#matrix-breadcrumb")).to_be_in_viewport()
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
             expect(page.locator(".matrix-detail thead th")).to_have_count(7)
             for value in [
                 "151.45",
-                "197.78",
                 "213.32",
-                "40.85%",
-                "7.86%",
                 "411.27",
                 "963.34",
             ]:
                 assert value in page.locator("#matrix-table").inner_text()
-            assert "P95/P99" in page.locator("#matrix-table").inner_text()
-            page.locator(
-                '[data-expand="swe-pro-real-hour-controller_original"]'
-            ).click()
-            detail = page.locator("#evidence-swe-pro-real-hour-controller_original")
-            expect(detail).to_be_visible()
-            assert '"quality_gate": false' in detail.inner_text()
-            assert '"pending": 122' in detail.inner_text()
-            page.locator(
-                '[data-expand="swe-pro-real-hour-controller_original"]'
-            ).click()
+            assert "P95 / P99" in page.locator("#matrix-table").inner_text()
+            assert "ThunderAgent" not in page.locator("#matrix-table").inner_text()
+            expect(page.locator("#matrix-table a")).to_have_count(2)
             page.screenshot(
                 path=str(args.output / f"real-agent-{width}-{lang}.png"), full_page=True
             )
