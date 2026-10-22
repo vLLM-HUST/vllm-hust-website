@@ -66,10 +66,10 @@
     const model = window.LeaderboardRunsModel;
     let menu = null;
     function filteredRows() { return model.selectRows(state.rows.filter(matches), state.columnFilters, state.sort); }
-    function setView(view) {
+    function setView(view, updateHash = true) {
         state.view = view;
         const fragment = view === 'frontier' ? 'settings' : view;
-        history.replaceState(null, '', `${location.pathname}${location.search}#${fragment}`);
+        if (updateHash) history.replaceState(null, '', `${location.pathname}${location.search}#${fragment}`);
         for (const name of ['runs', 'tasks', 'frontier']) {
             $(`${name}-panel`).hidden = view !== name;
             $(`view-${name}`).setAttribute('aria-pressed', String(view === name));
@@ -312,6 +312,6 @@
         }
     });
     window.addEventListener('vllm-hust:langchange', translate);
-    setView(['#runs', '#tasks'].includes(location.hash) ? location.hash.slice(1) : 'frontier');
+    setView(['#runs', '#tasks'].includes(location.hash) ? location.hash.slice(1) : 'frontier', !location.hash || ['#runs', '#tasks', '#settings', '#frontier'].includes(location.hash));
     initialize();
 })();

@@ -87,7 +87,10 @@ def main():
                         "data-loaded", "V0.67", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
+                    page.locator("#report-details > summary").click()
                     if filename == "dataset-validation.html":
+                        page.locator("#dataset-background > summary").click()
+                        page.locator("#supplementary-results > summary").click()
                         mmlu = page.locator("#dataset-program-list article").first
                         expect(mmlu).to_contain_text(
                             "子集质量已实测"
@@ -128,7 +131,8 @@ def main():
                         section.evaluate("el => el.scrollIntoView({block: 'start'})")
                         expect(section).to_be_visible()
                         assert section.locator("h3").evaluate(
-                            "e => getComputedStyle(e).color === 'rgb(23, 33, 43)'"
+                            "e => getComputedStyle(e).color === "
+                            "getComputedStyle(e.closest('.current-measurements')).color"
                         )
                         assert section.locator("tbody tr").evaluate_all(
                             "rows => rows.every(row => ![...row.cells].every("

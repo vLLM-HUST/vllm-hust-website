@@ -50,6 +50,7 @@ def main():
                         page.on("pageerror", lambda error: errors.append(str(error)))
                         suffix = f"?model={args.scenario}" if args.scenario else ""
                         page.goto(args.url + "/dataset-validation.html" + suffix)
+                        page.locator("#supplementary-results > summary").click()
                         legend = page.locator("#validation-legend-b1")
                         expect(legend).to_have_text(
                             "当前已实测最优的vLLM-HUST优化方案"
