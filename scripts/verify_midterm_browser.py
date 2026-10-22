@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from urllib.parse import quote
 
 from playwright.sync_api import expect, sync_playwright
 
@@ -136,11 +137,19 @@ def main():
                         assert section.locator("tbody tr").count() > 0
                         links = section.locator("tbody tr a.raw-evidence")
                         assert links.count() > 0
+                        evidence = next(
+                            item["evidence"]
+                            for item in report["sections"]
+                            if item["id"] == ident
+                        )
+                        allowed_links = [
+                            "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
+                            f"{item['kind']}/{manifest['commit']}/{quote(item['path'])}"
+                            for item in evidence
+                        ]
                         assert links.evaluate_all(
-                            "(links, commit) => links.every(a => a.href.startsWith("
-                            "'https://github.com/vLLM-HUST/vllm-hust-benchmark/') && "
-                            "a.href.includes('/' + commit + '/reports/'))",
-                            manifest["commit"],
+                            "(links, allowed) => links.every(a => allowed.includes(a.href))",
+                            allowed_links,
                         )
                         assert section.locator(".midterm-evidence a").count() > 0
                         page.screenshot(
