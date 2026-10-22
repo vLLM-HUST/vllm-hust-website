@@ -31,7 +31,7 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-validation.html")
             page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(7)
             expect(page.locator("#matrix-table table")).to_have_count(1)
             assert "+91.7%" in page.locator(".matrix-overview").inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
@@ -79,7 +79,7 @@ def main():
             assert "25.90%" in page.locator(".matrix-overview").inner_text()
             assert "27.65%" in page.locator(".matrix-overview").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(7)
             assert "631.59" in page.locator(".matrix-detail").inner_text()
             for value in ["360.53", "337.20", "2026-10-18"]:
                 assert value in page.locator(".matrix-detail").inner_text()
@@ -108,7 +108,7 @@ def main():
             page.locator("#langToggle").click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(4)
             page.locator("#matrix-reset").click()
-            expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(7)
             page.screenshot(
                 path=str(args.output / f"detail-{width}-{lang}.png"), full_page=True
             )

@@ -18,6 +18,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
+      - name: Checkout pinned benchmark data for this presentation
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: 6666294e2a4cd7db80e6c55a15392075cc329fd8 # pragma: allowlist secret
+          path: .benchmark-source
+          persist-credentials: false
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+          sparse-checkout-cone-mode: false
+      - name: Project and verify the committed benchmark publication
+        run: |
+          python .benchmark-source/scripts/sync_website_publication.py publish \
+            --revision 6666294e2a4cd7db80e6c55a15392075cc329fd8 --website .
+          python .benchmark-source/scripts/sync_website_publication.py check \
+            --revision 6666294e2a4cd7db80e6c55a15392075cc329fd8 --website .
       - name: Run pre-commit
         run: pre-commit run --all-files
         env:
@@ -49,6 +66,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Checkout pinned benchmark data for this presentation
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: 6666294e2a4cd7db80e6c55a15392075cc329fd8 # pragma: allowlist secret
+          path: .benchmark-source
+          persist-credentials: false
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+          sparse-checkout-cone-mode: false
+      - name: Project and verify the committed benchmark publication
+        run: |
+          python .benchmark-source/scripts/sync_website_publication.py publish \
+            --revision 6666294e2a4cd7db80e6c55a15392075cc329fd8 --website .
+          python .benchmark-source/scripts/sync_website_publication.py check \
+            --revision 6666294e2a4cd7db80e6c55a15392075cc329fd8 --website .
       - name: Install browser test dependencies
         run: |
           python -m pip install playwright

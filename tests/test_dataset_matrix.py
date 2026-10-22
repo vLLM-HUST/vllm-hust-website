@@ -58,6 +58,9 @@ def test_scope_and_metrics():
             for s in p["scores"].values():
                 if p["metric"] == "programs_per_minute":
                     assert s["value"] > 0 and s["unit"] == "programs/min"
+                elif p["metric"] == "engine_output_tokens_per_second":
+                    assert s["value"] > 0 and s["unit"] == "token/s"
+                    assert s["repetitions"] == 1
                 elif p["metric"] == "output_throughput_gain":
                     assert s["value"] >= 0 and s["unit"] == "relative_gain"
                 else:
@@ -277,7 +280,7 @@ def test_offline_window_report_contains_only_public_evidence():
 
 def test_controller_uses_existing_dataset_rows_and_preserves_matching_baseline():
     data = module.build()
-    assert len(data["datasets"]) == 4
+    assert len(data["datasets"]) == 5
     assert not any(d.get("runtime_profile") for d in data["datasets"])
     frontier = next(d for d in data["datasets"] if d["id"] == "frontierscience")
     assert [
@@ -367,7 +370,7 @@ def test_controller_mmlu_preserves_original_row_and_matching_baseline():
     import statistics
 
     data = module.build()
-    assert len(data["datasets"]) == 4
+    assert len(data["datasets"]) == 5
     part = next(d for d in data["datasets"] if d["id"] == "mmlu-pro")["parts"][0]
     assert part["scores"]["native"]["correct"] == 9609
     measured = part["scores"]["request-throttling-controller"]
@@ -438,3 +441,52 @@ def test_controller_revision_public_report_has_no_private_payload():
         r'10\.244\.|192\.168\.|Bearer\s|"(?:base_url|raw_response|prompt_token_ids)"\s*:',
         body,
     )
+
+
+def test_real_agent_system_window_has_three_original_arms_and_no_quality_gate():
+    data = module.build()
+    dataset = next(d for d in data["datasets"] if d["id"] == "swe-bench-pro")
+    assert dataset["evidence_type"] == "real-agent-system-window"
+    assert dataset["parts"][0]["metric"] == "engine_output_tokens_per_second"
+    rows = {r["solution"]: r for r in data["records"] if r["dataset"] == dataset["id"]}
+    assert set(rows) == {
+        "native",
+        "thunderagent-original",
+        "request-throttling-controller",
+    }
+    for row in rows.values():
+        assert row["quality"] == [] and row["protocol"]["quality_gate"] is False
+        assert row["configuration"]["client_concurrency_limit"] is None
+        assert row["configuration"]["agent_wall_seconds"] == 3600
+        assert row["protocol"]["complete_batch_makespan_claim"] is False
+        assert row["protocol"]["client_boundary"]["pending"] > 0
+    n, c = (
+        rows["native"]["performance"],
+        rows["request-throttling-controller"]["performance"],
+    )
+    assert c["engine_output_tokens_per_s"] > n["engine_output_tokens_per_s"]
+    assert c["p95_latency_s"] > n["p95_latency_s"]  # Preserve adverse tails.
+    assert (
+        rows["thunderagent-original"]["protocol"]["ray_status"]
+        == "FAILED_POST_AGENT_DRAIN_GUARD"
+    )
+
+
+def test_real_agent_window_refuses_quality_or_makespan_reclassification(tmp_path):
+    import pytest
+
+    source = ROOT / "data/swe-bench-pro-real-agent-threeway-20261022/report.json"
+    path = tmp_path / source.relative_to(ROOT)
+    path.parent.mkdir(parents=True)
+    report = json.loads(source.read_text())
+    report["quality_gate"] = True
+    path.write_text(json.dumps(report))
+    with pytest.raises(AssertionError):
+        module.append_real_agent_system_window(tmp_path, [], [], [], {})
+
+
+def test_matrix_reuses_result_table_palette_and_readable_scope():
+    page = (ROOT / "dataset-validation.html").read_text()
+    assert 'class="matrix-shell runs-shell"' in page
+    assert "./assets/leaderboard-runs.css?v=threeway-20261022" in page
+    assert "./assets/dataset-matrix-v1.js?v=real-threeway-20261022" in page

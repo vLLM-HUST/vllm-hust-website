@@ -192,6 +192,80 @@ def append_offline_window(root, solutions, datasets, records, sources):
             )
 
 
+def append_real_agent_system_window(root, solutions, datasets, records, sources):
+    """Project the archived real-Agent system window without a quality gate."""
+    path = "data/swe-bench-pro-real-agent-threeway-20261022/report.json"
+    if not (root / path).exists():
+        return
+    raw = (root / path).read_bytes()
+    report = json.loads(raw)
+    assert report["status"] == "VERIFIED_SYSTEM_WINDOW"
+    assert report["quality_gate"] is False
+    assert report["complete_batch_makespan_claim"] is False
+    config = report["configuration"]
+    assert config["arrival_time"] == 0 and config["client_concurrency_limit"] is None
+    sources[path] = hashlib.sha256(raw).hexdigest()
+    arms = [
+        ("native", "native", "Native"),
+        ("thunderagent_original", "thunderagent-original", "ThunderAgent original"),
+        ("controller_original", "request-throttling-controller", "Controller original"),
+    ]
+    scores = {}
+    baseline = report["full_window"]["native"]["engine_output_tokens_per_s"]
+    for arm, sid, label in arms:
+        if not any(s["id"] == sid for s in solutions):
+            solutions.append({"id": sid, "name": label})
+        point = report["full_window"][arm]
+        scores[sid] = {
+            "value": point["engine_output_tokens_per_s"],
+            "unit": "token/s",
+            "repetitions": 1,
+            "speedup": point["engine_output_tokens_per_s"] / baseline,
+        }
+        records.append(
+            {
+                "id": "swe-pro-real-hour-" + arm,
+                "dataset": "swe-bench-pro",
+                "solution": sid,
+                "scope": "real-agent-hour",
+                "scope_label": "128 programs · 3600s · single run",
+                "quality": [],
+                "performance": point,
+                "configuration": report["cohort"] | config,
+                "report": path,
+                "protocol": {
+                    "evidence_type": "real-agent-system-window",
+                    "window_seconds": config["agent_wall_seconds"],
+                    "quality_gate": False,
+                    "complete_batch_makespan_claim": False,
+                    "ray_status": report["arm_ray_status"][arm],
+                    "client_boundary": report["client_boundary"][arm],
+                    "archive": report["archive"],
+                    "source_report": "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/"
+                    + report["report_path"],
+                },
+                "limitations": report["limitations"],
+            }
+        )
+    datasets.append(
+        {
+            "id": "swe-bench-pro",
+            "name": "SWE-bench Pro V1",
+            "evidence_type": "real-agent-system-window",
+            "parts": [
+                {
+                    "id": "real-agent128-3600s",
+                    "name": "真实Agent · 128 programs · 单轮1小时",
+                    "name_en": "Real Agent · 128 programs · one hour, one run",
+                    "metric": "engine_output_tokens_per_second",
+                    "scores": scores,
+                    "statuses": {},
+                }
+            ],
+        }
+    )
+
+
 def append_controller_dataset_profiles(root, solutions, datasets, records, sources):
     """Add the MOD to existing dataset rows; preserve each baseline receipt."""
     path = "data/request-throttling-dataset-matrix-20261018/frontierscience.json"
@@ -816,6 +890,7 @@ def build(root=ROOT):
     append_controller_gold_profile(root, datasets, records, sources)
     append_controller_mmlu_profile(root, datasets, records, sources)
     append_controller_revision_profile(root, datasets, records, sources)
+    append_real_agent_system_window(root, solutions, datasets, records, sources)
     return {
         "schema": 1,
         "cohort": {
