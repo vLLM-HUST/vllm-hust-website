@@ -207,7 +207,6 @@ def append_real_agent_system_window(root, solutions, datasets, records, sources)
     sources[path] = hashlib.sha256(raw).hexdigest()
     arms = [
         ("native", "native", "Native"),
-        ("thunderagent_original", "thunderagent-original", "ThunderAgent original"),
         ("controller_original", "request-throttling-controller", "Controller original"),
     ]
     scores = {}
