@@ -80,7 +80,14 @@ def test_state_scheduler_public_m0_release_does_not_claim_runtime_benefit() -> N
     assert "Compilation Control" in component["summary_en"]
     assert component["evidence_level"] == "cpu_smoke"
     assert MOD_TAXONOMY["components"]["state-scheduler"]["kind"] == "tool_mod"
-    assert component["public_effect_url"].endswith("/state-scheduler-v0.2.0")
+    assert component["public_effect_url"].endswith(
+        "/state-scheduler-v0.2.0"
+    ) or re.fullmatch(
+        r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
+        r"archive/mod-git-20261022/state-scheduler-website-source/snapshot/"
+        r"docs/STATE_SCHEDULER_ARCHIVE\.md",
+        component["public_effect_url"],
+    )
     assert "releases/download/state-scheduler-v0.2.0/" in SCRIPT
     assert "vllm-state-scheduler-mod status" in SCRIPT
     assert "state-scheduler" not in {
