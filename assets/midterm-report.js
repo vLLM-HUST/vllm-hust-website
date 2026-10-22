@@ -18,13 +18,15 @@
         'website-publication/data/mmlu-pro-20261012/report.json',
         'website-publication/data/dataset-matrix-campaign-20261016/report.json',
         'website-publication/data/betterscale-school-runtime-20261016/report.json',
+        'reports/frontierscience-combination-quality-20261022/summary.json',
+        'reports/native-version-recovery-20261022/version-mapping.json',
         ...['mmlu-pro', 'frontierscience', 'hle-gold', 'hle-revision'].map(name =>
             `website-publication/data/request-throttling-dataset-matrix-20261018/${name}.json`)
     ]);
     const rowSources = (section, tableIndex) => {
         if (section.id === 'candidates') return section.evidence;
         if (section.id === 'dataset-quality-inventory') {
-            const indices = [[0, 0, 1, 1], [2, 4, 3, 3, 5, 5], [4, 4, 4, 4], [7, 8, 6, 6]];
+            const indices = [[0, 0, 1, 1], [2, 4, 3, 3, 5, 5], [4, 4, 4, 4], [7, 8, 6, 6], [9, 9]];
             return indices[tableIndex].map(index => section.evidence[index]);
         }
         return [section.evidence[0]];
@@ -56,12 +58,12 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v068.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v069.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.68' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.69' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             for (const section of value.sections) {
                 if (!section.evidence?.length) throw Error('Missing original evidence');
