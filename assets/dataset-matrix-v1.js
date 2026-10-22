@@ -134,7 +134,7 @@
         selected.set(dataset().id, [...document.querySelectorAll('[data-solution]:checked')].map(el => el.dataset.solution));
         const id = event.target.dataset.solution; render(); document.querySelector(`[data-solution="${id}"]`).focus({ preventScroll: true });
     });
-    window.addEventListener('hashchange', () => { render(); $('matrix-breadcrumb').focus({ preventScroll: true }); });
+    window.addEventListener('hashchange', () => { render(); $('matrix-breadcrumb').focus({ preventScroll: true }); focusLinkedSystemResult(); });
     window.addEventListener('vllm-hust:langchange', render);
     fetch('./data/dataset-matrix-v1.json?v=20261018-single-matrix-1', { cache: 'no-cache' }).then(response => { if (!response.ok) throw new Error('Snapshot unavailable'); return response.json(); }).then(snapshot => { data = snapshot; $('matrix-loading').hidden = true; $('matrix-content').hidden = false; render(); focusLinkedSystemResult(); }).catch(() => { $('matrix-loading').textContent = t('数据暂时无法加载，请刷新重试。', 'Data could not be loaded. Please refresh to retry.'); });
 })();
