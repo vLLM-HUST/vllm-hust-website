@@ -143,7 +143,7 @@ def main():
                     trace_qualification = page.locator("#midterm-trace-qualification")
                     worker = page.locator("#midterm-worker-model")
                     closure = page.locator("#midterm-reference-closure")
-                    for value in ("3.6%", "达成率未赋值", "40.288556"):
+                    for value in ("3.6%", "请求窗口核算见M01本轮判定", "40.288556"):
                         expect(closure).to_contain_text(value)
                     assert closure.locator(".midterm-evidence a").count() > 0
                     expect(worker.locator("tbody tr")).to_have_count(6)
