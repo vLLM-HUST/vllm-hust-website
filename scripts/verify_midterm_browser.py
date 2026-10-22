@@ -22,11 +22,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v061.json")
+        response = context.request.get(f"{args.url}/data/midterm-v062.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.61"
+        assert report["version"] == "V0.62"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -35,7 +35,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v061.json"
+            if f["website_path"] == "data/midterm-v062.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -80,13 +80,14 @@ def main():
                     expect(
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
-                        "src", "./assets/midterm-report.js?v=midterm-v061-20261021"
+                        "src", "./assets/midterm-report.js?v=midterm-v062-20261022"
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.61", timeout=30000
+                        "data-loaded", "V0.62", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     for ident in (
+                        "fenced-model",
                         "trace-qualification",
                         "long-context-parser",
                         "paired-lifecycle",
@@ -138,6 +139,16 @@ def main():
                     expect(recovered_quality).to_contain_text("149/200")
                     expect(recovered_quality).to_contain_text("原评分器")
                     trace_qualification = page.locator("#midterm-trace-qualification")
+                    fenced = page.locator("#midterm-fenced-model")
+                    expect(fenced.locator("tbody tr")).to_have_count(6)
+                    for value in (
+                        "125.031105",
+                        "175.853432",
+                        "完整采集未通过",
+                        "exit 130",
+                        "M01未通过本轮验收",
+                    ):
+                        expect(fenced).to_contain_text(value)
                     expect(trace_qualification.locator("tbody tr")).to_have_count(6)
                     expect(trace_qualification).to_contain_text("16条已知探针依赖通过")
                     expect(trace_qualification).to_contain_text("M01仍未通过本轮验收")
@@ -187,7 +198,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.61"
+                        "V0.62"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -239,6 +250,15 @@ def main():
                     page.screenshot(path=output / f"{filename}-{width}-{lang}.png")
                     for scheme in ("light", "dark"):
                         page.emulate_media(color_scheme=scheme)
+                        fenced.scroll_into_view_if_needed()
+                        expect(fenced).to_be_visible()
+                        assert fenced.evaluate(
+                            "e => e.getBoundingClientRect().right <= innerWidth + 1"
+                        )
+                        page.screenshot(
+                            path=output
+                            / f"{filename}-{width}-{lang}-{scheme}-fenced.png"
+                        )
                         recovered = page.locator("#midterm-model-runtime")
                         recovered.scroll_into_view_if_needed()
                         expect(recovered).to_be_visible()
@@ -281,7 +301,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v061.json",
+            "**/data/midterm-v062.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
