@@ -486,7 +486,7 @@ def test_pair_table_does_not_add_a_page_section_or_change_existing_content():
     assert 'id="dataset-results" class="matrix-shell runs-shell"' in page
     assert "./assets/dataset-matrix-v1.js?v=controller-native-table-20261022" in page
     assert 'id="mmlu-pro-handoff"' in page
-    assert "./assets/midterm-report.js?v=midterm-v067-20261022" in page
+    assert "./assets/midterm-report.js?v=midterm-v068-20261022" in page
     js = (ROOT / "assets/dataset-matrix-v1.js").read_text()
     pair = js.split("function realAgentDetail(d)", 1)[1].split("function detail(d)", 1)[
         0
