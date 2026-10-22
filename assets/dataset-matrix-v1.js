@@ -67,6 +67,30 @@
         const profileNote = d.runtime_profile ? `<p class="runs-note"><strong>${escape(d.runtime_profile.label)}</strong> · ${t('两臂同配置，完整质量各测1次；性能各预热1次、正式3次，逐指标取中位数。质量下降与失败均保留；未通过质量预算不计正式降本。普通单轮请求，不代表轨迹节流收益。', 'Matching settings; one full quality pass and one performance warmup plus three formal runs per arm, median per metric. Quality decreases and failures retained; no qualified cost reduction when the quality budget fails. Single-turn requests do not establish trajectory throttling benefit.')}</p>` : '';
         return profileNote + `<div class="matrix-tools"><fieldset><legend>${t('方案', 'Solutions')}</legend>${available.map(s => `<label><input type="checkbox" data-solution="${s.id}" ${choices.includes(s.id) ? 'checked' : ''}>${escape(s.name)}</label>`).join('')}</fieldset><button class="run-toggle" type="button" id="matrix-reset">${t('重置排序与筛选', 'Reset sorting & filters')}</button></div><div class="runs-table-scroll" tabindex="0" role="region" aria-label="${escape(d.name)} ${t('性能对照', 'performance comparison')}"><table class="runs-table matrix-detail"><caption class="matrix-sr">${escape(d.name)} · ${t('每项性能来自独立压测，不是答题阶段延迟', 'Performance from separate load tests, not evaluation latency')}</caption><thead><tr>${header(t('方案', 'Solution'))}${header(t('评测成绩', 'Quality'))}${header(t('压测范围', 'Load-test scope'))}${header(t('输出 tok/s', 'Output tok/s'), 'throughput', d.id)}${header(t('平均 TTFT · s', 'Mean TTFT · s'), 'ttft', d.id)}${header(t('平均 TPOT · ms', 'Mean TPOT · ms'), 'tpot', d.id)}${header(t('配置与来源', 'Configuration & source'))}</tr></thead><tbody>${ordered.map(r => `<tr class="run-row"><th scope="row">${escape(names()[r.solution])}<small>${r.measured_at || (r.solution === 'betterscale' ? '2026-10-15' : r.dataset === 'mmlu-pro' ? '2026-10-12' : r.dataset === 'frontierscience' ? '2026-10-13' : '2026-10-14/15')}</small>${r.configuration_label ? `<small>${escape(document.documentElement.lang === 'zh' ? r.configuration_label : r.configuration_label_en)}</small>` : ''}</th><td class="metric">${r.quality.map(q => `<div class="matrix-score"><small>${escape(q.label)}</small>${quality(q)}${q.label === 'Research' ? `<small>${t('得分 ≥ 7', 'Score ≥ 7')}</small>` : ''}</div>`).join('')}</td><td>${escape(recordScope(r))}<small>${r.performance.completed}/${r.performance.completed + r.performance.failed} ${t('请求完成', 'completed')}</small></td>${['throughput', 'ttft', 'tpot'].map(k => `<td class="metric" data-metric="${k}">${fmt(r.metrics[k])}</td>`).join('')}<td><button type="button" class="run-toggle" data-expand="${r.id}" aria-expanded="${expanded.has(r.id)}" aria-controls="evidence-${r.id}">${expanded.has(r.id) ? t('收起', 'Close') : t('展开', 'Inspect')}</button></td></tr>${evidence(r)}`).join('')}${!ordered.length ? `<tr><td colspan="7">${t('所选方案暂无实测记录。', 'No measurements for the selected solutions.')}</td></tr>` : ''}</tbody></table></div>${failures}${d.id === 'hle-verified' ? `<p class="runs-note">${t('Gold / Revision 的 text 与 image 分别压测，未合成吞吐。BetterScale 的未决判分分别为 20 / 27 条，保留在总分母中。', 'Gold / Revision text and image were load-tested separately; no pooled throughput is reported. BetterScale has 20 / 27 unresolved judges, retained in the overall denominators.')}</p>` : ''}`;
     }
+    function focusLinkedSystemResult() {
+        if (dataset()?.evidence_type !== 'real-agent-system-window') return;
+        const breadcrumb = $('matrix-breadcrumb');
+        const reveal = () => {
+            const bounds = breadcrumb.getBoundingClientRect();
+            if (bounds.top < 90 || bounds.bottom > innerHeight) breadcrumb.scrollIntoView({ block: 'start' });
+        };
+        let frame;
+        const observer = new MutationObserver(() => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(reveal);
+        });
+        // Other dataset summaries mount asynchronously above this linked result.
+        observer.observe(document.querySelector('main'), { childList: true, subtree: true });
+        const events = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
+        const stop = () => {
+            observer.disconnect();
+            cancelAnimationFrame(frame);
+            events.forEach(event => window.removeEventListener(event, stop, true));
+        };
+        events.forEach(event => window.addEventListener(event, stop, { once: true, capture: true, passive: true }));
+        breadcrumb.focus({ preventScroll: true });
+        reveal();
+    }
     function render() {
         if (!data) return;
         const d = dataset(), c = data.cohort;
@@ -112,5 +136,5 @@
     });
     window.addEventListener('hashchange', () => { render(); $('matrix-breadcrumb').focus({ preventScroll: true }); });
     window.addEventListener('vllm-hust:langchange', render);
-    fetch('./data/dataset-matrix-v1.json?v=20261018-single-matrix-1', { cache: 'no-cache' }).then(response => { if (!response.ok) throw new Error('Snapshot unavailable'); return response.json(); }).then(snapshot => { data = snapshot; $('matrix-loading').hidden = true; $('matrix-content').hidden = false; render(); if (dataset()?.evidence_type === 'real-agent-system-window') $('matrix-breadcrumb').focus(); }).catch(() => { $('matrix-loading').textContent = t('数据暂时无法加载，请刷新重试。', 'Data could not be loaded. Please refresh to retry.'); });
+    fetch('./data/dataset-matrix-v1.json?v=20261018-single-matrix-1', { cache: 'no-cache' }).then(response => { if (!response.ok) throw new Error('Snapshot unavailable'); return response.json(); }).then(snapshot => { data = snapshot; $('matrix-loading').hidden = true; $('matrix-content').hidden = false; render(); focusLinkedSystemResult(); }).catch(() => { $('matrix-loading').textContent = t('数据暂时无法加载，请刷新重试。', 'Data could not be loaded. Please refresh to retry.'); });
 })();
