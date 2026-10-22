@@ -154,7 +154,9 @@ def main():
                     assert "PROJECT COMPONENTS" in pegaflow_text, pegaflow_text
                     assert "PegaFlow vLLM Connectors" in pegaflow.inner_text()
                     assert "+6.34%" in pegaflow.inner_text()
-                    performance_link = pegaflow.locator(".plugin-performance a")
+                    performance_link = pegaflow.locator(
+                        ".plugin-performance a.plugin-public-effect-link"
+                    )
                     assert "C1: -28.43%" in performance_link.get_attribute("title")
                     assert "C16: +27.79%" in performance_link.get_attribute("title")
                     page.locator("#langToggle").click()
