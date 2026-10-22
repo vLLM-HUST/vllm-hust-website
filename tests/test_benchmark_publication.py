@@ -46,6 +46,8 @@ class Elements(HTMLParser):
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
     assert "./data/midterm-v067.json" in loader
+    payload = json.loads((ROOT / "data/midterm-v067.json").read_text())
+    assert payload["version"] == "V0.67"
     for filename in ("dataset-validation.html", "leaderboard-runs.html"):
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
