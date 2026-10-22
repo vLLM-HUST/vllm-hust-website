@@ -1086,6 +1086,13 @@ vllm-hust-ext extension check ${extensionId}`
           + result.comparisons.map(row => `C${row.concurrency}: ${format(row.gain)}`).join(" · ")
         : [...new Set(result.published_comparisons.map(row => row.scope))].join(" · ");
       panel.append(link);
+      if (matchedSetting && result.url) {
+        const evidence = element("a", "plugin-raw-evidence-link", zh ? "原始来源 ↗" : "Original source ↗");
+        evidence.href = result.url;
+        evidence.target = "_blank";
+        evidence.rel = "noopener noreferrer";
+        panel.append(evidence);
+      }
     }
     return panel;
   }

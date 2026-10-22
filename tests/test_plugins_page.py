@@ -80,7 +80,14 @@ def test_state_scheduler_public_m0_release_does_not_claim_runtime_benefit() -> N
     assert "Compilation Control" in component["summary_en"]
     assert component["evidence_level"] == "cpu_smoke"
     assert MOD_TAXONOMY["components"]["state-scheduler"]["kind"] == "tool_mod"
-    assert component["public_effect_url"].endswith("/state-scheduler-v0.2.0")
+    assert component["public_effect_url"].endswith(
+        "/state-scheduler-v0.2.0"
+    ) or re.fullmatch(
+        r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
+        r"archive/mod-git-20261022/state-scheduler-website-source/snapshot/"
+        r"docs/STATE_SCHEDULER_ARCHIVE\.md",
+        component["public_effect_url"],
+    )
     assert "releases/download/state-scheduler-v0.2.0/" in SCRIPT
     assert "vllm-state-scheduler-mod status" in SCRIPT
     assert "state-scheduler" not in {
@@ -198,7 +205,14 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
     assert component["maturity"] == "experimental"
     assert component["evidence_level"] == "performance_verified"
     assert component["public_effect_status"] == "beneficial"
-    assert component["public_effect_url"].endswith("/vllm-ascend-simllm-hust/pull/5")
+    legacy = "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/pull/5"
+    canonical = re.fullmatch(
+        r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
+        r"archive/mod-git-20261022/website-source-vllm-ascend-simllm-hust/snapshot/"
+        r"benchmarks/results/qwen35_latency_20261008/README\.md",
+        component["public_effect_url"],
+    )
+    assert component["public_effect_url"] == legacy or canonical
     assert component["compatibility"]["status"] == "experimental"
     assert (
         "one-output-token similarity replay" in component["compatibility"]["models"][0]

@@ -281,6 +281,42 @@ def main():
                         )
                     print(filename, width, lang, "PASS", flush=True)
                     page.close()
+        for width in (390, 1440):
+            page = browser.new_page(viewport={"width": width, "height": 1000})
+            source_response = page.request.get(
+                f"{args.url}/data/plugin-performance.json"
+            )
+            assert source_response.ok
+            sources = source_response.json()["entries"]
+            page.goto(f"{args.url}/plugins.html", wait_until="domcontentloaded")
+            expect(page.locator("#adm .plugin-performance a").first).to_be_attached(
+                timeout=30000
+            )
+            for lang in ("zh", "en"):
+                page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
+                checked = []
+                for source in sources:
+                    card = page.locator(f"[id='{source['id']}']")
+                    if not card.count():
+                        continue
+                    observation = next(
+                        row
+                        for row in source["observations"]
+                        if row["id"] == source["default_observation_id"]
+                    )
+                    url = observation.get("url", source["url"])
+                    link = card.locator(f".plugin-performance a[href='{url}']")
+                    expect(link).to_have_count(1)
+                    checked.append(source["id"])
+                assert {
+                    "adm",
+                    "bidkv",
+                    "pegaflow-vllm-connectors",
+                    "simllm-migration",
+                } <= set(checked)
+                page.screenshot(path=output / f"plugins-sources-{width}-{lang}.png")
+                print("plugins source hrefs", width, lang, checked, "PASS", flush=True)
+            page.close()
         for filename in ("betterscale.html", "traceloom.html", "serving-plan.html"):
             page = browser.new_page(viewport={"width": 390, "height": 1000})
             page.goto(f"{args.url}/{filename}", wait_until="domcontentloaded")
