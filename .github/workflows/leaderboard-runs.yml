@@ -33,7 +33,7 @@ permissions:
 jobs:
   review:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -43,11 +43,14 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/leaderboard_runs_model.test.cjs tests/leaderboard_frontier_model.test.cjs
-      - run: |
+      - name: Install review dependencies and run Python tests
+        timeout-minutes: 15
+        run: |
           python -m pip install pytest playwright
           python -m playwright install --with-deps chromium
           pytest tests/test_leaderboard_run_observations.py -q
       - name: Check real evidence and responsive interactions
+        timeout-minutes: 8
         run: |
           python -m http.server 8774 --bind 127.0.0.1 > /tmp/leaderboard-runs-server.log 2>&1 &
           server_pid=$!
