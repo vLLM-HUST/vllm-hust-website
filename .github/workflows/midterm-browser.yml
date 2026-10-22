@@ -12,7 +12,7 @@ permissions:
 jobs:
   midterm-browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -32,8 +32,12 @@ jobs:
           python _benchmark/scripts/sync_website_publication.py publish --revision "$(git -C _benchmark rev-parse HEAD)" --website .
           python -m pip install playwright pytest
           python -m pytest tests/test_benchmark_publication.py -q
+      - name: Install browser and system dependencies
+        timeout-minutes: 15
+        run: |
           python -m playwright install --with-deps chromium
       - name: Verify default scenario, report sections, languages and mobile layout
+        timeout-minutes: 8
         env:
           VERIFY_URL: ${{ inputs.url || 'http://127.0.0.1:8769' }}
           GH_TOKEN: ${{ github.token }}
