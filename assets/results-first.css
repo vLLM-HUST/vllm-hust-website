@@ -25,6 +25,7 @@ body .current-measurements a { color: var(--result-link); }
 .result-next a { font-size: 12px; padding: 7px 10px; border: 1px solid var(--result-line); border-radius: 6px; }
 .result-disclosure { margin: 20px 0; border: 1px solid var(--result-line); border-radius: 12px; background: var(--result-bg); color: var(--result-ink); min-width: 0; }
 .result-disclosure > summary { padding: 20px; cursor: pointer; font-weight: 600; }
+.result-disclosure:has(> #frontier-agent-qualifications[hidden]) { display: none; }
 .result-disclosure > :not(summary) { margin: 16px; }
 .result-disclosure .page-hero { padding: 0; }
 #current-configuration > summary { padding: 12px 0; font-size: 14px; }
@@ -46,4 +47,9 @@ body .midterm-report .midterm-audit { background: var(--result-tint); }
   .result-metric > small { text-align: right; }
   .result-disclosure > summary { padding: 16px; }
   .result-disclosure > :not(summary) { margin: 8px; }
+}
+@media (max-width: 360px) {
+  .result-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .result-pair strong { font-size: 19px; }
+  .result-pair span { font-size: 11px; }
 }
