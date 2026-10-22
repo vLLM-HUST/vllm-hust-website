@@ -31,7 +31,7 @@ def main():
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-validation.html")
             page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(6)
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(7)
             expect(page.locator("#matrix-table table")).to_have_count(1)
             assert "+91.7%" in page.locator(".matrix-overview").inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
@@ -207,6 +207,25 @@ def main():
             page.screenshot(
                 path=str(args.output / f"controller-frontier-{width}-{lang}.png"),
                 full_page=True,
+            )
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= innerWidth + 1"
+            )
+            page.goto(args.url + "/dataset-validation.html#swe-bench-pro")
+            expect(page.locator(".matrix-detail .run-row")).to_have_count(2)
+            expect(page.locator(".matrix-detail thead th")).to_have_count(7)
+            for value in [
+                "151.45",
+                "213.32",
+                "411.27",
+                "963.34",
+            ]:
+                assert value in page.locator("#matrix-table").inner_text()
+            assert "P95 / P99" in page.locator("#matrix-table").inner_text()
+            assert "ThunderAgent" not in page.locator("#matrix-table").inner_text()
+            expect(page.locator("#matrix-table a")).to_have_count(2)
+            page.screenshot(
+                path=str(args.output / f"real-agent-{width}-{lang}.png"), full_page=True
             )
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"

@@ -333,6 +333,7 @@
             ].filter(Boolean).join('<br>')}</p>`:''}
             <p class="frontier-popup-load">${t('warmup')}: ${Number.isInteger(point.evidence.benchmark_protocol?.warmup_requests)?`${point.evidence.benchmark_protocol.warmup_requests} ${lang()==='zh'?'个请求（不计入测量）':'requests (excluded)'}`:t(warmupKey)}</p>
             ${nearby.length>1?`<div class="frontier-nearby"><span>${t('nearby')}</span>${nearby.map(p=>`<button type="button" data-nearby="${escape(p.id)}" aria-pressed="${p.id===point.id}">${escape(parallel(p))}${hasRotation()?` · ${rotationLabel(p.load.session_rotation_depth)}`:''} · C${fmt(p.load.concurrency)} · MTP${p.configuration.parameters.mtp_draft_tokens??'—'} · ${fmt(p.configuration.parameters.max_num_seqs)}</button>`).join('')}</div>`:''}
+            <p class="frontier-popup-evidence" data-benchmark-point="${escape(point.id)}">${lang()==='zh'?'正在加载测量来源…':'Loading measurement sources…'}</p>
             <button type="button" class="frontier-download" data-download>${t('download')} ↓</button>`;
         const anchor=$('frontier-chart').querySelector(`[data-point="${CSS.escape(point.id)}"]`);
         if(!anchor){panel.hidden=true;return;}
