@@ -689,6 +689,7 @@ def main():
             page.locator("#view-frontier").click()
             assert page.locator("#runs-panel table:visible").count() == 0
             assert page.locator("#tasks-panel table:visible").count() == 0
+            page.locator("#agent-results-details > summary").click()
             assert (
                 page.locator(
                     "#frontier-agent-qualifications .agent-qualification-table:visible"
