@@ -56,7 +56,7 @@ def test_leaderboard_names_exact_settings_without_frontier_jargon() -> None:
     assert "Preserved evidence" in runs_script
     assert "保留证据" in runs_script
     assert "Historical evidence" not in runs_script
-    assert "preserved-evidence-20261010" in page
+    assert "./assets/leaderboard-runs.js?v=results-first-20261023" in page
     assert "Setting-specific matched baseline" in settings_script
     assert "当前设定同配置基线" in settings_script
     assert "Fixed official baseline" not in settings_script
@@ -972,7 +972,7 @@ def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
     page_cache_keys = {
         "leaderboard-runs.html": (
             "version-scoped-baseline-20261010",
-            "preserved-evidence-20261010",
+            "./assets/leaderboard-runs.js?v=results-first-20261023",
         ),
         "dataset-validation.html": ("quality-regression-20261020",),
         "members.html": ("data-freshness-20261009",),
