@@ -39,12 +39,12 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v064.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v065.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.64' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.65' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             for (const section of value.sections) {
                 if (!section.evidence?.length) throw Error('Missing original evidence');
