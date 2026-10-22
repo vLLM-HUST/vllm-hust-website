@@ -5,7 +5,7 @@
 .matrix-heading h1 { font-size: clamp(24px, 4vw, 34px); margin: 0 0 8px; color: #f1f5ff; }
 .matrix-heading p { color: #b4c2d6; margin: 0 0 18px; font-size: 14px; }
 .matrix-cohort { display: inline-block; border: 1px solid #344158; border-radius: 8px; padding: 10px 14px; color: #d5e0f2; background: #152036; font-size: 13px; line-height: 1.8; }
-.matrix-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; color: #e5edf9; font-size: 14px; margin: 30px 0 8px; }
+.matrix-breadcrumb { scroll-margin-top: 100px; display: flex; align-items: center; flex-wrap: wrap; gap: 14px; color: #e5edf9; font-size: 14px; margin: 30px 0 8px; }
 .matrix-breadcrumb a { color: #9cb4ff; text-decoration: none; }
 .matrix-breadcrumb span { color: #aebcd0; font-size: 12px; }
 .matrix-overview { min-width: 540px; }
