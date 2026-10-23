@@ -3,12 +3,12 @@
     const STATUS_ORDER = ['not_tested', 'baseline_only', 'queued', 'running', 'passed', 'failed', 'not_applicable'];
     const TREND_ORDER = ['improved', 'regressed', 'unchanged', 'not_comparable'];
     const STATUS_LABELS = {
-        en: { not_tested: 'Not tested', baseline_only: 'B0 only', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
-        zh: { not_tested: '未测试', baseline_only: '仅 B0', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
+        en: { not_tested: 'Not tested', baseline_only: 'Control only', queued: 'Queued', running: 'Running', passed: 'Passed', failed: 'Failed', not_applicable: 'N/A' },
+        zh: { not_tested: '未测试', baseline_only: '仅对照', queued: '排队中', running: '运行中', passed: '通过', failed: '失败', not_applicable: '不适用' },
     };
     const TEXT = {
-        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', sourceCellEvidence: 'Cell-level evidence in details', detailTitle: 'Cell detail', baseline: 'B0 baseline', current: 'Current', delta: 'Delta', reason: 'Reason', note: 'Note', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', candidates: 'B1 candidates', selected: 'Selected', exercised: 'Exercised', notExercised: 'Not exercised', notRecorded: 'Not recorded', viewSource: 'View report', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
-        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', sourceCellEvidence: '证据见单元格详情', detailTitle: '单元格详情', baseline: 'B0 基线', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', candidates: 'B1 候选', selected: '已选为 B1', exercised: '已执行控制动作', notExercised: '未执行控制动作', notRecorded: '未记录控制动作', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
+        en: { all: 'All statuses', noValue: 'No result', filtered: 'Filtered', allDatasets: 'All datasets', searchDataset: 'Search datasets', page: 'Page', of: 'of', previous: 'Previous', next: 'Next', noDataTitle: 'No dataset results yet', noDataBody: 'The validation service has not published a result for this scenario. Empty cells are intentionally shown as Not tested.', sourcePending: 'Awaiting validation service artifact', sourceCellEvidence: 'Cell-level evidence in details', detailTitle: 'Cell detail', baseline: 'Recorded control', current: 'Current', delta: 'Delta', reason: 'Reason', note: 'Note', tracking: 'Tracking', updated: 'Updated', model: 'Model', hardware: 'Hardware', provenance: 'Provenance', candidates: 'B1 candidates', selected: 'Selected', exercised: 'Exercised', notExercised: 'Not exercised', notRecorded: 'Not recorded', viewSource: 'View report', notProvided: 'Not provided', timestampUnavailable: 'Timestamp unavailable', freshPrefix: 'Updated', stalePrefix: 'Stale' },
+        zh: { all: '全部状态', noValue: '暂无结果', filtered: '已筛选', allDatasets: '全部数据集', searchDataset: '搜索数据集', page: '第', of: '/', previous: '上一页', next: '下一页', noDataTitle: '当前还没有数据集结果', noDataBody: '验证服务尚未为该场景发布结果。空单元格会明确显示为“未测试”。', sourcePending: '等待验证服务产物', sourceCellEvidence: '证据见单元格详情', detailTitle: '单元格详情', baseline: '已记录对照', current: '当前值', delta: '变化', reason: '原因', note: '说明', tracking: '跟踪', updated: '更新时间', model: '模型', hardware: '硬件', provenance: '来源', candidates: 'B1 候选', selected: '已选为 B1', exercised: '已执行控制动作', notExercised: '未执行控制动作', notRecorded: '未记录控制动作', viewSource: '查看报告', notProvided: '未提供', timestampUnavailable: '缺少时间戳', freshPrefix: '更新时间', stalePrefix: '结果已过期' },
     };
 
     const state = { data: null, index: null, program: null, scenarioId: null, status: 'all', selected: null, query: '', group: 'all', page: 1, pageSize: 20 };
@@ -123,7 +123,7 @@
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
             let note = lang() === 'zh' ? dataset.note_zh : dataset.note;
             const handoff = dataset.id === 'mmlu-pro'
-                ? `<p><a href="#midterm-native-paired-quality">${lang() === 'zh' ? '查看同环境200题B0/B1质量配对及原始证据' : 'View matched 200-task B0/B1 quality results and evidence'}</a></p><p><a href="#mmlu-pro-handoff">${lang() === 'zh' ? '查看 10 月 12 日准确率与性能实测（非正式验收）' : 'View October 12 accuracy and performance measurements (not formal acceptance)'}</a></p>`
+                ? `<p><a href="#midterm-native-paired-quality">${lang() === 'zh' ? '查看同环境200题开发栈质量配对及原始证据' : 'View development-stack 200-task quality results and evidence'}</a></p><p><a href="#mmlu-pro-handoff">${lang() === 'zh' ? '查看 10 月 12 日准确率与性能实测（非正式验收）' : 'View October 12 accuracy and performance measurements (not formal acceptance)'}</a></p>`
                 : dataset.id === 'hle-verified'
                     ? '<p><a href="#hle-verified-handoff">' + (lang() === 'zh' ? '查看 Gold、Revision 与图文压测实测（非正式验收）' : 'View Gold, Revision and text/image load tests (not formal acceptance)') + '</a></p>'
                 : dataset.id === 'frontierscience'
@@ -266,7 +266,7 @@
             if (hidden) return `<td class="validation-cell" data-filtered="true"><span class="validation-filtered-cell">${t('filtered')}</span></td>`;
             const trend = TREND_ORDER.includes(cell.comparison?.trend) ? cell.comparison.trend : 'not_comparable';
             const trendText = cell.comparison?.trend ? `${cell.comparison.trend}${delta ? ` ${delta}` : ''}` : delta;
-            return `<td class="validation-cell"><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-pair"><span><small>B0</small>${formatBaselineValue(cell, metric)}</span><span><small>B1</small>${formatValue(cell, metric)}</span></span>${trendText ? `<span class="validation-cell-delta validation-trend--${trend}">${escapeHtml(trendText)}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
+            return `<td class="validation-cell"><button class="validation-cell-button" type="button" data-cell="${escapeHtml(key)}" aria-label="${escapeHtml(dataset.label)} ${escapeHtml(metric.label)}"><span class="validation-cell-pair"><span><small>Native</small>${formatBaselineValue(cell, metric)}</span><span><small>B1</small>${formatValue(cell, metric)}</span></span>${trendText ? `<span class="validation-cell-delta validation-trend--${trend}">${escapeHtml(trendText)}</span>` : ''}<span class="validation-status validation-status--${cell.status}">${statusLabel(cell.status)}</span></button></td>`;
         }).join('')}</tr>`).join('');
         body.querySelectorAll('[data-cell]').forEach((button) => button.addEventListener('click', () => { state.selected = button.dataset.cell; renderDetail(); }));
         renderPagination(datasets.length, pageCount);
@@ -385,7 +385,7 @@
 
     function renderDatasetControls() {
         const groupSelect = $('validation-group-filter');
-        $('validation-legend-b0').textContent = lang() === 'zh' ? '基线' : 'Baseline';
+        $('validation-legend-b0').textContent = lang() === 'zh' ? '已记录版本对照（不自动视为 B0）' : 'Recorded version control (not automatically B0)';
         $('validation-legend-b1').textContent = lang() === 'zh' ? '当前已实测最优的vLLM-HUST优化方案' : 'Currently best measured vLLM-HUST optimization solution';
         $('validation-legend-improved').textContent = lang() === 'zh' ? '性能提升' : 'Improved';
         $('validation-legend-regressed').textContent = lang() === 'zh' ? '性能回退' : 'Regressed';

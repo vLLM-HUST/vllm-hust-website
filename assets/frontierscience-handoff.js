@@ -59,7 +59,7 @@
               'From the saved actual startup log, with current process arguments checked before the full run. The service continued after smoke; this run did not restart it. Only verified actual values are shown.') +
             '</p><dl class="fs-runtime-grid">' + Object.entries(runtime.fields).map(([key, v]) => '<div><dt>' + escape(key) + '</dt><dd>' + escape(format(v.value)) + '</dd></div>').join('') + '</dl></section>';
         return '<span class="eyebrow">' + t('指定数据集 · 全量实测', 'Designated dataset · Full measurement') + '</span>' +
-            '<h2>FrontierScience · ' + escape(r.measurement_date_utc) + ' UTC</h2><p>' + escape(r.model) + ' · B0 · 100 Olympiad + 60 Research</p>' +
+            '<h2>FrontierScience · ' + escape(r.measurement_date_utc) + ' UTC</h2><p>' + escape(r.model) + ' · Native · 100 Olympiad + 60 Research</p>' +
             '<p class="fs-boundary">' + t('开发验证结果，非官方排行榜复现，未通过 V5.5 正式验收。采用官方 Appendix B 提示词、同一 Qwen 模型作答与评分、单次测评和本地判定提取。部分判定待人工复核；暂无 B1 或提升幅度。',
             'Development evaluation, not official leaderboard replication or V5.5 acceptance. Uses official Appendix B prompts, the same Qwen model for solving and judging, one trial and local verdict extraction. Some grades require human review; no B1 or improvement claim.') + '</p>' +
             '<div class="fs-cards">' +

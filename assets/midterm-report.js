@@ -48,7 +48,7 @@
             return `<tr>${row.map((cell, i) => i === 0 ? `<th scope="row">${cellText(cell)}</th>` : `<td>${cellText(cell)}</td>`).join('')}</tr>`;
         }).join('')}</tbody></table></div>`;
         panel.innerHTML = `<h2>${title} ${escape(data.version)}</h2>
-            <p>${zh ? '指定基线为 vLLM 0.18 / vLLM-Ascend 0.18，MMLU-Pro 固定200题判对151题；同题已测 KV物化、Microflow、恢复组合分别判对152、149、146题。主性能与恢复配对采用 0.28.1 / Ascend 0.25.1rc2 开发栈，Controller 配对采用 0.23 / 0.23。各运行栈和配置分别列示，改善仅对应实际比较对象。' : 'The designated vLLM 0.18 / vLLM-Ascend 0.18 baseline scored 151/200 on the fixed MMLU-Pro subset. Reused KV materialization, Microflow and recovered-combination results scored 152, 149 and 146 on identical requests. Main performance and recovery pairs use the 0.28.1 / Ascend 0.25.1rc2 development stack; Controller pairs use 0.23 / 0.23. Runtime stacks and configurations remain explicit; gains apply only to their actual comparisons.'}</p>
+            <p>${zh ? 'B0 固定为 vLLM 0.18 + vLLM-Ascend 0.18。B1 为当前最佳实测优化配置，基座版本不限，实际版本逐项标明。其他版本 Native 是版本对照，不是 B0。' : 'B0 is fixed at vLLM 0.18 + vLLM-Ascend 0.18. B1 is the best measured optimized configuration, with no base-version restriction and actual versions explicitly identified. Other-version Native runs are controls, not B0.'}</p>
             <p><a href="${escape(data.report_url)}">${zh ? `阅读完整 ${escape(data.version)} 报告` : `Read the complete ${escape(data.version)} report`}</a></p>
             <nav aria-label="${title}">${data.sections.map(s => `<a href="#midterm-${escape(s.id)}">${escape(s.title.split(' / ')[zh ? 0 : 1])}</a>`).join(' · ')}</nav>
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
@@ -59,12 +59,12 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v070.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v071.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.70' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.71' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             for (const section of value.sections) {
                 if (!section.evidence?.length) throw Error('Missing original evidence');

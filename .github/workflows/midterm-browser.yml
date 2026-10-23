@@ -46,6 +46,7 @@ jobs:
           website_server_pid=$!
           trap 'kill "$website_server_pid"' EXIT
           python scripts/verify_midterm_browser.py --url "$VERIFY_URL"
+          python scripts/verify_results_first_browser.py --url "$VERIFY_URL"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

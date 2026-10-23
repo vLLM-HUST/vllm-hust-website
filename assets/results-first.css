@@ -1,0 +1,59 @@
+/* Presentation only: original metric values, contracts and evidence stay intact. */
+body { --result-bg: #fff; --result-ink: #17212b; --result-muted: #526171; --result-line: #dce4e9; --result-tint: #f2f7f8; --result-link: #086b60; }
+.current-measurements:not(.midterm-report) { padding: 28px; border: 1px solid var(--result-line); border-radius: 18px; margin: 24px 0; }
+body .current-measurements { background: var(--result-bg); color: var(--result-ink); }
+body .current-measurements :is(h1,h2,h3,p,th,td,summary,span,strong,small), body #midterm-report h3 { color: var(--result-ink); -webkit-text-fill-color: currentColor; }
+body .current-measurements a { color: var(--result-link); }
+.result-heading { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+.result-heading h1 { font-size: clamp(22px, 2.5vw, 32px); margin: 8px 0 12px; line-height: 1.2; letter-spacing: -.025em; }
+.result-eyebrow, .result-date { font-size: 12px; letter-spacing: .06em; }
+.result-date { white-space: nowrap; }
+.result-context { font-size: 14px; margin: 0 0 12px; }
+.result-boundary { border-left: 3px solid #b88729; padding: 8px 12px; background: var(--result-tint); font-size: 13px; line-height: 1.6; }
+.result-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 20px; }
+.result-metric { min-width: 0; padding: 18px; background: var(--result-tint); border: 1px solid var(--result-line); border-radius: 12px; }
+.result-metric h3 { margin: 0 0 18px; font-size: 15px; letter-spacing: 0; }
+.result-metric h3 small { font-weight: 400; }
+.result-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.result-pair span { display: block; font-size: 12px; }
+.result-pair strong { display: block; font-size: clamp(22px,2.3vw,32px); font-variant-numeric: tabular-nums; line-height: 1.4; }
+.result-pair a { text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.result-change { margin: 14px 0 6px; font-weight: 700; font-size: 18px; }
+.result-change span, .result-metric > small { font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
+.result-selection { font-size: 13px; line-height: 1.6; }
+.result-quality { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 12px; background: var(--result-tint); border: 1px solid var(--result-line); border-radius: 8px; }
+.result-quality small { flex-basis: 100%; font-size: 12px; }
+.result-next { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.result-next a { font-size: 12px; padding: 7px 10px; border: 1px solid var(--result-line); border-radius: 6px; }
+.result-disclosure { margin: 20px 0; border: 1px solid var(--result-line); border-radius: 12px; background: var(--result-bg); color: var(--result-ink); min-width: 0; }
+.result-disclosure > summary { padding: 20px; cursor: pointer; font-weight: 600; }
+.result-disclosure:has(> #frontier-agent-qualifications[hidden]) { display: none; }
+.result-disclosure > :not(summary) { margin: 16px; }
+.result-disclosure .page-hero { padding: 0; }
+#current-configuration > summary { padding: 12px 0; font-size: 14px; }
+.result-disclosure, [id^="midterm-"], #current-workload { scroll-margin-top: 90px; }
+body .midterm-report .midterm-audit { background: var(--result-tint); }
+@media (prefers-color-scheme: dark) {
+  body { --result-bg: #14212c; --result-ink: #e4edf4; --result-muted: #b2c3ce; --result-line: #364957; --result-tint: #1c2d39; --result-link: #79dcca; }
+}
+@media (max-width: 700px) {
+  .current-measurements:not(.midterm-report) { padding: 16px; border-radius: 12px; }
+  .result-heading { display: block; }
+  .result-date { display: none; }
+  .result-metrics { grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
+  .result-metric { padding: 10px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; align-items: center; }
+  .result-metric h3 { margin: 0; font-size: 13px; grid-column: 1 / -1; }
+  .result-pair { grid-column: 1 / -1; }
+  .result-pair strong { font-size: 24px; }
+  .result-change { margin: 0; font-size: 15px; }
+  .result-metric > small { text-align: right; }
+  .result-disclosure > summary { padding: 16px; }
+  .result-disclosure > :not(summary) { margin: 8px; }
+}
+@media (max-width: 360px) {
+  body .site-directory-links { grid-template-columns: repeat(2, minmax(0, 1fr)); overflow-wrap: anywhere; }
+  .benchmark-tabs a { overflow-wrap: anywhere; }
+  .result-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .result-pair strong { font-size: 19px; }
+  .result-pair span { font-size: 11px; }
+}
