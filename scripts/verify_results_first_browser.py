@@ -31,6 +31,7 @@ def main():
                             color_scheme=scheme,
                         )
                         context.add_init_script(
+                            "if (location.protocol === 'http:' || location.protocol === 'https:') "
                             f"localStorage.setItem('vllm-hust_lang', '{lang}')"
                         )
                         page = context.new_page()
@@ -115,6 +116,23 @@ def main():
                         assert page.locator("#report-details").evaluate("e => e.open")
                         page.screenshot(path=output / f"{name}-evidence.png")
                         # Fresh deep link must reveal asynchronous sections, too.
+                        page.goto("about:blank")
+                        if filename == "leaderboard-runs.html":
+                            # Force curves to load before the report: this exposed
+                            # the production-only hash overwrite race.
+                            def delayed_report(route):
+                                expect(
+                                    page.locator("#frontier-status")
+                                ).to_have_attribute(
+                                    "data-state", "ready", timeout=30000
+                                )
+                                assert (
+                                    page.evaluate("location.hash")
+                                    == "#midterm-m01-verdict"
+                                )
+                                route.continue_()
+
+                            page.route("**/data/midterm-v071.json", delayed_report)
                         page.goto(f"{args.url}/{filename}#midterm-m01-verdict")
                         expect(page.locator("#midterm-m01-verdict")).to_be_visible()
                         assert not errors, errors
