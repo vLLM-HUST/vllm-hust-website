@@ -484,7 +484,7 @@ def test_real_agent_window_refuses_quality_or_makespan_reclassification(tmp_path
 def test_pair_table_does_not_add_a_page_section_or_change_existing_content():
     page = (ROOT / "dataset-validation.html").read_text()
     assert 'id="dataset-results" class="matrix-shell runs-shell"' in page
-    assert "./assets/dataset-matrix-v1.js?v=controller-native-table-20261022" in page
+    assert "./assets/dataset-matrix-v1.js?v=controller-native-percent-20261023" in page
     assert 'id="mmlu-pro-handoff"' in page
     assert "./assets/midterm-report.js?v=midterm-v070-20261022" in page
     js = (ROOT / "assets/dataset-matrix-v1.js").read_text()
