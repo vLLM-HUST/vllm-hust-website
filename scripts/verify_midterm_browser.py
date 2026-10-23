@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v074.json")
+        response = context.request.get(f"{args.url}/data/midterm-v075.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.74"
+        assert report["version"] == "V0.75"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v074.json"
+            if f["website_path"] == "data/midterm-v075.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v074-audit-20261023",
+                        "./assets/midterm-report.js?v=midterm-v075-audit-20261023",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.74", timeout=30000
+                        "data-loaded", "V0.75", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -105,6 +105,7 @@ def main():
                         ).to_have_count(1)
                     for ident in (
                         "milestone-v15",
+                        "v15-remaining",
                         "dataset-quality-inventory",
                         "reference-closure",
                         "worker-model",
@@ -148,6 +149,26 @@ def main():
                             for item in report["sections"]
                             if item["id"] == ident
                         )
+                        if ident == "v15-remaining":
+                            inventory = next(
+                                item["evidence"]
+                                for item in report["sections"]
+                                if item["id"] == "dataset-quality-inventory"
+                            )
+                            evidence = evidence + [inventory[i] for i in (11, 0, 9)]
+                            for row, path in (
+                                (0, inventory[11]["path"]),
+                                (1, inventory[0]["path"]),
+                                (3, inventory[9]["path"]),
+                            ):
+                                href = (
+                                    section.locator("table")
+                                    .first.locator("tbody tr")
+                                    .nth(row)
+                                    .locator("a")
+                                    .first.get_attribute("href")
+                                )
+                                assert href.endswith(quote(path)), (row, href, path)
                         allowed_links = [
                             "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
                             f"{item['kind']}/{manifest['commit']}/{quote(item['path'])}"
@@ -260,7 +281,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.74"
+                        "V0.75"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -486,7 +507,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v074.json",
+            "**/data/midterm-v075.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
