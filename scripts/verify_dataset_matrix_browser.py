@@ -34,6 +34,13 @@ def main():
             expect(page.locator(".matrix-overview tbody tr")).to_have_count(7)
             expect(page.locator("#matrix-table table")).to_have_count(1)
             assert "+91.7%" in page.locator(".matrix-overview").inner_text()
+            system_row = page.locator(".matrix-overview tbody tr").filter(
+                has=page.locator('a[href="#swe-bench-pro"]')
+            )
+            assert "+40.8%" in system_row.inner_text()
+            assert "213.32" not in system_row.inner_text()
+            assert "1.408" not in system_row.inner_text()
+            assert ("基线" if lang == "zh" else "Baseline") in system_row.inner_text()
             assert "79.70%" in page.locator(".matrix-overview").inner_text()
             expect(
                 page.locator(".matrix-profile-section, .matrix-replay-section")

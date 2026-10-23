@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v067.json")
+        response = context.request.get(f"{args.url}/data/midterm-v070.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.67"
+        assert report["version"] == "V0.70"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v067.json"
+            if f["website_path"] == "data/midterm-v070.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -81,10 +81,10 @@ def main():
                     expect(
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
-                        "src", "./assets/midterm-report.js?v=midterm-v067-20261022"
+                        "src", "./assets/midterm-report.js?v=midterm-v070-20261022"
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.67", timeout=30000
+                        "data-loaded", "V0.70", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -241,7 +241,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.67"
+                        "V0.70"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -252,8 +252,52 @@ def main():
                     inventory = page.locator("#midterm-dataset-quality-inventory")
                     for score in ("156 / 668", "313 / 1143", "57 / 100", "5 / 60"):
                         expect(inventory).to_contain_text(score)
-                    expect(inventory).to_contain_text("当前B1组合配对为空")
-                    expect(inventory.locator("tbody tr")).to_have_count(4)
+                    expect(inventory).to_contain_text("指定0.18 Native固定200题151/200")
+                    expect(inventory.locator("tbody tr")).to_have_count(24)
+                    for score in ("151 / 200", "152 / 200", "149 / 200", "146 / 200"):
+                        expect(inventory).to_contain_text(score)
+                    for score in (
+                        "9589 / 12032",
+                        "9599 / 12032",
+                        "173 / 668",
+                        "316 / 1143",
+                        "159 / 668",
+                        "308 / 1143",
+                        "62 / 100",
+                        "2 / 60",
+                    ):
+                        expect(inventory).to_contain_text(score)
+                    inventory_section = next(
+                        s
+                        for s in report["sections"]
+                        if s["id"] == "dataset-quality-inventory"
+                    )
+                    for table_index, indices in enumerate(
+                        (
+                            (0, 0, 1, 1),
+                            (2, 4, 3, 3, 5, 5),
+                            (4, 4, 4, 4),
+                            (7, 8, 6, 6),
+                            (9, 9),
+                            (11, 11, 11, 11),
+                        )
+                    ):
+                        rows = (
+                            inventory.locator("table")
+                            .nth(table_index)
+                            .locator("tbody tr")
+                        )
+                        expect(rows).to_have_count(len(indices))
+                        for row_index, evidence_index in enumerate(indices):
+                            href = (
+                                rows.nth(row_index)
+                                .locator("a")
+                                .first.get_attribute("href")
+                            )
+                            assert href.endswith(
+                                "/"
+                                + inventory_section["evidence"][evidence_index]["path"]
+                            )
                     for index, dataset in enumerate(
                         ("hle-verified-20261015",) * 2
                         + ("frontierscience-20261013",) * 2
@@ -313,6 +357,15 @@ def main():
                     page.screenshot(path=output / f"{filename}-{width}-{lang}.png")
                     for scheme in ("light", "dark"):
                         page.emulate_media(color_scheme=scheme)
+                        native018 = inventory.locator(".measurement-table-scroll").last
+                        native018.scroll_into_view_if_needed()
+                        bounds = native018.bounding_box()
+                        assert bounds and bounds["x"] >= 0
+                        assert bounds["x"] + bounds["width"] <= width + 1
+                        native018.screenshot(
+                            path=output
+                            / f"{filename}-{width}-{lang}-{scheme}-native018.png"
+                        )
                         fenced.scroll_into_view_if_needed()
                         expect(fenced).to_be_visible()
                         assert fenced.evaluate(
@@ -400,7 +453,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v067.json",
+            "**/data/midterm-v070.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
