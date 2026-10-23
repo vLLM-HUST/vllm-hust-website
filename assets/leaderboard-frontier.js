@@ -160,7 +160,9 @@
         if (!state.ready || !state.cohort || $('view-frontier')?.getAttribute('aria-pressed') !== 'true') return;
         const params = new URLSearchParams(location.search);
         params.set('setting', state.cohort);
-        history.replaceState(null, '', `${location.pathname}?${params.toString()}#settings`);
+        // Asynchronous curve loading must not erase a report/evidence deep link.
+        const fragment = ['', '#settings', '#frontier'].includes(location.hash) ? '#settings' : location.hash;
+        history.replaceState(null, '', `${location.pathname}?${params.toString()}${fragment}`);
     }
     function shell() {
         reconcile();
