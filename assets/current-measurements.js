@@ -54,7 +54,7 @@
     ].filter(item => Number.isFinite(item.value) && item.value >= 0) : [];
     const maximum = Math.max(1, ...points.map(item => item.value));
     const bars = points.map(item => `<li><span>${escape(item.label || item.candidate_id)}</span><div class="measurement-bar-track"><div class="measurement-bar" style="width:${item.value / maximum * 100}%"></div></div><strong>${linkedNumber(item.value, item.candidate_id)}</strong></li>`).join('');
-    const report = data.source?.report_url;
+    const report = reportData.report_url;
     const safeReport = typeof report === 'string' && report.startsWith('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/');
     const cards = data.results.map(result => {
       const metric = data.metrics.find(item => item.id === result.metric_id);
