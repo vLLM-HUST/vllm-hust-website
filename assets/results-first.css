@@ -21,6 +21,8 @@ body .current-measurements a { color: var(--result-link); }
 .result-change { margin: 14px 0 6px; font-weight: 700; font-size: 18px; }
 .result-change span, .result-metric > small { font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .result-selection { font-size: 13px; line-height: 1.6; }
+.result-quality { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 12px; background: var(--result-tint); border: 1px solid var(--result-line); border-radius: 8px; }
+.result-quality small { flex-basis: 100%; font-size: 12px; }
 .result-next { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
 .result-next a { font-size: 12px; padding: 7px 10px; border: 1px solid var(--result-line); border-radius: 6px; }
 .result-disclosure { margin: 20px 0; border: 1px solid var(--result-line); border-radius: 12px; background: var(--result-bg); color: var(--result-ink); min-width: 0; }

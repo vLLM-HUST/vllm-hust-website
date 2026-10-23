@@ -36,7 +36,7 @@
         };
         return `<section class="mmlu-runtime" aria-labelledby="mmlu-runtime-title">
           <div class="mmlu-runtime-heading"><div><span class="mmlu-runtime-badge">${zh ? '运行回执已确认' : 'Confirmed by runtime receipt'}</span><h3 id="mmlu-runtime-title">${zh ? '已确认运行配置' : 'Confirmed runtime configuration'}</h3></div><a href="${BASE}runtime.json" download>${zh ? '下载配置 JSON ↓' : 'Download configuration JSON ↓'}</a></div>
-          <p>${zh ? '以下为本次 B0 启动日志中确认的实际值；由保存的启动回执事后重新解析，仅展示 verified 字段。' : 'Actual values confirmed in this B0 startup log, obtained by a later reparse of the saved receipt. Only verified fields are shown.'}</p>
+          <p>${zh ? '以下为本次 Native 启动日志中确认的实际值；由保存的启动回执事后重新解析，仅展示 verified 字段。' : 'Actual values confirmed in this Native startup log, obtained by a later reparse of the saved receipt. Only verified fields are shown.'}</p>
           <dl class="mmlu-runtime-grid">${fields.map(([key, label]) => `<div><dt>${label[zh ? 0 : 1]}</dt><dd>${format(runtime.fields[key].value)}</dd><small>${key}</small></div>`).join('')}</dl>
         </section>`;
     }
@@ -63,7 +63,7 @@
         const limited = r.by_termination.length_limited;
         return `<span class="eyebrow">${t('指定数据集 · 新增实测', 'Designated dataset · New measurement')}</span>
           <h2>MMLU-Pro · ${escape(m.measurement_date)}</h2>
-          <p>${escape(m.model)} · B0 · ${t('全量测试集 / 单次运行 / B1 待测', 'Full test split / Single lifecycle / B1 not measured')}</p>
+          <p>${escape(m.model)} · Native · ${t('全量测试集 / 单次运行 / B1 待测', 'Full test split / Single lifecycle / B1 not measured')}</p>
           <p class="mmlu-boundary">${t('非官方评测口径，未通过 V5.5 正式验收。此处为操作者提供的运行摘要，独立于下方验证服务矩阵；使用 legacy plan，运行并发 16 与合同并发 1 不同，未绑定评分器哈希。', 'Non-official evaluation; not V5.5 acceptance. These operator-supplied summaries are separate from the validation-service matrix below. Legacy plan; runtime concurrency 16 differs from contract concurrency 1; scorer hash was not bound.')}</p>
           <div class="mmlu-cards">
             ${card(t('全量准确率', 'Full-test accuracy'), pct(a.correct, a.cases), `${count(a.correct)} / ${count(a.cases)} ${t('题', 'questions')}`)}
@@ -94,7 +94,7 @@
         const update = () => {
             const language = window.vllmHustSite?.getCurrentLang() || 'en';
             if (data) root.innerHTML = render(data, language);
-            else if (failed) root.innerHTML = `<h2>MMLU-Pro · B0 · 2026-10-12</h2><p>${language === 'zh' ? '实测摘要暂时无法加载。' : 'Measurement summaries are unavailable.'}</p><a href="${BASE}manifest.json">manifest.json</a>`;
+            else if (failed) root.innerHTML = `<h2>MMLU-Pro · Native · 2026-10-12</h2><p>${language === 'zh' ? '实测摘要暂时无法加载。' : 'Measurement summaries are unavailable.'}</p><a href="${BASE}manifest.json">manifest.json</a>`;
         };
         window.addEventListener('vllm-hust:langchange', update);
         try {
