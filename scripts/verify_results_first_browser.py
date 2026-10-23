@@ -31,6 +31,7 @@ def main():
                             color_scheme=scheme,
                         )
                         context.add_init_script(
+                            "if (location.protocol === 'http:' || location.protocol === 'https:') "
                             f"localStorage.setItem('vllm-hust_lang', '{lang}')"
                         )
                         page = context.new_page()
