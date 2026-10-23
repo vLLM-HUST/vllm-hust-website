@@ -1,0 +1,41 @@
+body[data-page="gennova"] { background: #f7f9f8; color: #192b29; --gn-bg: #f7f9f8; --gn-line: #cedbd5; --gn-muted: #486159; --gn-link: #14684d; }
+body[data-page="gennova"]::before, body[data-page="gennova"]::after { display: none; }
+body[data-page="gennova"] .gn-page h1, body[data-page="gennova"] .gn-page h2 { color: inherit; }
+body[data-page="gennova"] .site-nav { background: #f7f9f8; border-color: var(--gn-line); }
+body[data-page="gennova"] .brand-copy small { color: var(--gn-muted); }
+body[data-page="gennova"] .nav-links, body[data-page="gennova"] .nav-group-menu, body[data-page="gennova"] .lang-toggle, body[data-page="gennova"] .nav-toggle { background: var(--gn-bg); border-color: var(--gn-line); }
+body[data-page="gennova"] .nav-link, body[data-page="gennova"] .nav-group-label, body[data-page="gennova"] .lang-toggle, body[data-page="gennova"] .nav-toggle { color: inherit; }
+body[data-page="gennova"] .nav-group.active > .nav-group-label { color: var(--gn-link); }
+html[lang="en"] .gn-page [lang="zh"], html[lang="zh"] .gn-page [lang="en"] { display: none; }
+.gn-page { max-width: 1080px; padding-bottom: 48px; letter-spacing: 0; }
+.gn-heading { padding: 40px 0 28px; }
+.gn-heading h1 { display: flex; align-items: center; gap: 14px; font-size: 42px; margin: 10px 0; letter-spacing: 0; }
+.gn-heading h1 img { flex: 0 0 44px; border-radius: 6px; }
+.gn-heading p { max-width: 800px; }
+.gn-page .gn-kicker { color: var(--gn-link); font-weight: 700; }
+.gn-page section { padding: 24px 0; border-top: 1px solid var(--gn-line); }
+.gn-page h2 { font-size: 22px; margin: 0 0 12px; letter-spacing: 0; }
+.gn-page a { color: var(--gn-link); text-underline-offset: 4px; }
+.gn-links { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.gn-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin: 24px 0; }
+.gn-metrics[hidden] { display: none; }
+.gn-metrics dt { color: var(--gn-muted); font-size: 14px; }
+.gn-metrics dd { font-size: 30px; font-weight: 700; margin: 4px 0; font-variant-numeric: tabular-nums; }
+.gn-metrics small { font-size: 14px; font-weight: 400; }
+.gn-scope { border-left: 3px solid #b38a21; padding-left: 16px; }
+.gn-facts { margin: 0; }
+.gn-facts > div { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--gn-line); }
+.gn-facts dt { color: var(--gn-muted); }
+.gn-facts dd { margin: 0; overflow-wrap: anywhere; }
+.gn-fixes { padding-left: 22px; }
+.gn-fixes li { margin-bottom: 14px; }
+@media (max-width: 600px) {
+  .gn-heading { padding-top: 24px; }
+  .gn-heading h1 { font-size: 36px; }
+  .gn-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gn-facts > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+}
+@media (prefers-color-scheme: dark) {
+  body[data-page="gennova"] { background: #161d1b; color: #e1eae5; --gn-bg: #161d1b; --gn-line: #3b4e45; --gn-muted: #a1b7ac; --gn-link: #86dab5; }
+  body[data-page="gennova"] .site-nav { background: #161d1b; }
+}

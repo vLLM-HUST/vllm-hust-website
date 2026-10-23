@@ -18,6 +18,7 @@
             navIssues: 'Issues',
             navProducts: 'Products',
             navEngine: 'Engine',
+            navGenNova: 'GenNova · Independent engine',
             navProjects: 'Projects',
             navPlugins: 'Ecosystem',
             navPublications: 'Papers & news',
@@ -57,6 +58,7 @@
             navIssues: '议题',
             navProducts: '产品',
             navEngine: '引擎',
+            navGenNova: 'GenNova · 独立引擎',
             navProjects: '项目',
             navPlugins: '生态架构',
             navPublications: '论文与新闻',
@@ -168,6 +170,15 @@
 
     const NAV_GROUPS = [
         {
+            id: 'engine',
+            label: 'navEngine',
+            pages: ['gennova'],
+            links: [
+                ['', './index.html#stack', 'navEngine'],
+                ['gennova', './gennova.html', 'navGenNova'],
+            ],
+        },
+        {
             id: 'publications',
             label: 'navPublications',
             pages: ['achievements', 'news'],
@@ -228,7 +239,6 @@
         links.id = 'site-navigation';
         links.innerHTML = [
             navLink('', './index.html#products', 'navProducts'),
-            navLink('', './index.html#stack', 'navEngine'),
             navLink('', './index.html#projects', 'navProjects'),
             navLink('plugins', './plugins.html', 'navPlugins'),
             ...NAV_GROUPS.map((group) => `
