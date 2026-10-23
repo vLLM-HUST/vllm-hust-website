@@ -21,14 +21,14 @@ jobs:
       - name: Checkout website presentation
         uses: actions/checkout@v4
         with:
-          ref: f3e03ef05625b8dadabf173fa07e5f3940e606d2 # pragma: allowlist secret
+          ref: main
           path: website
           persist-credentials: false
       - name: Checkout merged benchmark publication
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: main
+          ref: f3e03ef05625b8dadabf173fa07e5f3940e606d2 # pragma: allowlist secret
           path: benchmark
           persist-credentials: false
           sparse-checkout: |
