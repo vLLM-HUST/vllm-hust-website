@@ -45,9 +45,9 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v074.json" in loader
-    payload = json.loads((ROOT / "data/midterm-v074.json").read_text())
-    assert payload["version"] == "V0.74"
+    assert "./data/midterm-v075.json" in loader
+    payload = json.loads((ROOT / "data/midterm-v075.json").read_text())
+    assert payload["version"] == "V0.75"
     inventory = next(
         section
         for section in payload["sections"]
@@ -68,7 +68,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v074-audit-20261023"
+            "./assets/midterm-report.js?v=midterm-v075-audit-20261023"
         ]
 
 
@@ -107,7 +107,7 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v074.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v075.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "V1.5"
     assert method["current"]["passed"] is None
@@ -126,3 +126,10 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
     assert "not a current cost veto" in sections["resources"]["scope_en"]
     assert sections["milestone-v15"]["tables_en"]
     assert len(sections["milestone-v15"]["evidence"]) == 3
+    review = sections["v15-remaining"]
+    assert len(review["tables"][0]["rows"]) == 5
+    assert len(review["tables_en"][0]["rows"]) == 5
+    assert "22.601951%" in review["scope"]
+    assert "does not improve" in review["scope_en"]
+    assert "E2E is not TTFT/TPOT" in review["scope_en"]
+    assert "1730876356085005" in review["scope"]

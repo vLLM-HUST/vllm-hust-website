@@ -74,6 +74,7 @@
       <p class="result-selection">${zh ? 'B1 按指标选择当前已实测最优方案；三项不代表同一部署。性能改善不等于质量或 M01 验收通过。' : 'B1 is the best measured solution per metric, not one deployment achieving all three. Performance gains do not establish quality or M01 acceptance.'}</p>
       <nav class="result-next" aria-label="${zh ? '结论与验证进展' : 'Conclusions and validation progress'}">
         <a href="#midterm-milestone-v15">${zh ? 'V1.5 · 当前方法、成本与稳定性' : 'V1.5 · current method, cost & stability'}</a>
+        <a href="#midterm-v15-remaining">${zh ? '新增复算 · 五项任务、成本与利用率' : 'New reanalysis · five tasks, cost & utilization'}</a>
         <a href="#midterm-dataset-quality-inventory">${zh ? '质量 · 子集配对，非全集' : 'Quality · paired subset, not full corpus'}</a>
         <a href="#midterm-long-context-parser">${zh ? '长上下文 · 原判分与解析复核分列' : 'Long context · original and parser review separate'}</a>
         <a href="#midterm-kv-audit">${zh ? 'KV · 跨轮状态核查未闭合' : 'KV · cross-run state review open'}</a>
@@ -90,11 +91,11 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  Promise.all([dataPath, './data/midterm-v074.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
+  Promise.all([dataPath, './data/midterm-v075.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
   }))).then(([value, report]) => {
-    if (report.version !== 'V0.74' || report.comparison_contract?.b0?.fixed !== true ||
+    if (report.version !== 'V0.75' || report.comparison_contract?.b0?.fixed !== true ||
         report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
         !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
     data = value; reportData = report; render();
