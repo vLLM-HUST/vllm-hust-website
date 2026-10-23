@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GenNova 独立推理引擎 | vLLM-HUST</title>
+  <meta name="description" content="GenNova 独立推理引擎：Qwen3.5-35B-A3B BF16 TP2 运行验证、实测结果与可追溯原始证据。" />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/gennova.html" />
+  <link rel="icon" href="./assets/brand/vllm-hust-icon.png" />
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
+  <link rel="stylesheet" href="./assets/gennova.css?v=20261023" />
+</head>
+<body data-page="gennova">
+  <nav class="site-nav"><div class="site-shell site-nav-inner">
+    <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>面向国产算力的推理引擎</small></span></a>
+    <div class="nav-links"><a href="./index.html#independent-engines">独立引擎 / Independent engines</a></div>
+  </div></nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
+  <main class="gn-page site-shell">
+    <header class="gn-heading">
+      <p class="gn-kicker"><span lang="zh">独立推理引擎</span><span lang="en">Independent inference engine</span></p>
+      <h1><img src="./assets/brand/vllm-hust-icon.png" width="44" height="44" alt="vLLM-HUST" />GenNova</h1>
+      <p><span lang="zh">独立拥有调度、状态管理、图执行与 Ascend 算子路径，不以 vLLM-HUST 的 MOD 挂载方式运行。</span><span lang="en">An independent engine owning its scheduler, state management, graph execution and Ascend operators, not a MOD loaded into vLLM-HUST.</span></p>
+      <div class="gn-links"><a href="https://github.com/vLLM-HUST/GenNova"><span lang="zh">源码仓库</span><span lang="en">Source repository</span> ↗</a><a href="#evidence"><span lang="zh">验证证据</span><span lang="en">Validation evidence</span> ↓</a></div>
+    </header>
+    <section aria-labelledby="validation-title" id="validation">
+      <h2 id="validation-title"><span lang="zh">运行验证</span><span lang="en">Runtime validation</span></h2>
+      <p><span lang="zh">Qwen3.5-35B-A3B · BF16 · Ascend 910B2 · TP2 / PP1 / DP1</span><span lang="en">Qwen3.5-35B-A3B · BF16 · Ascend 910B2 · TP2 / PP1 / DP1</span></p>
+      <p id="gn-status" role="status"><span lang="zh">正在核验 benchmark 数据源…</span><span lang="en">Verifying benchmark source…</span></p>
+      <dl class="gn-metrics" id="gn-metrics" hidden>
+        <div><dt><span lang="zh">完成请求</span><span lang="en">Completed requests</span></dt><dd id="gn-requests"></dd></div>
+        <div><dt><span lang="zh">输出吞吐</span><span lang="en">Output throughput</span></dt><dd><span id="gn-throughput"></span> <small>tok/s</small></dd></div>
+        <div><dt><span lang="zh">输出 token</span><span lang="en">Output tokens</span></dt><dd id="gn-tokens"></dd></div>
+        <div><dt><span lang="zh">计时窗口</span><span lang="en">Timed interval</span></dt><dd><span id="gn-seconds"></span> <small>s</small></dd></div>
+      </dl>
+      <p class="gn-scope"><span lang="zh">该结果确认此模型和工况下独立推理路径有效。不代表完整 MMLU-Pro 准确率评分，也不构成超过当前 B1 的结论。</span><span lang="en">This validates the independent inference path for this model and workload. It is not a full MMLU-Pro accuracy score or evidence of superiority over the current B1.</span></p>
+    </section>
+    <section aria-labelledby="method-title">
+      <h2 id="method-title"><span lang="zh">工况与计量</span><span lang="en">Workload and measurement</span></h2>
+      <dl class="gn-facts">
+        <div><dt><span lang="zh">输入与输出</span><span lang="en">Input and output</span></dt><dd><span lang="zh">固定 MMLU-Pro 200 请求，282,265 输入 token，每请求 256 输出 token；greedy，保留 thinking 模板。</span><span lang="en">200 frozen MMLU-Pro requests, 282,265 input tokens, 256 output tokens each; greedy generation with the thinking template preserved.</span></dd></div>
+        <div><dt><span lang="zh">执行配置</span><span lang="en">Execution configuration</span></dt><dd>execution seats 24 · resident seats 36 · token pages 2048 · mixed tokens 4096 · max position 65536 · Native MTP 2</dd></div>
+        <div><dt><span lang="zh">计时边界</span><span lang="en">Timing boundary</span></dt><dd><span lang="zh">tokenized 请求提交至 CPU 可见完整输出。不含模型加载、图捕获、HTTP 或分词开销；不能直接与 HTTP 服务吞吐比较。</span><span lang="en">Tokenized enqueue through CPU-visible complete outputs. Excludes model loading, graph capture, HTTP and tokenization; not directly comparable to HTTP serving throughput.</span></dd></div>
+        <div><dt><span lang="zh">缓存与资源</span><span lang="en">Cache and resources</span></dt><dd><span lang="zh">独立进程和新建编译缓存目录；共享只读权重与核验过的原生算子。四张可见 NPU 预留、两张参与。该入口无 APC 或主机状态 offload。</span><span lang="en">Separate processes and fresh compiler caches; shared read-only weights and verified native operators. Four visible NPUs reserved, two used. This entrypoint has no APC or host-state offload.</span></dd></div>
+        <div><dt><span lang="zh">实测源码</span><span lang="en">Measured source</span></dt><dd><a id="gn-source" href="https://github.com/vLLM-HUST/GenNova/commit/ea13161d09446b8e8db0fc903b2356e75d1b4002"><code>ea13161d09446b8e8db0fc903b2356e75d1b4002</code></a></dd></div>
+      </dl>
+    </section>
+    <section aria-labelledby="fixes-title">
+      <h2 id="fixes-title"><span lang="zh">已合并修复</span><span lang="en">Merged fixes</span></h2>
+      <ul class="gn-fixes">
+        <li><a href="https://github.com/vLLM-HUST/GenNova/pull/171">#171</a> <span lang="zh">补齐独立 ACLNN 构建所需 CMake 辅助文件。原生算子 6 项资格检查通过。</span><span lang="en">Include the CMake helpers required for standalone ACLNN builds. Six native-operator qualification checks passed.</span></li>
+        <li><a href="https://github.com/vLLM-HUST/GenNova/pull/172">#172</a> <span lang="zh">合并相邻启动状态拷贝区间，保留稀疏间隙与目标地址。74 项 CPU 回归、8 项 NPU 对照通过；未计入上方性能轮次。</span><span lang="en">Coalesce adjacent startup state transfers while preserving sparse gaps and destination addresses. 74 CPU regressions and eight NPU differential cases passed; this fix is not included in the performance run above.</span></li>
+      </ul>
+    </section>
+    <section id="evidence" aria-labelledby="evidence-title">
+      <h2 id="evidence-title"><span lang="zh">报告与原始证据</span><span lang="en">Report and raw evidence</span></h2>
+      <p><span lang="zh">证据保存于 vllm-hust-benchmark。链接固定到已合并提交，包含请求、输出 token、交付时间、服务日志、设备状态与 SHA256 清单。</span><span lang="en">Evidence is preserved in vllm-hust-benchmark at a merged commit, including requests, output tokens, delivery timestamps, service logs, device state and SHA256 manifests.</span></p>
+      <div id="gn-evidence" class="gn-links"></div>
+      <noscript><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/b80727393ed07a12a4dfbb5d8006c7ac8c221346/reports/gennova-mmlu-pro-20261023/README.md">中文验证报告 / Validation report</a></noscript>
+    </section>
+  </main>
+  <script src="./assets/site.js?v=gennova-20261023"></script>
+  <script src="./assets/gennova.js?v=20261023"></script>
+</body>
+</html>

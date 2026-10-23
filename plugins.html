@@ -910,6 +910,11 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 <a class="adjacent-card" href="https://github.com/vLLM-HUST/production-stack-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Production Stack HUST</h3><p>fork of vllm-project/production-stack</p></a>
 </div>
 </section>
+    <section class="workshop-scope-note" id="independent-engines" aria-labelledby="independent-engine-title">
+      <h2 id="independent-engine-title"><span class="lang-zh">独立推理引擎</span><span class="lang-en">Independent inference engines</span></h2>
+      <p><span class="lang-zh">GenNova 独立拥有调度、状态和原生执行路径，不作为 MOD 挂载，也不计入下方 MOD 目录统计。</span><span class="lang-en">GenNova owns its scheduler, state and native execution path. It is not a loaded MOD and is not counted in the MOD catalog below.</span></p>
+      <a href="./gennova.html">GenNova · <span class="lang-zh">运行验证与证据</span><span class="lang-en">Runtime validation and evidence</span> →</a>
+    </section>
     <section class="plugin-controls" aria-label="Ecosystem filters">
 <label>
 <span id="plugins-search-label">Search</span>
@@ -1068,7 +1073,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
       "plugins-legend-roadmap-copy": "正向、负向、效果未定、仅功能验证或待验证，都不会改变组件本身的类型。"
     });
   </script>
-  <script src="./assets/site.js?v=performance-20261020">
+  <script src="./assets/site.js?v=gennova-20261023">
 </script>
 <script src="./assets/plugin-performance.js?v=ecpa-final-20261009"></script>
 <script src="./assets/ecosystem-catalog.js?v=mod-count-20261010"></script>
