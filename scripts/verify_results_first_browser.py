@@ -42,7 +42,7 @@ def main():
                             "data-loaded", "true"
                         )
                         expect(page.locator("#midterm-report")).to_have_attribute(
-                            "data-loaded", "V0.74"
+                            "data-loaded", "V0.75"
                         )
                         assert not page.locator("#report-details").evaluate(
                             "e => e.open"
@@ -114,6 +114,21 @@ def main():
                         page.locator('a[href="#midterm-kv-audit"]').first.click()
                         expect(page.locator("#midterm-kv-audit")).to_be_visible()
                         assert page.locator("#report-details").evaluate("e => e.open")
+                        page.locator('a[href="#midterm-v15-remaining"]').first.click()
+                        review = page.locator("#midterm-v15-remaining")
+                        expect(review).to_be_visible()
+                        expect(review).to_contain_text("22.601951%")
+                        expect(review).to_contain_text("TerminalBench 2.1")
+                        expect(review).to_contain_text(
+                            "利用率却未提高"
+                            if lang == "zh"
+                            else "utilization does not improve"
+                        )
+                        assert review.locator("table").count() == 3
+                        assert review.locator("a.raw-evidence").count() > 20
+                        assert page.evaluate(
+                            "document.documentElement.scrollWidth <= innerWidth + 1"
+                        )
                         page.screenshot(path=output / f"{name}-evidence.png")
                         # Fresh deep link must reveal asynchronous sections, too.
                         page.goto("about:blank")
@@ -132,7 +147,7 @@ def main():
                                 )
                                 route.continue_()
 
-                            page.route("**/data/midterm-v074.json", delayed_report)
+                            page.route("**/data/midterm-v075.json", delayed_report)
                         page.goto(f"{args.url}/{filename}#midterm-m01-verdict")
                         expect(page.locator("#midterm-m01-verdict")).to_be_visible()
                         verdict = page.locator("#midterm-m01-verdict")
