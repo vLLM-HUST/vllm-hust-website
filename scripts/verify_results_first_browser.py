@@ -41,7 +41,7 @@ def main():
                             "data-loaded", "true"
                         )
                         expect(page.locator("#midterm-report")).to_have_attribute(
-                            "data-loaded", "V0.67"
+                            "data-loaded", "V0.71"
                         )
                         assert not page.locator("#report-details").evaluate(
                             "e => e.open"
@@ -57,23 +57,35 @@ def main():
                                 f'[data-metric="{metric["metric_id"]}"]'
                             )
                             expect(card).to_be_visible()
-                            for value in (metric["baseline_value"], metric["value"]):
+                            for value in (metric["value"],):
                                 formatted = page.evaluate(
                                     "v => v.toLocaleString('en-US', {maximumFractionDigits:2})",
                                     value,
                                 )
                                 expect(card).to_contain_text(formatted)
-                            assert card.locator("a.raw-evidence").count() == 2
+                            assert card.locator("a.raw-evidence").count() == 1
+                            expect(
+                                card.locator(".result-pair strong").first
+                            ).to_have_text("—")
+                            expect(card.locator(".result-change")).not_to_contain_text(
+                                "%"
+                            )
                             assert card.locator("a").evaluate_all(
                                 "aa => aa.every(a => /^https:\\/\\/github.com\\/vLLM-HUST\\/vllm-hust-benchmark\\/(blob|tree)\\/[a-f0-9]{40}\\//.test(a.href))"
                             )
                         expect(page.locator(".result-boundary")).to_contain_text(
-                            "0.18 / 0.18"
+                            "vLLM 0.18 / vLLM-Ascend 0.18"
                         )
                         expect(page.locator(".result-boundary")).to_contain_text(
                             "0.25.1rc2"
                         )
-                        assert page.locator(".result-metrics").evaluate(
+                        expect(page.locator(".result-quality")).to_contain_text(
+                            "151/200"
+                        )
+                        expect(page.locator(".result-quality")).to_contain_text(
+                            "152/200"
+                        )
+                        assert page.locator(".result-quality").evaluate(
                             "e => e.getBoundingClientRect().bottom < innerHeight"
                         ), "B0/B1 must be on the first screen"
                         assert page.evaluate(

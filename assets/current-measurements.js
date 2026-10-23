@@ -15,6 +15,7 @@
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const number = value => Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—';
   let data;
+  let reportData;
   let failed = false;
   const original = id => {
     const paths = { baseline: ['blob', 'aligned-mmlu-b0.tar.gz'],
@@ -32,7 +33,7 @@
   function render() {
     const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
     const title = zh ? 'MMLU-Pro · 当前实测 B0 / B1' : 'MMLU-Pro · Current measured B0 / B1';
-    if (!data) {
+    if (!data || !reportData) {
       section.innerHTML = `<h2>${title}</h2><p>${failed
         ? (zh ? '实测摘要加载失败。' : 'Measurement summary unavailable.')
         : (zh ? '正在加载实测结果…' : 'Loading measurements…')}</p><a href="${dataPath}">${zh ? '原始数据' : 'Source data'}</a>`;
@@ -48,7 +49,7 @@
     }).join('');
     const throughput = data.results.find(item => item.metric_id === 'output_token_throughput');
     const points = throughput ? [
-      { label: 'B0 Native', value: throughput.baseline_value, candidate_id: 'baseline' },
+      { label: zh ? '开发栈对照' : 'Development control', value: throughput.baseline_value, candidate_id: 'baseline' },
       ...(throughput.candidate_values || [])
     ].filter(item => Number.isFinite(item.value) && item.value >= 0) : [];
     const maximum = Math.max(1, ...points.map(item => item.value));
@@ -58,25 +59,29 @@
     const cards = data.results.map(result => {
       const metric = data.metrics.find(item => item.id === result.metric_id);
       return `<article class="result-metric" data-metric="${escape(result.metric_id)}"><h3>${escape(labels[result.metric_id] || result.metric_id)} <small>${escape(metric?.unit || '')}</small></h3>
-        <div class="result-pair"><div><span>B0 · Native</span><strong>${linkedNumber(result.baseline_value, 'baseline')}</strong></div><div><span>B1 · vLLM-HUST</span><strong>${linkedNumber(result.value, result.selected_candidate_id)}</strong></div></div>
-        <p class="result-change">${Number.isFinite(result.delta_pct) ? `${result.delta_pct > 0 ? '+' : ''}${number(result.delta_pct)}%` : '—'} <span>${zh ? '相对本工况 B0' : 'vs this workload’s B0'}</span></p>
+        <div class="result-pair"><div><span>B0 · 0.18/0.18</span><strong>—</strong></div><div><span>B1 · 0.28.1/0.25.1rc2</span><strong>${linkedNumber(result.value, result.selected_candidate_id)}</strong></div></div>
+        <p class="result-change"><span>${zh ? '本工况尚无固定 B0 配对，不计算收益' : 'No matched fixed B0 for this workload; gain not calculated'}</span></p>
         <small>${escape(result.selected_candidate_id || '')}</small></article>`;
     }).join('');
     const expanded = section.querySelector('#current-configuration')?.open;
-    section.innerHTML = `<div class="result-heading"><div><span class="result-eyebrow">${zh ? '当前工况 · 开发栈对照' : 'CURRENT WORKLOAD · DEVELOPMENT STACK'}</span><h1>${title}</h1></div><span class="result-date">${escape(throughput?.updated_at || data.baseline.generated_at)}</span></div>
+    const quality = reportData.current_summary.quality;
+    const qualityUrl = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${reportData.source_commit}/${quality.evidence_path}`;
+    section.innerHTML = `<div class="result-heading"><div><span class="result-eyebrow">${zh ? '当前工况 · 固定基线与最优配置' : 'CURRENT WORKLOAD · FIXED BASELINE & BEST CONFIGURATION'}</span><h1>${title}</h1></div><span class="result-date">${escape(reportData.version)}</span></div>
       <p class="result-context">${escape(data.scenario.model)} · ${escape(data.scenario.precision)} · TP2 · ${data.scenario.num_prompts} ${zh ? '请求' : 'requests'} · out${data.scenario.output_length} · ${escape(data.scenario.hardware)}</p>
-      <p class="result-boundary">${zh ? '本组比较：vLLM 0.28.1 / Ascend 0.25.1rc2 开发栈。指定的 0.18 / 0.18 基线另列，不以此替代验收。' : 'This comparison: vLLM 0.28.1 / Ascend 0.25.1rc2 development stack. The designated 0.18 / 0.18 baseline is separate; these are not its acceptance results.'}</p>
+      <p class="result-boundary">${zh ? 'B0 固定：vLLM 0.18 / vLLM-Ascend 0.18。B1 基座版本不限，本页已测优化配置使用 0.28.1 / 0.25.1rc2 开发栈。' : 'B0 is fixed: vLLM 0.18 / vLLM-Ascend 0.18. B1 has no base-version restriction; the measured optimizations here use the 0.28.1 / 0.25.1rc2 development stack.'}</p>
+      <div class="result-quality"><strong>${zh ? '同题质量 · out8192' : 'Matched quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b0.correct}/${quality.b0.total}</a></span><span>B1 · KV materialization: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b1.candidate_correct}/${quality.b0.total}</a></span><small>${zh ? '固定200题子集；不代表全集或统计非劣' : 'Fixed 200-task subset; not full-corpus quality or statistical noninferiority'}</small></div>
       <div class="result-metrics">${cards}</div>
       <p class="result-selection">${zh ? 'B1 按指标选择当前已实测最优方案；三项不代表同一部署。性能改善不等于质量或 M01 验收通过。' : 'B1 is the best measured solution per metric, not one deployment achieving all three. Performance gains do not establish quality or M01 acceptance.'}</p>
       <nav class="result-next" aria-label="${zh ? '结论与验证进展' : 'Conclusions and validation progress'}">
-        <a href="#midterm-native-paired-quality">${zh ? '质量 · 子集配对，非全集' : 'Quality · paired subset, not full corpus'}</a>
+        <a href="#midterm-dataset-quality-inventory">${zh ? '质量 · 子集配对，非全集' : 'Quality · paired subset, not full corpus'}</a>
         <a href="#midterm-long-context-parser">${zh ? '长上下文 · 原判分与解析复核分列' : 'Long context · original and parser review separate'}</a>
         <a href="#midterm-kv-audit">${zh ? 'KV · 跨轮状态核查未闭合' : 'KV · cross-run state review open'}</a>
         <a href="#midterm-m01-verdict">${zh ? 'M01 · 本轮未通过' : 'M01 · not accepted this round'}</a>
       </nav>
       <details id="current-configuration" ${expanded ? 'open' : ''}><summary>${zh ? '配置、候选对比与原始证据' : 'Configurations, candidates & original evidence'}</summary>
       <p>${escape(data.scenario.label)} · ${zh ? 'B1：当前已实测最优的 vLLM-HUST 优化方案，按指标选择。' : 'B1: currently best measured vLLM-HUST optimization solution, selected per metric.'}</p>
-      <div class="measurement-table-scroll"><table><thead><tr><th>${zh ? '指标' : 'Metric'}</th><th>B0</th><th>B1</th><th>${zh ? '单位' : 'Unit'}</th><th>${zh ? 'B1 配置' : 'B1 configuration'}</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p>${zh ? '以下保留开发栈对照，不是 B0。' : 'The following development-stack control is not B0.'}</p>
+      <div class="measurement-table-scroll"><table><thead><tr><th>${zh ? '指标' : 'Metric'}</th><th>${zh ? '开发栈对照' : 'Development control'}</th><th>B1</th><th>${zh ? '单位' : 'Unit'}</th><th>${zh ? 'B1 配置' : 'B1 configuration'}</th></tr></thead><tbody>${rows}</tbody></table></div>
       <details><summary>${zh ? '同工况候选吞吐对比' : 'Same-workload candidate throughput'} (token/s)</summary><ul class="measurement-bars">${bars}</ul></details>
       <p>${zh ? '200 请求、out256 服务性能；不代表完整数据集准确率。有效算力核算进展见报告，不计作新增性能点。' : '200-request out256 serving performance, not full-dataset accuracy. Effective-compute accounting is documented in the report, not counted as new performance points.'}</p>
       <p><a href="${matrixPath}">${zh ? '查看配对矩阵与候选证据' : 'Paired matrix and candidate evidence'}</a> · <a href="${dataPath}">${zh ? '原始数据' : 'Source data'}</a>${safeReport ? ` · <a href="${escape(report)}">${zh ? '中文测试报告' : 'Chinese test report'}</a>` : ''}</p></details>`;
@@ -84,8 +89,13 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  fetch(dataPath).then(response => {
+  Promise.all([dataPath, './data/midterm-v071.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
-  }).then(value => { data = value; render(); }).catch(() => { failed = true; data = null; render(); });
+  }))).then(([value, report]) => {
+    if (report.version !== 'V0.71' || report.comparison_contract?.b0?.fixed !== true ||
+        report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
+        !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
+    data = value; reportData = report; render();
+  }).catch(() => { failed = true; data = null; render(); });
 })();
