@@ -149,6 +149,26 @@ def main():
                             for item in report["sections"]
                             if item["id"] == ident
                         )
+                        if ident == "v15-remaining":
+                            inventory = next(
+                                item["evidence"]
+                                for item in report["sections"]
+                                if item["id"] == "dataset-quality-inventory"
+                            )
+                            evidence = evidence + [inventory[i] for i in (11, 0, 9)]
+                            for row, path in (
+                                (0, inventory[11]["path"]),
+                                (1, inventory[0]["path"]),
+                                (3, inventory[9]["path"]),
+                            ):
+                                href = (
+                                    section.locator("table")
+                                    .first.locator("tbody tr")
+                                    .nth(row)
+                                    .locator("a")
+                                    .first.get_attribute("href")
+                                )
+                                assert href.endswith(quote(path)), (row, href, path)
                         allowed_links = [
                             "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
                             f"{item['kind']}/{manifest['commit']}/{quote(item['path'])}"

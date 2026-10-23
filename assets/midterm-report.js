@@ -29,6 +29,10 @@
             `website-publication/data/request-throttling-dataset-matrix-20261018/${name}.json`)
     ]);
     const rowSources = (section, tableIndex) => {
+        if (section.id === 'v15-remaining' && tableIndex === 0) {
+            const inventory = data.sections.find(s => s.id === 'dataset-quality-inventory').evidence;
+            return [inventory[11], inventory[0], section.evidence[0], inventory[9], section.evidence[0]];
+        }
         if (section.id === 'milestone-v15') return [section.evidence[0], section.evidence[2], section.evidence[1], section.evidence[0]];
         if (section.id === 'candidates') return section.evidence;
         if (section.id === 'dataset-quality-inventory') {
