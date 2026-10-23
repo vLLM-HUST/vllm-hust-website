@@ -81,7 +81,8 @@ def main():
                     expect(
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
-                        "src", "./assets/midterm-report.js?v=midterm-v072-20261022"
+                        "src",
+                        "./assets/midterm-report.js?v=midterm-v072-audit-20261023",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
                         "data-loaded", "V0.72", timeout=30000
@@ -324,6 +325,15 @@ def main():
                     expect(communication.locator("tbody tr")).to_have_count(2)
                     expect(communication).to_contain_text("17,879,040")
                     verdict = page.locator("#midterm-m01-verdict")
+                    expect(page.locator(".midterm-history-notice")).to_have_count(5)
+                    for notice in page.locator(".midterm-history-notice").all():
+                        expect(notice).to_contain_text(
+                            "历史" if lang == "zh" else "Historical"
+                        )
+                        expect(notice.locator("a")).to_have_attribute(
+                            "href", "#midterm-m01-verdict"
+                        )
+                    expect(verdict.locator(".midterm-history-notice")).to_have_count(0)
                     expect(verdict.locator("tbody tr")).to_have_count(4)
                     expect(verdict).to_contain_text("V5.27")
                     expect(verdict).to_contain_text(
