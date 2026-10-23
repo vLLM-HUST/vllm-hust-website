@@ -12,7 +12,7 @@
     let data;
     let publicationCommit;
     let failed = false;
-    // These retained acquisition/method notes predate the V5.27 current verdict.
+    // These retained acquisition/method notes predate the V1.5 current verdict.
     // Keep their recorded wording and numbers; make the time scope explicit.
     const historicalM01 = new Set(['m01', 'fenced-model', 'trace-qualification', 'reference-closure', 'worker-model']);
     const datasetEvidence = new Set([
@@ -24,10 +24,12 @@
         'reports/frontierscience-combination-quality-20261022/summary.json',
         'reports/native-version-recovery-20261022/version-mapping.json',
         'reports/mmlu-quality018-20261022/quality018-completed-audit-r1.json',
+        'reports/c16-baseline018-reuse-20261022/manifest.json',
         ...['mmlu-pro', 'frontierscience', 'hle-gold', 'hle-revision'].map(name =>
             `website-publication/data/request-throttling-dataset-matrix-20261018/${name}.json`)
     ]);
     const rowSources = (section, tableIndex) => {
+        if (section.id === 'milestone-v15') return [section.evidence[0], section.evidence[2], section.evidence[1], section.evidence[0]];
         if (section.id === 'candidates') return section.evidence;
         if (section.id === 'dataset-quality-inventory') {
             const indices = [[0, 0, 1, 1], [2, 4, 3, 3, 5, 5], [4, 4, 4, 4], [7, 8, 6, 6], [9, 9], [11, 11, 11, 11]];
@@ -55,21 +57,21 @@
             <p><a href="${escape(data.report_url)}">${zh ? `阅读完整 ${escape(data.version)} 报告` : `Read the complete ${escape(data.version)} report`}</a></p>
             <nav aria-label="${title}">${data.sections.map(s => `<a href="#midterm-${escape(s.id)}">${escape(s.title.split(' / ')[zh ? 0 : 1])}</a>`).join(' · ')}</nav>
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
-            <p>${escape(data.kv_audit.scope)}</p>
+            <p>${escape(!zh && data.kv_audit.scope_en ? data.kv_audit.scope_en : data.kv_audit.scope)}</p>
             ${table({ headers: ['运行', '请求 / 独立盐', '前缀命中日志数', '最大已记录命中率'], rows: data.kv_audit.runs.map(r => [r.run_id, `${r.requests} / ${r.unique_salts}`, r.prefix_hit_samples, `${r.max_logged_prefix_hit_percent}%`]) }, data.sections.find(s => s.id === 'candidates').evidence.slice(4, 6))}</aside>
-            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${historicalM01.has(s.id) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前 V5.27 结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current V5.27 assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：复算中／未判定' : 'Current M01: recalculation / not determined'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
+            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${historicalM01.has(s.id) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前 V1.5 结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current V1.5 assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：复算中／未判定' : 'Current M01: recalculation / not determined'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
         panel.dataset.loaded = data.version;
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v072.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v074.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.72' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.74' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
-            if (value.m01_method?.method_version !== 'V5.27' || value.m01_method.current?.efficiency_percent !== null || value.m01_method.current?.passed !== null) throw Error('Invalid current M01 status');
+            if (value.m01_method?.method_version !== 'V1.5' || value.m01_method.current?.efficiency_percent !== null || value.m01_method.current?.passed !== null) throw Error('Invalid current M01 status');
             for (const section of value.sections) {
                 if (!section.evidence?.length) throw Error('Missing original evidence');
                 for (const source of section.evidence) {

@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v072.json")
+        response = context.request.get(f"{args.url}/data/midterm-v074.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.72"
+        assert report["version"] == "V0.74"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v072.json"
+            if f["website_path"] == "data/midterm-v074.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v072-audit-20261023",
+                        "./assets/midterm-report.js?v=midterm-v074-audit-20261023",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.72", timeout=30000
+                        "data-loaded", "V0.74", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -104,6 +104,7 @@ def main():
                             mmlu.locator('a[href="#midterm-native-paired-quality"]')
                         ).to_have_count(1)
                     for ident in (
+                        "milestone-v15",
                         "dataset-quality-inventory",
                         "reference-closure",
                         "worker-model",
@@ -200,8 +201,10 @@ def main():
                     parser_confirmation = page.locator("#midterm-long-context-parser")
                     expect(parser_confirmation.locator("tbody tr")).to_have_count(6)
                     for value in (
-                        "正文严格匹配6/6",
-                        "原0/6记录保留",
+                        "正文严格匹配6/6"
+                        if lang == "zh"
+                        else "not five-task continuous stability acceptance",
+                        "原0/6记录保留" if lang == "zh" else "Original scores",
                         "16,457",
                         "32,843",
                         "已分离",
@@ -217,7 +220,11 @@ def main():
                         "+121.48%",
                     ):
                         expect(paired).to_contain_text(value)
-                    expect(paired).to_contain_text("文件页缓存未全局清空")
+                    expect(paired).to_contain_text(
+                        "文件页缓存未全局清空"
+                        if lang == "zh"
+                        else "not the fixed 0.18 B0"
+                    )
                     native_quality = page.locator("#midterm-native-paired-quality")
                     expect(native_quality.locator("tbody tr")).to_have_count(2)
                     expect(native_quality).to_contain_text("147/200")
@@ -227,9 +234,20 @@ def main():
                     expect(long_current.locator("tbody tr")).to_have_count(6)
                     expect(long_current).to_contain_text("16,457")
                     expect(long_current).to_contain_text("32,843")
-                    expect(long_current).to_contain_text("正文严格匹配0/6")
-                    expect(long_current).to_contain_text("补充解析6/6")
-                    expect(long_current).to_contain_text("不替换原始判分")
+                    if lang == "zh":
+                        expect(long_current).to_contain_text("正文严格匹配0/6")
+                        expect(long_current).to_contain_text("补充解析6/6")
+                        expect(long_current).to_contain_text("不替换原始判分")
+                    else:
+                        expect(long_current).to_contain_text(
+                            "not five-task continuous stability acceptance"
+                        )
+                    current_method = page.locator("#midterm-milestone-v15")
+                    expect(current_method).to_contain_text("V1.5")
+                    expect(current_method).to_contain_text("3.4.4")
+                    expect(current_method).to_contain_text(
+                        "不新增补测" if lang == "zh" else "no new measurement"
+                    )
                     expect(page.locator("#midterm-resources")).to_contain_text("2.68%")
                     expect(page.locator("#midterm-m01")).to_contain_text("未通过验收")
                     expect(page.locator("#midterm-runtime-recovery")).to_contain_text(
@@ -242,7 +260,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.72"
+                        "V0.74"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -335,7 +353,7 @@ def main():
                         )
                     expect(verdict.locator(".midterm-history-notice")).to_have_count(0)
                     expect(verdict.locator("tbody tr")).to_have_count(4)
-                    expect(verdict).to_contain_text("V5.27")
+                    expect(verdict).to_contain_text("V1.5")
                     expect(verdict).to_contain_text(
                         "复算中 / 未判定" if lang == "zh" else "not determined"
                     )
@@ -344,7 +362,7 @@ def main():
                     expect(historical).to_contain_text("30.2443%–30.2505%")
                     expect(historical).to_contain_text("135.340126192")
                     expect(page.locator("#midterm-kv-audit")).to_contain_text(
-                        "不能排除"
+                        "不能排除" if lang == "zh" else "does not exclude"
                     )
                     assert (
                         page.locator(
@@ -468,7 +486,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v072.json",
+            "**/data/midterm-v074.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")

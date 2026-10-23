@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import base64
 import hashlib
 import json
 import os
@@ -35,7 +36,7 @@ async def publication_evidence(request, base):
     assert response.ok, response.status
     manifest = await response.json()
     urls, receipts = set(), []
-    for name in ("benchmark-evidence-links.json", "midterm-v072.json"):
+    for name in ("benchmark-evidence-links.json", "midterm-v074.json"):
         path = f"data/{name}"
         entry = next(row for row in manifest["files"] if row["website_path"] == path)
         response = await request.get(f"{base}/{path}")
@@ -46,6 +47,31 @@ async def publication_evidence(request, base):
         payload = json.loads(body)
         urls.update(evidence_urls(payload, manifest["commit"]))
         receipts.append({"path": path, "sha256": digest, "bytes": len(body)})
+        if name == "midterm-v074.json":
+            report_path = "reports/vllm-hust-midterm-20261019/中期测试报告.md"
+            report_url = (
+                "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/"
+                f"{report_path}?ref={payload['source_commit']}"
+            )
+            report_headers = {"Accept": "application/vnd.github+json"}
+            if os.environ.get("GH_TOKEN"):
+                report_headers["Authorization"] = f"Bearer {os.environ['GH_TOKEN']}"
+            report_response = await request.get(
+                report_url, headers=report_headers, timeout=60000, max_retries=2
+            )
+            assert report_response.ok, (report_url, report_response.status)
+            report_object = await report_response.json()
+            assert report_object["encoding"] == "base64"
+            report_body = base64.b64decode(report_object["content"])
+            assert hashlib.sha256(report_body).hexdigest() == payload["report_sha256"]
+            assert "报告版本：V0.74" in report_body.decode()
+            receipts.append(
+                {
+                    "path": report_url,
+                    "sha256": payload["report_sha256"],
+                    "bytes": len(report_body),
+                }
+            )
     return urls, {"commit": manifest["commit"], "files": receipts}
 
 
