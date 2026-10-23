@@ -23,7 +23,24 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
         if step.get("uses", "").startswith("actions/checkout@")
     ]
     assert len(checkouts) == 2
-    assert all(step["with"]["ref"] == "main" for step in checkouts)
+    assert checkouts[0]["with"]["ref"] == "main"
+    # Benchmark #443 is merged. Freeze the same reviewed data identity across
+    # deployment and both CI workflows instead of advancing to an untested main.
+    benchmark_revision = (
+        "f3e03ef05625b8dadabf173fa07e5f3940e606d2"  # pragma: allowlist secret
+    )
+    assert checkouts[1]["with"]["ref"] == benchmark_revision
+    for filename in ("ci.yml", "midterm-browser.yml"):
+        source = yaml.load(
+            (ROOT / ".github/workflows" / filename).read_text(), Loader=yaml.BaseLoader
+        )
+        for job in source["jobs"].values():
+            for step in job.get("steps", []):
+                if (
+                    step.get("with", {}).get("repository")
+                    == "vLLM-HUST/vllm-hust-benchmark"
+                ):
+                    assert step["with"]["ref"] == benchmark_revision
     assert all(step["with"]["persist-credentials"] == "false" for step in checkouts)
     assert checkouts[1]["with"]["repository"] == "vLLM-HUST/vllm-hust-benchmark"
     scripts = "\n".join(step.get("run", "") for step in build["steps"])
