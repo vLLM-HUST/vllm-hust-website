@@ -45,9 +45,9 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v071.json" in loader
-    payload = json.loads((ROOT / "data/midterm-v071.json").read_text())
-    assert payload["version"] == "V0.71"
+    assert "./data/midterm-v072.json" in loader
+    payload = json.loads((ROOT / "data/midterm-v072.json").read_text())
+    assert payload["version"] == "V0.72"
     inventory = next(
         section
         for section in payload["sections"]
@@ -68,7 +68,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v071-20261022"
+            "./assets/midterm-report.js?v=midterm-v072-20261022"
         ]
 
 

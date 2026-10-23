@@ -41,7 +41,7 @@ def main():
                             "data-loaded", "true"
                         )
                         expect(page.locator("#midterm-report")).to_have_attribute(
-                            "data-loaded", "V0.71"
+                            "data-loaded", "V0.72"
                         )
                         assert not page.locator("#report-details").evaluate(
                             "e => e.open"

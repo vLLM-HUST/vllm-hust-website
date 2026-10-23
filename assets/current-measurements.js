@@ -76,7 +76,7 @@
         <a href="#midterm-dataset-quality-inventory">${zh ? '质量 · 子集配对，非全集' : 'Quality · paired subset, not full corpus'}</a>
         <a href="#midterm-long-context-parser">${zh ? '长上下文 · 原判分与解析复核分列' : 'Long context · original and parser review separate'}</a>
         <a href="#midterm-kv-audit">${zh ? 'KV · 跨轮状态核查未闭合' : 'KV · cross-run state review open'}</a>
-        <a href="#midterm-m01-verdict">${zh ? 'M01 · 本轮未通过' : 'M01 · not accepted this round'}</a>
+        <a href="#midterm-m01-verdict">${zh ? 'M01 · V5.27 复算中／未判定' : 'M01 · V5.27 recalculation / not determined'}</a>
       </nav>
       <details id="current-configuration" ${expanded ? 'open' : ''}><summary>${zh ? '配置、候选对比与原始证据' : 'Configurations, candidates & original evidence'}</summary>
       <p>${escape(data.scenario.label)} · ${zh ? 'B1：当前已实测最优的 vLLM-HUST 优化方案，按指标选择。' : 'B1: currently best measured vLLM-HUST optimization solution, selected per metric.'}</p>
@@ -89,11 +89,11 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  Promise.all([dataPath, './data/midterm-v071.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
+  Promise.all([dataPath, './data/midterm-v072.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
   }))).then(([value, report]) => {
-    if (report.version !== 'V0.71' || report.comparison_contract?.b0?.fixed !== true ||
+    if (report.version !== 'V0.72' || report.comparison_contract?.b0?.fixed !== true ||
         report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
         !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
     data = value; reportData = report; render();
