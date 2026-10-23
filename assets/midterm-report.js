@@ -12,6 +12,9 @@
     let data;
     let publicationCommit;
     let failed = false;
+    // These retained acquisition/method notes predate the V5.27 current verdict.
+    // Keep their recorded wording and numbers; make the time scope explicit.
+    const historicalM01 = new Set(['m01', 'fenced-model', 'trace-qualification', 'reference-closure', 'worker-model']);
     const datasetEvidence = new Set([
         'website-publication/data/hle-verified-20261015/report.json',
         'website-publication/data/frontierscience-20261013/report.json',
@@ -54,7 +57,7 @@
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
             <p>${escape(data.kv_audit.scope)}</p>
             ${table({ headers: ['运行', '请求 / 独立盐', '前缀命中日志数', '最大已记录命中率'], rows: data.kv_audit.runs.map(r => [r.run_id, `${r.requests} / ${r.unique_salts}`, r.prefix_hit_samples, `${r.max_logged_prefix_hit_percent}%`]) }, data.sections.find(s => s.id === 'candidates').evidence.slice(4, 6))}</aside>
-            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3><p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
+            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${historicalM01.has(s.id) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前 V5.27 结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current V5.27 assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：复算中／未判定' : 'Current M01: recalculation / not determined'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
         panel.dataset.loaded = data.version;
     }
     window.addEventListener('vllm-hust:langchange', render);
