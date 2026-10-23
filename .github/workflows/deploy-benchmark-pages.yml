@@ -21,7 +21,7 @@ jobs:
       - name: Checkout website presentation
         uses: actions/checkout@v4
         with:
-          ref: 701e2000c826292d102896bc5014d735a45c5a83 # pragma: allowlist secret
+          ref: f3e03ef05625b8dadabf173fa07e5f3940e606d2 # pragma: allowlist secret
           path: website
           persist-credentials: false
       - name: Checkout merged benchmark publication
