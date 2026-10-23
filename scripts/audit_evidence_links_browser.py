@@ -2,12 +2,51 @@
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from playwright.async_api import async_playwright
+
+def evidence_urls(value, revision):
+    """Include registry entries behind unselected controls, not only DOM links."""
+    urls = set()
+    if isinstance(value, dict):
+        if value.get("kind") in ("blob", "tree") and value.get("path"):
+            urls.add(
+                "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
+                f"{value['kind']}/{revision}/{value['path']}"
+            )
+        for child in value.values():
+            urls.update(evidence_urls(child, revision))
+    elif isinstance(value, list):
+        for child in value:
+            urls.update(evidence_urls(child, revision))
+    elif isinstance(value, str) and value.startswith(
+        "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
+    ):
+        urls.add(value)
+    return urls
+
+
+async def publication_evidence(request, base):
+    response = await request.get(f"{base}/data/benchmark-source-manifest.json")
+    assert response.ok, response.status
+    manifest = await response.json()
+    urls, receipts = set(), []
+    for name in ("benchmark-evidence-links.json", "midterm-v072.json"):
+        path = f"data/{name}"
+        entry = next(row for row in manifest["files"] if row["website_path"] == path)
+        response = await request.get(f"{base}/{path}")
+        assert response.ok, (path, response.status)
+        body = await response.body()
+        digest = hashlib.sha256(body).hexdigest()
+        assert digest == entry["sha256"] and len(body) == entry["bytes"], path
+        payload = json.loads(body)
+        urls.update(evidence_urls(payload, manifest["commit"]))
+        receipts.append({"path": path, "sha256": digest, "bytes": len(body)})
+    return urls, {"commit": manifest["commit"], "files": receipts}
 
 
 async def verify_targets(request, urls):
@@ -60,6 +99,8 @@ async def verify_targets(request, urls):
 
 
 async def run(args):
+    from playwright.async_api import async_playwright
+
     root = Path(__file__).resolve().parents[1]
     pages = sorted(p.name for p in root.glob("*.html"))
     output = Path(args.output)
@@ -121,6 +162,14 @@ async def run(args):
         if args.verify_targets:
             context = await browser.new_context()
             urls = {link["href"] for row in results for link in row.get("links", [])}
+            publication_urls, identity = await publication_evidence(
+                context.request, args.url.rstrip("/")
+            )
+            urls.update(publication_urls)
+            identity["registry_and_report_destinations"] = len(publication_urls)
+            (output / "publication-identity.json").write_text(
+                json.dumps(identity, indent=2) + "\n"
+            )
             checked = await verify_targets(context.request, urls)
             (output / "verified-targets.json").write_text(
                 json.dumps(checked, indent=2) + "\n"

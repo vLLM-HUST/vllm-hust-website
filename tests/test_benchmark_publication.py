@@ -68,7 +68,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v072-20261022"
+            "./assets/midterm-report.js?v=midterm-v072-audit-20261023"
         ]
 
 
