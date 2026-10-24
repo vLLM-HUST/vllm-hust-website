@@ -42,7 +42,7 @@ def main():
                             "data-loaded", "true"
                         )
                         expect(page.locator("#midterm-report")).to_have_attribute(
-                            "data-loaded", "V0.76"
+                            "data-loaded", "V0.77"
                         )
                         assert not page.locator("#report-details").evaluate(
                             "e => e.open"
@@ -147,14 +147,16 @@ def main():
                                 )
                                 route.continue_()
 
-                            page.route("**/data/midterm-v076.json", delayed_report)
+                            page.route("**/data/midterm-v077.json", delayed_report)
                         page.goto(f"{args.url}/{filename}#midterm-m01-verdict")
                         expect(page.locator("#midterm-m01-verdict")).to_be_visible()
                         verdict = page.locator("#midterm-m01-verdict")
                         expect(verdict).to_contain_text("V1.5")
                         expect(verdict).to_contain_text(
-                            "复算中 / 未判定" if lang == "zh" else "not determined"
+                            "未判定" if lang == "zh" else "undetermined"
                         )
+                        expect(verdict).to_contain_text("7.1042")
+                        expect(verdict).to_contain_text("1812905151088034")
                         expect(verdict).not_to_contain_text("30.2443")
                         expect(page.locator("#midterm-m01-historical")).to_contain_text(
                             "30.2443%–30.2505%"

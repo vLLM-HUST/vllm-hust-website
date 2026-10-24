@@ -63,17 +63,17 @@
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
             <p>${escape(!zh && data.kv_audit.scope_en ? data.kv_audit.scope_en : data.kv_audit.scope)}</p>
             ${table({ headers: ['运行', '请求 / 独立盐', '前缀命中日志数', '最大已记录命中率'], rows: data.kv_audit.runs.map(r => [r.run_id, `${r.requests} / ${r.unique_salts}`, r.prefix_hit_samples, `${r.max_logged_prefix_hit_percent}%`]) }, data.sections.find(s => s.id === 'candidates').evidence.slice(4, 6))}</aside>
-            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${historicalM01.has(s.id) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前 V1.5 结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current V1.5 assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：复算中／未判定' : 'Current M01: recalculation / not determined'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
+            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${historicalM01.has(s.id) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前 V1.5 结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current V1.5 assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：C 已测／η 未判定' : 'Current M01: C measured / eta undetermined'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
         panel.dataset.loaded = data.version;
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v076.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v077.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.76' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.77' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             if (value.m01_method?.method_version !== 'V1.5' || value.m01_method.current?.efficiency_percent !== null || value.m01_method.current?.passed !== null) throw Error('Invalid current M01 status');
             for (const section of value.sections) {

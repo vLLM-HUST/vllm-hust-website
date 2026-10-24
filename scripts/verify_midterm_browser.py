@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v076.json")
+        response = context.request.get(f"{args.url}/data/midterm-v077.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.76"
+        assert report["version"] == "V0.77"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v076.json"
+            if f["website_path"] == "data/midterm-v077.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v076-audit-20261023",
+                        "./assets/midterm-report.js?v=midterm-v077-compute-20261024",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.76", timeout=30000
+                        "data-loaded", "V0.77", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -267,7 +267,7 @@ def main():
                     expect(current_method).to_contain_text("V1.5")
                     expect(current_method).to_contain_text("3.4.4")
                     expect(current_method).to_contain_text(
-                        "不新增补测" if lang == "zh" else "no new measurement"
+                        "本轮M01计数方法" if lang == "zh" else "this M01 run discloses"
                     )
                     expect(page.locator("#midterm-resources")).to_contain_text("2.68%")
                     expect(page.locator("#midterm-m01")).to_contain_text("未通过验收")
@@ -281,7 +281,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.76"
+                        "V0.77"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -382,7 +382,18 @@ def main():
                         "同一F和k" if lang == "zh" else "same F and k"
                     )
                     expect(verdict).to_contain_text(
-                        "复算中 / 未判定" if lang == "zh" else "not determined"
+                        "未判定" if lang == "zh" else "undetermined"
+                    )
+                    expect(verdict).to_contain_text("7.1042")
+                    expect(verdict).to_contain_text("1812905151088034")
+                    expect(verdict).to_contain_text("127.59352582134306")
+                    expect(verdict).to_contain_text(
+                        "不是严格无插桩"
+                        if lang == "zh"
+                        else "not strictly uninstrumented"
+                    )
+                    expect(verdict).not_to_contain_text(
+                        "当前F、T、T参、C和η均未核验齐备"
                     )
                     expect(verdict).not_to_contain_text("30.2443")
                     historical = page.locator("#midterm-m01-historical")
@@ -513,7 +524,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v076.json",
+            "**/data/midterm-v077.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")

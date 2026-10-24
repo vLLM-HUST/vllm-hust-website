@@ -45,9 +45,9 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v076.json" in loader
-    payload = json.loads((ROOT / "data/midterm-v076.json").read_text())
-    assert payload["version"] == "V0.76"
+    assert "./data/midterm-v077.json" in loader
+    payload = json.loads((ROOT / "data/midterm-v077.json").read_text())
+    assert payload["version"] == "V0.77"
     assert "C / C_reference" in payload["m01_method"]["efficiency_formula"]
     assert (
         payload["m01_method"]["current"]["reference_effective_tflops_per_chip"] is None
@@ -72,7 +72,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v076-audit-20261023"
+            "./assets/midterm-report.js?v=midterm-v077-compute-20261024"
         ]
 
 
@@ -111,10 +111,15 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v076.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v077.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "V1.5"
     assert method["current"]["passed"] is None
+    assert method["current"]["efficiency_percent"] is None
+    assert method["current"]["effective_tflops_per_chip"] == 7.1042207644080255
+    assert method["current"]["effective_flops"] == 1812905151088034
+    assert method["current"]["matched_uninstrumented_seconds"] is None
+    assert method["current_measurement"]["strict_uninstrumented"] is False
     assert method["measured_synchronized_b1"]["completed"] == 200
     assert method["measured_synchronized_b1"]["failed"] == 0
     assert (
@@ -125,7 +130,7 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
     assert audit["stability_method"]["six_probe_pass_is_task_stability_pass"] is False
     sections = {s["id"]: s for s in data["sections"]}
     assert "同工作量" in sections["m01-verdict"]["scope"]
-    assert "same-workload" in sections["m01-verdict"]["scope_en"]
+    assert "same-workload" in sections["m01-verdict"]["scope_en"].lower()
     assert "不是当前成本否决条件" in sections["resources"]["scope"]
     assert "not a current cost veto" in sections["resources"]["scope_en"]
     assert sections["milestone-v15"]["tables_en"]
@@ -136,4 +141,5 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
     assert "22.601951%" in review["scope"]
     assert "does not improve" in review["scope_en"]
     assert "E2E is not TTFT/TPOT" in review["scope_en"]
-    assert "1730876356085005" in review["scope"]
+    assert "1812905151088034" in review["scope"]
+    assert "7.1042" in review["scope_en"]
