@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import itertools
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -18,8 +19,7 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for width, lang, scheme in [
-            (1440, "zh", "light"),
-            (390, "en", "dark"),
+            *itertools.product((390, 1440), ("zh", "en"), ("light", "dark")),
             (320, "zh", "light"),
         ]:
             context = browser.new_context(
@@ -30,18 +30,18 @@ def main():
             errors = []
             page.on("pageerror", lambda error, errors=errors: errors.append(str(error)))
             page.goto(args.url + "/dataset-validation.html")
-            page.locator(".matrix-overview").wait_for()
-            expect(page.locator(".matrix-overview tbody tr")).to_have_count(7)
-            expect(page.locator("#matrix-table table")).to_have_count(1)
-            assert "+91.7%" in page.locator(".matrix-overview").inner_text()
-            system_row = page.locator(".matrix-overview tbody tr").filter(
-                has=page.locator('a[href="#swe-bench-pro"]')
+            page.locator(".matrix-overview").first.wait_for()
+            expect(page.locator(".matrix-overview")).to_have_count(7)
+            expect(page.locator("#matrix-table table")).to_have_count(7)
+            assert "+91.7%" in page.locator(".matrix-measured-grid").inner_text()
+            system_row = page.locator(
+                '.matrix-measured-group[data-dataset="swe-bench-pro"]'
             )
             assert "+40.8%" in system_row.inner_text()
             assert "213.32" not in system_row.inner_text()
             assert "1.408" not in system_row.inner_text()
             assert ("基线" if lang == "zh" else "Baseline") in system_row.inner_text()
-            assert "79.70%" in page.locator(".matrix-overview").inner_text()
+            assert "79.70%" in page.locator(".matrix-measured-grid").inner_text()
             expect(
                 page.locator(".matrix-profile-section, .matrix-replay-section")
             ).to_have_count(0)
@@ -54,7 +54,7 @@ def main():
                 "79.78%",
                 "26.95%",
             ]:
-                assert value in page.locator(".matrix-overview").inner_text()
+                assert value in page.locator(".matrix-measured-grid").inner_text()
             snapshot = page.request.get(
                 args.url + "/data/dataset-matrix-v1.json"
             ).json()
@@ -74,17 +74,49 @@ def main():
             )
             expect(page.locator(".matrix-missing")).to_have_count(missing)
             expect(page.locator(".matrix-status")).to_have_count(statuses)
+            measured_count = sum(sid in part["scores"] for part, sid in cells)
+            expect(page.locator(".matrix-overview tbody tr")).to_have_count(
+                measured_count
+            )
+            expect(
+                page.locator(
+                    ".matrix-measured-grid .matrix-missing, .matrix-measured-grid .matrix-status"
+                )
+            ).to_have_count(0)
+            assert page.locator(".matrix-unscored").evaluate_all(
+                "ee => ee.every(e => !e.open)"
+            )
+            # Every measured MOD is readable without horizontal scrolling, even on mobile.
+            mmlu = page.locator('.matrix-measured-group[data-dataset="mmlu-pro"]')
+            for name in (
+                "BetterScale",
+                "Core Attention Boundary",
+                "Ascend Attention Boundary",
+                "request-throttling-controller",
+            ):
+                expect(mmlu).to_contain_text(name)
+            assert mmlu.locator("th, td").evaluate_all(
+                "ee => ee.every(e => e.getBoundingClientRect().left >= 0 && e.getBoundingClientRect().right <= innerWidth)"
+            )
+            failures = page.locator('.matrix-unscored[data-dataset="mmlu-pro"]')
+            failures.locator("summary").focus()
+            failures.locator("summary").press("Enter")
+            expect(failures).to_contain_text("0.23.0")
+            expect(failures.locator(".matrix-status").first).to_be_visible()
+            assert failures.locator("a").count() > 0
+            failures.locator("summary").press("Enter")
+            assert not failures.evaluate("e => e.open")
             expect(
                 page.locator(
                     '[data-nav-group="performance"] a[href="./dataset-validation.html"]'
                 )
             ).to_have_count(1)
             page.screenshot(
-                path=str(args.output / f"overview-{width}-{lang}.png"), full_page=True
+                path=str(args.output / f"overview-{width}-{lang}-{scheme}.png"),
+                full_page=True,
             )
-            page.locator('[data-sort="betterscale"]').click()
-            assert "25.90%" in page.locator(".matrix-overview").inner_text()
-            assert "27.65%" in page.locator(".matrix-overview").inner_text()
+            assert "25.90%" in page.locator(".matrix-measured-grid").inner_text()
+            assert "27.65%" in page.locator(".matrix-measured-grid").inner_text()
             page.locator('.matrix-dataset[href="#mmlu-pro"]').click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             assert "631.59" in page.locator(".matrix-detail").inner_text()
@@ -117,21 +149,15 @@ def main():
             page.locator("#matrix-reset").click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(6)
             page.screenshot(
-                path=str(args.output / f"detail-{width}-{lang}.png"), full_page=True
+                path=str(args.output / f"detail-{width}-{lang}-{scheme}.png"),
+                full_page=True,
             )
             page.locator("#matrix-breadcrumb a").click()
-            assert (
-                page.locator('[data-sort="betterscale"]')
-                .locator("..")
-                .locator("..")
-                .get_attribute("aria-sort")
-                == "ascending"
-            )
             page.locator('.matrix-dataset[href="#frontierscience"]').first.click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(5)
             assert "906.25" in page.locator(".matrix-detail").inner_text()
             page.go_back()
-            page.locator(".matrix-overview").wait_for()
+            page.locator(".matrix-overview").first.wait_for()
             page.locator('.matrix-dataset[href="#hle-verified"]').first.click()
             expect(page.locator(".matrix-detail .run-row")).to_have_count(18)
             page.locator('[data-solution="native"]').uncheck()
@@ -149,7 +175,8 @@ def main():
             expect(page.locator(".matrix-detail thead th")).to_have_count(7)
 
             page.screenshot(
-                path=str(args.output / f"hle-{width}-{lang}.png"), full_page=True
+                path=str(args.output / f"hle-{width}-{lang}-{scheme}.png"),
+                full_page=True,
             )
             page.reload()
             page.locator(".matrix-detail").wait_for()
@@ -188,7 +215,7 @@ def main():
                 "#evidence-offline-window-request-throttling-controller-short-20261017-r18-on"
             ).is_visible()
             page.screenshot(
-                path=str(args.output / f"offline-window-{width}-{lang}.png"),
+                path=str(args.output / f"offline-window-{width}-{lang}-{scheme}.png"),
                 full_page=True,
             )
             assert page.evaluate(
@@ -212,7 +239,9 @@ def main():
             toggle.click()
             page.locator(".runs-table-scroll").evaluate("e => e.scrollLeft = 0")
             page.screenshot(
-                path=str(args.output / f"controller-frontier-{width}-{lang}.png"),
+                path=str(
+                    args.output / f"controller-frontier-{width}-{lang}-{scheme}.png"
+                ),
                 full_page=True,
             )
             assert page.evaluate(
@@ -232,7 +261,8 @@ def main():
             assert "ThunderAgent" not in page.locator("#matrix-table").inner_text()
             expect(page.locator("#matrix-table a")).to_have_count(2)
             page.screenshot(
-                path=str(args.output / f"real-agent-{width}-{lang}.png"), full_page=True
+                path=str(args.output / f"real-agent-{width}-{lang}-{scheme}.png"),
+                full_page=True,
             )
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= innerWidth + 1"

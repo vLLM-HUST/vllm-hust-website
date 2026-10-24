@@ -920,6 +920,15 @@ body[data-page="issues"] .issue-links {
 
 [hidden] { display: none !important; }
 
+body[data-page="achievements"] .serving-plan-entry a {
+  display: inline-block;
+  padding: 10px 14px;
+  color: #c7f0e8;
+  background: #142b2c;
+  border: 1px solid #557b77;
+  border-radius: 6px;
+}
+
 /* Public pages share one compact hierarchy: title, purpose, primary content. */
 body:not([data-page="home"]):not([data-page="plugins"]) .page-hero { padding-top: 32px; }
 body:not([data-page="home"]):not([data-page="plugins"]) .page-hero .content-panel {
