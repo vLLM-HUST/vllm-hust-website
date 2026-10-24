@@ -1,6 +1,9 @@
 /* TraceLoom: a peer project page using the site's shared navigation. */
 body[data-page="traceloom"] { margin: 0; background: #f3f5f1; color: #142b2a; font-family: Inter, system-ui, sans-serif; }
 body[data-page="traceloom"]::before { display: none; }
+body[data-page="traceloom"] .site-nav { background: #102728; border-color: #3b5555; backdrop-filter: none; }
+body[data-page="traceloom"] .brand-copy { color: #f3f5f1; }
+body[data-page="traceloom"] .brand-copy small { color: #c9ddda; }
 html { scroll-padding-top: 95px; }
 .tl-page [lang="zh"], .tl-footer [lang="zh"] { display: none; }
 html[lang="zh"] .tl-page [lang="en"], html[lang="zh"] .tl-footer [lang="en"] { display: none; }
