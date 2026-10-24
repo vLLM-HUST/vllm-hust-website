@@ -24,10 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 2
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #458 is merged. Freeze the same reviewed data identity across
+    # Benchmark #495 supplies this identity; merge it before deploying the site.
+    # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "fe0c3f18e81234d62cb50f0561fbf8de931aff82"  # pragma: allowlist secret
+        "05a0111a0936b96e1310ffbe2578b5062423a858"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     for filename in ("ci.yml", "midterm-browser.yml"):

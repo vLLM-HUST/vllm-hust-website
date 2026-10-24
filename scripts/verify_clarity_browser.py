@@ -46,7 +46,9 @@ def main():
                         page = context.new_page()
                         errors = []
                         page.on("pageerror", lambda error: errors.append(str(error)))
-                        page.goto(f"{args.url}/{name}.html", wait_until="networkidle")
+                        page.goto(
+                            f"{args.url}/{name}.html", wait_until="domcontentloaded"
+                        )
                         selectors = []
                         if name in ("dataset-validation", "leaderboard-runs"):
                             expect(page.locator("#current-workload")).to_have_attribute(
