@@ -29,6 +29,15 @@
             `website-publication/data/request-throttling-dataset-matrix-20261018/${name}.json`)
     ]);
     const rowSources = (section, tableIndex) => {
+        if (section.id === 'm01-verdict') {
+            const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
+            const suffix = tableIndex === 0
+                ? 'official018-paired-compute-20261024/summary.json'
+                : zh && tableIndex === 2
+                    ? 'storage-reference-supplement-20261024/summary.json'
+                    : 'storage-reference-closed-20261024/summary.json';
+            return [section.evidence.find(source => source.path.endsWith(suffix))];
+        }
         if (section.id === 'v15-remaining' && tableIndex === 0) {
             const inventory = data.sections.find(s => s.id === 'dataset-quality-inventory').evidence;
             return [inventory[11], inventory[0], section.evidence[0], inventory[9], section.evidence[0]];
@@ -68,12 +77,12 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v078.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v079.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.78' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.79' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             if (value.m01_method?.method_version !== 'V1.5' || value.m01_method.current?.efficiency_percent !== null || value.m01_method.current?.passed !== null) throw Error('Invalid current M01 status');
             for (const section of value.sections) {

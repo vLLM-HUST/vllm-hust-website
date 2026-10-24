@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v078.json")
+        response = context.request.get(f"{args.url}/data/midterm-v079.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.78"
+        assert report["version"] == "V0.79"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v078.json"
+            if f["website_path"] == "data/midterm-v079.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v078-reference-20261024",
+                        "./assets/midterm-report.js?v=midterm-v079-reference-20261024",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.78", timeout=30000
+                        "data-loaded", "V0.79", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -169,6 +169,25 @@ def main():
                                     .first.get_attribute("href")
                                 )
                                 assert href.endswith(quote(path)), (row, href, path)
+                        if ident == "m01-verdict":
+                            for table_index in range(section.locator("table").count()):
+                                suffix = (
+                                    "official018-paired-compute-20261024/summary.json"
+                                    if table_index == 0
+                                    else "storage-reference-supplement-20261024/summary.json"
+                                    if lang == "zh" and table_index == 2
+                                    else "storage-reference-closed-20261024/summary.json"
+                                )
+                                table_links = (
+                                    section.locator("table")
+                                    .nth(table_index)
+                                    .locator("a.raw-evidence")
+                                )
+                                assert table_links.count() > 0
+                                assert table_links.evaluate_all(
+                                    "(links, suffix) => links.every(a => a.href.endsWith(suffix))",
+                                    suffix,
+                                )
                         allowed_links = [
                             "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
                             f"{item['kind']}/{manifest['commit']}/{quote(item['path'])}"
@@ -281,7 +300,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.78"
+                        "V0.79"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -373,27 +392,24 @@ def main():
                             "href", "#midterm-m01-verdict"
                         )
                     expect(verdict.locator(".midterm-history-notice")).to_have_count(0)
-                    expect(verdict.locator("table")).to_have_count(2)
+                    expect(verdict.locator("table")).to_have_count(
+                        4 if lang == "zh" else 2
+                    )
                     expect(
                         verdict.locator("table").nth(0).locator("tbody tr")
-                    ).to_have_count(4)
+                    ).to_have_count(6)
                     expect(
                         verdict.locator("table").nth(1).locator("tbody tr")
-                    ).to_have_count(4)
-                    expect(verdict).to_contain_text("V1.5")
-                    expect(verdict).to_contain_text(
-                        "η=C/C参" if lang == "zh" else "eta=C/C_reference"
-                    )
-                    expect(verdict).to_contain_text(
-                        "同一F和k" if lang == "zh" else "same F and k"
-                    )
-                    expect(verdict).to_contain_text(
-                        "未判定" if lang == "zh" else "undetermined"
-                    )
+                    ).to_have_count(4 if lang == "zh" else 3)
+                    expect(verdict).to_contain_text("3.8407")
+                    expect(verdict).to_contain_text("84.9705%")
                     expect(verdict).to_contain_text("7.1042")
-                    expect(verdict).to_contain_text("1402")
+                    expect(verdict).to_contain_text("1829161955258989")
+                    expect(verdict).to_contain_text("37.2302")
                     expect(verdict).to_contain_text(
-                        "26组未通过" if lang == "zh" else "26 fail"
+                        "C提升不是参考达成率"
+                        if lang == "zh"
+                        else "Compute gain is not reference attainment"
                     )
                     expect(verdict).to_contain_text("1812905151088034")
                     expect(verdict).to_contain_text("127.59352582134306")
@@ -534,7 +550,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v078.json",
+            "**/data/midterm-v079.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
