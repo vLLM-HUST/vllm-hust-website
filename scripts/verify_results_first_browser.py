@@ -50,6 +50,7 @@ def main():
                         assert not page.locator("#current-configuration").evaluate(
                             "e => e.open"
                         )
+                        expect(page.locator(".result-date")).to_have_text("V0.78")
                         source = page.evaluate(
                             "async () => (await fetch('./data/dataset_validation_qwen35_mmlu_school028_inf_out256.json')).json()"
                         )

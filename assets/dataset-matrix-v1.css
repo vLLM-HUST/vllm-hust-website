@@ -53,3 +53,25 @@
 .matrix-attempt summary { cursor: pointer; }
 .matrix-attempt pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .matrix-attempt a { color: #9cb4ff; }
+
+/* Measured results stay in view, including narrow screens; no empty MOD columns. */
+.matrix-measured-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; align-items: start; }
+.matrix-measured-group { min-width: 0; background: var(--run-bg); border: 1px solid var(--run-border); border-radius: 12px; padding: 16px; color: var(--run-ink); }
+.matrix-measured-group h3 { margin: 0 0 12px; }
+.matrix-measured-group .matrix-dataset { font-size: 18px; }
+.matrix-measured-group .matrix-overview { width: 100%; min-width: 0; table-layout: fixed; }
+.matrix-measured-group .matrix-overview th,
+.matrix-measured-group .matrix-overview td { width: auto; min-width: 0; padding: 12px 8px; overflow-wrap: anywhere; white-space: normal; }
+.matrix-measured-group .matrix-overview th:first-child { width: 55%; }
+.matrix-measured-group caption { text-align: left; padding: 12px 8px; color: var(--run-muted); font-size: 12px; }
+.matrix-score-source { color: var(--run-accent); text-decoration: underline; text-underline-offset: 3px; }
+.matrix-unscored { margin-top: 12px; padding: 16px; border: 1px solid var(--run-border); border-radius: 10px; color: var(--run-ink); background: var(--run-bg); font-size: 13px; overflow-wrap: anywhere; }
+.matrix-unscored summary { cursor: pointer; font-weight: 600; }
+.matrix-unscored li { margin: 12px 0; }
+.matrix-unscored p { line-height: 1.7; }
+.matrix-unscored a { color: var(--run-accent); }
+.matrix-unscored small { display: block; }
+@media (prefers-color-scheme: dark) {
+    .matrix-measured-group, .matrix-unscored { --run-bg: #14212c; --run-ink: #e7edf4; --run-muted: #afbdcc; --run-border: #354657; --run-accent: #82cfff; }
+    .matrix-measured-group .runs-table thead th { background: #1b2c3a; color: #afbdcc; }
+}
