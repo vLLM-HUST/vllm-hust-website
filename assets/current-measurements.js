@@ -32,7 +32,7 @@
     ? `<a class="raw-evidence" href="${original(id)}" title="原始测试数据 / Original test data">${number(value)}</a>` : number(value);
   function render() {
     const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
-    const title = zh ? 'MMLU-Pro · 当前实测 B0 / B1' : 'MMLU-Pro · Current measured B0 / B1';
+    const title = zh ? 'MMLU-Pro · 当前实测结果' : 'MMLU-Pro · Current measurements';
     if (!data || !reportData) {
       section.innerHTML = `<h2>${title}</h2><p>${failed
         ? (zh ? '实测摘要加载失败。' : 'Measurement summary unavailable.')
@@ -59,9 +59,8 @@
     const cards = data.results.map(result => {
       const metric = data.metrics.find(item => item.id === result.metric_id);
       return `<article class="result-metric" data-metric="${escape(result.metric_id)}"><h3>${escape(labels[result.metric_id] || result.metric_id)} <small>${escape(metric?.unit || '')}</small></h3>
-        <div class="result-pair"><div><span>B0 · 0.18/0.18</span><strong>—</strong></div><div><span>B1 · 0.28.1/0.25.1rc2</span><strong>${linkedNumber(result.value, result.selected_candidate_id)}</strong></div></div>
-        <p class="result-change"><span>${zh ? '本工况尚无固定 B0 配对，不计算收益' : 'No matched fixed B0 for this workload; gain not calculated'}</span></p>
-        <small>${escape(result.selected_candidate_id || '')}</small></article>`;
+        <div class="result-pair"><div><span>B1 · 0.28.1/0.25.1rc2</span><strong>${linkedNumber(result.value, result.selected_candidate_id)}</strong></div></div>
+        <small class="result-candidate">${escape(result.selected_candidate_id || '')}</small></article>`;
     }).join('');
     const expanded = section.querySelector('#current-configuration')?.open;
     const quality = reportData.current_summary.quality;
@@ -70,6 +69,7 @@
       <p class="result-context">${escape(data.scenario.model)} · ${escape(data.scenario.precision)} · TP2 · ${data.scenario.num_prompts} ${zh ? '请求' : 'requests'} · out${data.scenario.output_length} · ${escape(data.scenario.hardware)}</p>
       <p class="result-boundary">${zh ? 'B0 固定：vLLM 0.18 / vLLM-Ascend 0.18。B1 基座版本不限，本页已测优化配置使用 0.28.1 / 0.25.1rc2 开发栈。' : 'B0 is fixed: vLLM 0.18 / vLLM-Ascend 0.18. B1 has no base-version restriction; the measured optimizations here use the 0.28.1 / 0.25.1rc2 development stack.'}</p>
       <div class="result-quality"><strong>${zh ? '同题质量 · out8192' : 'Matched quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b0.correct}/${quality.b0.total}</a></span><span>B1 · KV materialization: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b1.candidate_correct}/${quality.b0.total}</a></span><small>${zh ? '固定200题子集；不代表全集或统计非劣' : 'Fixed 200-task subset; not full-corpus quality or statistical noninferiority'}</small></div>
+      <p class="result-comparison-note">${zh ? '服务性能 · out256：以下为各指标的 B1 实测值。本工况尚无固定 B0 配对，不计算收益。' : 'Serving performance · out256: measured B1 values per metric. No matched fixed B0 for this workload; gain not calculated.'}</p>
       <div class="result-metrics">${cards}</div>
       <p class="result-selection">${zh ? 'B1 按指标选择当前已实测最优方案；三项不代表同一部署。性能改善不等于质量或 M01 验收通过。' : 'B1 is the best measured solution per metric, not one deployment achieving all three. Performance gains do not establish quality or M01 acceptance.'}</p>
       <nav class="result-next" aria-label="${zh ? '结论与验证进展' : 'Conclusions and validation progress'}">
@@ -78,7 +78,7 @@
         <a href="#midterm-dataset-quality-inventory">${zh ? '质量 · 子集配对，非全集' : 'Quality · paired subset, not full corpus'}</a>
         <a href="#midterm-long-context-parser">${zh ? '长上下文 · 原判分与解析复核分列' : 'Long context · original and parser review separate'}</a>
         <a href="#midterm-kv-audit">${zh ? 'KV · 跨轮状态核查未闭合' : 'KV · cross-run state review open'}</a>
-        <a href="#midterm-m01-verdict">${zh ? 'M01 · V1.5 复算中／未判定' : 'M01 · V1.5 recalculation / not determined'}</a>
+        <a href="#midterm-m01-verdict">${zh ? 'M01 · C 已测／η 未判定' : 'M01 · C measured / eta undetermined'}</a>
       </nav>
       <details id="current-configuration" ${expanded ? 'open' : ''}><summary>${zh ? '配置、候选对比与原始证据' : 'Configurations, candidates & original evidence'}</summary>
       <p>${escape(data.scenario.label)} · ${zh ? 'B1：当前已实测最优的 vLLM-HUST 优化方案，按指标选择。' : 'B1: currently best measured vLLM-HUST optimization solution, selected per metric.'}</p>
@@ -91,11 +91,11 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  Promise.all([dataPath, './data/midterm-v076.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
+  Promise.all([dataPath, './data/midterm-v079.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
   }))).then(([value, report]) => {
-    if (report.version !== 'V0.76' || report.comparison_contract?.b0?.fixed !== true ||
+    if (report.version !== 'V0.79' || report.comparison_contract?.b0?.fixed !== true ||
         report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
         !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
     data = value; reportData = report; render();

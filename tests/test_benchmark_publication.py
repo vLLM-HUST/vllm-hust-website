@@ -46,6 +46,15 @@ class Elements(HTMLParser):
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
     assert "./data/midterm-v079.json" in loader
+    hero = (ROOT / "assets/current-measurements.js").read_text()
+    assert "./data/midterm-v079.json" in hero
+    assert "report.version !== 'V0.79'" in hero
+    assert "midterm-v076.json" not in hero
+    for page in ("dataset-validation.html", "leaderboard-runs.html"):
+        assert (
+            "current-measurements.js?v=clarity-v079-20261024"
+            in (ROOT / page).read_text()
+        )
     payload = json.loads((ROOT / "data/midterm-v079.json").read_text())
     assert payload["version"] == "V0.79"
     assert "C / C_reference" in payload["m01_method"]["efficiency_formula"]

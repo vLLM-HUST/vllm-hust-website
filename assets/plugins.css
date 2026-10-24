@@ -447,3 +447,14 @@ body[data-page="plugins"] .content-panel .plugin-summary {
 .plugin-performance > .performance-negative { color: #a43e29; }
 .plugin-performance-runtime { color: #61706f; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; }
 .plugin-performance p { margin: 0; line-height: 1.6; }
+
+/* Explicit surface colors: generic panel rules must not dim the dark hero. */
+body[data-page="plugins"] .plugin-hero .content-panel > p { color: #c7d4d1; }
+body[data-page="plugins"] #independent-engines { padding: 18px 22px; margin: 20px 0; border: 1px solid #cbd4d1; border-radius: 8px; background: #fff; }
+body[data-page="plugins"] #independent-engine-title { margin: 0 0 8px; color: #172321; font-size: 18px; }
+body[data-page="plugins"] #independent-engines p { color: #465754; }
+body[data-page="plugins"] #independent-engines a { color: #105456; }
+@media (max-width: 760px) {
+  /* A tall sticky search/filter panel otherwise hides most of the catalog. */
+  body[data-page="plugins"] .plugin-controls { position: static; }
+}

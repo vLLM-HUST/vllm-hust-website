@@ -1211,7 +1211,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=phase-scenario-navigation-20261012" in PAGE
+    assert "plugins.css?v=clarity-20261024" in PAGE
     assert "plugins-page.js?v=state-scheduler-archive-20261018" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
