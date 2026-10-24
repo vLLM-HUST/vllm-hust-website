@@ -920,6 +920,16 @@ body[data-page="issues"] .issue-links {
 
 [hidden] { display: none !important; }
 
+/* Eyebrows and provenance must follow their surface, not one global color. */
+body:not([data-page="home"]) .content-panel .eyebrow { color: #795300; }
+body:not([data-page="home"]) .page-hero .content-panel .eyebrow { color: #f4c463; }
+body:not([data-page="home"]) .page-hero .content-panel > p { color: #c7d4d1; }
+body:not([data-page="home"]) .page-hero .content-panel > p a { color: #b9e9e0; }
+body[data-page="issues"] .metric-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  body[data-page="issues"] .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 body[data-page="achievements"] .serving-plan-entry a {
   display: inline-block;
   padding: 10px 14px;

@@ -100,6 +100,7 @@ jobs:
           python scripts/verify_capability_coverage_browser.py --url http://127.0.0.1:8769
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_clarity_browser.py --url http://127.0.0.1:8769
+          python scripts/verify_public_pages_browser.py --url http://127.0.0.1:8769
           python scripts/verify_betterscale_browser.py --url http://127.0.0.1:8769
           python scripts/verify_traceloom_browser.py --url http://127.0.0.1:8769
           python scripts/verify_gennova_browser.py --url http://127.0.0.1:8769
@@ -116,6 +117,7 @@ jobs:
             output/playwright/b1-definition/
             output/playwright/site-repair/
             output/playwright/clarity/
+            output/playwright/public-pages/
             output/playwright/betterscale/
             output/playwright/traceloom/
             output/playwright/gennova/

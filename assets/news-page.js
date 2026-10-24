@@ -10,7 +10,7 @@
   const local = (value) => value?.[lang()] || value?.en || value?.zh || '';
   const copy = () => lang() === 'zh'
     ? { featured: '重点新闻', community: '社区', stories: '条动态', failed: '新闻数据暂时无法加载。' }
-    : { featured: 'Featured', community: 'Community', stories: 'stories', failed: 'News is temporarily unavailable.' };
+    : { featured: 'Featured', community: 'Community', stories: items.length === 1 ? 'story' : 'stories', failed: 'News is temporarily unavailable.' };
 
   const formatDate = (value) => {
     const date = new Date(`${value}T00:00:00Z`);
