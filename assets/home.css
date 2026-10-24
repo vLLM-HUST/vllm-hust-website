@@ -14,6 +14,9 @@
 
 body[data-page="home"] { color: var(--exec-ink); background: var(--exec-paper); }
 body[data-page="home"]::before, body[data-page="home"] .cosmic-background { display: none; }
+@media (max-width: 680px) {
+  body[data-page="home"] .inference-fabric { display: none; }
+}
 body[data-page="home"] .site-nav {
   position: absolute;
   inset: 0 0 auto;

@@ -311,6 +311,7 @@
     function renderFooter() {
         const footer = document.querySelector('.site-footer, .execution-footer');
         if (!footer) return;
+        const summaryId = footer.querySelector('span[id]')?.id || 'footer-copy';
         const summary = footer.querySelector('#footer-copy')?.textContent
             || footer.textContent.replace(/vllm-hust/ig, '').replace(/·/g, '').trim()
             || 'Inference for domestic compute.';
@@ -319,7 +320,7 @@
             <div class="site-directory-inner">
                 <div class="site-directory-brand">
                     <strong>vLLM-HUST</strong>
-                    <span id="footer-copy">${summary}</span>
+                    <span id="${summaryId}">${summary}</span>
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
                     <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
