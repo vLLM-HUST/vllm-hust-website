@@ -52,7 +52,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=measured-first-v078-20261024"
+            "current-measurements.js?v=clarity-v078-20261024"
             in (ROOT / page).read_text()
         )
     payload = json.loads((ROOT / "data/midterm-v078.json").read_text())

@@ -67,10 +67,11 @@ def main():
                                 expect(card).to_contain_text(formatted)
                             assert card.locator("a.raw-evidence").count() == 1
                             expect(
-                                card.locator(".result-pair strong").first
-                            ).to_have_text("—")
-                            expect(card.locator(".result-change")).not_to_contain_text(
-                                "%"
+                                card.locator(".result-pair strong")
+                            ).not_to_have_text("—")
+                            expect(card.locator(".result-pair")).to_contain_text("B1")
+                            expect(card.locator(".result-pair")).not_to_contain_text(
+                                "B0"
                             )
                             assert card.locator("a").evaluate_all(
                                 "aa => aa.every(a => /^https:\\/\\/github.com\\/vLLM-HUST\\/vllm-hust-benchmark\\/(blob|tree)\\/[a-f0-9]{40}\\//.test(a.href))"
@@ -80,6 +81,9 @@ def main():
                         )
                         expect(page.locator(".result-boundary")).to_contain_text(
                             "0.25.1rc2"
+                        )
+                        expect(page.locator(".result-comparison-note")).to_contain_text(
+                            "不计算收益" if lang == "zh" else "gain not calculated"
                         )
                         expect(page.locator(".result-quality")).to_contain_text(
                             "151/200"
