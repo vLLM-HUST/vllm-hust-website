@@ -1,13 +1,15 @@
 import { calculate } from "./calc.mjs?v=accounted-plans-20261009";
+import { t, translate, errorText } from "./i18n.mjs?v=public-pages-20261024";
 const $ = (id) => document.getElementById(id);
 const fmt = (n, d = 2) =>
   n.toLocaleString("zh-CN", { maximumFractionDigits: d });
 let data, last;
 const selected = new Set();
 const prices = new Map();
-function element(tag, text, className) {
+function element(tag, text, className, english) {
   const el = document.createElement(tag);
-  if (text !== undefined) el.textContent = text;
+  if (text !== undefined) el.textContent = english ? t(text, english) : text;
+  if (english) { el.dataset.planZh = text; el.dataset.planEn = english; }
   if (className) el.className = className;
   return el;
 }
@@ -15,7 +17,7 @@ function number(id, optional = false) {
   const s = $(id).value.trim();
   if (!s && optional) return null;
   if (!s || !Number.isFinite(Number(s)) || Number(s) < 0)
-    throw Error("请输入有效的非负数");
+    throw Error(t("请输入有效的非负数", "Enter a valid non-negative number"));
   return Number(s);
 }
 function render() {
@@ -30,6 +32,7 @@ function render() {
       cost: number("cost", true),
     };
     const denom = unit === "month" ? "卡月" : unit === "24" ? "卡天" : "卡时";
+    const displayDenom = t(denom, unit === "month" ? "card-month" : unit === "24" ? "card-day" : "card-hour");
     $("util-label").textContent = `${shared.utilization}%`;
     const rows = data.plans
       .filter((p) => selected.has(p.id))
@@ -63,15 +66,16 @@ function render() {
         plan.inputTpsPerChip === null || plan.cachedInputTpsPerChip === null,
     );
     $("coverage").textContent = rows.length
-      ? `${rows.length} 个方案 · ${rows.length - valuedRows.length} 个待输入售价 · 元 / ${denom} · ${incomplete ? "缺失输入的方案仅显示已知输出价值" : "新增输入、缓存命中与输出完整计账"}`
-      : "请勾选至少一个方案。";
+      ? t(`${rows.length} 个方案 · ${rows.length - valuedRows.length} 个待输入售价 · 元 / ${denom} · ${incomplete ? "缺失输入的方案仅显示已知输出价值" : "新增输入、缓存命中与输出完整计账"}`,
+          `${rows.length} plans · ${rows.length - valuedRows.length} awaiting prices · CNY / ${displayDenom} · ${incomplete ? "Plans with missing inputs show known output value only" : "New input, cached input and output accounted separately"}`)
+      : t("请勾选至少一个方案。", "Select at least one plan.");
     $("result-title").textContent =
       shared.utilization === 100
-        ? "满载 API 等价产值"
-        : "按利用率折算的 API 等价产值";
+        ? t("满载 API 等价产值", "API-equivalent value at full load")
+        : t("按利用率折算的 API 等价产值", "Utilization-adjusted API-equivalent value");
     $("kind").textContent = valuedRows.some((r) => r.priceSource === "user-assumption")
-      ? "实测产能 × 价格（含自定义）"
-      : "实测产能 × 参考价格";
+      ? t("实测产能 × 价格（含自定义）", "Measured capacity × prices (including custom)")
+      : t("实测产能 × 参考价格", "Measured capacity × reference prices");
     $("columns").replaceChildren();
     const expense = valuedRows[0]?.results.expense ?? null;
     const max =
@@ -109,8 +113,8 @@ function render() {
       col.append(
         element("strong", `¥${fmt(expense)}`),
         bar,
-        element("b", "综合成本"),
-        element("small", "用户输入 / 同单位"),
+        element("b", t("综合成本", "Total cost")),
+        element("small", t("用户输入 / 同单位", "User input / same unit")),
       );
       $("columns").append(col);
     }
@@ -124,13 +128,13 @@ function render() {
   } catch (e) {
     $("computed").hidden = true;
     $("error").hidden = false;
-    $("error").textContent = e.message;
+    $("error").textContent = errorText(e.message);
     $("export").disabled = true;
     last = null;
   }
 }
 function initialize() {
-  $("plan-options").replaceChildren(element("legend", "旗舰推理方案 · 可多选"));
+  $("plan-options").replaceChildren(element("legend", "旗舰推理方案 · 可多选", undefined, "Measured plans · select one or more"));
   for (const p of data.plans) {
     selected.add(p.id);
     const choice = element("div", undefined, "plan-choice");
@@ -152,7 +156,7 @@ function initialize() {
     source.dataset.benchmarkPlan = p.id;
     source.target = "_blank";
     source.rel = "noreferrer";
-    source.title = "查看方案测量来源";
+    source.title = t("查看方案测量来源", "Open measurement source");
     copy.append(label, source);
     choice.append(check, copy);
     $("plan-options").append(choice);
@@ -161,10 +165,10 @@ function initialize() {
     const box = element("fieldset");
     box.append(element("legend", p.model));
     const controls = { changed: false };
-    for (const [key, label, value] of [
-      ["input", "新增输入", p.inputCnyPerMillion],
-      ["cached", "缓存命中输入", p.cachedInputCnyPerMillion],
-      ["output", "输出", p.outputCnyPerMillion],
+    for (const [key, label, value, english] of [
+      ["input", "新增输入", p.inputCnyPerMillion, "New input"],
+      ["cached", "缓存命中输入", p.cachedInputCnyPerMillion, "Cached input"],
+      ["output", "输出", p.outputCnyPerMillion, "Output"],
     ]) {
       const input = element("input");
       input.id = `price-${id}-${key}`;
@@ -174,7 +178,7 @@ function initialize() {
       input.value = value ?? "";
       input.placeholder = "请输入售价";
       input.defaultValue = value ?? "";
-      const tag = element("label", label);
+      const tag = element("label", label, undefined, english);
       tag.htmlFor = input.id;
       box.append(tag, input);
       controls[key] = input.id;
@@ -183,23 +187,26 @@ function initialize() {
         render();
       });
     }
-    box.append(element("p", p.cacheScope, "hint"));
+    // Original source wording remains available without relabeling its evidence.
+    box.append(element("p", "来源说明（原文）", "hint", "Source note (original wording)"), element("p", p.cacheScope, "hint"));
     prices.set(id, controls);
     $("price-controls").append(box);
     if (p.userDefined) {
-      $("price-note").append(element("p", `${p.model}：售价由用户输入，不预设参考价格；未填写时仅展示实测性能，不计算产值。`));
+      $("price-note").append(element("p", `${p.model}：售价由用户输入，不预设参考价格；未填写时仅展示实测性能，不计算产值。`, undefined, `${p.model}: enter your own prices. Without prices, only measured performance is shown; no value is calculated.`));
       continue;
     }
     const note = element(
       "p",
       `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${p.cacheScope} `,
+      undefined,
+      `${p.model}: new input ¥${p.inputCnyPerMillion}, cached input ¥${p.cachedInputCnyPerMillion}, output ¥${p.outputCnyPerMillion} per million tokens. Checked ${p.checkedAt}. Source region / scope (original): ${p.region}; ${p.cacheScope}`,
     );
-    const link = element("a", "官方价格 ↗");
+    const link = element("a", "官方价格 ↗", undefined, "Official prices ↗");
     link.href = p.url;
     link.target = "_blank";
     link.rel = "noreferrer";
-    note.append(link);
-    $("price-note").append(note);
+    // Separate the link so translation of the note cannot remove it.
+    $("price-note").append(note, link);
   }
   for (const id of ["utilization", "cost", "days", "unit"])
     $(id).addEventListener("input", render);
@@ -229,11 +236,18 @@ function initialize() {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
+  translate();
   render();
 }
+window.addEventListener("vllm-hust:langchange", () => {
+  translate();
+  document.querySelectorAll(".plan-source").forEach(a => { a.title = t("查看方案测量来源", "Open measurement source"); });
+  render();
+});
+translate();
 fetch("data/serving-plans.json?v=native-glm-20261013", { cache: "no-cache" })
   .then((r) => {
-    if (!r.ok) throw Error("方案数据读取失败");
+    if (!r.ok) throw Error(t("方案数据读取失败", "Measured plans could not be loaded"));
     return r.json();
   })
   .then((d) => {
@@ -242,6 +256,6 @@ fetch("data/serving-plans.json?v=native-glm-20261013", { cache: "no-cache" })
   })
   .catch((e) => {
     $("error").hidden = false;
-    $("error").textContent = e.message;
+    $("error").textContent = errorText(e.message);
     $("export").disabled = true;
   });
