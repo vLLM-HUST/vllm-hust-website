@@ -42,7 +42,7 @@ def main():
                             "data-loaded", "true"
                         )
                         expect(page.locator("#midterm-report")).to_have_attribute(
-                            "data-loaded", "V0.79"
+                            "data-loaded", "V0.80"
                         )
                         assert not page.locator("#report-details").evaluate(
                             "e => e.open"
@@ -50,7 +50,7 @@ def main():
                         assert not page.locator("#current-configuration").evaluate(
                             "e => e.open"
                         )
-                        expect(page.locator(".result-date")).to_have_text("V0.79")
+                        expect(page.locator(".result-date")).to_have_text("V0.80")
                         source = page.evaluate(
                             "async () => (await fetch('./data/dataset_validation_qwen35_mmlu_school028_inf_out256.json')).json()"
                         )
@@ -89,7 +89,7 @@ def main():
                             "151/200"
                         )
                         expect(page.locator(".result-quality")).to_contain_text(
-                            "152/200"
+                            "156/200"
                         )
                         assert page.locator(".result-quality").evaluate(
                             "e => e.getBoundingClientRect().bottom < innerHeight"
@@ -152,7 +152,7 @@ def main():
                                 )
                                 route.continue_()
 
-                            page.route("**/data/midterm-v079.json", delayed_report)
+                            page.route("**/data/midterm-v080.json", delayed_report)
                         page.goto(f"{args.url}/{filename}#midterm-m01-verdict")
                         expect(page.locator("#midterm-m01-verdict")).to_be_visible()
                         verdict = page.locator("#midterm-m01-verdict")
