@@ -28,7 +28,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "ff62bd4a264b04e00b116db2a1f33b7457c69cc5"  # pragma: allowlist secret
+        "034d0ea5de8be8a628313b068349d069973f5b20"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     for filename in ("ci.yml", "midterm-browser.yml"):

@@ -160,9 +160,7 @@ def main():
                         expect(verdict).to_contain_text("54.0301%")
                         expect(verdict).to_contain_text("7.1085")
                         expect(verdict).to_contain_text(
-                            "不是理论峰值"
-                            if lang == "zh"
-                            else "not theoretical peak"
+                            "不是理论峰值" if lang == "zh" else "not theoretical peak"
                         )
                         expect(verdict).to_contain_text("7.1042")
                         expect(verdict).to_contain_text("127.5166")
