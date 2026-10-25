@@ -45,18 +45,24 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v079.json" in loader
+    assert "./data/midterm-v080.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v079.json" in hero
-    assert "report.version !== 'V0.79'" in hero
+    assert "./data/midterm-v080.json" in hero
+    assert "report.version !== 'V0.80'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v079-20261024"
+            "current-measurements.js?v=clarity-v080-20261025"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v079.json").read_text())
-    assert payload["version"] == "V0.79"
+    payload = json.loads((ROOT / "data/midterm-v080.json").read_text())
+    assert payload["version"] == "V0.80"
+    assert payload["corrected_quality"]["reference"]["eta_percent"] is None
+    assert payload["current_summary"]["quality"]["b1"]["candidate_correct"] == 156
+    assert (
+        payload["current_summary"]["quality"]["b1"]["original_controller_status"]
+        == "failed"
+    )
     assert "C / C_reference" in payload["m01_method"]["efficiency_formula"]
     assert (
         payload["m01_method"]["current"]["reference_effective_tflops_per_chip"] is None
@@ -81,7 +87,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v079-reference-20261024"
+            "./assets/midterm-report.js?v=midterm-v080-quality-20261025"
         ]
 
 
@@ -120,7 +126,7 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v079.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v080.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "V1.5"
     assert method["current"]["passed"] is None

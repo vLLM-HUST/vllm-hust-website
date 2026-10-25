@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v079.json")
+        response = context.request.get(f"{args.url}/data/midterm-v080.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.79"
+        assert report["version"] == "V0.80"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v079.json"
+            if f["website_path"] == "data/midterm-v080.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v079-reference-20261024",
+                        "./assets/midterm-report.js?v=midterm-v080-quality-20261025",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.79", timeout=30000
+                        "data-loaded", "V0.80", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -300,7 +300,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.79"
+                        "V0.80"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -422,6 +422,13 @@ def main():
                         "当前F、T、T参、C和η均未核验齐备"
                     )
                     expect(verdict).not_to_contain_text("30.2443")
+                    corrected = page.locator("#midterm-corrected-quality")
+                    for value in ("156/200", "143/200", "151/200"):
+                        expect(corrected).to_contain_text(value)
+                    expect(corrected).to_contain_text("failed")
+                    expect(corrected).to_contain_text(
+                        "尚未完成" if lang == "zh" else "remain incomplete"
+                    )
                     historical = page.locator("#midterm-m01-historical")
                     expect(historical).to_contain_text("30.2443%–30.2505%")
                     expect(historical).to_contain_text("135.340126192")
@@ -550,7 +557,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v079.json",
+            "**/data/midterm-v080.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
