@@ -36,7 +36,7 @@ async def publication_evidence(request, base):
     assert response.ok, response.status
     manifest = await response.json()
     urls, receipts = set(), []
-    for name in ("benchmark-evidence-links.json", "midterm-v080.json"):
+    for name in ("benchmark-evidence-links.json", "midterm-v081.json"):
         path = f"data/{name}"
         entry = next(row for row in manifest["files"] if row["website_path"] == path)
         response = await request.get(f"{base}/{path}")
@@ -47,7 +47,7 @@ async def publication_evidence(request, base):
         payload = json.loads(body)
         urls.update(evidence_urls(payload, manifest["commit"]))
         receipts.append({"path": path, "sha256": digest, "bytes": len(body)})
-        if name == "midterm-v080.json":
+        if name == "midterm-v081.json":
             report_path = "reports/vllm-hust-midterm-20261019/中期测试报告.md"
             report_url = (
                 "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/"
@@ -64,7 +64,7 @@ async def publication_evidence(request, base):
             assert report_object["encoding"] == "base64"
             report_body = base64.b64decode(report_object["content"])
             assert hashlib.sha256(report_body).hexdigest() == payload["report_sha256"]
-            assert "报告版本：V0.80" in report_body.decode()
+            assert "报告版本：V0.81" in report_body.decode()
             receipts.append(
                 {
                     "path": report_url,

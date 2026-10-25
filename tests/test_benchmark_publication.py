@@ -45,19 +45,22 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v080.json" in loader
+    assert "./data/midterm-v081.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v080.json" in hero
-    assert "report.version !== 'V0.80'" in hero
+    assert "./data/midterm-v081.json" in hero
+    assert "report.version !== 'V0.81'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v080-20261025"
+            "current-measurements.js?v=clarity-v081-20261025"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v080.json").read_text())
-    assert payload["version"] == "V0.80"
-    assert payload["corrected_quality"]["reference"]["eta_percent"] is None
+    payload = json.loads((ROOT / "data/midterm-v081.json").read_text())
+    assert payload["version"] == "V0.81"
+    assert (
+        payload["corrected_quality"]["reference"]["eta_percent"]
+        == payload["wholechain_reference"]["B1"]["eta_percent"]
+    )
     assert payload["current_summary"]["quality"]["b1"]["candidate_correct"] == 156
     assert (
         payload["current_summary"]["quality"]["b1"]["original_controller_status"]
@@ -65,7 +68,8 @@ def test_midterm_loader_cache_key_matches_publication_version():
     )
     assert "C / C_reference" in payload["m01_method"]["efficiency_formula"]
     assert (
-        payload["m01_method"]["current"]["reference_effective_tflops_per_chip"] is None
+        payload["m01_method"]["current"]["reference_effective_tflops_per_chip"]
+        == payload["wholechain_reference"]["reference_C_TFLOPS_per_chip"]
     )
     inventory = next(
         section
@@ -87,7 +91,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v080-quality-20261025"
+            "./assets/midterm-report.js?v=midterm-v081-quality-20261025"
         ]
 
 
@@ -126,16 +130,19 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v080.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v081.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "V1.5"
-    assert method["current"]["passed"] is None
+    assert method["current"]["passed"] is True
     supplement = data["reference_supplement"]
     assert supplement["totals"]["numerical_checks"] == 1402
     assert supplement["model_validation"]["passed"] == 6
     assert supplement["model_validation"]["failed"] == 26
     assert supplement["efficiency_percent"] is supplement["attainment"] is None
-    assert method["current"]["efficiency_percent"] is None
+    assert (
+        method["current"]["efficiency_percent"]
+        == data["wholechain_reference"]["B1"]["eta_percent"]
+    )
     assert method["current"]["effective_tflops_per_chip"] == 7.1042207644080255
     assert method["current"]["effective_flops"] == 1812905151088034
     assert method["current"]["matched_uninstrumented_seconds"] is None
@@ -149,12 +156,13 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
     assert audit["cost_method"]["lifecycle_is_current_gate"] is False
     assert audit["stability_method"]["six_probe_pass_is_task_stability_pass"] is False
     sections = {s["id"]: s for s in data["sections"]}
-    assert "同轮F/T/C配对已闭合" in sections["m01-verdict"]["scope"]
-    assert "own-run F/T/C are closed" in sections["m01-verdict"]["scope_en"]
+    assert "独立整链参考与配对验收完成" in sections["m01-verdict"]["scope"]
+    assert "paired assessment are complete" in sections["m01-verdict"]["scope_en"]
     pair = data["paired_own_compute"]
     assert pair["rows"]["B0"]["F"] == 1829161955258989
-    assert pair["eta_percent"] is pair["attainment"] is None
-    assert "not reference attainment" in sections["m01-verdict"]["scope_en"]
+    assert pair["eta_percent"] == data["wholechain_reference"]["B1"]["eta_percent"]
+    assert pair["attainment"] is True
+    assert "not theoretical peak" in sections["m01-verdict"]["scope_en"]
     assert "不是当前成本否决条件" in sections["resources"]["scope"]
     assert "not a current cost veto" in sections["resources"]["scope_en"]
     assert sections["milestone-v15"]["tables_en"]
