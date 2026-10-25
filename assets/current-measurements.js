@@ -2,6 +2,7 @@
   'use strict';
   const main = document.querySelector('main');
   if (!main) return;
+  const qualityPage = document.body.dataset.page === 'dataset-validation';
   const section = document.createElement('section');
   section.className = 'current-measurements';
   section.id = 'current-workload';
@@ -32,7 +33,9 @@
     ? `<a class="raw-evidence" href="${original(id)}" title="原始测试数据 / Original test data">${number(value)}</a>` : number(value);
   function render() {
     const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
-    const title = zh ? 'MMLU-Pro · 当前实测结果' : 'MMLU-Pro · Current measurements';
+    const title = qualityPage
+      ? (zh ? 'MMLU-Pro · 同题质量回归' : 'MMLU-Pro · Matched quality regression')
+      : (zh ? 'MMLU-Pro · 服务性能摘要' : 'MMLU-Pro · Serving performance summary');
     if (!data || !reportData) {
       section.innerHTML = `<h2>${title}</h2><p>${failed
         ? (zh ? '实测摘要加载失败。' : 'Measurement summary unavailable.')
@@ -59,20 +62,21 @@
     const cards = data.results.map(result => {
       const metric = data.metrics.find(item => item.id === result.metric_id);
       return `<article class="result-metric" data-metric="${escape(result.metric_id)}"><h3>${escape(labels[result.metric_id] || result.metric_id)} <small>${escape(metric?.unit || '')}</small></h3>
-        <div class="result-pair"><div><span>B1 · 0.28.1/0.25.1rc2</span><strong>${linkedNumber(result.value, result.selected_candidate_id)}</strong></div></div>
-        <small class="result-candidate">${escape(result.selected_candidate_id || '')}</small></article>`;
+        <div class="result-candidate">${escape(result.selected_candidate_id || '')}</div>
+        <div class="result-pair"><div><span>B1 · 0.28.1/0.25.1rc2</span><strong>${linkedNumber(result.value, result.selected_candidate_id)}</strong></div></div></article>`;
     }).join('');
     const expanded = section.querySelector('#current-configuration')?.open;
+    const relatedExpanded = section.querySelector('#result-related-evidence')?.open;
     const quality = reportData.current_summary.quality;
     const reference = reportData.current_summary.reference;
     const eta = reference.B1.eta_percent.toFixed(4);
     const qualityUrl = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${reportData.source_commit}/${quality.evidence_path}`;
-    section.innerHTML = `<div class="result-heading"><div><span class="result-eyebrow">${zh ? '当前工况 · 固定基线与最优配置' : 'CURRENT WORKLOAD · FIXED BASELINE & BEST CONFIGURATION'}</span><h1>${title}</h1></div><span class="result-date">${escape(reportData.version)}</span></div>
+    section.innerHTML = `<div class="result-heading"><div><span class="result-eyebrow">${zh ? '中期报告摘要 · 固定基线与按指标最优配置' : 'MIDTERM SUMMARY · FIXED BASELINE & METRIC-SPECIFIC BEST CONFIGURATIONS'}</span><h1>${title}</h1></div><span class="result-date">${escape(reportData.version)}</span></div>
       <p class="result-context">${escape(data.scenario.model)} · ${escape(data.scenario.precision)} · TP2 · ${data.scenario.num_prompts} ${zh ? '请求' : 'requests'} · out${data.scenario.output_length} · ${escape(data.scenario.hardware)}</p>
       <p class="result-boundary">${zh ? 'B0 固定：vLLM 0.18 / vLLM-Ascend 0.18。B1 基座版本不限，本页已测优化配置使用 0.28.1 / 0.25.1rc2 开发栈。' : 'B0 is fixed: vLLM 0.18 / vLLM-Ascend 0.18. B1 has no base-version restriction; the measured optimizations here use the 0.28.1 / 0.25.1rc2 development stack.'}</p>
       <div class="result-quality"><strong>${zh ? '同题质量 · out8192' : 'Matched quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b0.correct}/${quality.b0.total}</a></span><span>${zh ? 'B1 · 当前纠正组合' : 'B1 · corrected combination'}: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b1.candidate_correct}/${quality.b0.total}</a></span><small>${zh ? '固定200题子集；不代表全集或统计非劣' : 'Fixed 200-task subset; not full-corpus quality or statistical noninferiority'}</small></div>
       <p class="result-reference"><a href="#midterm-m01-verdict">${zh ? `M01 · B1 η=${eta}%，达到90%` : `M01 · B1 eta=${eta}%, meets 90%`}</a><br><small>${zh ? '指定工况的独立整链实测参考；共享实现代码，不是芯片标称峰值利用率。' : 'Independent whole-chain measured reference in this workload; shared implementation, not utilization of nominal chip peak.'}</small></p>
-      <p class="result-comparison-note">${zh ? '服务性能 · out256：以下为各指标的 B1 实测值。本工况尚无固定 B0 配对，不计算收益。' : 'Serving performance · out256: measured B1 values per metric. No matched fixed B0 for this workload; gain not calculated.'}</p>
+      <p class="result-comparison-note">${zh ? '服务性能 · out256：各指标分别选优，并非同一部署。本工况尚无固定 B0 性能配对，不计算收益。' : 'Serving performance · out256: metric-specific best configurations, not one deployment. No matched fixed B0 performance pair for this workload; gain not calculated.'}</p>
       <div class="result-metrics">${cards}</div>
       <p class="result-selection">${zh ? 'B1 按指标选择当前已实测最优方案；三项不代表同一部署。性能改善不等于质量或 M01 验收通过。' : 'B1 is the best measured solution per metric, not one deployment achieving all three. Performance gains do not establish quality or M01 acceptance.'}</p>
       <nav class="result-next" aria-label="${zh ? '结论与验证进展' : 'Conclusions and validation progress'}">
@@ -90,6 +94,29 @@
       <details><summary>${zh ? '同工况候选吞吐对比' : 'Same-workload candidate throughput'} (token/s)</summary><ul class="measurement-bars">${bars}</ul></details>
       <p>${zh ? '200 请求、out256 服务性能；不代表完整数据集准确率。有效算力核算进展见报告，不计作新增性能点。' : '200-request out256 serving performance, not full-dataset accuracy. Effective-compute accounting is documented in the report, not counted as new performance points.'}</p>
       <p><a href="${matrixPath}">${zh ? '查看配对矩阵与候选证据' : 'Paired matrix and candidate evidence'}</a> · <a href="${dataPath}">${zh ? '原始数据' : 'Source data'}</a>${safeReport ? ` · <a href="${escape(report)}">${zh ? '中文测试报告' : 'Chinese test report'}</a>` : ''}</p></details>`;
+    // Keep the two entry pages task-specific without dropping evidence or anchors.
+    const related = document.createElement('details');
+    related.id = 'result-related-evidence';
+    related.open = Boolean(relatedExpanded);
+    related.innerHTML = `<summary>${qualityPage
+      ? (zh ? '服务性能、M01 与其他验证进展' : 'Serving performance, M01 & other validation')
+      : (zh ? 'M01 与其他验证进展' : 'M01 & other validation')}</summary>`;
+    const secondary = qualityPage
+      ? ['.result-reference', '.result-comparison-note', '.result-metrics', '.result-selection', '.result-next']
+      : ['.result-reference', '.result-next'];
+    secondary.forEach(selector => related.append(section.querySelector(selector)));
+    section.querySelector('#current-configuration').before(related);
+    if (qualityPage) {
+      section.classList.add('quality-summary');
+      section.querySelector('.result-context').textContent = `${data.scenario.model} · ${data.scenario.precision} · TP2 · 200 ${zh ? '题固定子集' : 'fixed tasks'} · out8192`;
+    } else {
+      const boundary = document.createElement('p');
+      boundary.className = 'result-chart-boundary';
+      boundary.textContent = zh
+        ? '下方为其他工况的性能曲线，使用各自的模型、输入与运行配置；不与本摘要拼接比较。请以曲线的工况选择器和合同为准。'
+        : 'The curves below cover other workloads with their own models, inputs and runtime configurations. Do not combine them with this summary; use each chart’s workload selector and contract.';
+      section.append(boundary);
+    }
     section.dataset.loaded = 'true';
   }
   window.addEventListener('vllm-hust:langchange', render);

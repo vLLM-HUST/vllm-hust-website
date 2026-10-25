@@ -1,30 +1,22 @@
+"""Public promotion is paused; experiment evidence is deliberately preserved."""
+
+import json
 from pathlib import Path
-from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-class Page(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.ids = []
-
-    def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        if "id" in attrs:
-            self.ids.append(attrs["id"])
+def test_gennova_is_not_a_public_page_or_navigation_target():
+    assert not (ROOT / "gennova.html").exists()
+    for page in [*ROOT.glob("*.html"), ROOT / "assets/site.js"]:
+        text = page.read_text()
+        assert "./gennova.html" not in text, page
+        assert "navGenNova" not in text, page
+        assert 'id="independent-engines"' not in text, page
 
 
-def test_standalone_page_and_discoverable_entrances():
-    html = (ROOT / "gennova.html").read_text()
-    parser = Page()
-    parser.feed(html)
-    assert len(parser.ids) == len(set(parser.ids))
-    assert {"validation", "evidence", "gn-status", "gn-metrics"} <= set(parser.ids)
-    assert "独立推理引擎" in html
-    assert "不构成超过当前 B1" in html
-    assert "完整 MMLU-Pro 准确率" in html
-    for page in ("index.html", "plugins.html", "assets/site.js"):
-        assert "./gennova.html" in (ROOT / page).read_text()
-    assert 'data-page="gennova"' in html
-    assert "data-plugin-id" not in html
+def test_withdrawal_preserves_benchmark_evidence():
+    data = json.loads((ROOT / "data/gennova-validation-v1.json").read_text())
+    assert data["kind"] == "independent-engine"
+    assert data["b1_replacement_approved"] is False
+    assert data["metrics"]["output_tokens_per_second"] > 0
