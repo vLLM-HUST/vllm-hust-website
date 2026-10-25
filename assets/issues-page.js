@@ -93,6 +93,10 @@
         setText('issue-stat-prs', String(openPrs));
         setText('issue-stat-blocked', String(blocked));
         setText('issue-stat-draft', String(draft));
+        const total = (data.issues || []).length;
+        setText('issues-snapshot-summary', lang === 'zh'
+            ? `本档案保留 ${total} 条精选记录，其中 ${issues.length} 条在快照时开放；不是项目当前任务总览。`
+            : `This archive preserves ${total} selected records, ${issues.length} open at the snapshot date; it is not a current project task overview.`);
     }
 
     function statusBadgeClass(status) {

@@ -726,6 +726,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       );
       button.type = "button";
       button.dataset.phase = phaseId;
+      button.disabled = !isAll && count === 0 && selectedPhase !== phaseId;
       button.setAttribute("aria-pressed", String(selectedPhase === phaseId));
       button.append(
         element("span", "", isAll ? copy().allPhases : taxonomyLabel("phases", phaseId)),
@@ -757,6 +758,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       );
       button.type = "button";
       button.dataset.scenario = traitId;
+      button.disabled = !isAll && count === 0 && selectedScenario !== traitId;
       button.setAttribute("aria-pressed", String(selectedScenario === traitId));
       button.append(
         element("span", "", isAll ? copy().allScenarios : traitLabel(traitId)),
@@ -1159,7 +1161,6 @@ vllm-hust-ext extension check ${extensionId}`
     const summary = local(item, "catalog_project_summary") || local(item, "summary");
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", summary));
     const projectComponents = projectComponentsPanel(projectItems);
-    if (projectComponents) card.append(projectComponents);
     const phases = phaseTags(item);
     if (phases) card.append(phases);
     const scenarios = scenarioTags(item);
@@ -1169,14 +1170,17 @@ vllm-hust-ext extension check ${extensionId}`
     }
     const community = communityPanel(item)
       || document.getElementById(`community-${item.id}`)?.content.firstElementChild.cloneNode(true);
-    if (community) card.append(community);
     const compatibility = compatibilityPanel(item);
-    if (compatibility) card.append(compatibility);
+    // Keep status visible; full runtime identities and requirements remain expandable.
+    if (compatibility) card.append(compatibility.querySelector('.plugin-compatibility-head').cloneNode(true));
     const installState = installationStatus(item);
     if (installState) card.append(installState);
     const details = element("details", "plugin-technical-details");
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
+    if (projectComponents) detailBody.append(projectComponents);
+    if (community) detailBody.append(community);
+    if (compatibility) detailBody.append(compatibility);
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) detailBody.append(publicEffect);
     const compatibilityDetailsBlock = compatibilityDetails(item);
@@ -1361,6 +1365,8 @@ vllm-hust-ext extension check ${extensionId}`
         : selectedType
     }));
 
+    const expandedCards = new Set([...catalog.querySelectorAll('.plugin-card')]
+      .filter(card => card.querySelector('.plugin-technical-details')?.open).map(card => card.id));
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
     catalog.replaceChildren();
     const appendGroup = (title, items, kind) => {
@@ -1379,7 +1385,11 @@ vllm-hust-ext extension check ${extensionId}`
       const section = element("section", `plugin-category plugin-category-${kind}`);
       section.append(element("h2", "plugin-category-title", title));
       const grid = element("div", "plugin-grid workshop-grid");
-      items.forEach((project) => grid.append(renderCard(project.primary, project.items)));
+      items.forEach((project) => {
+        const card = renderCard(project.primary, project.items);
+        card.querySelector('.plugin-technical-details').open = expandedCards.has(card.id);
+        grid.append(card);
+      });
       section.append(grid);
       catalog.append(section);
     };
@@ -1395,6 +1405,13 @@ vllm-hust-ext extension check ${extensionId}`
       appendGroup(title, visible.filter((project) => project.kind === kind), kind);
     });
     status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
+    const activeCount = window.EcosystemCatalog.summarize(registry, {schema_version: 'mod-taxonomy/v2', components: modTaxonomy}).total;
+    const extraCount = catalogProjects().length - activeCount;
+    const scope = element('p', 'plugin-catalog-scope', language() === 'zh'
+      ? `目录共 ${catalogProjects().length} 个项目：${activeCount} 个公开 MOD（与首页一致），另有 ${extraCount} 个外部系统或退役项目。`
+      : `${catalogProjects().length} catalog projects: ${activeCount} public MODs (as on the homepage), plus ${extraCount} external or retired projects.`);
+    document.querySelector('.plugin-catalog-scope')?.remove();
+    status.after(scope);
     if (more) {
       more.hidden = true;
     }
