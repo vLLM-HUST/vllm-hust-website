@@ -156,14 +156,16 @@ def main():
                         page.goto(f"{args.url}/{filename}#midterm-m01-verdict")
                         expect(page.locator("#midterm-m01-verdict")).to_be_visible()
                         verdict = page.locator("#midterm-m01-verdict")
-                        expect(verdict).to_contain_text("84.9705%")
+                        expect(verdict).to_contain_text("99.9397%")
+                        expect(verdict).to_contain_text("54.0301%")
+                        expect(verdict).to_contain_text("7.1085")
                         expect(verdict).to_contain_text(
-                            "C提升不是参考达成率"
+                            "不是理论峰值"
                             if lang == "zh"
-                            else "Compute gain is not reference attainment"
+                            else "not theoretical peak"
                         )
                         expect(verdict).to_contain_text("7.1042")
-                        expect(verdict).to_contain_text("1812905151088034")
+                        expect(verdict).to_contain_text("127.5166")
                         expect(verdict).not_to_contain_text("30.2443")
                         expect(page.locator("#midterm-m01-historical")).to_contain_text(
                             "30.2443%–30.2505%"
