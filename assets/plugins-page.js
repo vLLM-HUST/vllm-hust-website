@@ -1365,6 +1365,8 @@ vllm-hust-ext extension check ${extensionId}`
         : selectedType
     }));
 
+    const expandedCards = new Set([...catalog.querySelectorAll('.plugin-card')]
+      .filter(card => card.querySelector('.plugin-technical-details')?.open).map(card => card.id));
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
     catalog.replaceChildren();
     const appendGroup = (title, items, kind) => {
@@ -1383,7 +1385,11 @@ vllm-hust-ext extension check ${extensionId}`
       const section = element("section", `plugin-category plugin-category-${kind}`);
       section.append(element("h2", "plugin-category-title", title));
       const grid = element("div", "plugin-grid workshop-grid");
-      items.forEach((project) => grid.append(renderCard(project.primary, project.items)));
+      items.forEach((project) => {
+        const card = renderCard(project.primary, project.items);
+        card.querySelector('.plugin-technical-details').open = expandedCards.has(card.id);
+        grid.append(card);
+      });
       section.append(grid);
       catalog.append(section);
     };
