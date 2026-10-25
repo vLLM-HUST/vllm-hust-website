@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v080.json")
+        response = context.request.get(f"{args.url}/data/midterm-v081.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.80"
+        assert report["version"] == "V0.81"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v080.json"
+            if f["website_path"] == "data/midterm-v081.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v080-quality-20261025",
+                        "./assets/midterm-report.js?v=midterm-v081-quality-20261025",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.80", timeout=30000
+                        "data-loaded", "V0.81", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -171,13 +171,7 @@ def main():
                                 assert href.endswith(quote(path)), (row, href, path)
                         if ident == "m01-verdict":
                             for table_index in range(section.locator("table").count()):
-                                suffix = (
-                                    "official018-paired-compute-20261024/summary.json"
-                                    if table_index == 0
-                                    else "storage-reference-supplement-20261024/summary.json"
-                                    if lang == "zh" and table_index == 2
-                                    else "storage-reference-closed-20261024/summary.json"
-                                )
+                                suffix = "wholechain-reference-20261025/summary.json"
                                 table_links = (
                                     section.locator("table")
                                     .nth(table_index)
@@ -300,7 +294,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.80"
+                        "V0.81"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -392,31 +386,24 @@ def main():
                             "href", "#midterm-m01-verdict"
                         )
                     expect(verdict.locator(".midterm-history-notice")).to_have_count(0)
-                    expect(verdict.locator("table")).to_have_count(
-                        4 if lang == "zh" else 2
-                    )
+                    expect(verdict.locator("table")).to_have_count(1)
                     expect(
                         verdict.locator("table").nth(0).locator("tbody tr")
-                    ).to_have_count(6)
-                    expect(
-                        verdict.locator("table").nth(1).locator("tbody tr")
-                    ).to_have_count(4 if lang == "zh" else 3)
+                    ).to_have_count(2)
                     expect(verdict).to_contain_text("3.8407")
-                    expect(verdict).to_contain_text("84.9705%")
+                    expect(verdict).to_contain_text("99.9397%")
                     expect(verdict).to_contain_text("7.1042")
-                    expect(verdict).to_contain_text("1829161955258989")
-                    expect(verdict).to_contain_text("37.2302")
+                    expect(verdict).to_contain_text("7.1085")
+                    expect(verdict).to_contain_text("54.0301%")
                     expect(verdict).to_contain_text(
-                        "C提升不是参考达成率"
-                        if lang == "zh"
-                        else "Compute gain is not reference attainment"
+                        "不是理论峰值" if lang == "zh" else "not theoretical peak"
                     )
-                    expect(verdict).to_contain_text("1812905151088034")
-                    expect(verdict).to_contain_text("127.59352582134306")
+                    expect(verdict).to_contain_text("127.5166")
+                    expect(verdict).to_contain_text("128.6601")
                     expect(verdict).to_contain_text(
-                        "不是严格无插桩"
+                        "未扣除计量开销"
                         if lang == "zh"
-                        else "not strictly uninstrumented"
+                        else "Accounting overhead remains"
                     )
                     expect(verdict).not_to_contain_text(
                         "当前F、T、T参、C和η均未核验齐备"
@@ -425,9 +412,9 @@ def main():
                     corrected = page.locator("#midterm-corrected-quality")
                     for value in ("156/200", "143/200", "151/200"):
                         expect(corrected).to_contain_text(value)
-                    expect(corrected).to_contain_text("failed")
+                    expect(corrected).to_contain_text("143/200")
                     expect(corrected).to_contain_text(
-                        "尚未完成" if lang == "zh" else "remain incomplete"
+                        "达到90%" if lang == "zh" else "meets 90%"
                     )
                     historical = page.locator("#midterm-m01-historical")
                     expect(historical).to_contain_text("30.2443%–30.2505%")
@@ -557,7 +544,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v080.json",
+            "**/data/midterm-v081.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
