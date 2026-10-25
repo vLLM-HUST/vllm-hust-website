@@ -1498,7 +1498,7 @@ def test_graduation_followups_and_external_advisors_are_visible() -> None:
         for item in REGISTRY["components"]
         if item.get("compatibility", {}).get("followup_url")
     ]
-    assert len(followups) == 13
+    assert len(followups) == 14
     assert all(url.startswith("https://github.com/vLLM-HUST/") for url in followups)
     assert "profile.followup_url" in SCRIPT
     assert "plugin-compatibility-followup" in SCRIPT
@@ -1734,7 +1734,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 40
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 41
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE

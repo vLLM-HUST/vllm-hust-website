@@ -1222,8 +1222,8 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     html_text = (root / "index.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
-    assert "39 public MODs across 8 lifecycle phases" in html_text
-    assert "39 个公开 MOD，覆盖 8 个推理生命周期阶段" in html_text
+    assert "40 public MODs across 8 lifecycle phases" in html_text
+    assert "40 个公开 MOD，覆盖 8 个推理生命周期阶段" in html_text
     assert "Domestic-compute inference engine" in site_js
     assert "面向国产算力的推理引擎" in site_js
     assert 'class="plugin-path"' in html_text

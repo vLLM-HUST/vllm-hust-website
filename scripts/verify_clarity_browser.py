@@ -7,6 +7,51 @@ from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
 
+def verify_muxpd_links(page, output, stem):
+    """Check real hit targets without navigating or hiding neighboring cards."""
+    card = page.locator("#muxpd")
+    details = card.locator("details.plugin-technical-details")
+    details.locator("summary").click()
+    trigger = card.locator(".plugin-launch-icon")
+    trigger.click()
+    tooltip = page.locator("#plugin-launch-muxpd")
+    expect(tooltip).to_be_visible()
+    before = page.url
+    results = []
+    base = "https://github.com/vLLM-HUST/vllm-ascend-MuxPD-hust"
+    paths = (
+        "/blob/v0.2.0a1/docs/ecpa-deployment.md",
+        "/releases/tag/v0.2.0a1",
+        "/issues/23",
+    )
+    for phase in ("normal", "after-card-screenshot"):
+        if phase == "after-card-screenshot":
+            card.screenshot(path=str(output / f"muxpd-card-{stem}.png"))
+        for suffix in paths:
+            link = tooltip.locator(f'a[href="{base + suffix}"]')
+            expect(link).to_have_count(1)
+            link.scroll_into_view_if_needed()
+            link.click(trial=True, timeout=5000)
+            hit = link.evaluate("""el => {
+                const r = el.getBoundingClientRect();
+                const target = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                return {matches: target?.closest('a') === el, rect: r.toJSON()};
+            }""")
+            assert hit["matches"], (phase, suffix, hit)
+            results.append(
+                {"phase": phase, "href": base + suffix, "trial_click": True, **hit}
+            )
+    assert page.url == before, "Trial clicks must not navigate"
+    geometry = tooltip.evaluate("""el => {
+        const s = getComputedStyle(el), r = el.getBoundingClientRect();
+        return {height: r.height, viewport: innerHeight, overflow: s.overflowY};
+    }""")
+    assert geometry["height"] <= geometry["viewport"] * 0.7 + 2, geometry
+    assert geometry["overflow"] == "auto", geometry
+    page.screenshot(path=str(output / f"muxpd-links-{stem}.png"))
+    return {"links": results, "geometry": geometry, "external_navigation": False}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
@@ -50,6 +95,7 @@ def main():
                             f"{args.url}/{name}.html", wait_until="domcontentloaded"
                         )
                         selectors = []
+                        muxpd_links = None
                         if name in ("dataset-validation", "leaderboard-runs"):
                             expect(page.locator("#current-workload")).to_have_attribute(
                                 "data-loaded", "true"
@@ -94,10 +140,10 @@ def main():
                             expect(page.locator(".plugin-card").first).to_be_visible()
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("39")
+                            ).to_contain_text("40")
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("43")
+                            ).to_contain_text("44")
                             expect(
                                 page.locator('[data-scenario="service_suspend_resume"]')
                             ).to_be_disabled()
@@ -123,6 +169,9 @@ def main():
                                     )
                                     == "static"
                                 )
+                            muxpd_links = verify_muxpd_links(
+                                page, args.output, f"{width}-{lang}-{scheme}"
+                            )
                         else:
                             selectors = ["#serving-plan-link"]
                         ratios = {
@@ -149,6 +198,7 @@ def main():
                                 "language": lang,
                                 "theme": scheme,
                                 "contrast": ratios,
+                                "muxpd_links": muxpd_links,
                             }
                         )
                         page.close()
