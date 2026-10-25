@@ -45,18 +45,18 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v082.json" in loader
+    assert "./data/midterm-v083.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v082.json" in hero
-    assert "report.version !== 'V0.82'" in hero
+    assert "./data/midterm-v083.json" in hero
+    assert "report.version !== 'V0.83'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v082-20261025"
+            "current-measurements.js?v=clarity-v083-20261025"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v082.json").read_text())
-    assert payload["version"] == "V0.82"
+    payload = json.loads((ROOT / "data/midterm-v083.json").read_text())
+    assert payload["version"] == "V0.83"
     pair = payload["frontierscience_designated_pair"]
     assert pair["quality_passed"] is None
     assert [pair["B0"][t]["successes"] for t in ("olympiad", "research")] == [66, 3]
@@ -96,7 +96,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v082-quality-20261025"
+            "./assets/midterm-report.js?v=midterm-v083-quality-20261025"
         ]
 
 
@@ -135,9 +135,12 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v082.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v083.json").read_text())
     method = data["m01_method"]
-    assert method["method_version"] == "V1.5"
+    assert method["method_version"] == "wholechain-20261025"
+    assert method == data["milestone_contract"]["method"]
+    assert method["identity"]["formal_indicator_amendment"] is False
+    assert method["identity"]["original_v15"]["threshold_percent"] == 50
     assert method["current"]["passed"] is True
     supplement = data["reference_supplement"]
     assert supplement["totals"]["numerical_checks"] == 1402
@@ -168,10 +171,13 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
     assert pair["eta_percent"] == data["wholechain_reference"]["B1"]["eta_percent"]
     assert pair["attainment"] is True
     assert "not theoretical peak" in sections["m01-verdict"]["scope_en"]
-    assert "不是当前成本否决条件" in sections["resources"]["scope"]
-    assert "not a current cost veto" in sections["resources"]["scope_en"]
+    assert "不构成固定0.18/0.18 B0的M06货币成本通过" in sections["resources"]["scope"]
+    assert "not M06 monetary-cost acceptance" in sections["resources"]["scope_en"]
     assert sections["milestone-v15"]["tables_en"]
-    assert len(sections["milestone-v15"]["evidence"]) == 3
+    assert sections["milestone-v15"]["evidence"][0]["path"].endswith(
+        "/current-method.json"
+    )
+    assert sections["milestone-v15"]["tables"][0]["headers"][1] == "依据及本轮方法"
     review = sections["v15-remaining"]
     assert len(review["tables"][0]["rows"]) == 5
     assert len(review["tables_en"][0]["rows"]) == 5
