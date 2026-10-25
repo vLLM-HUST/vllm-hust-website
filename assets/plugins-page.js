@@ -378,6 +378,8 @@
       limitation_en: "Numerical repeatability limitation (Issue #23) →",
       limitation_zh: "数值重复性限制（Issue #23）→",
       command: String.raw`# Download and verify both wheels using the linked release notes first.
+# In the existing qualified Ascend environment, install only these utility dependencies.
+python -m pip install 'packaging>=24' 'greenlet>=3.1,<4' 'cryptography>=3.4' 'jcs==0.2.1' 'platformdirs>=4'
 python -m pip install --no-deps /path/to/vllm_hust_ext-0.3.1.dev1-py3-none-any.whl
 python -m pip install --no-deps /path/to/vllm_ascend_muxpd-0.2.0a1-py3-none-any.whl
 export VLLM_HUST_EXT_CONFIG="$PWD/muxpd-state/config.json"

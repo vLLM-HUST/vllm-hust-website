@@ -35,6 +35,17 @@ def test_muxpd_uses_explicit_wheels_and_the_release_build_guide():
     assert "wheel checksums" in entry["note_en"]
     command = entry["command"]
     assert command.count("python -m pip install --no-deps ") == 2
+    dependencies = (
+        "python -m pip install 'packaging>=24' 'greenlet>=3.1,<4' "
+        "'cryptography>=3.4' 'jcs==0.2.1' 'platformdirs>=4'"
+    )
+    assert command.index(dependencies) < command.index(
+        "python -m pip install --no-deps "
+    )
+    assert "existing qualified Ascend environment" in command
+    assert all(
+        "torch" not in line for line in command.splitlines() if "pip install" in line
+    )
     assert "/path/to/vllm_hust_ext-0.3.1.dev1-py3-none-any.whl" in command
     assert "/path/to/vllm_ascend_muxpd-0.2.0a1-py3-none-any.whl" in command
     assert "@main" not in command and "git+" not in command
