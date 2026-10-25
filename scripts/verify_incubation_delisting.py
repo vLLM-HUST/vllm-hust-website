@@ -63,7 +63,9 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     search.fill("Unified Communication")
                     unified = page.locator("#unified-communication-migration")
                     unified.wait_for(state="visible")
-                    unified.locator("details > summary").first.click()
+                    details = unified.locator(".plugin-technical-details")
+                    if not details.evaluate("e => e.open"):
+                        details.locator("summary").click()
                     assert unified.count() == 1
                     assert (
                         unified.locator(
