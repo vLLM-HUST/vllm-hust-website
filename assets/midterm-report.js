@@ -39,7 +39,10 @@
             const inventory = data.sections.find(s => s.id === 'dataset-quality-inventory').evidence;
             return [inventory[11], inventory[0], section.evidence[0], inventory[9], section.evidence[0]];
         }
-        if (section.id === 'milestone-v15') return [section.evidence[0], section.evidence[2], section.evidence[1], section.evidence[0]];
+        if (section.id === 'milestone-v15') {
+            const bySuffix = suffix => section.evidence.find(source => source.path.endsWith(suffix));
+            return [bySuffix('/current-method.json'), bySuffix('c16-baseline018-reuse-20261022/manifest.json'), bySuffix('/project4-v1.5.txt'), bySuffix('/project4-v1.5.txt')];
+        }
         if (section.id === 'candidates') return section.evidence;
         if (section.id === 'dataset-quality-inventory') {
             const indices = [[0, 0, 1, 1], [2, 4, 3, 3, 5, 5], [4, 4, 4, 4], [7, 8, 6, 6], [9, 9], [11, 11, 11, 11]];
@@ -69,25 +72,32 @@
             <aside id="midterm-kv-audit" class="midterm-audit"><h3>${zh ? 'KV 结果：跨轮状态复用核查未闭合' : 'KV results: cross-run state reuse review remains open'}</h3>
             <p>${escape(!zh && data.kv_audit.scope_en ? data.kv_audit.scope_en : data.kv_audit.scope)}</p>
             ${table({ headers: ['运行', '请求 / 独立盐', '前缀命中日志数', '最大已记录命中率'], rows: data.kv_audit.runs.map(r => [r.run_id, `${r.requests} / ${r.unique_salts}`, r.prefix_hit_samples, `${r.max_logged_prefix_hit_percent}%`]) }, data.sections.find(s => s.id === 'candidates').evidence.slice(4, 6))}</aside>
-            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${historicalM01.has(s.id) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前 V1.5 结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current V1.5 assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：独立整链参考验收' : 'Current M01: independent whole-chain assessment'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
+            ${data.sections.map(s => `<section id="midterm-${escape(s.id)}"><h3>${escape(s.title.split(' / ')[zh ? 0 : 1])}</h3>${(s.historical || historicalM01.has(s.id)) ? `<p class="midterm-history-notice">${zh ? '历史采集与方法验证记录；下文判定保留原记录时点，不代表当前整链参考结论。' : 'Historical acquisition and method-validation records; verdict wording below belongs to the original record, not the current wholechain assessment.'} <a href="#midterm-m01-verdict">${zh ? '当前 M01：独立整链参考验收' : 'Current M01: independent whole-chain assessment'}</a></p>` : ''}<p>${escape(!zh && s.scope_en ? s.scope_en : s.scope)}</p><p class="midterm-evidence">${zh ? '原始记录 / 校验索引' : 'Original records / checksum index'}: ${s.evidence.map(e => `<a href="${escape(sourceUrl(e))}">${escape(e.label)}</a>`).join(' · ')}</p>${(!zh && s.tables_en ? s.tables_en : s.tables).map((t, index) => table(t, rowSources(s, index))).join('')}<p class="midterm-caption">${escape(s.source_heading)} · <a href="${escape(data.report_url)}">${zh ? '报告证据与完整说明' : 'Evidence and full scope'}</a></p></section>`).join('')}`;
         panel.dataset.loaded = data.version;
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v082.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v083.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.82' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.83' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             const reference = value.wholechain_reference;
-            if (value.m01_method?.method_version !== 'V1.5' || !reference?.reference_qualified || !reference.all_frozen_applicability_checks_pass || !Number.isFinite(reference.reference_C_TFLOPS_per_chip) || reference.reference_C_TFLOPS_per_chip <= 0) throw Error('Invalid current M01 reference');
+            if (value.m01_method?.method_version !== 'wholechain-20261025' || !reference?.reference_qualified || !reference.all_frozen_applicability_checks_pass || !Number.isFinite(reference.reference_C_TFLOPS_per_chip) || reference.reference_C_TFLOPS_per_chip <= 0) throw Error('Invalid current M01 reference');
             for (const arm of ['B0', 'B1']) {
                 const result = reference[arm];
                 if (!result || !Number.isFinite(result.eta_percent) || result.eta_percent !== 100 * result.own_C / reference.reference_C_TFLOPS_per_chip || result.eta_target_met !== (result.eta_percent >= 90)) throw Error('Invalid paired M01 attainment');
             }
             if (value.m01_method.current?.efficiency_percent !== reference.B1.eta_percent || value.m01_method.current?.passed !== reference.B1.eta_target_met) throw Error('Inconsistent current M01 status');
+            const method = value.m01_method;
+            const nested = value.milestone_contract?.method;
+            if (!nested || nested.status !== method.status || nested.threshold_percent !== method.threshold_percent ||
+                nested.current?.efficiency_percent !== method.current?.efficiency_percent ||
+                nested.current?.passed !== method.current?.passed ||
+                method.identity?.formal_indicator_amendment !== false || method.threshold_percent !== 90)
+                throw Error('Inconsistent current method contract');
             for (const section of value.sections) {
                 if (!section.evidence?.length) throw Error('Missing original evidence');
                 for (const source of section.evidence) {
