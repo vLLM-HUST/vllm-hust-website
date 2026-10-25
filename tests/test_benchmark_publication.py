@@ -45,18 +45,23 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v081.json" in loader
+    assert "./data/midterm-v082.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v081.json" in hero
-    assert "report.version !== 'V0.81'" in hero
+    assert "./data/midterm-v082.json" in hero
+    assert "report.version !== 'V0.82'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v081-20261025"
+            "current-measurements.js?v=clarity-v082-20261025"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v081.json").read_text())
-    assert payload["version"] == "V0.81"
+    payload = json.loads((ROOT / "data/midterm-v082.json").read_text())
+    assert payload["version"] == "V0.82"
+    pair = payload["frontierscience_designated_pair"]
+    assert pair["quality_passed"] is None
+    assert [pair["B0"][t]["successes"] for t in ("olympiad", "research")] == [66, 3]
+    assert [pair["B1"][t]["successes"] for t in ("olympiad", "research")] == [62, 2]
+    assert "frontierscience-native018-paired-20261025" in loader
     assert (
         payload["corrected_quality"]["reference"]["eta_percent"]
         == payload["wholechain_reference"]["B1"]["eta_percent"]
@@ -91,7 +96,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v081-quality-20261025"
+            "./assets/midterm-report.js?v=midterm-v082-quality-20261025"
         ]
 
 
@@ -130,7 +135,7 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v081.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v082.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "V1.5"
     assert method["current"]["passed"] is True
