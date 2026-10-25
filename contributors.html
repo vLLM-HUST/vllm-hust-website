@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901-public-pages-20261024" />
 </head>
 
@@ -97,7 +97,7 @@
           </ul>
         </div>
 
-        <details class="research-members-menu">
+        <details class="research-members-menu" open>
           <summary>
             <span>
               <strong id="contributors-members-menu-title">Contributor profiles</strong>
@@ -199,11 +199,12 @@
     </div>
   </main>
 
-  <footer class="site-footer"><strong>vllm-hust</strong> · Contributors across the project repositories.</footer>
+  <footer class="site-footer"><strong>vllm-hust</strong> · <span id="contributors-footer-copy">Contributors across the project repositories.</span></footer>
 
   <script>
     window.vllmHustPageDict = {
       en: {
+        'contributors-footer-copy': 'Contributors across the project repositories.',
         title: 'Core Contributors - vllm-hust',
         'contributors-eyebrow': 'People',
         'contributors-title': 'Core Contributors',
@@ -241,6 +242,7 @@
         'contributors-core-description': 'Verified code contributions remain distinct from assigned MOD ownership; the complete 19-MOD catalog records maintainers, guidance, compatibility, and evidence separately.'
       },
       zh: {
+        'contributors-footer-copy': '项目各仓库的贡献成员。',
         title: '核心贡献成员 - vllm-hust',
         'contributors-eyebrow': '成员',
         'contributors-title': '核心贡献成员',
@@ -279,7 +281,7 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=gennova-20261023-public-pages-20261024"></script>
+  <script src="./assets/site.js?v=site-clarity-20261025"></script>
   <script src="./assets/contributors-page.js?v=member-interests-20260728-github-status-external-guidance-20260901-public-members-20260927"></script>
 </body>
 

@@ -334,6 +334,7 @@ def main():
         assert tool_section.locator(".plugin-performance").count() == 0
         research = tool_section.locator("#state-scheduler")
         assert research.count() == 1
+        research.locator(".plugin-technical-details > summary").click()
         assert "M0" in research.inner_text()
         research.locator(".plugin-launch-icon").click()
         research_tooltip = research.locator(".plugin-launch-tooltip")

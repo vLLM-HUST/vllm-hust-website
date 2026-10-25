@@ -2327,3 +2327,45 @@ h1 {
         white-space: normal;
     }
 }
+
+/* One shared masthead; project pages retain their own content palettes. */
+body[data-page] .site-nav.site-nav--shared {
+    position: sticky; top: 0; background: #0c1112; color: #d7e0df;
+    border-bottom: 1px solid #2b3838; backdrop-filter: none;
+}
+body[data-page] .site-nav--shared .site-nav-inner {
+    width: min(1440px, calc(100% - 8vw)); min-height: 72px; padding-right: 0;
+}
+body[data-page] .site-nav--shared .brand-mark {
+    width: 34px; height: 34px; border: 0; border-radius: 4px;
+    color: #0c1112; background: #f0b341; box-shadow: none;
+}
+body[data-page] .site-nav--shared .brand-mark img { display: none; }
+body[data-page] .site-nav--shared .brand-copy { color: #fff; }
+body[data-page] .site-nav--shared .brand-copy small { color: #aebdbc; font-size: 11px; }
+body[data-page] .site-nav--shared .nav-links {
+    gap: 2px; padding: 0; border: 0; border-radius: 0;
+    background: transparent; box-shadow: none; backdrop-filter: none;
+}
+body[data-page] .site-nav--shared :is(.nav-link, .nav-group-label) {
+    color: #d7e0df; min-height: 40px; padding: 0 12px; font-size: 12px;
+}
+body[data-page] .site-nav--shared .nav-link { border: 0; border-radius: 0; }
+body[data-page] .site-nav--shared .nav-group-label { border-radius: 9px; }
+body[data-page] .site-nav--shared :is(.nav-link:hover, .nav-link.active, .nav-group.active > .nav-group-label) { color: #f0b341; }
+body[data-page] .site-nav--shared :is(.nav-group-menu, .nav-toggle) { background: #0c1112; color: #d7e0df; }
+body[data-page] .site-nav--shared .lang-toggle {
+    position: static; margin: 0; min-width: 58px; min-height: 34px; padding: 6px 9px;
+    border: 1px solid #ffffff57; border-radius: 4px; color: #fff; background: #0c1112; box-shadow: none;
+}
+.workload-filter:disabled { opacity: .5; cursor: not-allowed; }
+.plugin-catalog-scope { font-size: 13px; line-height: 1.6; }
+.issue-snapshot-statistics { margin-top: 18px; }
+@media (max-width: 860px) {
+    body[data-page] .site-nav--shared .site-nav-inner { min-height: 64px; padding-right: 98px; }
+    body[data-page] .site-nav--shared .lang-toggle { position: absolute; top: 14px; right: 48px; }
+    body[data-page] .site-nav--shared.enhanced .nav-links { padding: 18px 16px; background: #0c1112; gap: 10px; }
+}
+@media (max-width: 680px) {
+    body[data-page] .site-nav--shared .site-nav-inner { width: calc(100% - 24px); }
+}

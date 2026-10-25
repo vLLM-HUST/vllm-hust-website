@@ -1,6 +1,23 @@
 // Translate presentation only. Source notes and exported evidence keep their identity.
 export const isZh = () => window.vllmHustSite?.getCurrentLang() === "zh";
 export const t = (zh, en) => isZh() ? zh : en;
+// Exact source-text keys prevent a new price condition inheriting an old translation.
+export const sourceTranslations = new Map([
+  ['C44 吞吐方案', 'C44 throughput configuration'],
+  ['DeepSeek-V4.1-Flash（V4-0731 方案参考定价）', 'DeepSeek-V4.1-Flash (reference pricing for V4-0731)'],
+  ['华北2（北京）', 'China North 2 (Beijing)'],
+  ['中国公开刊例价', 'Published China list prices'],
+  ['空闲时段公开价；高峰时段为两倍', 'Published off-peak prices; peak-period prices are twice as high'],
+  ['百炼该模型不支持上下文缓存折扣；命中与新增输入均按普通输入价计。', 'Model Studio offers no context-cache discount for this model; cached and new input both use the standard input price.'],
+  ['采用隐式缓存命中价；将实测命中输入映射为参考 API 的可计费命中量是情景假设，不保证云端相同命中率。未使用显式缓存价格。', 'Uses implicit-cache hit pricing, not explicit-cache pricing. Mapping measured cached input to billable API cache hits is a scenario assumption; the same cloud cache-hit rate is not guaranteed.'],
+  ['采用现行 V4.1 Flash 空闲时段报价作为 V4-0731 部署方案的参考售价，可自行调整；不是同一 checkpoint 的官方报价。', 'Uses the recorded V4.1 Flash off-peak quote as an adjustable reference for the V4-0731 deployment; it is not an official quote for the same checkpoint.'],
+  ['采用官方缓存命中价作参考；实测硬件缓存量映射到API计费量是情景假设，不保证云端相同命中率。', 'Uses the official cache-hit price as a reference. Mapping measured hardware cache volume to API billing is a scenario assumption; the same cloud cache-hit rate is not guaranteed.'],
+  ['公开原价，输入≤128K，不含活动折扣；并非效果、吞吐或延迟等价承诺。', 'Published list price for input up to 128K, excluding promotions; no promise of equivalent quality, throughput or latency.'],
+  ['北京公开原价，不含优惠或合同折扣；非云端体验或质量承诺。', 'Published Beijing list price, excluding promotional or contract discounts; no promise of cloud experience or quality.'],
+  ['参考定价，不代表模型质量或云端性能等价。', 'Reference pricing does not establish equivalent model quality or cloud performance.'],
+  ['参考API价格，不含优惠或合同折扣；非质量或云端性能等价承诺。', 'Reference API prices exclude promotional or contract discounts; no promise of equivalent quality or cloud performance.'],
+]);
+export const sourceEnglish = value => sourceTranslations.get(value) || value || '';
 export const errorText = message => t(message, ({
   "展示时长必须大于零": "Display duration must be greater than zero",
   "利用率需为 0–100%，月份天数需为 1–366": "Utilization must be 0–100%; days per month must be 1–366",

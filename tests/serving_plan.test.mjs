@@ -12,6 +12,23 @@ const base = {
   days: 30,
   cost: null,
 };
+test('all displayed source conditions have English translations without changing evidence', async () => {
+  globalThis.document = { querySelectorAll: () => [] };
+  try {
+    const {sourceEnglish} = await import('../assets/serving-plan/i18n.mjs');
+    const data = JSON.parse(readFileSync(new URL('../data/serving-plans.json', import.meta.url)));
+    const fields = [
+      ...data.plans.map(p => p.name),
+      ...Object.values(data.priceReferences).flatMap(p => [p.model, p.region, p.cacheScope, p.scope]),
+    ].filter(Boolean);
+    for (const text of fields) {
+      assert.doesNotMatch(sourceEnglish(text), /[\u4e00-\u9fff]/u, text);
+    }
+    assert.equal(sourceEnglish('new unseen source condition'), 'new unseen source condition');
+  } finally {
+    delete globalThis.document;
+  }
+});
 test("measured per-card output is not divided by TP twice", () => {
   const r = calculate(base);
   assert.ok(Math.abs(r.value - 7.7806144) < 1e-8);

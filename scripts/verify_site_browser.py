@@ -111,6 +111,8 @@ def main():
                     page.locator("#langToggle").click()
                 elif name == "issues":
                     page.wait_for_selector("#issues-content", state="visible")
+                    assert not page.locator("#issue-stat-total").is_visible()
+                    page.locator(".issue-snapshot-statistics > summary").click()
                     assert page.locator("#issue-stat-total").inner_text() == "0"
                     assert page.locator("#issue-stat-prs").inner_text() == "0"
                     assert page.locator("#issue-list .issue-card").count() == 0
@@ -147,6 +149,10 @@ def main():
                     pegaflow = page.locator("#pegaflow-vllm-connectors")
                     pegaflow.wait_for(state="visible")
                     assert pegaflow.count() == 1
+                    assert not pegaflow.locator(".plugin-technical-details").evaluate(
+                        "e=>e.open"
+                    )
+                    pegaflow.locator(".plugin-technical-details > summary").click()
                     pegaflow_text = pegaflow.inner_text()
                     assert (
                         pegaflow.get_attribute("data-project-component-count") == "2"
@@ -160,6 +166,9 @@ def main():
                     assert "C1: -28.43%" in performance_link.get_attribute("title")
                     assert "C16: +27.79%" in performance_link.get_attribute("title")
                     page.locator("#langToggle").click()
+                    assert pegaflow.locator(".plugin-technical-details").evaluate(
+                        "e=>e.open"
+                    )
                     assert "项目组件" in pegaflow.inner_text()
                     assert "国产化适配" in pegaflow.inner_text()
                     assert "输出吞吐" in pegaflow.inner_text()
@@ -168,6 +177,7 @@ def main():
                     mooncake = page.locator("#mooncake-vllm-connectors")
                     mooncake.wait_for(state="visible")
                     assert mooncake.count() == 1
+                    mooncake.locator(".plugin-technical-details > summary").click()
                     assert "Mooncake HUST" in mooncake.inner_text()
                     assert "Mooncake vLLM Connectors" in mooncake.inner_text()
                     search.fill("")
