@@ -54,6 +54,11 @@ def main():
                         source = page.evaluate(
                             "async () => (await fetch('./data/dataset_validation_qwen35_mmlu_school028_inf_out256.json')).json()"
                         )
+                        related = page.locator("#result-related-evidence")
+                        assert not related.evaluate("e => e.open")
+                        if filename == "dataset-validation.html":
+                            expect(page.locator(".result-metrics")).to_be_hidden()
+                            related.locator("summary").click()
                         for metric in source["results"]:
                             card = page.locator(
                                 f'[data-metric="{metric["metric_id"]}"]'
@@ -91,6 +96,9 @@ def main():
                         expect(page.locator(".result-quality")).to_contain_text(
                             "156/200"
                         )
+                        if filename == "dataset-validation.html":
+                            related.locator("summary").click()
+                        page.evaluate("window.scrollTo(0,0)")
                         assert page.locator(".result-quality").evaluate(
                             "e => e.getBoundingClientRect().bottom < innerHeight"
                         ), "B0/B1 must be on the first screen"
@@ -116,6 +124,7 @@ def main():
                             page.locator("#current-configuration table")
                         ).to_be_visible()
                         page.locator("#langToggle").click()
+                        page.locator("#result-related-evidence > summary").click()
                         page.locator('a[href="#midterm-kv-audit"]').first.click()
                         expect(page.locator("#midterm-kv-audit")).to_be_visible()
                         assert page.locator("#report-details").evaluate("e => e.open")

@@ -18,7 +18,6 @@
             navIssues: 'Issues',
             navProducts: 'Products',
             navEngine: 'Engine',
-            navGenNova: 'GenNova · Independent engine',
             navProjects: 'Projects',
             navPlugins: 'Ecosystem',
             navPublications: 'Papers & news',
@@ -58,7 +57,6 @@
             navIssues: '议题',
             navProducts: '产品',
             navEngine: '引擎',
-            navGenNova: 'GenNova · 独立引擎',
             navProjects: '项目',
             navPlugins: '生态架构',
             navPublications: '论文与新闻',
@@ -172,10 +170,9 @@
         {
             id: 'engine',
             label: 'navEngine',
-            pages: ['gennova'],
+            pages: [],
             links: [
                 ['', './index.html#stack', 'navEngine'],
-                ['gennova', './gennova.html', 'navGenNova'],
             ],
         },
         {
@@ -232,6 +229,7 @@
 
     function renderNavigation() {
         const nav = document.querySelector('.site-nav');
+        nav?.classList.add('site-nav--shared');
         const inner = nav?.querySelector('.site-nav-inner');
         const links = nav?.querySelector('.nav-links');
         if (!nav || !inner || !links) return;

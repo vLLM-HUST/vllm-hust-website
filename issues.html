@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003" />
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025" />
   <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901-public-pages-20261024" />
 </head>
 
@@ -56,14 +56,15 @@
             <h2 id="issues-stats-title">Active items in this snapshot</h2>
           </div>
         </div>
-        <div class="metric-strip">
+        <p id="issues-verified" class="snapshot-status" role="status"></p>
+        <p id="issues-snapshot-summary"></p>
+        <a id="issues-source-link" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/issues">View all current issues on GitHub</a>
+        <details class="issue-snapshot-statistics"><summary id="issues-statistics-toggle">Snapshot counts (not live)</summary><div class="metric-strip">
           <div class="metric-box"><span id="issue-stat-total-label">Open issues</span><strong id="issue-stat-total">0</strong></div>
           <div class="metric-box"><span id="issue-stat-prs-label">Open PRs</span><strong id="issue-stat-prs">0</strong></div>
           <div class="metric-box"><span id="issue-stat-blocked-label">Blocked</span><strong id="issue-stat-blocked">0</strong></div>
           <div class="metric-box"><span id="issue-stat-draft-label">Draft</span><strong id="issue-stat-draft">0</strong></div>
-        </div>
-        <p id="issues-verified" class="snapshot-status" role="status"></p>
-        <a id="issues-source-link" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/issues">View all current issues on GitHub</a>
+        </div></details>
       </section>
 
       <section class="content-panel" aria-labelledby="issues-list-title">
@@ -96,7 +97,8 @@
         'issues-loading': 'Loading issues...',
         'issues-error': 'Failed to load issues data.',
         'issues-stats-kicker': 'Snapshot',
-        'issues-stats-title': 'Active items in this snapshot',
+        'issues-stats-title': 'Curated issue archive',
+        'issues-statistics-toggle': 'Snapshot counts (not live)',
         'issue-stat-total-label': 'Open issues',
         'issue-stat-prs-label': 'Open PRs',
         'issue-stat-blocked-label': 'Blocked',
@@ -115,7 +117,8 @@
         'issues-loading': '正在加载议题数据...',
         'issues-error': '议题数据加载失败。',
         'issues-stats-kicker': '快照',
-        'issues-stats-title': '本快照中的开放项',
+        'issues-stats-title': '精选议题档案',
+        'issues-statistics-toggle': '快照计数（非实时）',
         'issue-stat-total-label': '开放议题',
         'issue-stat-prs-label': '开放 PR',
         'issue-stat-blocked-label': '阻塞',
@@ -127,9 +130,9 @@
     };
     window.vllmHustIssuesDataUrl = './data/issues.json';
   </script>
-  <script src="./assets/site.js?v=gennova-20261023-public-pages-20261024"></script>
+  <script src="./assets/site.js?v=site-clarity-20261025"></script>
   <script src="./assets/snapshot-status.js?v=0.3.7"></script>
-  <script src="./assets/issues-page.js?v=0.3.7"></script>
+  <script src="./assets/issues-page.js?v=0.3.7-clarity2-20261025"></script>
 </body>
 
 </html>

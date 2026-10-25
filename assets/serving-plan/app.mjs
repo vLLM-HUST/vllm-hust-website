@@ -1,5 +1,5 @@
 import { calculate } from "./calc.mjs?v=accounted-plans-20261009";
-import { t, translate, errorText } from "./i18n.mjs?v=public-pages-20261024";
+import { t, translate, errorText, sourceEnglish } from "./i18n.mjs?v=clarity-20261025";
 const $ = (id) => document.getElementById(id);
 const fmt = (n, d = 2) =>
   n.toLocaleString("zh-CN", { maximumFractionDigits: d });
@@ -151,7 +151,7 @@ function initialize() {
     const copy = element("div");
     const label = element("label", `${p.model} · ${p.provider}`);
     label.htmlFor = check.id;
-    const source = element("a", `${p.name} ↗`, "plan-source");
+    const source = element("a", `${p.name} ↗`, "plan-source", `${sourceEnglish(p.name)} ↗`);
     source.href = p.source;
     source.dataset.benchmarkPlan = p.id;
     source.target = "_blank";
@@ -163,7 +163,7 @@ function initialize() {
   }
   for (const [id, p] of Object.entries(data.priceReferences)) {
     const box = element("fieldset");
-    box.append(element("legend", p.model));
+    box.append(element("legend", p.model, undefined, sourceEnglish(p.model)));
     const controls = { changed: false };
     for (const [key, label, value, english] of [
       ["input", "新增输入", p.inputCnyPerMillion, "New input"],
@@ -187,8 +187,11 @@ function initialize() {
         render();
       });
     }
-    // Original source wording remains available without relabeling its evidence.
-    box.append(element("p", "来源说明（原文）", "hint", "Source note (original wording)"), element("p", p.cacheScope, "hint"));
+    box.append(element("p", p.cacheScope, "hint", sourceEnglish(p.cacheScope)));
+    const original = element("details");
+    original.append(element("summary", "来源条件（中文原文）", undefined, "Source conditions (original Chinese)"),
+      element("p", [p.region, p.cacheScope, p.scope].filter(Boolean).join(' '), "hint"));
+    box.append(original);
     prices.set(id, controls);
     $("price-controls").append(box);
     if (p.userDefined) {
@@ -197,9 +200,9 @@ function initialize() {
     }
     const note = element(
       "p",
-      `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${p.cacheScope} `,
+      `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${p.cacheScope} ${p.scope || ''}`,
       undefined,
-      `${p.model}: new input ¥${p.inputCnyPerMillion}, cached input ¥${p.cachedInputCnyPerMillion}, output ¥${p.outputCnyPerMillion} per million tokens. Checked ${p.checkedAt}. Source region / scope (original): ${p.region}; ${p.cacheScope}`,
+      `${sourceEnglish(p.model)}: new input ¥${p.inputCnyPerMillion}, cached input ¥${p.cachedInputCnyPerMillion}, output ¥${p.outputCnyPerMillion} per million tokens. Checked ${p.checkedAt}. ${sourceEnglish(p.region)}; ${sourceEnglish(p.cacheScope)} ${sourceEnglish(p.scope)}`,
     );
     const link = element("a", "官方价格 ↗", undefined, "Official prices ↗");
     link.href = p.url;
