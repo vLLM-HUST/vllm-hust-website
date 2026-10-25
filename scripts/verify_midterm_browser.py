@@ -392,7 +392,7 @@ def main():
                     expect(communication.locator("tbody tr")).to_have_count(2)
                     expect(communication).to_contain_text("17,879,040")
                     verdict = page.locator("#midterm-m01-verdict")
-                    expect(page.locator(".midterm-history-notice")).to_have_count(5)
+                    expect(page.locator(".midterm-history-notice")).to_have_count(11)
                     for notice in page.locator(".midterm-history-notice").all():
                         expect(notice).to_contain_text(
                             "历史" if lang == "zh" else "Historical"
