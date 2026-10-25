@@ -22,7 +22,10 @@ body .current-measurements a { color: var(--result-link); }
 .result-change span, .result-metric > small { font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .result-selection { font-size: 13px; line-height: 1.6; }
 .result-comparison-note { margin: 18px 0 0; font-size: 13px; line-height: 1.6; }
-.result-candidate { display: block; margin-top: 8px; }
+.result-candidate { display: block; margin-top: 8px; font-weight: 650; overflow-wrap: anywhere; }
+.result-chart-boundary { padding: 12px; border-left: 3px solid var(--result-link); background: var(--result-tint); font-size: 13px; }
+.quality-summary .result-context { margin: 8px 0; }
+.quality-summary .result-heading h1 { font-size: 24px; }
 .result-quality { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 12px; background: var(--result-tint); border: 1px solid var(--result-line); border-radius: 8px; }
 .result-quality small { flex-basis: 100%; font-size: 12px; }
 .result-next { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }

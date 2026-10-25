@@ -69,15 +69,42 @@ async def run(args):
                             == ("rgb(244, 196, 99)" if r["hero"] else "rgb(121, 83, 0)")
                             for r in record["surface_labels"]
                         ), record["surface_labels"]
-                    if filename == "traceloom.html":
-                        assert (
-                            await page.locator(".site-nav").evaluate(
-                                "e=>getComputedStyle(e).backgroundColor"
-                            )
-                            == "rgb(16, 39, 40)"
+                    assert (
+                        await page.locator(".site-nav").evaluate(
+                            "e=>getComputedStyle(e).backgroundColor"
                         )
+                        == "rgb(12, 17, 18)"
+                    )
+                    assert (
+                        await page.locator(".brand-mark").evaluate(
+                            "e=>getComputedStyle(e).backgroundColor"
+                        )
+                        == "rgb(240, 179, 65)"
+                    )
                     if filename == "index.html" and width == 390:
                         await expect(page.locator(".inference-fabric")).to_be_hidden()
+                    if filename == "versions.html":
+                        await expect(
+                            page.locator("#versions-verified")
+                        ).to_contain_text("2026-10-20")
+                        assert await page.locator("#versions-verified").evaluate(
+                            "e=>e.getBoundingClientRect().bottom < innerHeight"
+                        )
+                    if filename == "issues.html":
+                        await expect(
+                            page.locator("#issues-snapshot-summary")
+                        ).to_contain_text("3")
+                        await expect(page.locator("#issue-stat-total")).to_be_hidden()
+                        await expect(
+                            page.locator("#issues-source-link")
+                        ).to_be_visible()
+                    if filename == "contributors.html":
+                        await expect(
+                            page.locator(".research-members-menu")
+                        ).to_have_attribute("open", "")
+                        await expect(
+                            page.locator("#contributors-core-member-list > li").first
+                        ).to_be_visible()
                     # Preserve page-specific translation IDs through shared footer rendering.
                     footer = page.locator(".site-directory-brand > span")
                     if await footer.count():
@@ -92,6 +119,16 @@ async def run(args):
                         }[filename][0 if lang == "zh" else 1]
                         await expect(footer).to_contain_text(expected)
                     if filename == "serving-plan.html":
+                        if lang == "en":
+                            price_copy = await page.locator("#price-note").inner_text()
+                            assert "peak-period prices are twice as high" in price_copy
+                            assert (
+                                "not an official quote for the same checkpoint"
+                                in price_copy
+                            )
+                            assert not any(
+                                "\u4e00" <= char <= "\u9fff" for char in price_copy
+                            )
                         assert (
                             await page.locator(
                                 ".page-hero .content-panel > p"
@@ -110,7 +147,7 @@ async def run(args):
                         await page.locator("#utilization").fill("60")
                         await page.locator("#unit").select_option("24")
                         await page.locator("#plan-options input").first.uncheck()
-                        await page.locator(".controls details").evaluate(
+                        await page.locator(".controls > details").evaluate(
                             "e=>e.open=true"
                         )
                         price = page.locator("#price-controls input").first
@@ -145,7 +182,7 @@ async def run(args):
                         )
                         await page.locator("#reset").click()
                         await expect(page.locator("#cost")).to_have_value("")
-                        await page.locator(".controls details").evaluate(
+                        await page.locator(".controls > details").evaluate(
                             "e=>e.open=false"
                         )
                         await page.evaluate("window.scrollTo(0,0)")

@@ -166,10 +166,10 @@ def test_contributors_page_has_contribution_driven_member_profiles() -> None:
     css = (root / "assets" / "site.css").read_text(encoding="utf-8")
     script = (root / "assets" / "contributors-page.js").read_text(encoding="utf-8")
 
-    details_start = text.index('<details class="research-members-menu">')
+    details_start = text.index('<details class="research-members-menu" open>')
     details_end = text.index("</details>", details_start)
     details = text[details_start:details_end]
-    assert " open" not in details.split(">", 1)[0]
+    assert " open" in details.split(">", 1)[0]
     assert 'id="contributors-members-menu-title"' in details
     assert 'id="contributors-core-member-list"' in details
     assert 'id="contributors-participant-list"' in details
@@ -1197,7 +1197,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=gennova-20261023" in text
+        assert "assets/site.js?v=site-clarity-20261025" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -2832,7 +2832,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=gennova-20261023" in html_text
+    assert "assets/site.js?v=site-clarity-20261025" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js

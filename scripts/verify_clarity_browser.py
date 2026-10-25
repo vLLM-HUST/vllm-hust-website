@@ -55,6 +55,22 @@ def main():
                                 "data-loaded", "true"
                             )
                             expect(page.locator(".result-date")).to_be_visible()
+                            related = page.locator("#result-related-evidence")
+                            expect(related).not_to_have_attribute("open", "")
+                            if name == "dataset-validation":
+                                expect(page.locator(".result-quality")).to_be_visible()
+                                expect(page.locator(".result-metrics")).to_be_hidden()
+                                assert page.locator("#dataset-results").evaluate(
+                                    "e=>e.getBoundingClientRect().top < 850"
+                                )
+                            else:
+                                expect(page.locator(".result-metrics")).to_be_visible()
+                                expect(
+                                    page.locator(".result-chart-boundary")
+                                ).to_contain_text(
+                                    "其他工况" if lang == "zh" else "other workloads"
+                                )
+                            related.locator("summary").click()
                             expect(page.locator(".result-metric")).to_have_count(3)
                             expect(page.locator(".result-pair strong")).to_have_count(3)
                             expect(
@@ -75,10 +91,23 @@ def main():
                                 ).to_have_count(24)
                                 selectors += [".matrix-heading h1", ".matrix-heading p"]
                         elif name == "plugins":
-                            selectors = [
-                                "#independent-engine-title",
-                                "#independent-engines a",
-                            ]
+                            expect(page.locator(".plugin-card").first).to_be_visible()
+                            expect(
+                                page.locator(".plugin-catalog-scope")
+                            ).to_contain_text("39")
+                            expect(
+                                page.locator(".plugin-catalog-scope")
+                            ).to_contain_text("43")
+                            expect(
+                                page.locator('[data-scenario="service_suspend_resume"]')
+                            ).to_be_disabled()
+                            expect(
+                                page.locator(".plugin-technical-details").first
+                            ).not_to_have_attribute("open", "")
+                            expect(
+                                page.locator(".plugin-compatibility-facts").first
+                            ).to_be_hidden()
+                            selectors = [".plugin-catalog-scope", ".plugin-summary"]
                             # Hero is a gradient: verify its explicitly light text,
                             # not a flat-color contrast approximation through it.
                             assert (
@@ -101,6 +130,9 @@ def main():
                             for s in selectors
                         }
                         assert all(v >= 4.5 for v in ratios.values()), (name, ratios)
+                        if name in ("dataset-validation", "leaderboard-runs"):
+                            related.locator("summary").click()
+                            page.evaluate("window.scrollTo(0,0)")
                         assert page.evaluate(
                             "document.documentElement.scrollWidth <= innerWidth + 1"
                         ), name
