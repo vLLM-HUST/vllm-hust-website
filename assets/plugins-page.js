@@ -366,14 +366,17 @@
       title_zh: "安装并显式启用 MuxPD",
       action_en: "installation, launch and rollback",
       action_zh: "安装、启动与回滚",
-      note_en: "Experimental pinned Ascend stack only. Use the Manager 0.3.1.dev1 build and wheel checksums specified in the release. The Manager projects vllm.scheduler-class.v1, vllm.worker-class.v1 and vllm.batch-admission-policy.v1 together. Installation, configuration and enablement do not start a model; only the explicit serve command launches it. Live effectiveness requires successful output receipts from all three components, not merely health readiness. Drain requests and stop the old service before rollback: disable changes only the next launch. Restart native vLLM in fresh workers, not with vllm-muxpd serve. See the guide for exact software, model and device restrictions.",
-      note_zh: "仅限固定的实验性 Ascend 软件栈。请使用发布说明指定的 Manager 0.3.1.dev1 构建和 wheel 校验和。Manager 成对投影 vllm.scheduler-class.v1、vllm.worker-class.v1 与 vllm.batch-admission-policy.v1。安装、配置和启用不启动模型；只有显式 serve 命令才启动。运行生效要求三个组件的成功输出回执，健康检查并不足够。回滚前须排空请求并停止旧服务：disable 只影响下一次启动。用全新 worker 启动原生 vLLM，不继续使用 vllm-muxpd serve。精确软件、模型和设备限制见部署指南。",
+      note_en: "Experimental alpha on the pinned Ascend stack only. Functional qualification does not guarantee token-by-token or exact text consistency with native vLLM; see the numerical limitation in Issue #23. Use the Manager 0.3.1.dev1 build and wheel checksums specified in the release. The Manager projects vllm.scheduler-class.v1, vllm.worker-class.v1 and vllm.batch-admission-policy.v1 together. Installation, configuration and enablement do not start a model; only the explicit serve command launches it. Live effectiveness requires successful output receipts from all three components, not merely health readiness. Drain requests and stop the old service before rollback: disable changes only the next launch. Restart native vLLM in fresh workers, not with vllm-muxpd serve. See the guide for exact software, model and device restrictions.",
+      note_zh: "仅限固定 Ascend 软件栈的实验性 alpha。功能验收不保证与原生 vLLM 逐 token 或文本精确一致；数值限制见 Issue #23。请使用发布说明指定的 Manager 0.3.1.dev1 构建和 wheel 校验和。Manager 成对投影 vllm.scheduler-class.v1、vllm.worker-class.v1 与 vllm.batch-admission-policy.v1。安装、配置和启用不启动模型；只有显式 serve 命令才启动。运行生效要求三个组件的成功输出回执，健康检查并不足够。回滚前须排空请求并停止旧服务：disable 只影响下一次启动。用全新 worker 启动原生 vLLM，不继续使用 vllm-muxpd serve。精确软件、模型和设备限制见部署指南。",
       guide: "https://github.com/vLLM-HUST/vllm-ascend-MuxPD-hust/blob/v0.2.0a1/docs/ecpa-deployment.md",
       guide_en: "Pinned Manager build, configuration and rollback guide →",
       guide_zh: "指定 Manager 构建、配置与回滚指南 →",
       release: "https://github.com/vLLM-HUST/vllm-ascend-MuxPD-hust/releases/tag/v0.2.0a1",
       release_en: "0.2.0a1 wheels, checksums and release notes →",
       release_zh: "0.2.0a1 wheel、校验和与发布说明 →",
+      limitation: "https://github.com/vLLM-HUST/vllm-ascend-MuxPD-hust/issues/23",
+      limitation_en: "Numerical repeatability limitation (Issue #23) →",
+      limitation_zh: "数值重复性限制（Issue #23）→",
       command: String.raw`# Download and verify both wheels using the linked release notes first.
 python -m pip install --no-deps /path/to/vllm_hust_ext-0.3.1.dev1-py3-none-any.whl
 python -m pip install --no-deps /path/to/vllm_ascend_muxpd-0.2.0a1-py3-none-any.whl
@@ -894,6 +897,11 @@ vllm-hust-ext extension check ${extensionId}`
       const release = element("a", "plugin-launch-note", local(value, "release"));
       release.href = value.release;
       tooltip.append(release);
+    }
+    if (value.limitation) {
+      const limitation = element("a", "plugin-launch-note", local(value, "limitation"));
+      limitation.href = value.limitation;
+      tooltip.append(limitation);
     }
     if (value.alternative) {
       const details = element("details");

@@ -89,3 +89,20 @@ def test_muxpd_rollback_requires_drain_stop_disable_and_fresh_native_workers():
     assert 'element("code", "", value.command)' in source
     assert "release.href = value.release" in source
     assert "tooltip.append(release)" in source
+
+
+def test_muxpd_alpha_keeps_the_numerical_limitation_visible_in_both_languages():
+    entry = quick_start()
+    assert entry["limitation"] == (
+        "https://github.com/vLLM-HUST/vllm-ascend-MuxPD-hust/issues/23"
+    )
+    assert "Experimental alpha" in entry["note_en"]
+    assert (
+        "does not guarantee token-by-token or exact text consistency"
+        in entry["note_en"]
+    )
+    assert "不保证与原生 vLLM 逐 token 或文本精确一致" in entry["note_zh"]
+    assert "Issue #23" in entry["note_en"] and "Issue #23" in entry["note_zh"]
+    source = SCRIPT.read_text()
+    assert "limitation.href = value.limitation" in source
+    assert "tooltip.append(limitation)" in source
