@@ -24,11 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 2
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #505 supplies this merged MuxPD catalog identity.
+    # Benchmark #520 supplies the merged V0.88 evidence identity.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "df60b4a40a78cbaf2d706225f7d448f5db28df81"  # pragma: allowlist secret
+        "c8deb4e460c811d92979dd87ccf8d61b3efcaf39"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     for filename in ("ci.yml", "midterm-browser.yml"):
