@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v092.json")
+        response = context.request.get(f"{args.url}/data/midterm-v093.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.92"
+        assert report["version"] == "V0.93"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v092.json"
+            if f["website_path"] == "data/midterm-v093.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v092-quality-20261027",
+                        "./assets/midterm-report.js?v=midterm-v093-quality-20261027",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.92", timeout=30000
+                        "data-loaded", "V0.93", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -100,12 +100,22 @@ def main():
                     expect(cancel.locator("tbody tr")).to_have_count(2)
                     expect(cancel).to_contain_text("0 / 6")
                     expect(cancel).to_contain_text("6 / 6")
+                    partial = page.locator("#midterm-terminal-cancel-partial-recovery")
+                    expect(partial.locator("tbody tr")).to_have_count(2)
+                    for value in (
+                        "1 / 6",
+                        "null",
+                        "2/89",
+                        "87",
+                        "ContextLengthExceededError",
+                    ):
+                        expect(partial).to_contain_text(value)
                     expect(swe).to_contain_text("511.436103")
                     recovered = page.locator("#midterm-terminal-model-recovery")
                     expect(recovered.locator("tbody tr")).to_have_count(2)
                     expect(recovered).to_contain_text("6 / 6")
                     expect(recovered).to_contain_text("null")
-                    expect(recovered).to_contain_text("88")
+                    expect(recovered).to_contain_text("87")
                     expect(recovered).to_contain_text(
                         "非现场原文件快照"
                         if lang == "zh"
@@ -208,7 +218,7 @@ def main():
                                 (3, inventory[9]["path"]),
                                 (
                                     4,
-                                    "reports/terminal-openssl-model-recovery-20261026/summary.json",
+                                    "reports/terminal-cancel-async-partial-recovery-20261027/summary.json",
                                 ),
                             ):
                                 href = (
@@ -346,7 +356,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.92"
+                        "V0.93"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -609,7 +619,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v092.json",
+            "**/data/midterm-v093.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")

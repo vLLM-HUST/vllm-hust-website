@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_flipt_raw_failures_and_parser_coverage_are_disclosed():
-    data = json.loads((ROOT / "data/midterm-v092.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v093.json").read_text())
     section = next(
         s for s in data["sections"] if s["id"] == "swe-single-agent-observation"
     )
@@ -23,7 +23,7 @@ def test_flipt_raw_failures_and_parser_coverage_are_disclosed():
 
 
 def test_current_and_retained_swe_evidence_paths_remain_allowed():
-    data = json.loads((ROOT / "data/midterm-v092.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v093.json").read_text())
     loader = (ROOT / "assets/midterm-report.js").read_text()
     for section in data["sections"]:
         for source in section["evidence"]:
@@ -32,7 +32,7 @@ def test_current_and_retained_swe_evidence_paths_remain_allowed():
 
 
 def test_c16_latency_is_existing_request_weighted_evidence():
-    data = json.loads((ROOT / "data/midterm-v092.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v093.json").read_text())
     value = data["c16_equal_request_latency"]
     assert value["new_inference_requests"] == 0
     assert [arm["window"]["requests"] for arm in value["arms"]] == [392, 1280]
@@ -49,7 +49,7 @@ def test_c16_latency_is_existing_request_weighted_evidence():
 
 
 def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
-    data = json.loads((ROOT / "data/midterm-v092.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v093.json").read_text())
     assert data["hle_designated_baseline"]["gold"]["successes"] == 157
     assert data["hle_designated_baseline"]["revision"]["successes"] == 316
     swe = data["swe_single_agent"]
@@ -136,18 +136,18 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v092.json" in loader
+    assert "./data/midterm-v093.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v092.json" in hero
-    assert "report.version !== 'V0.92'" in hero
+    assert "./data/midterm-v093.json" in hero
+    assert "report.version !== 'V0.93'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v092-20261027"
+            "current-measurements.js?v=clarity-v093-20261027"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v092.json").read_text())
-    assert payload["version"] == "V0.92"
+    payload = json.loads((ROOT / "data/midterm-v093.json").read_text())
+    assert payload["version"] == "V0.93"
     pair = payload["frontierscience_designated_pair"]
     assert pair["quality_passed"] is None
     assert [pair["B0"][t]["successes"] for t in ("olympiad", "research")] == [66, 3]
@@ -187,7 +187,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v092-quality-20261027"
+            "./assets/midterm-report.js?v=midterm-v093-quality-20261027"
         ]
 
 
@@ -226,7 +226,7 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v092.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v093.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "wholechain-20261025"
     assert method == data["milestone_contract"]["method"]
@@ -277,3 +277,34 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
     assert "E2E is not TTFT/TPOT" in review["scope_en"]
     assert pair["rows"]["B1"]["F"] == 1812905151088034
     assert "7.1042" in review["scope_en"]
+
+
+def test_partial_artifact_does_not_overwrite_unscored_trial():
+    data = json.loads((ROOT / "data/midterm-v093.json").read_text())
+    value = data["terminal_cancel_partial_recovery"]
+    assert value["original_attempt"]["reward"] is None
+    assert not value["original_attempt"]["task_complete"]
+    assert value["original_attempt"]["HTTP200"] == 17
+    assert value["original_attempt"]["HTTP400"] == 1
+    assert value["recovery"]["reward"] == 0
+    assert value["recovery"]["passed"] == 1 and value["recovery"]["tests"] == 6
+    assert value["recovery"]["additional_model_calls"] == 0
+    assert value["artifact_provenance"]["original_filesystem_sha256"] is None
+    assert value["coverage"]["attempted_unique_tasks"] == 2
+    assert value["coverage"]["unattempted_tasks"] == 87
+    assert value["coverage"]["completed_Agent_score_for_this_task"] is None
+    loader = (ROOT / "assets/midterm-report.js").read_text()
+    path = "reports/terminal-cancel-async-partial-recovery-20261027/summary.json"
+    assert repr(path) in loader
+    browser_check = (ROOT / "scripts/verify_midterm_browser.py").read_text()
+    assert path in browser_check
+    assert (
+        "reports/terminal-openssl-model-recovery-20261026/summary.json"
+        not in browser_check
+    )
+    remaining = next(s for s in data["sections"] if s["id"] == "v15-remaining")
+    for key in ("tables", "tables_en"):
+        row = next(
+            r for t in remaining[key] for r in t["rows"] if r[0] == "TerminalBench 2.1"
+        )
+        assert "87" in row[1] and "null" in row[1] and "2/89" in row[1]
