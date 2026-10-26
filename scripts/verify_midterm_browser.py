@@ -218,7 +218,7 @@ def main():
                                 (3, inventory[9]["path"]),
                                 (
                                     4,
-                                    "reports/terminal-openssl-model-recovery-20261026/summary.json",
+                                    "reports/terminal-cancel-async-partial-recovery-20261027/summary.json",
                                 ),
                             ):
                                 href = (

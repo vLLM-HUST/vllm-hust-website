@@ -296,6 +296,12 @@ def test_partial_artifact_does_not_overwrite_unscored_trial():
     loader = (ROOT / "assets/midterm-report.js").read_text()
     path = "reports/terminal-cancel-async-partial-recovery-20261027/summary.json"
     assert repr(path) in loader
+    browser_check = (ROOT / "scripts/verify_midterm_browser.py").read_text()
+    assert path in browser_check
+    assert (
+        "reports/terminal-openssl-model-recovery-20261026/summary.json"
+        not in browser_check
+    )
     remaining = next(s for s in data["sections"] if s["id"] == "v15-remaining")
     for key in ("tables", "tables_en"):
         row = next(
