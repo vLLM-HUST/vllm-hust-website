@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v085.json")
+        response = context.request.get(f"{args.url}/data/midterm-v086.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.85"
+        assert report["version"] == "V0.86"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v085.json"
+            if f["website_path"] == "data/midterm-v086.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,13 +82,20 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v085-quality-20261026",
+                        "./assets/midterm-report.js?v=midterm-v086-quality-20261026",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.85", timeout=30000
+                        "data-loaded", "V0.86", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
+                    swe = page.locator("#midterm-swe-single-agent-observation")
+                    expect(swe.locator("tbody tr")).to_have_count(3)
+                    expect(swe).to_contain_text("0/3")
+                    expect(swe).to_contain_text("293.600182")
+                    expect(swe).to_contain_text(
+                        "补丁应用未获证明" if lang == "zh" else "Application unproven"
+                    )
                     latency = page.locator("#midterm-c16-request-latency")
                     expect(latency.locator("tbody tr")).to_have_count(6)
                     for value in (
@@ -176,7 +183,7 @@ def main():
                                 ),
                                 (
                                     2,
-                                    "reports/swe-native018-single-agent-20261026/summary.json",
+                                    "reports/swe-native018-incremental-20261026/catalog.json",
                                 ),
                                 (3, inventory[9]["path"]),
                             ):
@@ -315,7 +322,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.85"
+                        "V0.86"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -578,7 +585,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v085.json",
+            "**/data/midterm-v086.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
