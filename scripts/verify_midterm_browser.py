@@ -203,7 +203,7 @@ def main():
                                 (3, inventory[9]["path"]),
                                 (
                                     4,
-                                    "reports/terminal-openssl-arm64-controls-20261026/summary.json",
+                                    "reports/terminal-openssl-model-recovery-20261026/summary.json",
                                 ),
                             ):
                                 href = (
