@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v084.json")
+        response = context.request.get(f"{args.url}/data/midterm-v085.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.84"
+        assert report["version"] == "V0.85"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v084.json"
+            if f["website_path"] == "data/midterm-v085.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,13 +82,24 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v084-quality-20261026",
+                        "./assets/midterm-report.js?v=midterm-v085-quality-20261026",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.84", timeout=30000
+                        "data-loaded", "V0.85", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
+                    latency = page.locator("#midterm-c16-request-latency")
+                    expect(latency.locator("tbody tr")).to_have_count(6)
+                    for value in (
+                        "1.685444191",
+                        "0.365011074",
+                        "0.071246185",
+                        "0.017941781",
+                    ):
+                        expect(
+                            latency.get_by_role("cell", name=value, exact=True)
+                        ).to_have_count(1)
                     if filename == "dataset-validation.html":
                         page.locator("#dataset-background > summary").click()
                         page.locator("#supplementary-results > summary").click()
@@ -104,6 +115,7 @@ def main():
                             mmlu.locator('a[href="#midterm-native-paired-quality"]')
                         ).to_have_count(1)
                     for ident in (
+                        "c16-request-latency",
                         "milestone-v15",
                         "v15-remaining",
                         "dataset-quality-inventory",
@@ -303,7 +315,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.84"
+                        "V0.85"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -566,7 +578,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v084.json",
+            "**/data/midterm-v085.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
