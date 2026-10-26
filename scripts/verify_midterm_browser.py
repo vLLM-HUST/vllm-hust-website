@@ -158,7 +158,14 @@ def main():
                             evidence = evidence + [inventory[i] for i in (11, 0, 9)]
                             for row, path in (
                                 (0, inventory[11]["path"]),
-                                (1, inventory[0]["path"]),
+                                (
+                                    1,
+                                    "reports/hle-native018-completed-20261026/b0-completed-audit.json",
+                                ),
+                                (
+                                    2,
+                                    "reports/swe-native018-single-agent-20261026/summary.json",
+                                ),
                                 (3, inventory[9]["path"]),
                             ):
                                 href = (
