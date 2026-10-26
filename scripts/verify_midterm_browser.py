@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v090.json")
+        response = context.request.get(f"{args.url}/data/midterm-v091.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.90"
+        assert report["version"] == "V0.91"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v090.json"
+            if f["website_path"] == "data/midterm-v091.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,10 +82,10 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v090-quality-20261026",
+                        "./assets/midterm-report.js?v=midterm-v091-quality-20261026",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.90", timeout=30000
+                        "data-loaded", "V0.91", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
@@ -96,6 +96,16 @@ def main():
                     expect(controls.locator("tbody tr")).to_have_count(2)
                     expect(controls).to_contain_text("0 / 6")
                     expect(controls).to_contain_text("6 / 6")
+                    recovered = page.locator("#midterm-terminal-model-recovery")
+                    expect(recovered.locator("tbody tr")).to_have_count(2)
+                    expect(recovered).to_contain_text("6 / 6")
+                    expect(recovered).to_contain_text("null")
+                    expect(recovered).to_contain_text("88")
+                    expect(recovered).to_contain_text(
+                        "非现场原文件快照"
+                        if lang == "zh"
+                        else "not an original file snapshot"
+                    )
                     expect(swe).to_contain_text("293.600182")
                     expect(swe).to_contain_text("225.544925")
                     expect(swe).to_contain_text(
@@ -193,7 +203,7 @@ def main():
                                 (3, inventory[9]["path"]),
                                 (
                                     4,
-                                    "reports/terminal-openssl-arm64-controls-20261026/summary.json",
+                                    "reports/terminal-openssl-model-recovery-20261026/summary.json",
                                 ),
                             ):
                                 href = (
@@ -331,7 +341,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.90"
+                        "V0.91"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -594,7 +604,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v090.json",
+            "**/data/midterm-v091.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
