@@ -6,6 +6,25 @@ from html.parser import HTMLParser
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
+    data = json.loads((ROOT / "data/midterm-v084.json").read_text())
+    assert data["hle_designated_baseline"]["gold"]["successes"] == 157
+    assert data["hle_designated_baseline"]["revision"]["successes"] == 316
+    swe = data["swe_single_agent"]
+    assert swe["executed_tasks"] == 1 and swe["resolved"] == 0
+    assert swe["qualification"]["model_calls"] == 5
+    assert swe["agent"]["status"] == "LimitsExceeded"
+    assert swe["unresolved_grading"] == 0 and not swe["full_dataset_acceptance"]
+    sections = {s["id"]: s for s in data["sections"]}
+    for key in ("tables", "tables_en"):
+        rows = {row[0]: row for row in sections["v15-remaining"][key][0]["rows"]}
+        assert "23/31" in rows["HLE-Verified"][1]
+        assert "0/1" in rows["SWE-bench-Pro"][1]
+    loader = (ROOT / "assets/midterm-report.js").read_text()
+    for name in ("hle-designated-baseline", "swe-single-agent-observation"):
+        assert sections[name]["evidence"][0]["path"] in loader
+
+
 def test_all_data_files_match_the_benchmark_publication_manifest():
     manifest_path = ROOT / "data/benchmark-source-manifest.json"
     manifest = json.loads(manifest_path.read_text())
@@ -45,18 +64,18 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v083.json" in loader
+    assert "./data/midterm-v084.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v083.json" in hero
-    assert "report.version !== 'V0.83'" in hero
+    assert "./data/midterm-v084.json" in hero
+    assert "report.version !== 'V0.84'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v083-20261025"
+            "current-measurements.js?v=clarity-v084-20261026"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v083.json").read_text())
-    assert payload["version"] == "V0.83"
+    payload = json.loads((ROOT / "data/midterm-v084.json").read_text())
+    assert payload["version"] == "V0.84"
     pair = payload["frontierscience_designated_pair"]
     assert pair["quality_passed"] is None
     assert [pair["B0"][t]["successes"] for t in ("olympiad", "research")] == [66, 3]
@@ -96,7 +115,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v083-quality-20261025"
+            "./assets/midterm-report.js?v=midterm-v084-quality-20261026"
         ]
 
 
@@ -135,7 +154,7 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v083.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v084.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "wholechain-20261025"
     assert method == data["milestone_contract"]["method"]
