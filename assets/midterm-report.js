@@ -16,6 +16,7 @@
     // Keep their recorded wording and numbers; make the time scope explicit.
     const historicalM01 = new Set(['m01', 'fenced-model', 'trace-qualification', 'reference-closure', 'worker-model']);
     const datasetEvidence = new Set([
+        'reports/terminal-cancel-async-partial-recovery-20261027/summary.json',
         'reports/swe-native018-navidrome-20261027/catalog.json',
         'reports/terminal-cancel-async-controls-20261027/summary.json',
         'reports/terminal-openssl-model-recovery-20261026/summary.json',
@@ -49,7 +50,7 @@
         }
         if (section.id === 'v15-remaining' && tableIndex === 0) {
             const inventory = data.sections.find(s => s.id === 'dataset-quality-inventory').evidence;
-            return [inventory[11], section.evidence.find(e => e.path.includes('hle-native018-completed-20261026')), section.evidence.find(e => e.path.includes('swe-native018-navidrome-20261027')), inventory[9], section.evidence.find(e => e.path.includes('terminal-openssl-model-recovery-20261026'))];
+            return [inventory[11], section.evidence.find(e => e.path.includes('hle-native018-completed-20261026')), section.evidence.find(e => e.path.includes('swe-native018-navidrome-20261027')), inventory[9], section.evidence.find(e => e.path.includes('terminal-cancel-async-partial-recovery-20261027'))];
         }
         if (section.id === 'milestone-v15') {
             const bySuffix = suffix => section.evidence.find(source => source.path.endsWith(suffix));
@@ -89,12 +90,12 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v092.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v093.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.92' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.93' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             const reference = value.wholechain_reference;
             if (value.m01_method?.method_version !== 'wholechain-20261025' || !reference?.reference_qualified || !reference.all_frozen_applicability_checks_pass || !Number.isFinite(reference.reference_C_TFLOPS_per_chip) || reference.reference_C_TFLOPS_per_chip <= 0) throw Error('Invalid current M01 reference');
