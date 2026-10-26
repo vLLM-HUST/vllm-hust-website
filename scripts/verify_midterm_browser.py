@@ -203,7 +203,7 @@ def main():
                                 ),
                                 (
                                     2,
-                                    "reports/swe-native018-continuation-20261026/catalog.json",
+                                    "reports/swe-native018-navidrome-20261027/catalog.json",
                                 ),
                                 (3, inventory[9]["path"]),
                                 (
