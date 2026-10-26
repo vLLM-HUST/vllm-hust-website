@@ -188,9 +188,13 @@ def main():
                                 ),
                                 (
                                     2,
-                                    "reports/swe-native018-next-repository-20261026/catalog.json",
+                                    "reports/swe-native018-continuation-20261026/catalog.json",
                                 ),
                                 (3, inventory[9]["path"]),
+                                (
+                                    4,
+                                    "reports/terminal-openssl-arm64-controls-20261026/summary.json",
+                                ),
                             ):
                                 href = (
                                     section.locator("table")
