@@ -121,11 +121,11 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  Promise.all([dataPath, './data/midterm-v086.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
+  Promise.all([dataPath, './data/midterm-v087.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
   }))).then(([value, report]) => {
-    if (report.version !== 'V0.86' || report.comparison_contract?.b0?.fixed !== true ||
+    if (report.version !== 'V0.87' || report.comparison_contract?.b0?.fixed !== true ||
         report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
         !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
     data = value; reportData = report; render();
