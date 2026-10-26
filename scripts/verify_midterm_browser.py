@@ -88,6 +88,7 @@ def main():
                         "data-loaded", "V0.85", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
+                    page.locator("#report-details > summary").click()
                     latency = page.locator("#midterm-c16-request-latency")
                     expect(latency.locator("tbody tr")).to_have_count(6)
                     for value in (
@@ -99,7 +100,6 @@ def main():
                         expect(
                             latency.get_by_role("cell", name=value, exact=True)
                         ).to_have_count(1)
-                    page.locator("#report-details > summary").click()
                     if filename == "dataset-validation.html":
                         page.locator("#dataset-background > summary").click()
                         page.locator("#supplementary-results > summary").click()
@@ -115,6 +115,7 @@ def main():
                             mmlu.locator('a[href="#midterm-native-paired-quality"]')
                         ).to_have_count(1)
                     for ident in (
+                        "c16-request-latency",
                         "milestone-v15",
                         "v15-remaining",
                         "dataset-quality-inventory",
