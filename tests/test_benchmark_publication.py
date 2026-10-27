@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_flipt_raw_failures_and_parser_coverage_are_disclosed():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     section = next(
         s for s in data["sections"] if s["id"] == "swe-single-agent-observation"
     )
@@ -18,12 +18,12 @@ def test_flipt_raw_failures_and_parser_coverage_are_disclosed():
     assert "2 package setup failures" in section["scope_en"]
     assert "target executed and failed" in section["scope_en"]
     assert section["evidence"][0]["path"] == (
-        "reports/swe-protonmail-dependency-recovery-20261027/summary.json"
+        "reports/swe-native018-tutanota-20261027/catalog.json"
     )
 
 
-def test_v095_preserves_unscored_and_partial_boundaries():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+def test_v096_preserves_unscored_and_partial_boundaries():
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     recovery = data["protonmail_test_source_recovery"]
     assert recovery["test_source_restored"] is True
     assert recovery["accepted_functional_score"] is None
@@ -37,9 +37,9 @@ def test_v095_preserves_unscored_and_partial_boundaries():
     )
     assert "76次HTTP" in section["scope"]
     assert "76 HTTP" in section["scope_en"]
-    assert "3/17" in section["scope"] and "3/17" in section["scope_en"]
-    assert section["tables"][0]["rows"][-1][2] == "75成功 + 1拒绝"
-    assert "未提交部分补丁" in section["tables"][0]["rows"][-1][-1]
+    assert "3/18" in section["scope"] and "3/18" in section["scope_en"]
+    assert section["tables"][0]["rows"][-2][2] == "75成功 + 1拒绝"
+    assert "未提交部分补丁" in section["tables"][0]["rows"][-2][-1]
     loader = (ROOT / "assets/midterm-report.js").read_text()
     for path in (
         "reports/swe-native018-navidrome-20261027/catalog.json",
@@ -50,7 +50,7 @@ def test_v095_preserves_unscored_and_partial_boundaries():
 
 
 def test_current_and_retained_swe_evidence_paths_remain_allowed():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     loader = (ROOT / "assets/midterm-report.js").read_text()
     for section in data["sections"]:
         for source in section["evidence"]:
@@ -59,7 +59,7 @@ def test_current_and_retained_swe_evidence_paths_remain_allowed():
 
 
 def test_c16_latency_is_existing_request_weighted_evidence():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     value = data["c16_equal_request_latency"]
     assert value["new_inference_requests"] == 0
     assert [arm["window"]["requests"] for arm in value["arms"]] == [392, 1280]
@@ -76,7 +76,7 @@ def test_c16_latency_is_existing_request_weighted_evidence():
 
 
 def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     assert data["hle_designated_baseline"]["gold"]["successes"] == 157
     assert data["hle_designated_baseline"]["revision"]["successes"] == 316
     swe = data["swe_single_agent"]
@@ -88,16 +88,16 @@ def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
     for key in ("tables", "tables_en"):
         rows = {row[0]: row for row in sections["v15-remaining"][key][0]["rows"]}
         assert "23/31" in rows["HLE-Verified"][1]
-        assert "2/17" in rows["SWE-bench-Pro"][1]
+        assert "2/18" in rows["SWE-bench-Pro"][1]
     catalog = data["swe_incremental_tasks"]
-    assert catalog["attempted_unique_tasks"] == 17
+    assert catalog["attempted_unique_tasks"] == 18
     assert catalog["confirmed_patch_application_failure_tasks"] == 2
-    assert catalog["unattempted_tasks"] == 714
+    assert catalog["unattempted_tasks"] == 713
     assert catalog["application_evidence_limited_tasks"] == 1
     assert catalog["recorded_official_resolved"] == 2
     for key in ("tables", "tables_en"):
-        assert len(sections["swe-single-agent-observation"][key][0]["rows"]) == 17
-    assert catalog["confirmed_target_compilation_failure_tasks"] == 1
+        assert len(sections["swe-single-agent-observation"][key][0]["rows"]) == 18
+    assert catalog["confirmed_target_compilation_failure_tasks"] == 2
     assert catalog["entries"][-1]["official_resolved"] == 0
     terminal = data["terminal_arm64_controls"]
     assert terminal["model_calls"] == terminal["official_89_task_model_coverage"] == 0
@@ -144,8 +144,8 @@ def test_all_data_files_match_the_benchmark_publication_manifest():
         assert len(raw) == entry["bytes"]
 
 
-def test_v095_same_answer_recovery_and_diagnostic_bounds():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+def test_v096_same_answer_recovery_and_diagnostic_bounds():
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     s = data["protonmail_dependency_recovery"]
     assert s["derived_dependency_recovery_result"]["official"] is True
     assert s["derived_dependency_recovery_result"]["passed"] == 3
@@ -167,6 +167,26 @@ def test_v095_same_answer_recovery_and_diagnostic_bounds():
         assert repr(path) in loader
 
 
+def test_tutanota_partial_compilation_failure_and_current_counts():
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
+    value = data["swe_incremental_tasks"]["entries"][-1]
+    assert value["model_calls"] == 100
+    assert value["official_resolved"] == 0
+    assert value["agent_submitted"] is False
+    assert value["status"] == "LimitsExceeded"
+    aggregate = data["swe_same_answer_recovery_aggregate"]
+    assert aggregate["attempted_tasks"] == aggregate["recovery_denominator"] == 18
+    assert aggregate["original_official_positives"] == 2
+    assert aggregate["positives_after_disclosed_recovery"] == 3
+    assert aggregate["unattempted_tasks"] == 713
+    assert aggregate["prior_recovery_snapshot"]["attempted_tasks"] == 17
+    section = next(
+        s for s in data["sections"] if s["id"] == "swe-single-agent-observation"
+    )
+    assert "目标测试尚未执行" in section["scope"]
+    assert "before the target test ran" in section["scope_en"]
+
+
 class Elements(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -186,18 +206,18 @@ class Elements(HTMLParser):
 
 def test_midterm_loader_cache_key_matches_publication_version():
     loader = (ROOT / "assets/midterm-report.js").read_text()
-    assert "./data/midterm-v095.json" in loader
+    assert "./data/midterm-v096.json" in loader
     hero = (ROOT / "assets/current-measurements.js").read_text()
-    assert "./data/midterm-v095.json" in hero
-    assert "report.version !== 'V0.95'" in hero
+    assert "./data/midterm-v096.json" in hero
+    assert "report.version !== 'V0.96'" in hero
     assert "midterm-v076.json" not in hero
     for page in ("dataset-validation.html", "leaderboard-runs.html"):
         assert (
-            "current-measurements.js?v=clarity-v095-20261027"
+            "current-measurements.js?v=clarity-v096-20261027"
             in (ROOT / page).read_text()
         )
-    payload = json.loads((ROOT / "data/midterm-v095.json").read_text())
-    assert payload["version"] == "V0.95"
+    payload = json.loads((ROOT / "data/midterm-v096.json").read_text())
+    assert payload["version"] == "V0.96"
     pair = payload["frontierscience_designated_pair"]
     assert pair["quality_passed"] is None
     assert [pair["B0"][t]["successes"] for t in ("olympiad", "research")] == [66, 3]
@@ -237,7 +257,7 @@ def test_midterm_loader_cache_key_matches_publication_version():
         parser = Elements()
         parser.feed((ROOT / filename).read_text())
         assert [src for src in parser.scripts if "midterm-report.js" in src] == [
-            "./assets/midterm-report.js?v=midterm-v095-quality-20261027"
+            "./assets/midterm-report.js?v=midterm-v096-quality-20261027"
         ]
 
 
@@ -276,7 +296,7 @@ def test_three_destinations_preserve_sections_without_duplicate_ids():
 
 
 def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     method = data["m01_method"]
     assert method["method_version"] == "wholechain-20261025"
     assert method == data["milestone_contract"]["method"]
@@ -330,7 +350,7 @@ def test_v15_current_method_is_bilingual_and_not_historical_acceptance():
 
 
 def test_partial_artifact_does_not_overwrite_unscored_trial():
-    data = json.loads((ROOT / "data/midterm-v095.json").read_text())
+    data = json.loads((ROOT / "data/midterm-v096.json").read_text())
     value = data["terminal_cancel_partial_recovery"]
     assert value["original_attempt"]["reward"] is None
     assert not value["original_attempt"]["task_complete"]
