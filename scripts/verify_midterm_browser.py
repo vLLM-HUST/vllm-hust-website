@@ -23,11 +23,11 @@ def main():
             executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
         )
         context = browser.new_context()
-        response = context.request.get(f"{args.url}/data/midterm-v097.json")
+        response = context.request.get(f"{args.url}/data/midterm-v098.json")
         assert response.ok
         raw = response.body()
         report = json.loads(raw)
-        assert report["version"] == "V0.97"
+        assert report["version"] == "V0.98"
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -36,7 +36,7 @@ def main():
         entry = next(
             f
             for f in manifest["files"]
-            if f["website_path"] == "data/midterm-v097.json"
+            if f["website_path"] == "data/midterm-v098.json"
         )
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
         assert len(raw) == entry["bytes"]
@@ -82,20 +82,27 @@ def main():
                         page.locator('script[src*="midterm-report.js"]')
                     ).to_have_attribute(
                         "src",
-                        "./assets/midterm-report.js?v=midterm-v097-quality-20261027",
+                        "./assets/midterm-report.js?v=midterm-v098-quality-20261027",
                     )
                     expect(page.locator("#midterm-report")).to_have_attribute(
-                        "data-loaded", "V0.97", timeout=30000
+                        "data-loaded", "V0.98", timeout=30000
                     )
                     page.evaluate("lang => window.vllmHustSite.setLang(lang)", lang)
                     page.locator("#report-details > summary").click()
                     swe = page.locator("#midterm-swe-single-agent-observation")
-                    expect(swe.locator("tbody tr")).to_have_count(21)
+                    expect(swe.locator("tbody tr")).to_have_count(24)
                     expect(swe).to_contain_text("437.454803")
                     expect(swe).to_contain_text("Tutanota")
                     expect(swe).to_contain_text("OperationProgressTracker")
-                    expect(swe).to_contain_text("3/21")
-                    expect(swe).to_contain_text("4/21")
+                    expect(swe).to_contain_text("3/24")
+                    expect(swe).to_contain_text("4/24")
+                    break_filter = page.locator(
+                        "#midterm-terminal-break-filter-controls"
+                    )
+                    expect(break_filter.locator("tbody tr")).to_have_count(0)
+                    expect(break_filter).to_contain_text("null")
+                    expect(break_filter).to_contain_text("3/89")
+                    expect(break_filter).to_contain_text("1200")
                     expect(swe).to_contain_text("361.464713")
                     expect(swe).to_contain_text("511.628888")
                     expect(swe).to_contain_text(
@@ -237,7 +244,7 @@ def main():
                                 ),
                                 (
                                     2,
-                                    "reports/swe-native018-wave2-first-three-20261027/catalog.json",
+                                    "reports/swe-native018-wave2-followup-20261027/catalog.json",
                                 ),
                                 (3, inventory[9]["path"]),
                                 (
@@ -380,7 +387,7 @@ def main():
                         "不能排除完整模型跨轮状态污染"
                     )
                     expect(page.locator("#midterm-report > p a")).to_contain_text(
-                        "V0.97"
+                        "V0.98"
                     )
                     expect(page.locator("#midterm-model-runtime")).to_contain_text(
                         "100.000000%"
@@ -643,7 +650,7 @@ def main():
         page = browser.new_page()
         page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
         page.route(
-            "**/data/midterm-v097.json",
+            "**/data/midterm-v098.json",
             lambda route: route.fulfill(status=503, body="unavailable"),
         )
         page.goto(f"{args.url}/dataset-validation.html")
