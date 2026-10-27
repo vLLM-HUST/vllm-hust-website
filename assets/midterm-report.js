@@ -55,7 +55,7 @@
         }
         if (section.id === 'v15-remaining' && tableIndex === 0) {
             const inventory = data.sections.find(s => s.id === 'dataset-quality-inventory').evidence;
-            return [inventory[11], section.evidence.find(e => e.path.includes('hle-native018-completed-20261026')), section.evidence.find(e => e.path.includes('swe-native018-protonmail-qutebrowser-20261027')), inventory[9], section.evidence.find(e => e.path.includes('terminal-cancel-async-partial-recovery-20261027'))];
+            return [inventory[11], section.evidence.find(e => e.path.includes('hle-native018-completed-20261026')), section.evidence.find(e => e.path.includes('swe-protonmail-dependency-recovery-20261027')), inventory[9], section.evidence.find(e => e.path.includes('terminal-cancel-async-partial-recovery-20261027'))];
         }
         if (section.id === 'milestone-v15') {
             const bySuffix = suffix => section.evidence.find(source => source.path.endsWith(suffix));

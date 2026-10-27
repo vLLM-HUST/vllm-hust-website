@@ -226,7 +226,7 @@ def main():
                                 ),
                                 (
                                     2,
-                                    "reports/swe-native018-protonmail-qutebrowser-20261027/catalog.json",
+                                    "reports/swe-protonmail-dependency-recovery-20261027/summary.json",
                                 ),
                                 (3, inventory[9]["path"]),
                                 (
