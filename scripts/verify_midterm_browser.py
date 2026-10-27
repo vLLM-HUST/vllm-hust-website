@@ -129,8 +129,8 @@ def main():
                     for value in (
                         "1 / 6",
                         "null",
-                        "2/89",
-                        "87",
+                        "3/89",
+                        "86",
                         "ContextLengthExceededError",
                     ):
                         expect(partial).to_contain_text(value)
