@@ -24,7 +24,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 2
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #529 supplies the merged V0.94 evidence identity.
+    # Benchmark #529 supplies the merged V0.95 evidence identity.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
