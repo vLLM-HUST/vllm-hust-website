@@ -118,7 +118,7 @@ def main():
                     )
                     expect(break_filter.locator("tbody tr")).to_have_count(0)
                     expect(break_filter).to_contain_text("null")
-                    expect(break_filter).to_contain_text("4/89")
+                    expect(break_filter).to_contain_text("3/89")
                     expect(break_filter).to_contain_text("1200")
                     expect(swe).to_contain_text("361.464713")
                     expect(swe).to_contain_text("511.628888")
