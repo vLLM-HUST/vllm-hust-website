@@ -16,6 +16,8 @@
     // Keep their recorded wording and numbers; make the time scope explicit.
     const historicalM01 = new Set(['m01', 'fenced-model', 'trace-qualification', 'reference-closure', 'worker-model']);
     const datasetEvidence = new Set([
+        'reports/swe-protonmail-dependency-recovery-20261027/summary.json',
+        'reports/terminal-cython-single-trace-20261027/summary.json',
         'reports/terminal-build-cython-controls-20261027/summary.json',
         'reports/swe-protonmail-test-source-recovery-20261027/summary.json',
         'reports/swe-native018-navidrome-20261027/catalog.json',
