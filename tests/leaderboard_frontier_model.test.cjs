@@ -681,6 +681,11 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.equal(p.evidence.activation_log.point_isolated,true);
             assert.equal(p.evidence.benchmark_protocol.prepared_workload_sha256,'dff300c473f0407681c379bdea846756509e436d7faa1539479c17acd2ed2d7b'); // pragma: allowlist secret
             assert.equal(p.evidence.benchmark_protocol.tokenizer_fingerprint,'319f580a2fc8d2ff1e1f48a26ea0c29eea35798d747e7188ca584e92c014bdf9'); // pragma: allowlist secret
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-w4a8-gdnw8a8-tp1-swe-curves-20261023'){
+            assert.equal(p.cohort_id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1');
+            assert.ok([1,2,4,8,16].includes(p.load.concurrency));
+            assert.equal(p.configuration.hardware.accelerator_count,1);
+            assert.equal(byId.get(p.cohort_id).precision.id,'w4a8-expert-int4-linearattn-w8a8-weights-compute-bf16-kv');
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -1165,7 +1170,7 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const allQwen35=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.equal(allQwen35.length,8);
+    assert.equal(allQwen35.length,9);
     const cohorts=allQwen35.filter(c=>c.precision.id==='bf16-weights-compute-kv');
     assert.equal(cohorts.length,4);
     assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='configuration-study').length,3);
@@ -1197,6 +1202,12 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     assert.equal(w4a8[0].id,'qwen35-35b-a3b-w4a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1');
     assert.doesNotMatch(w4a8[0].id,/smoke|historical/i);
     assert.doesNotMatch(w4a8[0].workload.label,/smoke|historical/i);
+    const w4a8gdnw8a8=allQwen35.filter(c=>c.precision.id==='w4a8-expert-int4-linearattn-w8a8-weights-compute-bf16-kv');
+    assert.equal(w4a8gdnw8a8.length,1);
+    assert.equal(w4a8gdnw8a8[0].id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1');
+    assert.equal(w4a8gdnw8a8[0].workload.id,'sweprefix-qwen35-w4a8-gdnw8a8-tp1-900s-v1');
+    assert.equal(w4a8gdnw8a8[0].context_tokens,w4a8[0].context_tokens);
+    assert.doesNotMatch(w4a8gdnw8a8[0].id,/smoke|historical/i);
     const original=data.archived_cohorts.find(c=>c.id==='qwen35-35b-a3b-bf16-sweprefix-unified-v1');
     assert.ok(original);
     const moved=data.points.filter(p=>p.evidence.original_cohort_id===original.id);
