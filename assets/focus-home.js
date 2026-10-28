@@ -9,7 +9,7 @@
     document.getElementById('focus-stages').textContent = t('有效算力效率：中期里程碑门槛 50%，最终验收门槛 90%。当前结果按测量方法和适用范围分别判断。', 'Effective-compute efficiency: 50% for the midterm milestone, 90% for final acceptance. Assess each result within its measurement method and scope.');
     const root = document.getElementById('focus-paths'); root.replaceChildren();
     const items = [
-      ['01', 'dataset-introductions.html', t('浦江指定数据集测试', 'Pujiang designated datasets'), t('五项数据集的来源、测试说明、客户端安装、执行入口与评分边界。', 'Sources, test instructions, client installation, execution entrypoints and scoring scope for the five datasets.')],
+      ['01', 'dataset-introductions.html', t('项目指定数据集测试', 'Project-designated datasets'), t('五项数据集的来源、测试说明、客户端安装、执行入口与评分边界。', 'Sources, test instructions, client installation, execution entrypoints and scoring scope for the five datasets.')],
       ['02', 'b0-b1.html', t('B0/B1 大纲对比', 'B0/B1 results by test outline'), t('有效算力、吞吐与时延、稳定性、单位 token 成本；同时列出结果与未完成项。', 'Effective compute, throughput and latency, stability, and unit-token cost, including outstanding evidence.')],
       ['03', 'serving-plan.html', t('服务产能与成本', 'Serving capacity & cost'), t('从实测吞吐估算产能，输入实际成本与参考价格，查看假设下的账单。', 'Estimate capacity from measured throughput and inspect costs using your own expenses and price assumptions.')]
     ];

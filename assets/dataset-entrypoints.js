@@ -174,7 +174,7 @@
 
   function render() {
     const labels = {
-      'entry-title': ['Pujiang designated datasets', '浦江指定数据集测试'],
+      'entry-title': ['Project-designated datasets', '项目指定数据集测试'],
       'entry-lead': ['Original data, installation, execution and scoring for the five designated datasets.', '指定五项数据集的原始来源、安装、测试入口与评分说明。先选择数据集，再按对应客户端或沙箱流程执行。'],
       'entry-jump-basic': ['The five datasets', '指定五项数据集'], 'entry-jump-special': ['2. Special scoring', '2. 特殊评分'], 'entry-jump-sandbox': ['3. Agent sandboxes', '3. 闭环任务'],
       'entry-all-link': ['All 118 sources', '全部 118 来源'],
