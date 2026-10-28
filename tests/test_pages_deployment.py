@@ -32,7 +32,9 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     for filename in (
-        "ci.yml", "midterm-browser.yml", "sync-plugin-workshop-metadata.yml"
+        "ci.yml",
+        "midterm-browser.yml",
+        "sync-plugin-workshop-metadata.yml",
     ):
         source = yaml.load(
             (ROOT / ".github/workflows" / filename).read_text(), Loader=yaml.BaseLoader
