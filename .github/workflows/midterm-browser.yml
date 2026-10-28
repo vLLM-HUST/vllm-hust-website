@@ -30,6 +30,7 @@ jobs:
       - name: Assemble benchmark publication
         run: |
           python _benchmark/scripts/sync_website_publication.py publish --revision "$(git -C _benchmark rev-parse HEAD)" --website .
+          python scripts/assemble_dataset_entrypoints.py
           python -m pip install playwright pytest
           python -m pytest tests/test_benchmark_publication.py -q
       - name: Install browser and system dependencies
