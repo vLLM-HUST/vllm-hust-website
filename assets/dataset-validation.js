@@ -80,7 +80,7 @@
             throw new Error('Unsupported dataset program contract');
         }
         if (!data.designation || data.designation.id !== 'pujiang-specified-dataset-scope' || data.designation.scope_status !== 'names-only') {
-            throw new Error('Dataset program lacks the Pujiang designation');
+            throw new Error('Dataset program lacks the project designation');
         }
         if (!data.test_plan || data.test_plan.test_plan_version !== 'V5.5' || data.test_plan.mandatory_model !== 'Qwen/Qwen3.5-35B-A3B' || data.test_plan.formal_precision !== 'BF16' || data.test_plan.baseline_roles?.join('|') !== 'B0|B1' || typeof data.test_plan.contract_url !== 'string' || !data.test_plan.contract_url.startsWith('https://') || typeof data.test_plan.evidence_boundary !== 'string' || typeof data.test_plan.evidence_boundary_zh !== 'string') {
             throw new Error('Dataset program lacks the V5.5 acceptance contract');
@@ -116,9 +116,9 @@
         const receiptSummary = lang() === 'zh'
             ? `B0 配置与来源回执：${receiptGate.owner_zh} · 实际发布工件与实际运行`
             : 'B0 configuration and provenance receipt: release and evaluation engineering · actual release artifacts and runs';
-        $('dataset-program-kicker').textContent = lang() === 'zh' ? '浦江指定范围' : 'Pujiang-specified scope';
-        $('dataset-program-title').textContent = lang() === 'zh' ? designation.label_zh : designation.label;
-        $('dataset-program-lede').textContent = lang() === 'zh' ? designation.scope_note_zh : designation.scope_note;
+        $('dataset-program-kicker').textContent = lang() === 'zh' ? '项目指定范围' : 'Project-designated scope';
+        $('dataset-program-title').textContent = lang() === 'zh' ? '项目指定数据集' : 'Project-designated datasets';
+        $('dataset-program-lede').textContent = lang() === 'zh' ? designation.scope_note_zh.replaceAll('浦江指定', '项目指定') : designation.scope_note.replaceAll('Pujiang-specified', 'Project-designated');
         $('dataset-program-contract').innerHTML = `<a href="${escapeHtml(plan.contract_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(plan.test_plan_version)}</a><span>${escapeHtml(plan.mandatory_model)} · ${escapeHtml(plan.formal_precision)} · ${escapeHtml(plan.baseline_roles.join(' + '))}</span><span>${escapeHtml(lang() === 'zh' ? plan.optional_status_zh : plan.optional_status)}</span><span>${escapeHtml(lang() === 'zh' ? plan.evidence_boundary_zh : plan.evidence_boundary)}</span><span>${escapeHtml(receiptSummary)}</span>`;
         $('dataset-program-list').innerHTML = state.program.primary_datasets.map((dataset) => {
             let note = lang() === 'zh' ? dataset.note_zh : dataset.note;
