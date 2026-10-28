@@ -188,7 +188,7 @@ test('dataset program accepts exactly the five primary datasets', () => {
     }), /Unsupported dataset program/);
     const wrongDesignation = structuredClone(program);
     wrongDesignation.designation.id = 'generic-primary-datasets';
-    assert.throws(() => api.normalizeProgram(wrongDesignation), /Pujiang designation/);
+    assert.throws(() => api.normalizeProgram(wrongDesignation), /project designation/);
 });
 
 test('candidate sets are validated and rendered without hiding non-selected MODs', () => {
