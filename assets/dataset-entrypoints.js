@@ -100,14 +100,14 @@
 
   function agents() {
     const root = document.getElementById('entry-agent-guides'); root.replaceChildren();
-    const swe = section('SWE_BENCH_PRO', 'SWE-bench-Pro', t('An Agent edits a repository inside an authorized isolated CPU/Docker workspace. A model API alone is not a task sandbox. Use the administrator-provided template or your own authorized sandbox, not the model host Docker socket.',
-      'Agent 在获授权的独立 CPU/Docker 工作区修改仓库。模型 API 不等于任务沙箱；使用管理员提供的模板或自有获授权沙箱，不使用模型宿主机 Docker socket。'), root);
+    const swe = section('SWE_BENCH_PRO', 'SWE-bench-Pro', t('Run the Agent in your Coder CPU/Docker workspace using the published template. The workspace provides a separate task sandbox; connect it to your model API without using the model host Docker socket.',
+      '登录 Coder 后，使用已发布模板创建自己的 CPU/Docker 工作区，按下列步骤运行 Agent。工作区提供独立任务沙箱并连接模型 API，不使用模型宿主机 Docker socket。'), root);
     const sweLinks = el('p', undefined, 'entry-links');
-    sweLinks.append(link(t('Coder workspace instructions', 'Coder 工作区操作说明'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md#coder-上的执行结构docker-in-docker-沙箱'), link(t('Complete run and grading guide', '完整运行与评分指南'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md'), link(t('Ops skill: SWE Pro preparation', 'ops skill：SWE Pro 环境准备'), OPS + 'references/swe-bench-pro.md'));
+    sweLinks.append(link(t('Coder workspace instructions', 'Coder 工作区操作说明'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md#coder-上的执行结构docker-in-docker-沙箱'), link(t('Complete run and grading guide', '完整运行与评分指南'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md'), link(t('Platform assistant (optional)', '平台助手（可选）'), OPS + 'references/swe-bench-pro.md'));
     swe.append(sweLinks);
-    appendStep(swe, t('1. Prepare the CPU workspace with ops', '1. 请 ops 准备 CPU 执行工作区'), null,
-      t('Use the published swe-bench-pro-cpu template. Ops discovers the available template, isolated Docker daemon, pinned ARM images, dataset access and model API, then returns the workspace entry and ready-to-run command. The model service remains separate. The starter covers one NodeBB V1 task; the lock covers eight tasks, not the entire dataset.',
-        '使用已发布的 swe-bench-pro-cpu 模板。由 ops 发现可用模板、独立 Docker daemon、固定 ARM 镜像、数据访问和模型 API，交付工作区入口及可执行命令。模型服务独立运行。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
+    appendStep(swe, t('1. Create your Coder CPU workspace', '1. 创建自己的 Coder CPU 工作区'), null,
+      t('In Coder, create a workspace from the published swe-bench-pro-cpu template and open its terminal. Use your model API with the commands below. The template provides the isolated Docker environment. A platform assistant can optionally help prepare the workspace. The starter runs one NodeBB V1 task; the lock covers eight tasks, not the entire dataset.',
+        '在 Coder 中选择已发布的 swe-bench-pro-cpu 模板创建工作区，打开终端，使用自己的模型 API 执行下方命令。模板提供独立 Docker 环境；也可以让平台助手代为准备。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
     swe.append(code(t('Use npu-private-cloud-ops to prepare SWE-bench Pro on my authorized platform. Discover the CPU template and existing model service; complete the pinned environment and input checks. Return the workspace entry, exact command and result paths. Keep the official tested Agent unchanged. Report preparation, Agent submission and official grading separately.',
       '请使用 npu-private-cloud-ops，在我有权使用的平台准备 SWE-bench Pro。发现 CPU 模板和已有模型服务，完成固定环境与输入检查，交付工作区入口、实际命令和结果位置。保持被测官方 Agent 不变，分别报告环境就绪、Agent 提交和官方评分。')));
     appendStep(swe, t('2. Pinned bootstrap, then one explicit run', '2. 固定 bootstrap，然后显式运行'),
@@ -268,7 +268,7 @@
     const boundary = document.getElementById('entry-boundaries'); boundary.replaceChildren();
     for (const pair of [
       [t('Local client', '本地客户端'), t('Existing authorized service URL, exact model, credentials and task budgets. No SSH is needed for HTTP clients; runtime evidence comes from the service owner.', 'HTTP 客户端使用现有获授权服务 URL、真实模型、认证和任务预算，无需 SSH；服务身份由运维提供。')],
-      [t('Platform submission', '平台提交 API'), t('BLOCKED_NOT_INTEGRATED: ordinary-user production identity is not connected. The local Unix test component is not a public multi-user submission service.', 'BLOCKED_NOT_INTEGRATED：普通用户生产身份链路未接通。本地 Unix 测试组件不是公开多用户提交服务。')],
+      [t('Run the evaluation', '运行方式'), t('Follow the selected dataset guide in your Coder workspace. This page provides installation commands, execution steps and result instructions.', '在自己的 Coder 工作区按对应数据集指南运行。本页提供安装命令、执行步骤和结果查看说明。')],
       [t('MOD integration', 'MOD 接入'), t('Operators configure the server-side optimization and supported API. Reuse these clients when their contract matches; a new client is not required for each MOD. Do not silently change prompts, budgets or scoring.', '运维配置服务端优化及支持的 API；合同一致时复用客户端，不为每个 MOD 另造客户端，不静默改变提示、预算或评分。')]
     ]) boundary.append(el('dt', pair[0]), el('dd', pair[1]));
     text('entry-load-status', 'Five designated dataset guides loaded.', '已加载指定五项数据集的测试指南。');
