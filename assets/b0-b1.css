@@ -1,0 +1,30 @@
+body[data-page="b0-b1"] .focus-main { padding-top: 20px; }
+body[data-page="b0-b1"] .focus-hero { padding: 4px 0 12px; }
+body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); margin: 10px 0; }
+.comparison-overview > h2 { font-size: 22px; margin: 8px 0; }
+.comparison-context { font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+.comparison-group { border: 1px solid #75868a; border-radius: 12px; padding: 20px; margin: 18px 0; scroll-margin-top: 110px; }
+.comparison-group h2 { font-size: 20px; margin: 0 0 16px; }
+.comparison-row + .comparison-row { border-top: 1px solid #75868a; padding-top: 16px; margin-top: 16px; }
+.comparison-row h3 { font-size: 16px; margin: 0 0 12px; }
+.comparison-row dl { display: grid; grid-template-columns: 1fr 1fr 1.4fr 1.6fr; gap: 18px; margin: 0; }
+.comparison-row dl > div { min-width: 0; }
+.comparison-row dt { font-size: 12px; font-weight: 500; margin-bottom: 6px; }
+.comparison-row dd { margin: 0; font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
+.comparison-row dl > div:nth-child(-n+2) dd { font-weight: 700; font-variant-numeric: tabular-nums; }
+.comparison-row dl > div:nth-child(3) { border-left: 3px solid #c99c52; padding-left: 12px; }
+.comparison-caveat { font-size: 13px; line-height: 1.65; margin: 18px 0 12px; }
+.comparison-detail-link { display: inline-block; font-size: 14px; padding: 6px 0; }
+.comparison-methods { margin-top: 36px; }
+.comparison-methods > h2 { font-size: 22px; }
+.comparison-method { margin: 0; padding: 20px 0; scroll-margin-top: 110px; }
+.comparison-method > summary { cursor: pointer; font-size: 16px; font-weight: 650; line-height: 1.6; }
+.comparison-method[open] > summary { margin-bottom: 22px; }
+.comparison-method summary:focus-visible, .comparison-detail-link:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+@media (max-width: 700px) {
+ .comparison-group { padding: 16px; }
+ .comparison-row dl { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+ .comparison-row dl > div:nth-child(n+3) { grid-column: 1 / -1; }
+ body[data-page="b0-b1"] .focus-main > .benchmark-tabs { gap: 0; }
+ body[data-page="b0-b1"] .focus-main > .benchmark-tabs a { padding: 6px 8px; }
+}
