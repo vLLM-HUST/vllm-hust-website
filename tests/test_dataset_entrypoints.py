@@ -60,6 +60,13 @@ def test_public_projection_has_no_operational_private_paths():
 
 
 def test_canonical_navigation_copy_identity():
-    identity = json.loads((ROOT / "assets/data/dataset-entrypoints-source.json").read_text())
-    assert hashlib.sha256((ROOT / "assets/data/dataset-entrypoints-v1.json").read_bytes()).hexdigest() == identity["sha256"]
+    identity = json.loads(
+        (ROOT / "assets/data/dataset-entrypoints-source.json").read_text()
+    )
+    assert (
+        hashlib.sha256(
+            (ROOT / "assets/data/dataset-entrypoints-v1.json").read_bytes()
+        ).hexdigest()
+        == identity["sha256"]
+    )
     assert identity["path"] == "docs/dataset-entrypoints/dataset-entrypoints-v1.json"
