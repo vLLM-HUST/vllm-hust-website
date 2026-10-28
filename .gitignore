@@ -76,3 +76,7 @@ _benchmark/
 # Canonical metadata is assembled from benchmark at a fixed commit during CI/Pages.
 assets/data/dataset-entrypoints-v1.json
 assets/data/dataset-entrypoints-source.json
+
+# Canonical Terminal acceptance is assembled from the benchmark repository.
+/assets/data/terminal-arm64-acceptance-v1.json
+/assets/data/terminal-arm64-acceptance-source.json

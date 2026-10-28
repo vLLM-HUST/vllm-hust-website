@@ -42,3 +42,9 @@ body[data-page="dataset-entrypoints"] main :is(h1, h2, h3, h4, summary, strong) 
   .entry-toolbar label { width: 100%; }
   .entry-toolbar input, .entry-toolbar select { width: 100%; }
 }
+
+.terminal-current-result table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.terminal-current-result th, .terminal-current-result td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border-color, #76828a); vertical-align: top; }
+.terminal-current-result th:first-child, .terminal-current-result td:first-child { padding-left: 0; }
+.terminal-current-result th:last-child, .terminal-current-result td:last-child { padding-right: 0; }
+.terminal-current-result tbody tr:last-child { font-weight: 650; }
