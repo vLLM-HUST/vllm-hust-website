@@ -1206,7 +1206,7 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     assert.ok([0,1].includes(w4a8gdnw8a8.length));
     assert.equal(allQwen35.length,8+w4a8gdnw8a8.length);
     if(w4a8gdnw8a8.length===1){
-        assert.equal(w4a8gdnw8a8[0].id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1');
+        assert.equal(w4a8gdnw8a8[0].id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1'); // pragma: allowlist secret (public cohort id)
         assert.equal(w4a8gdnw8a8[0].workload.id,'sweprefix-qwen35-w4a8-gdnw8a8-tp1-900s-v1'); // pragma: allowlist secret (public workload id)
         assert.equal(w4a8gdnw8a8[0].context_tokens,w4a8[0].context_tokens);
         assert.doesNotMatch(w4a8gdnw8a8[0].id,/smoke|historical/i);
