@@ -8,23 +8,38 @@ HOME = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 
 
-def test_primary_navigation_focuses_on_the_three_deliverables() -> None:
+def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     groups = SITE_JS.split("const NAV_GROUPS =", 1)[1].split("function navLink", 1)[0]
-    assert "pages: ['dataset-entrypoints', 'b0-b1', 'serving-plan']" in groups
+    performance = groups.split("id: 'performance'", 1)[1].split("id: 'community'", 1)[0]
+    assert "pages: ['dataset-entrypoints', 'b0-b1', 'serving-plan']" in performance
     assert (
-        groups.index("./dataset-introductions.html")
-        < groups.index("./b0-b1.html")
-        < groups.index("./serving-plan.html")
+        performance.index("./dataset-introductions.html")
+        < performance.index("./b0-b1.html")
+        < performance.index("./serving-plan.html")
     )
-    assert groups.count("id:") == 1
-    for old in (
-        "plugins.html",
-        "achievements.html",
-        "leaderboard-runs.html",
-        "dataset-validation.html",
+    assert groups.count("id:") == 5
+    for name in ("engine", "publications", "community", "resources"):
+        assert f"id: '{name}'" in groups
+    for old in ("leaderboard-runs.html", "dataset-validation.html"):
+        assert old not in performance
+    for section in ("products", "projects", "stack"):
+        assert f"./ecosystem-archive.html#{section}" in SITE_JS
+        assert f'id="{section}"' in HOME
+    assert "navLink('plugins', './plugins.html', 'navPlugins')" in SITE_JS
+    for name in (
+        "achievements",
+        "news",
+        "members",
+        "contributors",
+        "conferences",
+        "courses",
+        "resources",
+        "versions",
+        "issues",
+        "plugins",
+        "ecosystem-archive",
     ):
-        assert old not in groups
-    assert '<details class="nav-group"' in SITE_JS
+        assert 'content="noindex, follow"' not in (ROOT / f"{name}.html").read_text()
 
 
 def test_resources_navigation_lists_two_distinct_verified_cluster_frontends() -> None:
@@ -84,7 +99,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">Ecosystem</a>' in text, name
-        assert "assets/site.js?v=focus-20261028" in text, name
+        assert "assets/site.js?v=nav-restored-20261028" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -124,7 +139,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=benchmarks-ia-20261003" in versions
-    assert "assets/site.js?v=focus-20261028" in versions
+    assert "assets/site.js?v=nav-restored-20261028" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
@@ -146,7 +161,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=focus-20261028" in text
+        assert "assets/site.js?v=nav-restored-20261028" in text
         if name not in ("ecosystem-archive.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 

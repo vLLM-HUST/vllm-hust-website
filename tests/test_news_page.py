@@ -4,14 +4,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_news_page_is_retained_but_delisted() -> None:
+def test_news_page_remains_in_navigation_and_footer() -> None:
     page = (ROOT / "news.html").read_text(encoding="utf-8")
     shell = (ROOT / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert 'data-page="news"' in page
     assert 'data-source="./data/news.json"' in page
-    assert "['news', './news.html', 'navNews']" not in shell
-    assert '<a href="./news.html" data-i18n-common="navNews">News</a>' not in shell
+    assert "['news', './news.html', 'navNews']" in shell
+    assert '<a href="./news.html" data-i18n-common="navNews">News</a>' in shell
     assert "navNews: 'News'" in shell
     assert "navNews: '新闻'" in shell
 
