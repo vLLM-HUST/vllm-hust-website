@@ -126,6 +126,14 @@ def main():
                                     in page.locator("#metric-2 table").inner_text()
                                 )
                                 assert page.locator("#metric-3 details").count() >= 5
+                                stability = page.locator("#metric-3").inner_text()
+                                assert (
+                                    "66 / 100" in stability and "62 / 100" in stability
+                                )
+                                assert (
+                                    "157 / 668" in stability
+                                    and "316 / 1143" in stability
+                                )
                                 assert page.locator(
                                     "#metric-4 .focus-status"
                                 ).inner_text()
