@@ -950,7 +950,12 @@ def test_scheduled_site_data_refreshes_are_self_healing() -> None:
     assert "bash scripts/check_stale_versions.sh" in versions
     for workflow in (status, plugin, versions):
         assert "group: ${{ github.workflow }}" in workflow
+    for workflow in (status, versions):
         assert "git pull --rebase origin main" in workflow
+    assert "contents: read" in plugin
+    assert "git push" not in plugin and "git commit" not in plugin
+    assert "actions/upload-artifact@v4" in plugin
+    assert "sync_website_publication.py publish" in plugin
 
 
 def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
