@@ -105,39 +105,63 @@ def main():
                                 page.wait_for_selector(
                                     '#comparison[data-loaded="V0.99"]'
                                 )
-                                assert page.locator(".focus-result").count() == 4
-                                table = page.locator(
-                                    "#metric-1 table"
-                                ).first.inner_text()
-                                assert "54.0301%" in table and "99.9397%" in table
-                                assert "50%" in table and "90%" in table
+                                overview = page.locator(".comparison-overview")
+                                assert page.locator(".comparison-group").count() == 4
+                                assert page.locator(".comparison-row").count() == 7
                                 assert (
-                                    "达到数值门槛" in table
+                                    page.locator(".comparison-method[open]").count()
+                                    == 0
+                                )
+                                assert (
+                                    overview.bounding_box()["y"]
+                                    < page.locator(
+                                        ".comparison-methods"
+                                    ).bounding_box()["y"]
+                                )
+                                current = overview.inner_text()
+                                for value in (
+                                    "3.8407",
+                                    "7.1042",
+                                    "54.0301%",
+                                    "99.9397%",
+                                    "50%",
+                                    "90%",
+                                    "247.2656",
+                                    "885.9611",
+                                    "258.3035%",
+                                    "1685.4442",
+                                    "365.0111",
+                                    "78.3433%",
+                                    "71.2462",
+                                    "17.9418",
+                                    "74.8172%",
+                                ):
+                                    assert value in current, value
+                                assert (
+                                    "尚不能判定"
+                                    in page.locator("#metric-4").inner_text()
                                     if language == "zh"
-                                    else "Meets numeric threshold" in table
+                                    else "not yet demonstrated"
+                                    in page.locator("#metric-4").inner_text()
                                 )
-                                assert (
-                                    "未达到" in table
-                                    if language == "zh"
-                                    else "Below threshold" in table
-                                )
-                                assert (
-                                    "258.3035%"
-                                    in page.locator("#metric-2 table").inner_text()
-                                )
-                                assert page.locator("#metric-3 details").count() >= 5
-                                stability = page.locator("#metric-3").inner_text()
-                                assert (
-                                    "66 / 100" in stability and "62 / 100" in stability
-                                )
-                                assert (
-                                    "157 / 668" in stability
-                                    and "316 / 1143" in stability
-                                )
-                                assert page.locator(
-                                    "#metric-4 .focus-status"
-                                ).inner_text()
-                                # Evidence links always identify the published source commit.
+                                assert "FrontierScience" in current and "HLE" in current
+                                # Every metric exposes both measurements, verdict and gaps
+                                # without opening details or horizontal scrolling on mobile.
+                                for row in page.locator(".comparison-row").all():
+                                    assert row.locator("dt").all_text_contents()[
+                                        :2
+                                    ] == ["B0", "B1"]
+                                    assert row.locator("dd").count() == 4
+                                    for value in row.locator("dd").all():
+                                        assert (
+                                            value.is_visible()
+                                            and value.inner_text().strip()
+                                        )
+                                        box = value.bounding_box()
+                                        assert (
+                                            box["x"] >= 0
+                                            and box["x"] + box["width"] <= width + 1
+                                        )
                                 evidence = page.locator(".focus-source a").evaluate_all(
                                     "ee=>ee.map(e=>e.href)"
                                 )
@@ -145,14 +169,40 @@ def main():
                                     "/blob/" in href or "/tree/" in href
                                     for href in evidence
                                 )
-                                page.locator("#metric-1 details summary").click()
+                                # In-page evidence links open the matching native disclosure.
+                                page.locator(
+                                    "#metric-1 .comparison-detail-link"
+                                ).click()
+                                assert (
+                                    page.locator("#method-1").get_attribute("open")
+                                    is not None
+                                )
+                                quality = page.locator("#method-1 details summary")
+                                quality.focus()
+                                page.keyboard.press("Enter")
                                 assert (
                                     "151 / 200"
-                                    in page.locator("#metric-1").inner_text()
+                                    in page.locator("#method-1").inner_text()
                                 )
                                 assert (
                                     "156 / 200"
-                                    in page.locator("#metric-1").inner_text()
+                                    in page.locator("#method-1").inner_text()
+                                )
+                                page.locator(
+                                    "#metric-3 .comparison-detail-link"
+                                ).click()
+                                stability = page.locator("#method-3").inner_text()
+                                assert (
+                                    "66 / 100" in stability and "62 / 100" in stability
+                                )
+                                assert (
+                                    "157 / 668" in stability
+                                    and "316 / 1143" in stability
+                                )
+                                # Screenshot the default result-first view after interaction.
+                                page.goto(f"{base}/{name}", wait_until="networkidle")
+                                page.wait_for_selector(
+                                    '#comparison[data-loaded="V0.99"]'
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
