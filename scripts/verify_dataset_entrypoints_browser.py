@@ -50,6 +50,9 @@ def main():
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth + 1"
                     )
+                    assert page.evaluate(
+                        "getComputedStyle(document.querySelector('h1')).color === getComputedStyle(document.body).color"
+                    )
                     page.screenshot(
                         path=str(args.output / f"{language}-{width}-{theme}.png")
                     )

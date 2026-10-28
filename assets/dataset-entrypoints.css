@@ -1,6 +1,7 @@
 .entry-main { padding-top: 42px; padding-bottom: 64px; max-width: 1120px; }
 body[data-page="dataset-entrypoints"] { background: #101719; color: #edf3f3; }
 body[data-page="dataset-entrypoints"] main a { color: #83d9db; }
+body[data-page="dataset-entrypoints"] main :is(h1, h2, h3, h4, summary, strong) { color: inherit; }
 .entry-main details > summary { cursor: pointer; font-weight: 650; }
 .entry-main h4 { font-size: 16px; margin-bottom: 8px; }
 @media (prefers-color-scheme: light) {
