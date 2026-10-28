@@ -2,6 +2,8 @@
     const I18N = {
         en: {
             navHome: 'Home',
+            navDatasetGuide: '1. Designated datasets',
+            navComparison: '2. B0/B1 results',
             navLeaderboard: 'Benchmarks',
             navPerformanceCurves: 'Performance tests',
             navFixedTarget: 'Fixed-target registry',
@@ -41,6 +43,8 @@
         },
         zh: {
             navHome: '首页',
+            navDatasetGuide: '1. 指定数据集测试',
+            navComparison: '2. B0/B1 大纲对比',
             navLeaderboard: '评测',
             navPerformanceCurves: '性能测试',
             navFixedTarget: '固定目标注册表',
@@ -166,59 +170,16 @@
         window.dispatchEvent(new CustomEvent('vllm-hust:langchange', { detail: { lang } }));
     }
 
-    const NAV_GROUPS = [
-        {
-            id: 'engine',
-            label: 'navEngine',
-            pages: [],
-            links: [
-                ['', './index.html#stack', 'navEngine'],
-            ],
-        },
-        {
-            id: 'publications',
-            label: 'navPublications',
-            pages: ['achievements', 'news'],
-            links: [
-                ['achievements', './achievements.html', 'navAchievements'],
-                ['news', './news.html', 'navNews'],
-            ],
-        },
-        {
-            id: 'performance',
-            label: 'navPerformance',
-            pages: ['leaderboard-v2', 'dataset-validation', 'serving-plan'],
-            links: [
-                ['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves'],
-                ['dataset-validation', './dataset-validation.html', 'navDatasetValidation'],
-                ['serving-plan', './serving-plan.html', 'navServingPlan'],
-            ],
-        },
-        {
-            id: 'community',
-            label: 'navCommunity',
-            pages: ['members', 'contributors', 'conferences', 'courses'],
-            links: [
-                ['members', './members.html', 'navMembers'],
-                ['contributors', './contributors.html', 'navContributors'],
-                ['conferences', './conferences.html', 'navConferences'],
-                ['courses', './courses.html', 'navCourses'],
-            ],
-        },
-        {
-            id: 'resources',
-            label: 'navResources',
-            pages: ['resources', 'versions', 'issues'],
-            links: [
-                ['resources', './resources.html', 'navComputeResources'],
-                ['', 'https://coder.sage.org.ai:9443/login?redirect=%2Fworkspaces%3Ffilter%3D', 'navCluster9443', true],
-                ['', 'https://coder.sage.org.ai:9450/login?redirect=%2Fworkspaces%3Ffilter%3D', 'navCluster9450', true],
-                ['versions', './versions.html', 'navVersions'],
-                ['issues', './issues.html', 'navIssues'],
-                ['', 'https://github.com/vLLM-HUST', 'navGithub', true],
-            ],
-        },
-    ];
+    const NAV_GROUPS = [{
+        id: 'performance',
+        label: 'navPerformance',
+        pages: ['dataset-entrypoints', 'b0-b1', 'serving-plan'],
+        links: [
+            ['dataset-entrypoints', './dataset-introductions.html', 'navDatasetGuide'],
+            ['b0-b1', './b0-b1.html', 'navComparison'],
+            ['serving-plan', './serving-plan.html', 'navServingPlan'],
+        ],
+    }];
 
     function navLink(page, href, key, external) {
         const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
@@ -236,9 +197,7 @@
 
         links.id = 'site-navigation';
         links.innerHTML = [
-            navLink('', './index.html#products', 'navProducts'),
-            navLink('', './index.html#projects', 'navProjects'),
-            navLink('plugins', './plugins.html', 'navPlugins'),
+            navLink('home', './index.html', 'navHome'),
             ...NAV_GROUPS.map((group) => `
                 <details class="nav-group" data-nav-group="${group.id}">
                     <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
@@ -321,11 +280,7 @@
                     <span id="${summaryId}">${summary}</span>
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
-                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html#products" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
-                    <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance tests</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset evaluation</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></div>
-                    <div><strong data-i18n-common="footerPublications">Papers & news</strong><a href="./achievements.html" data-i18n-common="navAchievements">Papers & achievements</a><a href="./news.html" data-i18n-common="navNews">News</a></div>
-                    <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
-                    <div><strong data-i18n-common="navResources">Resources</strong><a href="./resources.html" data-i18n-common="navComputeResources">910B2 compute clusters</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a><a href="./issues.html" data-i18n-common="navIssues">Issues</a></div>
+                    <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. Designated datasets</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 results</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></div>
                 </nav>
             </div>`;
     }

@@ -139,7 +139,7 @@ def test_release_and_navigation_contract():
                 self.by_id[attrs["id"]] = attrs
 
     page = Elements()
-    page.feed((ROOT / "index.html").read_text())
+    page.feed((ROOT / "ecosystem-archive.html").read_text())
     for target in ("stack", "ecosystem", "scope-engine", "scope-ecosystem"):
         assert "hidden" not in page.by_id[target]
     assert page.by_id["runtime-disclosure"]["aria-controls"] == "runtime-list"

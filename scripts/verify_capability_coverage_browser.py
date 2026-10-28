@@ -32,7 +32,7 @@ def main():
             page.keyboard.press("Enter")
             assert page.locator("#coverage-content details[open]").count() == 0
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
-            page.goto(args.url + "/index.html")
+            page.goto(args.url + "/ecosystem-archive.html")
             assert page.locator('a[href="./dataset-validation.html"]').count() > 0
             page.close()
         browser.close()

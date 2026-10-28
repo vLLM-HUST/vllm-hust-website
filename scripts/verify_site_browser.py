@@ -40,7 +40,13 @@ def main():
             page.set_default_timeout(12000)
             errors = []
             page.on("pageerror", lambda error: errors.append(str(error)))
-            for name in ["index", "versions", "issues", "achievements", "plugins"]:
+            for name in [
+                "ecosystem-archive",
+                "versions",
+                "issues",
+                "achievements",
+                "plugins",
+            ]:
                 response = page.goto(
                     f"{args.url.rstrip('/')}/{name}.html",
                     wait_until="domcontentloaded",
@@ -48,7 +54,7 @@ def main():
                 )
                 assert response.status == 200, (name, response.status)
                 suffix = f"{name}-{width}-{scheme}"
-                if name == "index":
+                if name == "ecosystem-archive":
                     for target in ["#stack", "#ecosystem"]:
                         assert page.locator(target).is_visible(), target
                     if width == 390:
