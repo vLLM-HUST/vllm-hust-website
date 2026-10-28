@@ -1,0 +1,7 @@
+{
+  "repository": "vLLM-HUST/vllm-hust-benchmark",
+  "commit": "c3b4297b337802af8b767bd0b3a6533b4c5604c9",
+  "path": "docs/dataset-entrypoints/dataset-entrypoints-v1.json",
+  "sha256": "dd192122308172b42227d70c0c6cd92afe368b0f2daa99aa419dc99d6f8d1c01",
+  "scope": "Separate canonical navigation directory; existing experimental publication pin and data are unchanged."
+}
