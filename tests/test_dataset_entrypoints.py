@@ -44,7 +44,8 @@ def test_real_page_not_redirect_and_three_layers():
     assert "scoring=NOT_RUN" in js
     assert "request_replay" in js
     assert "harbor run -c" in json.dumps(DATA)
-    assert "--source-revision ${REV}" in js
+    assert "bootstrap_swe_bench_pro.py?ref=${AGENT_REV}" in js
+    assert "--source-revision ${AGENT_REV}" in js
 
 
 def test_public_projection_has_no_operational_private_paths():
