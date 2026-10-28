@@ -392,6 +392,7 @@ def build_snapshot(
     *,
     identities: dict[str, str] | None = None,
     identity_advisors: dict[str, list[dict[str, str]]] | None = None,
+    inactive_maintainers: set[str] | None = None,
     generated_at: str | None = None,
 ) -> dict[str, Any]:
     components = registry.get("components")
@@ -442,6 +443,10 @@ def build_snapshot(
             raw_repository, _ = client.get_json(f"/repos/{slug}")
             default_branch = str(raw_repository.get("default_branch") or "main")
             handles, source = maintainer_handles(client, slug, default_branch)
+        inactive = {login.casefold() for login in (inactive_maintainers or set())}
+        handles = [login for login in handles if login.casefold() not in inactive]
+        if not handles:
+            raise ValueError(f"{plugin_id}: no current maintainer remains")
         declared_names = declared_identity_names(item, handles)
         plugin_identity_names = {**identity_names, **declared_names}
         advisors = declared_advisors(item)
@@ -540,7 +545,15 @@ def main() -> None:
     identities = verified_identity_names(identity_sources)
     advisors = verified_identity_advisors(identity_sources)
     snapshot = build_snapshot(
-        registry, client, identities=identities, identity_advisors=advisors
+        registry,
+        client,
+        identities=identities,
+        identity_advisors=advisors,
+        inactive_maintainers={
+            str(person["github_login"])
+            for person in organization_people.get("people", {}).values()
+            if person.get("is_current_member") is False and person.get("github_login")
+        },
     )
     if args.output.exists():
         existing = json.loads(args.output.read_text(encoding="utf-8"))

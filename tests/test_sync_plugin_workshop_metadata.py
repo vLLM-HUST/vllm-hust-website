@@ -284,3 +284,32 @@ def test_explicit_no_advisor_overrides_inferred_relationships():
         {"components": [item]}, PublicIdentityClient(), identity_advisors=inferred
     )
     assert result["plugins"][item["id"]]["advisors"] == inferred["shuhaozhangtony"]
+
+
+def test_inactive_maintainers_are_not_restored_from_stale_registry():
+    class IdentityClient:
+        def user(self, login):
+            assert login == "current-owner"
+            return {"name": login}
+
+    item = {
+        "id": "example-mod",
+        "canonical_repository": "https://github.com/example/example-mod",
+        "repository_visibility": "private",
+        "maintainers": ["Former-Owner", "current-owner"],
+    }
+    result = MODULE.build_snapshot(
+        {"components": [item]},
+        IdentityClient(),
+        inactive_maintainers={"former-owner"},
+    )
+    assert [p["login"] for p in result["plugins"][item["id"]]["maintainers"]] == [
+        "current-owner"
+    ]
+    item["maintainers"] = ["Former-Owner"]
+    with pytest.raises(ValueError, match="no current maintainer remains"):
+        MODULE.build_snapshot(
+            {"components": [item]},
+            IdentityClient(),
+            inactive_maintainers={"former-owner"},
+        )
