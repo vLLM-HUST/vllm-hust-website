@@ -72,3 +72,7 @@ data/legacy/
 # Directories starting with _ are special to Jekyll and would hang the build.
 # This entry prevents the workflow from accidentally re-committing it.
 _benchmark/
+
+# Canonical metadata is assembled from benchmark at a fixed commit during CI/Pages.
+assets/data/dataset-entrypoints-v1.json
+assets/data/dataset-entrypoints-source.json
