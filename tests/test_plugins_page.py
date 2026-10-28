@@ -307,9 +307,8 @@ def test_registry_is_canonical_and_multidimensional() -> None:
 
 
 def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> None:
-    expected = ["mynameisczj", "cybber695", "zhangshengxiang682"]
+    expected = ["cybber695", "zhangshengxiang682"]
     expected_profiles = [
-        {"login": "mynameisczj", "name": "陈子嘉"},
         {"login": "cybber695", "name": "陈彦博"},
         {"login": "zhangshengxiang682", "name": "张盛翔"},
     ]
@@ -1589,7 +1588,6 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
         ),
         "pegaflow": (
             [
-                ("陈子嘉", "mynameisczj"),
                 ("陈彦博", "cybber695"),
                 ("张盛翔", "zhangshengxiang682"),
             ],
@@ -1597,7 +1595,6 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
         ),
         "pegaflow-vllm-connectors": (
             [
-                ("陈子嘉", "mynameisczj"),
                 ("陈彦博", "cybber695"),
                 ("张盛翔", "zhangshengxiang682"),
             ],
