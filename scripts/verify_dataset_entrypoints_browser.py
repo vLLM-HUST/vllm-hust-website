@@ -75,6 +75,31 @@ def main():
                         expect(page.locator(f"#{anchor}")).to_have_attribute("open", "")
                     assert page.locator("#TERMINAL_BENCH_2_1").is_visible()
                     terminal = page.locator("#TERMINAL_BENCH_2_1")
+                    assert "bootstrap_terminal_arm64.py run" in terminal.inner_text()
+                    assert "model-receipt.json" in terminal.inner_text()
+                    evidence = page.locator("#terminal-current-result")
+                    assert evidence.locator("tbody tr").count() == 3
+                    canonical = page.request.get(
+                        args.url.rstrip("/")
+                        + "/assets/data/terminal-arm64-acceptance-v1.json"
+                    ).json()
+                    for index, role in enumerate(("nop", "oracle", "model")):
+                        score = canonical["validation"][role]
+                        cells = evidence.locator("tbody tr").nth(index).locator("td")
+                        expect(cells.nth(1)).to_have_text(format(score["reward"], "g"))
+                        expect(cells.nth(2)).to_have_text(
+                            f"{score['passed']}/{score['tests']}"
+                        )
+                    page.screenshot(
+                        path=str(
+                            args.output
+                            / f"terminal-current-{language}-{width}-{theme}.png"
+                        )
+                    )
+                    advanced = page.locator("#terminal-advanced")
+                    assert not advanced.evaluate("e => e.open")
+                    advanced.locator(":scope > summary").click()
+                    expect(advanced).to_have_attribute("open", "")
                     for command in (
                         "harbor run -c job-oracle.json",
                         "harbor run -c job-smoke.json",
