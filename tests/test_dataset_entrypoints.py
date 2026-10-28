@@ -36,6 +36,7 @@ def test_independent_clients_overlay_empty_provider_entries():
 def test_real_page_not_redirect_and_three_layers():
     html = (ROOT / "dataset-introductions.html").read_text()
     assert 'http-equiv="refresh"' not in html
+    assert '<span class="brand-mark">V</span>' in html
     for anchor in ("ordinary", "special", "sandbox", "all-sources"):
         assert f'id="{anchor}"' in html
     assert "./dataset-introductions.html" in (ROOT / "index.html").read_text()
