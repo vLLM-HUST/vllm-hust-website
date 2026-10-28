@@ -107,9 +107,7 @@ def main():
             failures.locator("summary").press("Enter")
             assert not failures.evaluate("e => e.open")
             expect(
-                page.locator(
-                    '[data-nav-group="performance"] a[href="./dataset-validation.html"]'
-                )
+                page.locator('[data-nav-group="performance"] a[href="./b0-b1.html"]')
             ).to_have_count(1)
             page.screenshot(
                 path=str(args.output / f"overview-{width}-{lang}-{scheme}.png"),

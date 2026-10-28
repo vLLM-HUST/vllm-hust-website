@@ -40,5 +40,5 @@ def test_members_are_separate_from_external_contributors() -> None:
 
     assert 'data-source="./data/members.json?v=roster-20260901"' in page
     assert "navMembers" in shell
-    assert "['members', './members.html', 'navMembers']" in shell
-    assert "['contributors', './contributors.html', 'navContributors']" in shell
+    assert "['members', './members.html', 'navMembers']" not in shell
+    assert "['contributors', './contributors.html', 'navContributors']" not in shell
