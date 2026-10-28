@@ -7,8 +7,8 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-REVISION = "c3b4297b337802af8b767bd0b3a6533b4c5604c9"  # pragma: allowlist secret - canonical commit
-SHA256 = "dd192122308172b42227d70c0c6cd92afe368b0f2daa99aa419dc99d6f8d1c01"  # pragma: allowlist secret - public metadata digest
+REVISION = "ce38eeb05001cfb65f8822b6bffcfe51a8c09805"  # pragma: allowlist secret - canonical commit
+SHA256 = "7cdb80726122cf1d73e93c3da2c16d580ca1181f6b948b666b0f7d9bb640f187"  # pragma: allowlist secret - public metadata digest
 SOURCE = "docs/dataset-entrypoints/dataset-entrypoints-v1.json"
 TERMINAL_REVISION = "d31b20c3b4f1dae120fe7fb5e62dac9f83433716"  # pragma: allowlist secret - public canonical commit
 TERMINAL_SHA256 = "e0c4c9554b096d9ac9cd66d5126e686ac1724c372ca3d3b14b588befca624d15"  # pragma: allowlist secret - public evidence digest

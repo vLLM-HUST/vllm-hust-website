@@ -29,7 +29,7 @@ def test_independent_clients_overlay_empty_provider_entries():
         "TERMINAL_BENCH_2_1",
     }
     assert {r["guide_id"] for r in DATA["sources"] if r["guide_id"]} == guides
-    assert DATA["platform_api"] == "BLOCKED_NOT_INTEGRATED"
+    assert "platform_api" not in DATA
     assert DATA["new_measurements"] == 0
 
 
@@ -72,3 +72,13 @@ def test_canonical_navigation_copy_identity():
         == identity["sha256"]
     )
     assert identity["path"] == "docs/dataset-entrypoints/dataset-entrypoints-v1.json"
+
+
+def test_coder_guide_has_one_user_workflow_without_unrelated_api_warning():
+    js = (ROOT / "assets/dataset-entrypoints.js").read_text()
+    for content in (js, json.dumps(DATA)):
+        assert "BLOCKED_" + "NOT_INTEGRATED" not in content
+    assert "普通用户生产身份链路未接通" not in js
+    assert "请 ops 准备 CPU 执行工作区" not in js
+    assert "1. 创建自己的 Coder CPU 工作区" in js
+    assert "平台助手（可选）" in js
