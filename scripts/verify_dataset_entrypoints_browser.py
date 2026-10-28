@@ -74,9 +74,31 @@ def main():
                         page.locator(f'#designated-cards a[href="#{anchor}"]').click()
                         expect(page.locator(f"#{anchor}")).to_have_attribute("open", "")
                     assert page.locator("#TERMINAL_BENCH_2_1").is_visible()
+                    terminal = page.locator("#TERMINAL_BENCH_2_1")
+                    for command in (
+                        "harbor run -c job-oracle.json",
+                        "harbor run -c job-smoke.json",
+                        "harbor run -c job-b0.json",
+                        "harbor run -c job-b1.json",
+                    ):
+                        assert command in terminal.inner_text()
+                    for anchor in ("terminal-preparation", "terminal-validation"):
+                        panel = page.locator(f"#{anchor}")
+                        assert not panel.evaluate("e => e.open")
+                        panel.locator("summary").click()
+                        expect(panel).to_have_attribute("open", "")
+                    assert "python3.12 -m venv" in terminal.inner_text()
+                    assert "--validate-harbor" in terminal.inner_text()
+                    assert "null reward" in terminal.inner_text()
+                    swe = page.locator("#SWE_BENCH_PRO")
+                    assert swe.locator('a[href*="#coder-"]').count() == 1
                     assert (
-                        "harbor run -c /ABSOLUTE/PRIVATE/job.json"
-                        in page.locator("#TERMINAL_BENCH_2_1").inner_text()
+                        swe.locator('a[href$="references/swe-bench-pro.md"]').count()
+                        == 1
+                    )
+                    assert "quality_score: null" in swe.inner_text()
+                    page.screenshot(
+                        path=str(args.output / f"guides-{language}-{width}-{theme}.png")
                     )
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth + 1"
