@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 
 def main():
@@ -42,9 +42,10 @@ def main():
                         == "rgb(240, 179, 65)"
                     )
                     page.wait_for_function(
-                        "document.querySelectorAll('.entry-source').length === 118"
+                        "document.querySelectorAll('#designated-cards .focus-card').length === 5"
                     )
-                    assert page.locator("#entry-count").inner_text() == "118 / 118"
+                    assert page.locator("#ordinary").is_hidden()
+                    assert page.locator("#all-sources").is_hidden()
                     assert 'http-equiv="refresh"' not in page.content()
                     for anchor in (
                         "MMLU_PRO",
@@ -63,17 +64,16 @@ def main():
                     page.screenshot(
                         path=str(args.output / f"{language}-{width}-{theme}.png")
                     )
-                    page.locator("#entry-search").fill("HLE_VERIFIED")
-                    assert page.locator(".entry-source").count() == 1
-                    page.locator("#source-HLE_VERIFIED summary").click()
-                    assert (
-                        "download-plan HLE_VERIFIED"
-                        not in page.locator("#source-HLE_VERIFIED").inner_text()
-                    )
-                    page.locator("#entry-search").fill("")
-                    page.locator("#entry-filter").select_option("client")
-                    assert page.locator(".entry-source").count() == 5
-                    page.locator("#TERMINAL_BENCH_2_1 summary").click()
+                    for anchor in (
+                        "MMLU_PRO",
+                        "HLE_VERIFIED",
+                        "SWE_BENCH_PRO",
+                        "FRONTIERSCIENCE",
+                        "TERMINAL_BENCH_2_1",
+                    ):
+                        page.locator(f'#designated-cards a[href="#{anchor}"]').click()
+                        expect(page.locator(f"#{anchor}")).to_have_attribute("open", "")
+                    assert page.locator("#TERMINAL_BENCH_2_1").is_visible()
                     assert (
                         "harbor run -c /ABSOLUTE/PRIVATE/job.json"
                         in page.locator("#TERMINAL_BENCH_2_1").inner_text()
@@ -87,7 +87,7 @@ def main():
                             "language": language,
                             "width": width,
                             "theme": theme,
-                            "sources": 118,
+                            "designated_datasets": 5,
                             "page_errors": errors,
                         }
                     )
@@ -96,7 +96,9 @@ def main():
     (args.output / "receipt.json").write_text(
         json.dumps({"checks": results, "model_requests": 0}, indent=2) + "\n"
     )
-    print("PASS: 8 bilingual viewport/theme checks; 118 sources; no model requests")
+    print(
+        "PASS: 8 bilingual viewport/theme checks; 5 designated datasets; no model requests"
+    )
 
 
 if __name__ == "__main__":

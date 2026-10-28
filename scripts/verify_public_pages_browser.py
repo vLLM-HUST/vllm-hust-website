@@ -81,7 +81,7 @@ async def run(args):
                         )
                         == "rgb(240, 179, 65)"
                     )
-                    if filename == "index.html" and width == 390:
+                    if filename == "ecosystem-archive.html" and width == 390:
                         await expect(page.locator(".inference-fabric")).to_be_hidden()
                     if filename == "versions.html":
                         await expect(

@@ -4,34 +4,26 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SITE_JS = (ROOT / "assets" / "site.js").read_text(encoding="utf-8")
 SITE_CSS = (ROOT / "assets" / "site.css").read_text(encoding="utf-8")
-HOME = (ROOT / "index.html").read_text(encoding="utf-8")
+HOME = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 
 
-def test_primary_navigation_separates_publications_from_performance_data() -> None:
-    for label in ("navProducts", "navEngine", "navProjects", "navPlugins"):
-        assert label in SITE_JS
-    assert "label: 'navPublications'" in SITE_JS
-    assert "pages: ['achievements', 'news']" in SITE_JS
-    assert "label: 'navPerformance'" in SITE_JS
-    assert "pages: ['leaderboard-v2', 'dataset-validation', 'serving-plan']" in SITE_JS
+def test_primary_navigation_focuses_on_the_three_deliverables() -> None:
+    groups = SITE_JS.split("const NAV_GROUPS =", 1)[1].split("function navLink", 1)[0]
+    assert "pages: ['dataset-entrypoints', 'b0-b1', 'serving-plan']" in groups
     assert (
-        "['leaderboard-v2', './leaderboard-runs.html', 'navPerformanceCurves']"
-        in SITE_JS
+        groups.index("./dataset-introductions.html")
+        < groups.index("./b0-b1.html")
+        < groups.index("./serving-plan.html")
     )
-    assert "['serving-plan', './serving-plan.html', 'navServingPlan']" in SITE_JS
-    performance = SITE_JS.split("id: 'performance',", 1)[1].split(
-        "id: 'community',", 1
-    )[0]
-    assert performance.count("['") == 4  # Page membership plus three links.
-    assert (
-        "['dataset-validation', './dataset-validation.html', "
-        "'navDatasetValidation']" in SITE_JS
-    )
-    assert "navDatasetIntroductions" not in SITE_JS
-    assert "pages: ['members', 'contributors', 'conferences', 'courses']" in SITE_JS
-    assert "pages: ['resources', 'versions', 'issues']" in SITE_JS
-    assert "navEvidence" not in SITE_JS
+    assert groups.count("id:") == 1
+    for old in (
+        "plugins.html",
+        "achievements.html",
+        "leaderboard-runs.html",
+        "dataset-validation.html",
+    ):
+        assert old not in groups
     assert '<details class="nav-group"' in SITE_JS
 
 
@@ -50,41 +42,35 @@ def test_resources_navigation_lists_two_distinct_verified_cluster_frontends() ->
         url = (
             f"https://coder.sage.org.ai:{port}/login?redirect=%2Fworkspaces%3Ffilter%3D"
         )
-        assert url in SITE_JS
         assert url in page
     assert "https://coder.sage.org.ai:9450/https://" not in page
 
 
-def test_published_dataset_validation_is_in_shared_navigation() -> None:
+def test_current_results_and_guide_are_in_shared_navigation() -> None:
     assert (
-        'href="./dataset-validation.html" data-i18n-common="navDatasetValidation"'
+        "['dataset-entrypoints', './dataset-introductions.html', 'navDatasetGuide']"
         in SITE_JS
     )
-    assert "navLeaderboard: 'Benchmarks'" in SITE_JS
-    assert "navLeaderboard: '评测'" in SITE_JS
-    assert "navDatasetValidation: 'Dataset evaluation'" in SITE_JS
-    assert "navDatasetValidation: '数据集评测'" in SITE_JS
-    assert "navLeaderboardV2" not in SITE_JS
+    assert "['b0-b1', './b0-b1.html', 'navComparison']" in SITE_JS
 
 
-def test_benchmark_pages_share_plain_language_subnavigation() -> None:
-    pages = {
-        "leaderboard-runs.html": "navPerformanceCurves",
-        "dataset-validation.html": "navDatasetValidation",
-    }
-    for name, active_key in pages.items():
-        text = (ROOT / name).read_text(encoding="utf-8")
+def test_benchmark_pages_share_the_ordered_workflow() -> None:
+    for name in (
+        "dataset-introductions.html",
+        "b0-b1.html",
+        "serving-plan.html",
+        "leaderboard-runs.html",
+        "dataset-validation.html",
+    ):
+        text = (ROOT / name).read_text()
         assert 'class="benchmark-tabs"' in text
-        assert 'href="./serving-plan.html"' in text
-        assert 'href="./leaderboard-runs.html"' in text
-        assert 'href="./dataset-validation.html"' in text
-        assert f'data-i18n-common="{active_key}"' in text
-        assert 'aria-current="page"' in text
+        for href in ("dataset-introductions.html", "b0-b1.html", "serving-plan.html"):
+            assert f'href="./{href}"' in text
 
 
 def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() -> None:
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
@@ -98,7 +84,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">Ecosystem</a>' in text, name
-        assert "assets/site.js?v=site-clarity-20261025" in text, name
+        assert "assets/site.js?v=focus-20261028" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -138,13 +124,13 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=benchmarks-ia-20261003" in versions
-    assert "assets/site.js?v=site-clarity-20261025" in versions
+    assert "assets/site.js?v=focus-20261028" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
 def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     pages = (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "news.html",
@@ -160,8 +146,8 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=site-clarity-20261025" in text
-        if name not in ("index.html", "versions.html"):
+        assert "assets/site.js?v=focus-20261028" in text
+        if name not in ("ecosystem-archive.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
 

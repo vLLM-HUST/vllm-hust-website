@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <meta name="robots" content="noindex, follow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="hf-repo" content="intellistream/vllm-hust-benchmark-results">
@@ -47,7 +48,7 @@
   <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
 
   <main class="site-shell runs-shell">
-    <nav class="benchmark-tabs"><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves" aria-current="page" class="active">Performance tests</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation">Dataset evaluation</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></nav><p id="runs-loading" role="status" data-runs-i18n="loading"></p>
+    <nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav><p id="runs-loading" role="status" data-runs-i18n="loading"></p>
     <p id="runs-error" role="alert" data-runs-i18n="error" hidden></p>
     <div id="runs-content" hidden>
       <p id="runs-supplement-warning" class="warning" data-runs-i18n="supplementMissing" hidden></p>
@@ -307,7 +308,7 @@
       'official-target-title': '验收与固定目标合同'
     });
   </script>
-  <script src="./assets/site.js?v=site-clarity-20261025"></script>
+  <script src="./assets/site.js?v=focus-20261028"></script>
   <script src="./assets/current-measurements.js?v=clarity-v099-20261027-clarity2-20261025"></script>
   <script src="./assets/midterm-report.js?v=midterm-v099-quality-20261027"></script>
   <script src="./assets/hf-data-loader.js?v=stable-trend-v5-public-sanitized-20260902"></script>
