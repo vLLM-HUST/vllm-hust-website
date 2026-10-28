@@ -58,7 +58,7 @@ def validate_source(source_dir: Path) -> tuple[dict, list[str]]:
         or designation.get("id") != "pujiang-specified-dataset-scope"
         or designation.get("scope_status") != "names-only"
     ):
-        raise SystemExit("dataset program lacks the Pujiang designation")
+        raise SystemExit("dataset program lacks the project designation")
     primary_ids = [item.get("id") for item in program.get("primary_datasets", [])]
     if primary_ids != [
         "mmlu-pro",
