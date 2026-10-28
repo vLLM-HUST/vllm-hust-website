@@ -24,14 +24,18 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 2
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #537 supplies the merged V0.99 evidence identity.
+    # Benchmark #545 corrects current owners while retaining V0.99 evidence.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "f3b23541a09dd3961f970c027aa8a647ac0f4c95"  # pragma: allowlist secret
+        "c17289b58c0e3d93033d8426d8d8b55ce17fc253"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
-    for filename in ("ci.yml", "midterm-browser.yml"):
+    for filename in (
+        "ci.yml",
+        "midterm-browser.yml",
+        "sync-plugin-workshop-metadata.yml",
+    ):
         source = yaml.load(
             (ROOT / ".github/workflows" / filename).read_text(), Loader=yaml.BaseLoader
         )

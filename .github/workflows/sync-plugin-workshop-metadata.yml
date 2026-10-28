@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   sync-plugin-workshop-metadata:
@@ -24,6 +24,23 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Checkout canonical publication data
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: c17289b58c0e3d93033d8426d8d8b55ce17fc253 # pragma: allowlist secret
+          path: .benchmark-source
+          persist-credentials: false
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+          sparse-checkout-cone-mode: false
+
+      - name: Project canonical publication data
+        run: >-
+          python .benchmark-source/scripts/sync_website_publication.py publish
+          --revision c17289b58c0e3d93033d8426d8d8b55ce17fc253 --website .
+
       - name: Sync Workshop metadata
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -36,15 +53,10 @@ jobs:
             tests/test_sync_plugin_workshop_metadata.py \
             tests/test_plugins_page.py -q
 
-      - name: Commit changes
-        run: |
-          if git diff --quiet -- data/plugin-workshop-metadata.json; then
-            echo "No Workshop metadata updates."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/plugin-workshop-metadata.json
-          git commit -m "chore: sync plugin workshop metadata"
-          git pull --rebase origin main
-          git push origin HEAD:main
+      # Publication data changes belong in benchmark; do not push stale copies to main.
+      - name: Save candidate metadata for benchmark publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-workshop-metadata-candidate
+          path: data/plugin-workshop-metadata.json
+          retention-days: 7

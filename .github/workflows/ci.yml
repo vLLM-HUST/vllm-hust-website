@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: f3b23541a09dd3961f970c027aa8a647ac0f4c95 # pragma: allowlist secret
+          ref: c17289b58c0e3d93033d8426d8d8b55ce17fc253 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -32,9 +32,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision f3b23541a09dd3961f970c027aa8a647ac0f4c95 --website .
+            --revision c17289b58c0e3d93033d8426d8d8b55ce17fc253 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision f3b23541a09dd3961f970c027aa8a647ac0f4c95 --website .
+            --revision c17289b58c0e3d93033d8426d8d8b55ce17fc253 --website .
       - name: Run pre-commit
         run: pre-commit run --all-files
         env:
@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: f3b23541a09dd3961f970c027aa8a647ac0f4c95 # pragma: allowlist secret
+          ref: c17289b58c0e3d93033d8426d8d8b55ce17fc253 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -81,9 +81,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision f3b23541a09dd3961f970c027aa8a647ac0f4c95 --website .
+            --revision c17289b58c0e3d93033d8426d8d8b55ce17fc253 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision f3b23541a09dd3961f970c027aa8a647ac0f4c95 --website .
+            --revision c17289b58c0e3d93033d8426d8d8b55ce17fc253 --website .
       - name: Install browser test dependencies
         run: |
           python -m pip install playwright
