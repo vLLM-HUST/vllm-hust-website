@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" role="img" aria-labelledby="title desc">
+<title id="title">Qwen3.5-35B-A3B W4A8 (experts int4, GDN W8A8) single-chip SWE concurrency speed-throughput tradeoff</title>
+<desc id="desc">Only client concurrency changes within the single-chip W4A8 real-MTP2 series. Every point is one 900s closed-loop observation on one Ascend 910B3 chip at max-num-seqs 16.</desc>
+<rect width="1000" height="580" fill="#fff"/>
+<g font-family="system-ui,sans-serif" fill="#172033">
+<text x="60" y="40" font-size="23" font-weight="700">Qwen3.5-35B-A3B W4A8 · single-chip SWE prefix reuse</text>
+<text x="60" y="68" font-size="15">TP1 · 1×910B3 · FULL_DECODE_ONLY · MNS16 · real MTP2 · int4 experts + GDN W8A8 · 900s/point</text>
+<path d="M90.00 120V440 M90 440.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="90.00" y="464" text-anchor="middle" font-size="13">0</text>
+<text x="78" y="444.00" text-anchor="end" font-size="13">0</text>
+<path d="M252.00 120V440 M90 376.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="252.00" y="464" text-anchor="middle" font-size="13">24</text>
+<text x="78" y="380.00" text-anchor="end" font-size="13">88</text>
+<path d="M414.00 120V440 M90 312.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="414.00" y="464" text-anchor="middle" font-size="13">48</text>
+<text x="78" y="316.00" text-anchor="end" font-size="13">176</text>
+<path d="M576.00 120V440 M90 248.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="576.00" y="464" text-anchor="middle" font-size="13">72</text>
+<text x="78" y="252.00" text-anchor="end" font-size="13">264</text>
+<path d="M738.00 120V440 M90 184.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="738.00" y="464" text-anchor="middle" font-size="13">96</text>
+<text x="78" y="188.00" text-anchor="end" font-size="13">352</text>
+<path d="M900.00 120V440 M90 120.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="900.00" y="464" text-anchor="middle" font-size="13">120</text>
+<text x="78" y="124.00" text-anchor="end" font-size="13">440</text>
+<polyline points="773.60,374.41 679.84,336.04 547.89,291.79 474.86,212.58 334.78,145.59" fill="none" stroke="#0f766e" stroke-width="2.5"/>
+<circle data-point="qwen35-sweprefix-int4exp-gdnw8a8-ascend-tp1-mtp2-c1-20261023" cx="773.60" cy="374.41" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C1: P90 101.27 tokens/s; 90.19 tokens/s/chip</title></circle>
+<text x="782.60" y="362.41" fill="#0f766e" font-size="14">C1</text>
+<circle data-point="qwen35-sweprefix-int4exp-gdnw8a8-ascend-tp1-mtp2-c2-20261023" cx="679.84" cy="336.04" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C2: P90 87.38 tokens/s; 142.95 tokens/s/chip</title></circle>
+<text x="688.84" y="324.04" fill="#0f766e" font-size="14">C2</text>
+<circle data-point="qwen35-sweprefix-int4exp-gdnw8a8-ascend-tp1-mtp2-c4-20261023" cx="547.89" cy="291.79" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C4: P90 67.83 tokens/s; 203.79 tokens/s/chip</title></circle>
+<text x="556.89" y="279.79" fill="#0f766e" font-size="14">C4</text>
+<circle data-point="qwen35-sweprefix-int4exp-gdnw8a8-ascend-tp1-mtp2-c8-20261023" cx="474.86" cy="212.58" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C8: P90 57.02 tokens/s; 312.70 tokens/s/chip</title></circle>
+<text x="483.86" y="200.58" fill="#0f766e" font-size="14">C8</text>
+<circle data-point="qwen35-sweprefix-int4exp-gdnw8a8-ascend-tp1-mtp2-c16-20261023" cx="334.78" cy="145.59" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C16: P90 36.26 tokens/s; 404.81 tokens/s/chip</title></circle>
+<text x="343.78" y="133.59" fill="#0f766e" font-size="14">C16</text>
+<text x="90" y="99" fill="#0f766e" font-size="15">W4A8 (GDN W8A8) + real MTP2 · int4 experts / int8 rest · bf16 KV</text>
+<text x="495" y="496" text-anchor="middle" font-size="16">P90 request decode speed · output tokens/s</text>
+<text transform="translate(25 280) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
+<text x="60" y="532" font-size="13">The line connects all five measured client C levels (C1/C2/C4/C8/C16); it is not a fitted curve or a cross-setting Pareto envelope.</text>
+<text x="60" y="554" font-size="13">One server instance, 33.49 GiB KV set explicitly for this artifact (5.46 lanes at 262144 tokens), so prefix reuse survives C16 and C16 is the measured peak. The KV budget is a deployment choice, not an int4 property; W4A8 vs W8A8/BF16 differs in precision and KV budget, so no cross-precision speedup claim.</text>
+</g></svg>
