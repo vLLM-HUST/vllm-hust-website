@@ -7,7 +7,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output/playwright/performance-navigation"
@@ -61,20 +61,56 @@ def main():
                                 )
                                 == LINKS
                             )
-                            assert page.locator(".site-nav .nav-group").count() == 1
+                            assert page.locator(".site-nav .nav-group").count() == 5
                             assert (
                                 page.locator(
                                     '.site-nav a[href="./plugins.html"]'
                                 ).count()
-                                == 0
+                                == 1
+                            )
+                            top = page.locator(
+                                ".nav-links > a, .nav-links > details > summary"
+                            )
+                            assert top.all_text_contents() == (
+                                [
+                                    "产品",
+                                    "项目",
+                                    "生态架构",
+                                    "引擎",
+                                    "论文与新闻",
+                                    "性能数据",
+                                    "社区",
+                                    "资源",
+                                ]
+                                if language == "zh"
+                                else [
+                                    "Products",
+                                    "Projects",
+                                    "Ecosystem",
+                                    "Engine",
+                                    "Papers & news",
+                                    "Performance data",
+                                    "Community",
+                                    "Resources",
+                                ]
                             )
                             if width == 390:
                                 page.locator("#navToggle").click()
-                                page.locator('[data-nav-group="performance"]').evaluate(
-                                    "e=>e.open=true"
+                            for group in page.locator(".site-nav .nav-group").all():
+                                group.locator("summary").click()
+                                assert group.locator("a").first.is_visible()
+                                expect(
+                                    page.locator(".site-nav .nav-group[open]")
+                                ).to_have_count(1)
+                            page.keyboard.press("Escape")
+                            if width == 390:
+                                expect(page.locator("#navToggle")).to_have_attribute(
+                                    "aria-expanded", "false"
                                 )
-                                assert links.first.is_visible()
-                                page.keyboard.press("Escape")
+                            else:
+                                expect(
+                                    page.locator(".site-nav .nav-group[open]")
+                                ).to_have_count(0)
                             if name == "index.html":
                                 assert (
                                     page.locator("#focus-paths .focus-card").count()
@@ -225,6 +261,13 @@ def main():
                                 path=OUTPUT / f"{name}-{width}-{language}-{theme}.png"
                             )
                             receipts.append([name, width, language, theme, "PASS"])
+                        # Restored primary links must reach actual preserved sections.
+                        for section_id in ("products", "projects", "stack"):
+                            page.goto(
+                                f"{base}/ecosystem-archive.html#{section_id}",
+                                wait_until="networkidle",
+                            )
+                            assert page.locator(f"#{section_id}").is_visible()
                         context.close()
             # A missing publication cannot become an empty "passed" dashboard.
             page = browser.new_page()
