@@ -34,6 +34,13 @@ def main():
                         args.url.rstrip("/") + "/dataset-introductions.html"
                     )
                     assert response.status == 200
+                    assert page.locator(".brand-mark").inner_text() == "V"
+                    assert (
+                        page.locator(".brand-mark").evaluate(
+                            "e=>getComputedStyle(e).backgroundColor"
+                        )
+                        == "rgb(240, 179, 65)"
+                    )
                     page.wait_for_function(
                         "document.querySelectorAll('.entry-source').length === 118"
                     )
