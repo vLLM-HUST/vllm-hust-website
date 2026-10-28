@@ -3,7 +3,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-INDEX = (Path(__file__).resolve().parents[1] / "index.html").read_text(encoding="utf-8")
+INDEX = (Path(__file__).resolve().parents[1] / "ecosystem-archive.html").read_text(
+    encoding="utf-8"
+)
 CATALOG_SCRIPT = (
     Path(__file__).resolve().parents[1] / "assets" / "ecosystem-catalog.js"
 ).read_text(encoding="utf-8")

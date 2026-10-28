@@ -3,35 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Datasets & evaluation quickstarts - vLLM-HUST</title>
-  <meta name="description" content="Official dataset sources, local evaluation clients, installation and minimum examples, with access and validation boundaries.">
+  <title>浦江指定数据集测试 - vLLM-HUST</title>
+  <meta name="description" content="浦江指定五项数据集的原始来源、测试说明、客户端安装、执行入口与评分边界。">
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-introductions.html">
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
   <link rel="stylesheet" href="./assets/site.css?v=site-clarity-20261025">
-  <link rel="stylesheet" href="./assets/dataset-entrypoints.css?v=20261028-r1">
+  <link rel="stylesheet" href="./assets/dataset-entrypoints.css?v=20261028-r1"><link rel="stylesheet" href="./assets/focus.css?v=20261028">
 </head>
 <body data-page="dataset-entrypoints">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
     <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
-    <div class="nav-links"><a href="./index.html" id="entry-home">Home</a><a href="./dataset-validation.html" id="entry-results">Evaluation results</a><a href="./plugins.html" id="entry-plugins">MOD integration</a></div>
+    <div class="nav-links"><a href="./index.html" id="entry-home">Home</a><a href="./b0-b1.html" id="entry-results">Evaluation results</a><a href="./plugins.html" id="entry-plugins">MOD integration</a></div>
   </div></nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
-  <main class="site-shell entry-main">
+  <main class="site-shell entry-main"><nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav>
     <header><p class="entry-eyebrow">vLLM-HUST / DATA & CLIENTS</p><h1 id="entry-title">Datasets & evaluation quickstarts</h1><p id="entry-lead">Get the original data, install a client, and connect to your authorized model service.</p></header>
-    <nav class="entry-jump" aria-label="Quickstarts"><a href="#ordinary" id="entry-jump-basic">1. Shared preparation</a><a href="#special" id="entry-jump-special">2. Special scoring</a><a href="#sandbox" id="entry-jump-sandbox">3. Agent sandboxes</a><a href="#all-sources" id="entry-all-link">All 118 sources</a></nav>
-    <section id="ordinary" aria-labelledby="entry-install-title"><h2 id="entry-install-title">1. Shared preparation, then a supported runner</h2><p id="entry-install-note"></p><pre><code id="entry-install"></code></pre><p id="entry-install-output"></p><div id="entry-basic"></div></section>
+    <nav class="entry-jump" aria-label="Quickstarts"><a href="#designated" id="entry-jump-basic">指定五项数据集</a><a href="#special" id="entry-jump-special">2. Special scoring</a><a href="#sandbox" id="entry-jump-sandbox">3. Agent sandboxes</a><a hidden href="#all-sources" id="entry-all-link">All 118 sources</a></nav>
+    <section id="designated" aria-label="Pujiang designated datasets"><div id="designated-cards" class="focus-cards"></div></section>
+    <div hidden><section id="ordinary" aria-labelledby="entry-install-title"><h2 id="entry-install-title">1. Shared preparation, then a supported runner</h2><p id="entry-install-note"></p><pre><code id="entry-install"></code></pre><p id="entry-install-output"></p><div id="entry-basic"></div></section>
+    </div>
     <section id="special" aria-labelledby="entry-quick-title"><h2 id="entry-quick-title">2. Special scoring and multimodal clients</h2><p id="entry-run-warning"></p><div id="entry-quickstarts"></div></section>
     <section id="sandbox" aria-labelledby="entry-sandbox-title"><h2 id="entry-sandbox-title">3. Sandboxes, tools and task graders</h2><div id="entry-agent-guides"></div></section>
     <section aria-labelledby="entry-boundary-title"><h2 id="entry-boundary-title">Services and integration</h2><dl id="entry-boundaries" class="entry-boundaries"></dl></section>
-    <section id="all-sources" aria-labelledby="entry-catalog-title"><h2 id="entry-catalog-title">All registered sources</h2><p id="entry-catalog-note"></p>
+    <div hidden><section id="all-sources" aria-labelledby="entry-catalog-title"><h2 id="entry-catalog-title">All registered sources</h2><p id="entry-catalog-note"></p>
       <div class="entry-toolbar"><label><span id="entry-search-label">Search</span><input id="entry-search" type="search" placeholder="Source ID, name, status" autocomplete="off"></label><label><span id="entry-filter-label">Entry status</span><select id="entry-filter"><option value="all">All</option><option value="client">Evaluation client</option><option value="indexed">Indexed source entrypoints</option><option value="metadata">Metadata / external preparation</option></select></label><output id="entry-count"></output></div>
       <div id="entry-sources" aria-live="polite"></div>
     </section>
+    </div>
     <p id="entry-load-status" role="status">Loading catalog… / 正在加载目录…</p>
-    <p><a href="./assets/data/dataset-entrypoints-v1.json" id="entry-json">Versioned catalog (JSON)</a> · <a href="./dataset-validation.html" id="entry-old-results">Existing results remain available</a></p>
+    <p><a href="./assets/data/dataset-entrypoints-v1.json" id="entry-json">Versioned catalog (JSON)</a> · <a href="./b0-b1.html" id="entry-old-results">Existing results remain available</a></p>
     <noscript><p>JavaScript is required for the searchable catalog. / 可检索目录需要 JavaScript。<a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/workload-preparation/README.md">Data preparation and source directory / 数据准备与来源目录</a></p></noscript>
   </main>
-  <script src="./assets/site.js?v=site-clarity-20261025"></script>
-  <script src="./assets/dataset-entrypoints.js?v=20261028-r1"></script>
+  <script src="./assets/site.js?v=focus-20261028"></script>
+  <script src="./assets/dataset-entrypoints.js?v=focus-20261028"></script>
 </body>
 </html>

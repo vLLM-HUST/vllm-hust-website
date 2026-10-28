@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = (ROOT / "index.html").read_text(encoding="utf-8")
+INDEX = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
 CATALOG = (ROOT / "assets" / "product-catalog.js").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 

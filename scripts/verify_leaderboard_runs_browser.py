@@ -79,32 +79,19 @@ def main():
             assert page.locator("#runs-panel").is_hidden()
             page.locator("#view-runs").click()
 
-            nav = page.locator('.site-nav [data-nav-page="leaderboard-v2"]')
-            assert nav.count() == 1
+            # Legacy evidence remains reachable directly; primary discovery follows the new workflow.
             group = page.locator('.site-nav [data-nav-group="performance"]')
-            assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 1
-            assert (
-                page.locator('.site-nav a[href="./dataset-validation.html"]').count()
-                == 1
-            )
-            assert page.locator('.site-nav a[href="./serving-plan.html"]').count() == 1
-            assert nav.text_content().strip() == (
-                "性能测试" if language == "zh" else "Performance tests"
-            )
-            assert nav.get_attribute("href") == "./leaderboard-runs.html"
-            assert "active" in nav.get_attribute("class")
-            assert (
-                page.locator('.site-nav [data-nav-page="leaderboard"].active').count()
-                == 0
-            )
+            assert group.locator("a").count() == 3
+            assert group.locator('[data-nav-page="leaderboard-v2"]').count() == 0
+            nav = group.locator('a[href="./b0-b1.html"]')
+            assert nav.count() == 1
             if width < 860:
                 page.locator("#navToggle").click()
-                assert nav.is_visible()
+            group.locator("summary").click()
+            assert nav.is_visible()
+            group.locator("summary").click()
+            if width < 860:
                 page.locator("#navToggle").click()
-            else:
-                group.locator("summary").click()
-                assert nav.is_visible()
-                group.locator("summary").click()
 
             assert (
                 page.locator(

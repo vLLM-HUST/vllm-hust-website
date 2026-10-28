@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <meta name="robots" content="noindex, follow">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dataset evaluation - vLLM-HUST</title>
@@ -32,7 +33,7 @@
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
   <canvas id="cosmic-background" class="cosmic-background" aria-hidden="true"></canvas>
   <main class="site-shell">
-    <nav class="benchmark-tabs"><a href="./leaderboard-runs.html" data-i18n-common="navPerformanceCurves">Performance tests</a><a href="./dataset-validation.html" data-i18n-common="navDatasetValidation" aria-current="page" class="active">Dataset evaluation</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></nav><section id="dataset-results" class="matrix-shell runs-shell"><p id="matrix-loading" class="runs-note" role="status">Loading / 正在加载…</p>
+    <nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav><section id="dataset-results" class="matrix-shell runs-shell"><p id="matrix-loading" class="runs-note" role="status">Loading / 正在加载…</p>
     <div id="matrix-content" hidden>
       <header class="matrix-heading"><h1 id="matrix-title">Dataset matrix v1</h1><p id="matrix-subtitle"></p><div id="matrix-cohort" class="matrix-cohort"></div></header>
       <nav id="matrix-breadcrumb" class="matrix-breadcrumb" aria-label="Dataset views" tabindex="-1"></nav>
@@ -1203,7 +1204,7 @@
   <link rel="stylesheet" href="./assets/current-measurements.css?v=evidence-20261021">
   <link rel="stylesheet" href="./assets/results-first.css?v=clarity-20261024-clarity2-20261025">
   <script defer src="./assets/results-first.js?v=20261023"></script>
-  <script src="./assets/site.js?v=site-clarity-20261025"></script>
+  <script src="./assets/site.js?v=focus-20261028"></script>
   <script src="./assets/current-measurements.js?v=clarity-v099-20261027-clarity2-20261025"></script>
   <script src="./assets/midterm-report.js?v=midterm-v099-quality-20261027"></script>
   <script src="./assets/dataset-validation.js?v=fixed-b0-20261023"></script>

@@ -157,11 +157,26 @@
     }
   }
 
+  function designated() {
+    const root = document.getElementById('designated-cards'); root.replaceChildren();
+    const names = {MMLU_PRO: 'MMLU-Pro', HLE_VERIFIED: 'HLE-Verified', SWE_BENCH_PRO: 'SWE-bench-Pro', FRONTIERSCIENCE: 'FrontierScience', TERMINAL_BENCH_2_1: 'TerminalBench 2.1'};
+    for (const id of Object.keys(names)) {
+      const entry = catalog.primary_entries.find(e => e.source_id === id);
+      const card = el('article', undefined, 'focus-card'); card.append(el('h2', names[id]));
+      card.append(link(t('Test instructions & runner →', '测试说明与执行入口 →'), '#' + id));
+      card.append(link(t('Official dataset ↗', '原始数据集 ↗'), entry.official_data));
+      const scope = entry.splits ? jsonText(entry.splits) : entry.split;
+      if (scope) card.append(el('p', scope));
+      if (entry.scorer_boundary) card.append(el('p', entry.scorer_boundary));
+      root.append(card);
+    }
+  }
+
   function render() {
     const labels = {
-      'entry-title': ['Datasets & evaluation quickstarts', '数据集下载与评测入门'],
-      'entry-lead': ['Start with shared preparation. Add a specific scorer or sandbox only where the task requires it.', '先用统一准备入口；仅在任务需要时增加专用评分或沙箱流程。'],
-      'entry-jump-basic': ['1. Shared preparation', '1. 普通数据准备'], 'entry-jump-special': ['2. Special scoring', '2. 特殊评分'], 'entry-jump-sandbox': ['3. Agent sandboxes', '3. 闭环任务'],
+      'entry-title': ['Pujiang designated datasets', '浦江指定数据集测试'],
+      'entry-lead': ['Original data, installation, execution and scoring for the five designated datasets.', '指定五项数据集的原始来源、安装、测试入口与评分说明。先选择数据集，再按对应客户端或沙箱流程执行。'],
+      'entry-jump-basic': ['The five datasets', '指定五项数据集'], 'entry-jump-special': ['2. Special scoring', '2. 特殊评分'], 'entry-jump-sandbox': ['3. Agent sandboxes', '3. 闭环任务'],
       'entry-all-link': ['All 118 sources', '全部 118 来源'],
       'entry-install-title': ['1. Shared preparation, then a supported runner', '1. 统一准备，再选择已支持的执行入口'],
       'entry-quick-title': ['2. Special scoring and multimodal clients', '2. 特殊评分与多模态客户端'],
@@ -176,14 +191,14 @@
     document.getElementById('entry-search').placeholder = t('Source ID, class, status', '来源 ID、类别、状态');
     const options = [['All', '全部'], ['On-page guides', '站内指南'], ['Indexed entrypoints', '已索引入口'], ['Metadata / external setup', '元数据 / 外部准备']];
     [...document.getElementById('entry-filter').options].forEach((o, i) => { o.textContent = t(...options[i]); });
-    basic(); special(); agents(); sources();
+    special(); agents(); designated();
     const boundary = document.getElementById('entry-boundaries'); boundary.replaceChildren();
     for (const pair of [
       [t('Local client', '本地客户端'), t('Existing authorized service URL, exact model, credentials and task budgets. No SSH is needed for HTTP clients; runtime evidence comes from the service owner.', 'HTTP 客户端使用现有获授权服务 URL、真实模型、认证和任务预算，无需 SSH；服务身份由运维提供。')],
       [t('Platform submission', '平台提交 API'), t('BLOCKED_NOT_INTEGRATED: ordinary-user production identity is not connected. The local Unix test component is not a public multi-user submission service.', 'BLOCKED_NOT_INTEGRATED：普通用户生产身份链路未接通。本地 Unix 测试组件不是公开多用户提交服务。')],
       [t('MOD integration', 'MOD 接入'), t('Operators configure the server-side optimization and supported API. Reuse these clients when their contract matches; a new client is not required for each MOD. Do not silently change prompts, budgets or scoring.', '运维配置服务端优化及支持的 API；合同一致时复用客户端，不为每个 MOD 另造客户端，不静默改变提示、预算或评分。')]
     ]) boundary.append(el('dt', pair[0]), el('dd', pair[1]));
-    text('entry-load-status', 'Catalog loaded: 118 sources. No datasets or models were run for this publication.', '已加载 118 个来源。本次发布未下载数据或运行模型。');
+    text('entry-load-status', 'Five designated dataset guides loaded.', '已加载指定五项数据集的测试指南。');
     revealHash();
   }
   function revealHash() {

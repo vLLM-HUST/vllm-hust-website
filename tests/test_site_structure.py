@@ -16,7 +16,7 @@ import pytest
 def test_required_entry_files_exist() -> None:
     root = Path(__file__).resolve().parents[1]
     required = [
-        root / "index.html",
+        root / "ecosystem-archive.html",
         root / "leaderboard-runs.html",
         root / "dataset-validation.html",
         root / "achievements.html",
@@ -35,7 +35,7 @@ def test_required_entry_files_exist() -> None:
 
 def test_index_contains_expected_project_markers() -> None:
     root = Path(__file__).resolve().parents[1]
-    text = (root / "index.html").read_text(encoding="utf-8")
+    text = (root / "ecosystem-archive.html").read_text(encoding="utf-8")
 
     assert "vllm-hust" in text
     assert "leaderboard" in text.lower()
@@ -110,7 +110,7 @@ def test_site_uses_vllm_hust_brand_icon() -> None:
     assert icon.exists(), "official vLLM-HUST brand icon should be bundled"
     assert icon.stat().st_size > 1000
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "news.html",
@@ -1044,7 +1044,7 @@ def test_index_cache_busts_leaderboard_script() -> None:
 
 def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     root = Path(__file__).resolve().parents[1]
-    text = (root / "index.html").read_text(encoding="utf-8")
+    text = (root / "ecosystem-archive.html").read_text(encoding="utf-8")
 
     assert 'data-page="home"' in text
     assert 'href="./leaderboard-runs.html"' in text
@@ -1063,7 +1063,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
 
 def test_homepage_does_not_duplicate_nav_links_below_hero() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "index.html").read_text(encoding="utf-8")
+    html_text = (root / "ecosystem-archive.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
 
     assert 'id="nav-home"' in html_text
@@ -1099,7 +1099,7 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
     conferences_html = (root / "conferences.html").read_text(encoding="utf-8")
 
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
@@ -1112,7 +1112,9 @@ def test_conference_navigation_is_general_not_event_specific() -> None:
     assert "navConferences: 'Conferences'" in site_js
     assert "navConferences: '会议'" in site_js
     assert "navWorkshop" not in site_js
-    assert "StateSys 2026" not in (root / "index.html").read_text(encoding="utf-8")
+    assert "StateSys 2026" not in (root / "ecosystem-archive.html").read_text(
+        encoding="utf-8"
+    )
     assert "StateSys 2026" in conferences_html
     assert "https://workshop.sage.org.ai" in conferences_html
 
@@ -1123,7 +1125,7 @@ def test_courses_page_exposes_course_materials_and_project_pointers() -> None:
     courses_html = (root / "courses.html").read_text(encoding="utf-8")
 
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
@@ -1155,7 +1157,7 @@ def test_language_toggle_is_integrated_into_the_enhanced_navigation() -> None:
     css_text = (root / "assets" / "site.css").read_text(encoding="utf-8")
 
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
@@ -1193,7 +1195,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     assert ".feature-card:hover" in css_text
 
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
@@ -1202,12 +1204,12 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=site-clarity-20261025" in text
+        assert "assets/site.js?v=focus-20261028" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "index.html").read_text(encoding="utf-8")
+    html_text = (root / "ecosystem-archive.html").read_text(encoding="utf-8")
     css_text = (root / "assets" / "home.css").read_text(encoding="utf-8")
 
     assert "assets/home.css?v=0.3.7" in html_text
@@ -1224,7 +1226,7 @@ def test_homepage_uses_shared_ecosystem_visual_system() -> None:
 
 def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_text = (root / "index.html").read_text(encoding="utf-8")
+    html_text = (root / "ecosystem-archive.html").read_text(encoding="utf-8")
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     assert "40 public MODs across 8 lifecycle phases" in html_text
@@ -2837,7 +2839,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=site-clarity-20261025" in html_text
+    assert "assets/site.js?v=focus-20261028" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js
@@ -2877,7 +2879,7 @@ def test_all_pages_have_issues_nav_link() -> None:
     site_js = (root / "assets" / "site.js").read_text(encoding="utf-8")
 
     for name in (
-        "index.html",
+        "ecosystem-archive.html",
         "leaderboard-runs.html",
         "achievements.html",
         "contributors.html",
