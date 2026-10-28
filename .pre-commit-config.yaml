@@ -63,6 +63,8 @@ repos:
   rev: v1.5.0
   hooks:
   - id: detect-secrets
+    # Public catalogue projection contains only upstream revisions and file hashes.
+    args: [--exclude-files, '^assets/data/dataset-entrypoints-(v1|source)\.json$']
     # Evidence snapshots carry public Git IDs and verified model/workload/script/request SHA256 values.
     # FrontierScience, MMLU-Pro and HLE-Verified JSON contain audited public revision/file hashes.
     # Dataset matrix is a generated projection of the same public reports and SHA256 bindings.
