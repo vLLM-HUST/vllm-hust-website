@@ -8,6 +8,20 @@ HOME = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 
 
+def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
+    assert "我们的重点是各类 MOD 插件优化。" in HOME
+    assert "部分 MOD 还需要修改 vLLM 或昇腾后端" in HOME
+    assert "Our focus is optimization through MOD plugins." in HOME
+    assert "Some MODs also need changes to vLLM or its Ascend backend" in HOME
+    section = HOME.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
+    for repo in ("vllm-hust", "vllm-ascend-hust", "vllm-hust-benchmark"):
+        assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
+    assert 'href="./plugins.html"' in section
+    assert "gennova" not in HOME.lower()
+    assert "Independent inference engine" not in HOME
+    assert "独立的推理引擎" not in HOME
+
+
 def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     groups = SITE_JS.split("const NAV_GROUPS =", 1)[1].split("function navLink", 1)[0]
     performance = groups.split("id: 'performance'", 1)[1].split("id: 'community'", 1)[0]
@@ -17,9 +31,11 @@ def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
         < performance.index("./b0-b1.html")
         < performance.index("./serving-plan.html")
     )
-    assert groups.count("id:") == 5
-    for name in ("engine", "publications", "community", "resources"):
+    assert groups.count("id:") == 4
+    for name in ("publications", "community", "resources"):
         assert f"id: '{name}'" in groups
+    assert "id: 'engine'" not in groups
+    assert "navLink('', './ecosystem-archive.html#stack', 'navEngine')" in SITE_JS
     for old in ("leaderboard-runs.html", "dataset-validation.html"):
         assert old not in performance
     for section in ("products", "projects", "stack"):
@@ -83,6 +99,21 @@ def test_benchmark_pages_share_the_ordered_workflow() -> None:
             assert f'href="./{href}"' in text
 
 
+def test_brand_always_returns_home_and_workflow_marks_current_page() -> None:
+    import re
+
+    for page in ROOT.glob("*.html"):
+        brand = re.search(r'<a\b[^>]*class="brand-link"[^>]*>', page.read_text())
+        assert brand and 'href="./index.html"' in brand.group(), page.name
+    assert "3. Capacity & cost" in SITE_JS
+    assert "3. 产能与成本" in SITE_JS
+    assert "function updateNavigationState()" in SITE_JS
+    assert "window.addEventListener('hashchange', updateNavigationState)" in SITE_JS
+    assert "target.pathname === pathname" in SITE_JS
+    assert "link.removeAttribute('aria-current')" in SITE_JS
+    assert '.benchmark-tabs a[aria-current="page"]' in SITE_CSS
+
+
 def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() -> None:
     for name in (
         "ecosystem-archive.html",
@@ -99,7 +130,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">Ecosystem</a>' in text, name
-        assert "assets/site.js?v=nav-restored-20261028" in text, name
+        assert "assets/site.js?v=navigation-cleanup-20261029" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -139,7 +170,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=benchmarks-ia-20261003" in versions
-    assert "assets/site.js?v=nav-restored-20261028" in versions
+    assert "assets/site.js?v=navigation-cleanup-20261029" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
@@ -161,7 +192,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=nav-restored-20261028" in text
+        assert "assets/site.js?v=navigation-cleanup-20261029" in text
         if name not in ("ecosystem-archive.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 

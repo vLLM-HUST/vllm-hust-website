@@ -1049,6 +1049,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
     assert 'data-page="home"' in text
     assert 'href="./leaderboard-runs.html"' in text
     assert 'href="./dataset-validation.html"' in text
+    assert 'href="https://github.com/vLLM-HUST/vllm-hust-benchmark"' in text
     assert 'href="./achievements.html"' in text
     assert 'href="./contributors.html"' in text
     assert 'href="./conferences.html"' in text
@@ -1204,7 +1205,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=nav-restored-20261028" in text
+        assert "assets/site.js?v=navigation-cleanup-20261029" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1259,11 +1260,11 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
         assert f"https://github.com/vLLM-HUST/{repository}" in html_text
 
     proving_ground = html_text.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
-    assert "Runtime Contracts" in proving_ground
-    assert "Ecosystem Interfaces" in proving_ground
-    assert "Dataset Matrix" in proving_ground
-    assert "Benchmark Contract" in proving_ground
-    assert "vllm-ascend-hust" not in proving_ground
+    assert "MOD plugins" in proving_ground
+    assert "vLLM-HUST" in proving_ground
+    assert "vLLM-Ascend-HUST" in proving_ground
+    assert "Benchmark evidence" in proving_ground
+    assert 'href="https://github.com/vLLM-HUST/vllm-ascend-hust"' in proving_ground
     assert "triton-ascend-hust" not in proving_ground
 
     catalog = html_text.split('id="projects"', 1)[1].split('id="ecosystem"', 1)[0]
@@ -2839,7 +2840,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=nav-restored-20261028" in html_text
+    assert "assets/site.js?v=navigation-cleanup-20261029" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js
