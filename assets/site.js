@@ -11,7 +11,7 @@
             navDatasetMatrixV1: 'Dataset matrix v1',
             navCapabilityCoverage: 'Capability coverage',
             navAchievements: 'Papers & achievements',
-            navServingPlan: 'Capacity & cost',
+            navServingPlan: '3. Capacity & cost',
             navNews: 'News',
             navContributors: 'Contributors',
             navMembers: 'Members',
@@ -52,7 +52,7 @@
             navDatasetMatrixV1: '数据集矩阵 v1',
             navCapabilityCoverage: '能力覆盖表',
             navAchievements: '论文与成果',
-            navServingPlan: '产能与成本',
+            navServingPlan: '3. 产能与成本',
             navNews: '新闻',
             navContributors: '核心成员',
             navMembers: '组织成员',
@@ -172,14 +172,6 @@
 
     const NAV_GROUPS = [
         {
-            id: 'engine',
-            label: 'navEngine',
-            pages: [],
-            links: [
-                ['', './ecosystem-archive.html#stack', 'navEngine'],
-            ],
-        },
-        {
             id: 'publications',
             label: 'navPublications',
             pages: ['achievements', 'news'],
@@ -243,6 +235,7 @@
             navLink('', './ecosystem-archive.html#products', 'navProducts'),
             navLink('', './ecosystem-archive.html#projects', 'navProjects'),
             navLink('plugins', './plugins.html', 'navPlugins'),
+            navLink('', './ecosystem-archive.html#stack', 'navEngine'),
             ...NAV_GROUPS.map((group) => `
                 <details class="nav-group" data-nav-group="${group.id}">
                     <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
@@ -334,15 +327,27 @@
             </div>`;
     }
 
-    function initNav() {
+    function updateNavigationState() {
         const currentPage = document.body?.dataset?.page || 'home';
-        document.querySelectorAll('[data-nav-page]').forEach((link) => {
-            link.classList.toggle('active', link.dataset.navPage === currentPage);
+        const pathname = window.location.pathname.replace(/\/$/, '/index.html');
+        document.querySelectorAll('.nav-links a, .benchmark-tabs a').forEach((link) => {
+            const target = new URL(link.href, window.location.href);
+            const current = target.origin === window.location.origin
+                && target.pathname === pathname
+                && (!target.hash || target.hash === window.location.hash);
+            link.classList.toggle('active', current);
+            if (current) link.setAttribute('aria-current', target.hash ? 'location' : 'page');
+            else link.removeAttribute('aria-current');
         });
         NAV_GROUPS.forEach((group) => {
             const node = document.querySelector(`[data-nav-group="${group.id}"]`);
             node?.classList.toggle('active', group.pages.includes(currentPage));
         });
+    }
+
+    function initNav() {
+        updateNavigationState();
+        window.addEventListener('hashchange', updateNavigationState);
         const button = document.getElementById('langToggle');
         if (button) {
             button.addEventListener('click', () => {
