@@ -127,6 +127,12 @@ def main():
                             )
                             if width == 390:
                                 page.locator("#navToggle").click()
+                                direct = page.locator(".nav-links > a")
+                                expect(direct).to_have_count(4)
+                                boxes = [link.bounding_box() for link in direct.all()]
+                                assert boxes[0]["y"] == boxes[1]["y"]
+                                assert boxes[2]["y"] == boxes[3]["y"]
+                                assert boxes[2]["y"] > boxes[0]["y"]
                             for group in page.locator(".site-nav .nav-group").all():
                                 group.locator("summary").click()
                                 assert group.locator("a").first.is_visible()

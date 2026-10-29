@@ -2065,7 +2065,7 @@ h1 {
         margin: 0;
         padding: 18px max(16px, calc((100vw - 1240px) / 2));
         display: none;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         align-items: start;
         align-content: start;
         gap: 10px;
