@@ -16,6 +16,7 @@
     // Keep their recorded wording and numbers; make the time scope explicit.
     const historicalM01 = new Set(['m01', 'fenced-model', 'trace-qualification', 'reference-closure', 'worker-model']);
     const datasetEvidence = new Set([
+        ...['README.md', 'continuous-raw.tar.gz', 'continuous-summary.json', 'out256-quality-audit.json', 'reference-method.md', 'five-task-stability.json'].map(name => `reports/acceptance-completion-20261029/${name}`),
         'reports/swe-native018-wave2-openlibrary-navidrome-20261027/catalog.json',
         'reports/terminal-circuit-context-20261027/summary.json',
         'reports/terminal-circuit-controls-20261027/summary.json',
@@ -61,6 +62,7 @@
             `website-publication/data/request-throttling-dataset-matrix-20261018/${name}.json`)
     ]);
     const rowSources = (section, tableIndex) => {
+        if (section.id === 'acceptance-completion') return [section.evidence.find(source => source.path.endsWith('/continuous-summary.json'))];
         if (section.id === 'm01-verdict') {
             const suffix = 'm01-reference-revision-20261029/summary.json';
             return [section.evidence.find(source => source.path.endsWith(suffix))];
@@ -107,15 +109,15 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v101.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v102.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V1.01' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V1.02' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             const reference = value.wholechain_reference;
-            if (value.m01_method?.method_version !== 'reference-revision-20261029' || reference?.status !== 'reference_under_revision' || reference.reference_qualified !== false || reference.reference_C_TFLOPS_per_chip !== null) throw Error('Invalid current M01 revision');
+            if (value.m01_method?.method_version !== 'reference-model-reassessment-20261029' || reference?.status !== 'reference_under_revision' || reference.reference_qualified !== false || reference.reference_C_TFLOPS_per_chip !== null) throw Error('Invalid current M01 revision');
             for (const arm of ['B0', 'B1']) {
                 const result = reference[arm];
                 if (!result || result.eta_percent !== null || result.eta_target_met !== null || !Number.isFinite(result.own_C) || result.own_C !== result.ownF / (reference.participating_chips * result.own_T_seconds * 1e12)) throw Error('Invalid paired M01 measurement');
