@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import json
+import re
 from pathlib import Path
 
 from playwright.async_api import async_playwright, expect
@@ -41,6 +42,46 @@ async def run(args):
                         timeout=60000,
                     )
                     assert response.status == 200
+                    # Every public shell has translated metadata and a shared footer.
+                    title = await page.title()
+                    assert title.strip(), filename
+                    if lang == "en":
+                        assert not re.search(r"[\u4e00-\u9fff]", title), title
+                    await expect(page.locator(".site-directory")).to_have_count(1)
+                    await expect(
+                        page.locator(".site-directory-links")
+                    ).to_have_attribute(
+                        "aria-label",
+                        "页脚导航" if lang == "zh" else "Footer navigation",
+                    )
+                    for key, zh_label, en_label in (
+                        ("navPlugins", "MOD 目录", "MOD catalog"),
+                        ("navContributors", "贡献者", "Contributors"),
+                        ("navMembers", "组织成员", "Organization members"),
+                    ):
+                        for link in await page.locator(
+                            f'[data-i18n-common="{key}"]'
+                        ).all():
+                            await expect(link).to_have_text(
+                                zh_label if lang == "zh" else en_label
+                            )
+                    record["title"] = title
+                    # Titles and footer copy also follow a live language switch.
+                    await page.locator("#langToggle").click()
+                    await expect(page.locator("html")).to_have_attribute(
+                        "lang", "en" if lang == "zh" else "zh"
+                    )
+                    if lang == "zh":
+                        assert not re.search(r"[\u4e00-\u9fff]", await page.title())
+                        assert not re.search(
+                            r"[\u4e00-\u9fff]",
+                            await page.locator(
+                                ".site-directory-brand > span"
+                            ).inner_text(),
+                        )
+                    await page.locator("#langToggle").click()
+                    await expect(page.locator("html")).to_have_attribute("lang", lang)
+                    await expect(page).to_have_title(title)
                     assert await page.locator("main").is_visible()
                     await expect(
                         page.locator(".site-nav .brand-link")
@@ -122,10 +163,22 @@ async def run(args):
                         ).to_be_visible()
                     # Preserve page-specific translation IDs through shared footer rendering.
                     footer = page.locator(".site-directory-brand > span")
-                    if await footer.count():
-                        await footer.scroll_into_view_if_needed()
-                        assert await footer.is_visible()
-                        await page.evaluate("window.scrollTo(0,0)")
+                    await expect(footer).to_have_count(1)
+                    await footer.scroll_into_view_if_needed()
+                    assert await footer.is_visible()
+                    record["footer"] = await footer.inner_text()
+                    assert record["footer"].strip()
+                    if lang == "en":
+                        assert not re.search(r"[\u4e00-\u9fff]", record["footer"]), (
+                            record["footer"]
+                        )
+                    await page.locator(".site-directory").screenshot(
+                        path=str(
+                            args.output
+                            / f"footer-{filename}-{width}-{lang}-{theme}.png"
+                        )
+                    )
+                    await page.evaluate("window.scrollTo(0,0)")
                     if filename in ("conferences.html", "courses.html", "issues.html"):
                         expected = {
                             "conferences.html": ("会议", "Conference"),

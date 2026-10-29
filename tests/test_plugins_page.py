@@ -807,7 +807,7 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert 'element("div", "workshop-cover")' in SCRIPT
     assert "function coverTone(item)" in SCRIPT
     assert ".workshop-tone-lagoon .workshop-cover" in STYLES
-    assert '"plugins-title": zh ? "MOD 工坊" : "MOD Workshop"' in SCRIPT
+    assert '"plugins-title": zh ? "MOD 目录" : "MOD catalog"' in SCRIPT
     assert 'body[data-page="plugins"] .technical-highlights' in STYLES
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
@@ -891,8 +891,9 @@ def test_workshop_supports_phase_first_scenario_discovery() -> None:
 
     assert "按介入阶段或场景找 MOD" in PAGE
     assert "你想介入推理生命周期的哪个阶段？" in PAGE
-    assert "仅在确实适用时再叠加场景或用例特征" in PAGE
-    assert "Catalog matching is not a performance guarantee." in PAGE
+    assert "按生命周期阶段、场景和用例筛选" in PAGE
+    assert "open each MOD for its configuration and measured results" in PAGE
+    assert "Catalog matching is not a performance guarantee." not in PAGE
     assert "data-phase-filters" in PAGE
     assert "data-phase-description" in PAGE
     assert 'data-source="./data/plugin-workload-navigation.json?v=' in PAGE
@@ -1211,7 +1212,7 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=clarity-20261024" in PAGE
-    assert "plugins-page.js?v=state-scheduler-archive-20261018" in PAGE
+    assert "plugins-page.js?v=site-labels-20261029" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1474,8 +1475,8 @@ def test_extension_standard_covers_core_and_host_providers() -> None:
 
 
 def test_public_copy_uses_ecosystem_language() -> None:
-    assert "MOD Workshop" in PAGE
-    assert "MOD 工坊" in PAGE
+    assert "MOD catalog" in PAGE
+    assert "MOD 目录" in PAGE
     assert "Find the right extension without losing sight of who runs it." in PAGE
     assert "插件、connector 与 control plane 承担不同角色。" in PAGE
 

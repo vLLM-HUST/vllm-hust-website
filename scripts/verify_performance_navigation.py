@@ -106,7 +106,7 @@ def main():
                                 [
                                     "产品",
                                     "项目",
-                                    "生态架构",
+                                    "MOD 目录",
                                     "引擎",
                                     "论文与新闻",
                                     "性能数据",
@@ -117,7 +117,7 @@ def main():
                                 else [
                                     "Products",
                                     "Projects",
-                                    "Ecosystem",
+                                    "MOD catalog",
                                     "Engine",
                                     "Papers & news",
                                     "Performance data",
