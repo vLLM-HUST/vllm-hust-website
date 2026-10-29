@@ -69,13 +69,12 @@
     const relatedExpanded = section.querySelector('#result-related-evidence')?.open;
     const quality = reportData.current_summary.quality;
     const reference = reportData.current_summary.reference;
-    const eta = reference.B1.eta_percent.toFixed(4);
     const qualityUrl = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${reportData.source_commit}/${quality.evidence_path}`;
     section.innerHTML = `<div class="result-heading"><div><span class="result-eyebrow">${zh ? '中期报告摘要 · 固定基线与按指标最优配置' : 'MIDTERM SUMMARY · FIXED BASELINE & METRIC-SPECIFIC BEST CONFIGURATIONS'}</span><h1>${title}</h1></div><span class="result-date">${escape(reportData.version)}</span></div>
       <p class="result-context">${escape(data.scenario.model)} · ${escape(data.scenario.precision)} · TP2 · ${data.scenario.num_prompts} ${zh ? '请求' : 'requests'} · out${data.scenario.output_length} · ${escape(data.scenario.hardware)}</p>
       <p class="result-boundary">${zh ? 'B0 固定：vLLM 0.18 / vLLM-Ascend 0.18。B1 基座版本不限，本页已测优化配置使用 0.28.1 / 0.25.1rc2 开发栈。' : 'B0 is fixed: vLLM 0.18 / vLLM-Ascend 0.18. B1 has no base-version restriction; the measured optimizations here use the 0.28.1 / 0.25.1rc2 development stack.'}</p>
       <div class="result-quality"><strong>${zh ? '同题质量 · out8192' : 'Matched quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b0.correct}/${quality.b0.total}</a></span><span>${zh ? 'B1 · 当前纠正组合' : 'B1 · corrected combination'}: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b1.candidate_correct}/${quality.b0.total}</a></span><small>${zh ? '固定200题子集；不代表全集或统计非劣' : 'Fixed 200-task subset; not full-corpus quality or statistical noninferiority'}</small></div>
-      <p class="result-reference"><a href="#midterm-m01-verdict">${zh ? `M01 · B1 η=${eta}%，达到90%` : `M01 · B1 eta=${eta}%, meets 90%`}</a><br><small>${zh ? '90%为本轮实施判据；指定工况独立整链参考，共享实现且保留计数成本，不是芯片标称峰值利用率。' : '90% is the round implementation criterion; independently measured wholechain reference with shared code and accounting costs retained, not nominal chip-peak utilization.'}</small></p>
+      <p class="result-reference"><a href="#midterm-m01-verdict">${zh ? 'M01 · 参考修订中，达成率未确定' : 'M01 · Reference under revision; attainment unresolved'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片；旧参考与达标判定已退出当前结论。' : 'chip; the old reference and acceptance verdicts are withdrawn.'}</small></p>
       <p class="result-comparison-note">${zh ? '服务性能 · out256：各指标分别选优，并非同一部署。本工况尚无固定 B0 性能配对，不计算收益。' : 'Serving performance · out256: metric-specific best configurations, not one deployment. No matched fixed B0 performance pair for this workload; gain not calculated.'}</p>
       <div class="result-metrics">${cards}</div>
       <p class="result-selection">${zh ? 'B1 按指标选择当前已实测最优方案；三项不代表同一部署。性能改善不等于质量或 M01 验收通过。' : 'B1 is the best measured solution per metric, not one deployment achieving all three. Performance gains do not establish quality or M01 acceptance.'}</p>
@@ -85,7 +84,7 @@
         <a href="#midterm-dataset-quality-inventory">${zh ? '质量 · 子集配对，非全集' : 'Quality · paired subset, not full corpus'}</a>
         <a href="#midterm-long-context-parser">${zh ? '长上下文 · 原判分与解析复核分列' : 'Long context · original and parser review separate'}</a>
         <a href="#midterm-kv-audit">${zh ? 'KV · 跨轮状态核查未闭合' : 'KV · cross-run state review open'}</a>
-        <a href="#midterm-m01-verdict">${zh ? 'M01 · 独立整链参考验收' : 'M01 · independent whole-chain assessment'}</a>
+        <a href="#midterm-m01-verdict">${zh ? 'M01 · 实测值与参考修订' : 'M01 · measurements & reference revision'}</a>
       </nav>
       <details id="current-configuration" ${expanded ? 'open' : ''}><summary>${zh ? '配置、候选对比与原始证据' : 'Configurations, candidates & original evidence'}</summary>
       <p>${escape(data.scenario.label)} · ${zh ? 'B1：当前已实测最优的 vLLM-HUST 优化方案，按指标选择。' : 'B1: currently best measured vLLM-HUST optimization solution, selected per metric.'}</p>
@@ -121,11 +120,11 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  Promise.all([dataPath, './data/midterm-v099.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
+  Promise.all([dataPath, './data/midterm-v101.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
   }))).then(([value, report]) => {
-    if (report.version !== 'V0.99' || report.comparison_contract?.b0?.fixed !== true ||
+    if (report.version !== 'V1.01' || report.comparison_contract?.b0?.fixed !== true ||
         report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
         !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
     data = value; reportData = report; render();
