@@ -8,6 +8,20 @@ HOME = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 
 
+def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
+    assert "我们的重点是各类 MOD 插件优化。" in HOME
+    assert "部分 MOD 还需要修改 vLLM 或昇腾后端" in HOME
+    assert "Our focus is optimization through MOD plugins." in HOME
+    assert "Some MODs also need changes to vLLM or its Ascend backend" in HOME
+    section = HOME.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
+    for repo in ("vllm-hust", "vllm-ascend-hust", "vllm-hust-benchmark"):
+        assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
+    assert 'href="./plugins.html"' in section
+    assert "gennova" not in HOME.lower()
+    assert "Independent inference engine" not in HOME
+    assert "独立的推理引擎" not in HOME
+
+
 def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     groups = SITE_JS.split("const NAV_GROUPS =", 1)[1].split("function navLink", 1)[0]
     performance = groups.split("id: 'performance'", 1)[1].split("id: 'community'", 1)[0]

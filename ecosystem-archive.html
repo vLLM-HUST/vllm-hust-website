@@ -132,8 +132,8 @@
 
     <section class="execution-section execution-dark" id="stack">
       <div class="execution-section-head">
-        <div><p id="stack-eyebrow" class="execution-eyebrow">Engine &amp; proving ground</p><h2 id="stack-title">Build, validate, and transfer serving mechanisms.</h2></div>
-        <p id="stack-summary">An upstream-compatible runtime connecting serving mechanisms to compilers, hardware backends, and fixed benchmarks.</p>
+        <div><p id="stack-eyebrow" class="execution-eyebrow">MOD optimization · Engine integration</p><h2 id="stack-title">vLLM-HUST: engine support for MOD optimizations.</h2></div>
+        <p><span id="stack-summary">Our focus is optimization through MOD plugins. Some MODs also need changes to vLLM or its Ascend backend.</span> <span id="stack-detail">These engine-level changes are maintained in vLLM-HUST and vLLM-Ascend-HUST.</span></p>
       </div>
       <div class="plugin-path" aria-label="Extension and integration path">
         <div><span>01</span><strong id="path-mechanism-title">Mechanism</strong><small id="path-mechanism-copy">A serving-system idea</small></div>
@@ -142,10 +142,10 @@
         <div><span>04</span><strong id="path-transfer-title">Transfer</strong><small id="path-transfer-copy">Upstream or another engine</small></div>
       </div>
       <div class="stack-grid">
-        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>01 / HOST</span><strong>Runtime Contracts</strong><p id="stack-core-copy">Typed domain boundaries owned by the engine.</p><em>Repository ↗</em></a>
-        <a href="./plugins.html"><span>02 / CONNECT</span><strong>Ecosystem Interfaces</strong><p id="stack-ascend-copy">Platform profiles, KV adapters, bridges, and bundles keep distinct roles.</p><em id="stack-catalog-link">Open ecosystem catalog →</em></a>
-        <a href="./dataset-validation.html"><span>03 / VALIDATE</span><strong>Dataset Matrix</strong><p id="stack-triton-copy">Validate across engines, compilers, and hardware.</p><em id="stack-leaderboard-link">Open dataset matrix →</em></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / MEASURE</span><strong>Benchmark Contract</strong><p id="stack-benchmark-copy">Fixed targets and public evidence.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
+        <a href="./plugins.html"><span>01 / MOD</span><strong id="stack-mod-title">MOD plugins</strong><p id="stack-mod-copy">Our main focus: optimization plugins, with their scope, setup, and measured results.</p><em id="stack-catalog-link">Explore MODs →</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust"><span>02 / VLLM</span><strong>vLLM-HUST</strong><p id="stack-core-copy">The vLLM fork where engine changes required by MODs are maintained.</p><em id="stack-core-link">Open vLLM fork ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span>03 / ASCEND</span><strong>vLLM-Ascend-HUST</strong><p id="stack-ascend-copy">The vLLM-Ascend fork where Ascend backend changes required by MODs are maintained.</p><em id="stack-ascend-link">Open Ascend fork ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / EVIDENCE</span><strong id="stack-benchmark-title">Benchmark evidence</strong><p id="stack-benchmark-copy">Check configurations and raw results; plugin availability alone is not proof of a performance gain.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
     </section>
 
@@ -218,7 +218,7 @@
         <a href="https://lab.sage.org.ai/"><span>00</span><strong>IntelliStream</strong><small id="ecosystem-intellistream">Cross-layer research incubator</small></a>
         <a href="https://ride-lab.github.io/"><span>01</span><strong>RIDE Lab</strong><small id="ecosystem-ride">Agent-native LLM control plane and SAGE core stewardship</small></a>
         <a href="https://datasys.sage.org.ai/"><span>02</span><strong>DataSys</strong><small id="ecosystem-datasys">Streams, graphs, vectors, indexes</small></a>
-        <a class="active" href="#top"><span>03</span><strong>vLLM-HUST</strong><small id="ecosystem-vllm">Independent inference engine and hardware execution substrate</small></a>
+        <a class="active" href="#stack"><span>03</span><strong>vLLM-HUST</strong><small id="ecosystem-vllm">MOD plugin optimization and supporting engine integration</small></a>
       </div>
     </section>
 
@@ -250,17 +250,18 @@
         'product-mate-feature-1': 'Knowledge Q&A', 'product-mate-feature-2': 'Personal corpus',
         'product-mate-feature-3': 'Cited support', 'product-mate-feature-4': 'Research flows',
         'product-mate-cta-copy': 'Talk to Sage Mate',
-        'stack-eyebrow': 'Engine & proving ground', 'stack-title': 'Build, validate, and transfer serving mechanisms.',
-        'stack-summary': 'An upstream-compatible runtime connecting serving mechanisms to compilers, hardware backends, and fixed benchmarks.',
+        'stack-eyebrow': 'MOD optimization · Engine integration', 'stack-title': 'vLLM-HUST: engine support for MOD optimizations.',
+        'stack-summary': 'Our focus is optimization through MOD plugins. Some MODs also need changes to vLLM or its Ascend backend.',
+        'stack-detail': 'These engine-level changes are maintained in vLLM-HUST and vLLM-Ascend-HUST.',
         'path-mechanism-title': 'Mechanism', 'path-mechanism-copy': 'A serving-system idea',
         'path-adapter-title': 'Adapter', 'path-adapter-copy': 'Runtime and hardware hooks',
         'path-prove-title': 'Prove', 'path-prove-copy': 'Correctness and performance evidence',
         'path-transfer-title': 'Transfer', 'path-transfer-copy': 'Upstream or another engine',
-        'stack-core-copy': 'Typed domain boundaries owned by the engine.',
-        'stack-ascend-copy': 'Platform profiles, KV adapters, bridges, and bundles keep distinct roles.',
-        'stack-triton-copy': 'Validate across engines, compilers, and hardware.',
-        'stack-catalog-link': 'Open ecosystem catalog ↓', 'stack-leaderboard-link': 'Open dataset matrix →',
-        'stack-benchmark-copy': 'Fixed targets and public evidence.', 'stack-benchmark-link': 'Open benchmark ↗',
+        'stack-mod-title': 'MOD plugins', 'stack-mod-copy': 'Our main focus: optimization plugins, with their scope, setup, and measured results.',
+        'stack-core-copy': 'The vLLM fork where engine changes required by MODs are maintained.',
+        'stack-ascend-copy': 'The vLLM-Ascend fork where Ascend backend changes required by MODs are maintained.',
+        'stack-catalog-link': 'Explore MODs →', 'stack-core-link': 'Open vLLM fork ↗', 'stack-ascend-link': 'Open Ascend fork ↗',
+        'stack-benchmark-title': 'Benchmark evidence', 'stack-benchmark-copy': 'Check configurations and raw results; plugin availability alone is not proof of a performance gain.', 'stack-benchmark-link': 'Open benchmark ↗',
         'atlas-eyebrow': 'MOD portfolio', 'atlas-title': 'Explore 40 MODs from offline preparation and service startup through request admission, prefill, decode, state and service lifecycle, and observability.',
         'atlas-summary': 'Each card separates availability, scope, activation evidence, and performance evidence; unverified gains remain unclaimed.',
         'mod-portfolio-title': 'Open the complete MOD catalog',
@@ -278,7 +279,7 @@
         'ecosystem-eyebrow': 'Collaborative ecosystem', 'ecosystem-title': 'Clear roles. Shared progress.',
         'ecosystem-summary': 'SAGE is the shared flagship product; each organization retains a clear technical boundary.',
         'ecosystem-intellistream': 'Cross-layer research incubator', 'ecosystem-ride': 'Agent-native LLM control plane and SAGE core stewardship',
-        'ecosystem-datasys': 'Streams, graphs, vectors, indexes', 'ecosystem-vllm': 'Independent inference engine and hardware execution substrate',
+        'ecosystem-datasys': 'Streams, graphs, vectors, indexes', 'ecosystem-vllm': 'MOD plugin optimization and supporting engine integration',
         'home-data-cta': 'Datasets & evaluation quickstarts →', 'scope-datasets': 'Download & evaluate',
         'footer-copy': 'Inference for domestic compute.'
       },
@@ -300,17 +301,18 @@
         'product-mate-feature-1': '知识问答', 'product-mate-feature-2': '个人知识库',
         'product-mate-feature-3': '引用依据', 'product-mate-feature-4': '研究工作流',
         'product-mate-cta-copy': '体验 Sage Mate',
-        'stack-eyebrow': '推理引擎与试验场', 'stack-title': '开发、验证并迁移推理机制。',
-        'stack-summary': '兼容上游的运行时，连接推理机制、编译栈、硬件后端与固定 Benchmark。',
+        'stack-eyebrow': 'MOD 插件优化 · 引擎适配', 'stack-title': 'vLLM-HUST：为 MOD 优化提供引擎支持。',
+        'stack-summary': '我们的重点是各类 MOD 插件优化。部分 MOD 还需要修改 vLLM 或昇腾后端。',
+        'stack-detail': '这些引擎侧改动集中维护在 vLLM-HUST 和 vLLM-Ascend-HUST 中。',
         'path-mechanism-title': '机制', 'path-mechanism-copy': '一个推理系统想法',
         'path-adapter-title': '适配', 'path-adapter-copy': '运行时与硬件钩子',
         'path-prove-title': '验证', 'path-prove-copy': '正确性与性能证据',
         'path-transfer-title': '迁移', 'path-transfer-copy': '上游或其他推理引擎',
-        'stack-core-copy': '由引擎拥有的类型化领域边界。',
-        'stack-ascend-copy': '平台 profile、KV 适配器、bridge 与 bundle 保持不同角色。',
-        'stack-triton-copy': '跨引擎、编译栈与硬件验证。',
-        'stack-catalog-link': '查看生态目录 ↓', 'stack-leaderboard-link': '打开数据集矩阵 →',
-        'stack-benchmark-copy': '固定靶与公开证据。', 'stack-benchmark-link': '打开 Benchmark ↗',
+        'stack-mod-title': 'MOD 插件', 'stack-mod-copy': '主要优化工作所在：查看各类插件的适用范围、配置与实测结果。',
+        'stack-core-copy': '基于上游 vLLM，集中维护 MOD 所需的引擎侧改动。',
+        'stack-ascend-copy': '基于上游 vLLM-Ascend，集中维护 MOD 所需的昇腾后端改动。',
+        'stack-catalog-link': '查看 MOD 目录 →', 'stack-core-link': '查看 vLLM 分支 ↗', 'stack-ascend-link': '查看 Ascend 分支 ↗',
+        'stack-benchmark-title': '实测证据', 'stack-benchmark-copy': '核对测试配置与原始结果；插件可用不等于已经证明性能提升。', 'stack-benchmark-link': '打开 Benchmark ↗',
         'atlas-eyebrow': 'MOD 项目组合', 'atlas-title': '探索 40 个 MOD：从离线准备、服务启动到请求准入、Prefill、Decode、状态与服务生命周期及可观测性。',
         'atlas-summary': '每张卡片分别说明可用性、适用范围、启用依据与性能证据；未验证收益不会被写成有效优化。',
         'mod-portfolio-title': '打开完整 MOD 目录',
@@ -328,7 +330,7 @@
         'ecosystem-eyebrow': '协作生态', 'ecosystem-title': '角色清晰，共同演进。',
         'ecosystem-summary': 'SAGE 是共同旗舰产品；各组织保持清晰的技术边界。',
         'ecosystem-intellistream': '跨层研究孵化器', 'ecosystem-ride': '智能体原生大模型控制平面与 SAGE 核心维护',
-        'ecosystem-datasys': '流、图、向量与索引', 'ecosystem-vllm': '独立的推理引擎与硬件执行底座',
+        'ecosystem-datasys': '流、图、向量与索引', 'ecosystem-vllm': 'MOD 插件优化及配套引擎适配',
         'home-data-cta': '数据下载与评测快速开始 →', 'scope-datasets': '下载与评测入口',
         'footer-copy': '面向国产算力的推理服务。'
       }
