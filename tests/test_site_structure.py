@@ -1048,6 +1048,7 @@ def test_homepage_exposes_multi_page_navigation_and_products() -> None:
 
     assert 'data-page="home"' in text
     assert 'href="./leaderboard-runs.html"' in text
+    assert 'href="./dataset-validation.html"' in text
     assert 'href="https://github.com/vLLM-HUST/vllm-hust-benchmark"' in text
     assert 'href="./achievements.html"' in text
     assert 'href="./contributors.html"' in text
