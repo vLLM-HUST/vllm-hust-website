@@ -21,7 +21,7 @@
       coverage: `${phases} 个阶段 · ${scenarios} 类场景`,
       evidence: "启用证据 ≠ 性能证据",
       atlas: `探索 ${modCount} 个 MOD：从离线准备、服务启动到请求准入、Prefill、Decode、状态与服务生命周期及可观测性。`,
-      atlasSummary: "每张卡片分别说明可用性、适用范围、启用依据与性能证据；未验证收益不会被写成有效优化。",
+      atlasSummary: "每张卡片展示可用性、适用范围、启用记录与实测结果。",
       portfolioCopy: "按生命周期阶段、场景、平台与成熟度比较 MOD，并查看维护者、配置、证据标签与公开结果。"
     } : {
       kicker: `${modCount} public MODs across ${phases} lifecycle phases, with scope and evidence explicit.`,
@@ -31,7 +31,7 @@
       coverage: `${phases} phases · ${scenarios} scenarios`,
       evidence: "activation evidence ≠ performance evidence",
       atlas: `Explore ${modCount} MODs from offline preparation and service startup through request admission, prefill, decode, state and service lifecycle, and observability.`,
-      atlasSummary: "Each card separates availability, scope, activation evidence, and performance evidence; unverified gains remain unclaimed.",
+      atlasSummary: "Each card shows availability, scope, activation records, and measured results.",
       portfolioCopy: "Compare MODs by lifecycle phase, scenario, platform, and readiness, with maintainers, setup, evidence labels, and public results."
     };
   }

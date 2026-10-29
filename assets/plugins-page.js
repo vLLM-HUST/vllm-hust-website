@@ -1485,7 +1485,7 @@ vllm-hust-ext extension check ${extensionId}`
     const zh = language() === "zh";
     const values = {
       "plugins-eyebrow": zh ? "vLLM-HUST MOD 目录" : "vLLM-HUST MOD catalog",
-      "plugins-title": zh ? "MOD 工坊" : "MOD Workshop",
+      "plugins-title": zh ? "MOD 目录" : "MOD catalog",
       "plugins-fact-items": zh ? "个公开 MOD" : "public MODs",
       "plugins-fact-runtime": zh ? "个兼容性已验证" : "compatibility verified",
       "plugins-fact-review": zh ? "个实验性或仅检查" : "experimental or inspection-only",

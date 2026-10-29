@@ -1205,7 +1205,7 @@ def test_shared_visual_styles_use_current_cache_key_and_non_negative_tracking() 
     ):
         text = (root / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=navigation-cleanup-20261029" in text
+        assert "assets/site.js?v=site-labels-20261029" in text
 
 
 def test_homepage_uses_shared_ecosystem_visual_system() -> None:
@@ -1237,8 +1237,8 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     assert 'class="plugin-path"' in html_text
     assert "offline preparation and service startup" in html_text
     assert "离线准备、服务启动" in html_text
-    assert "activation evidence, and performance evidence" in html_text
-    assert "启用依据与性能证据" in html_text
+    assert "activation records, and measured results" in html_text
+    assert "启用记录与实测结果" in html_text
 
     expected_repositories = (
         "vllm-hust-bidkv",
@@ -2840,7 +2840,7 @@ def test_issues_page_exists_and_has_nav() -> None:
     assert "assets/issues-page.js?v=" in html_text
     assert "assets/site.css?v=benchmarks-ia-20261003" in html_text
     assert "assets/subpages.css?v=site-structure-20260816" in html_text
-    assert "assets/site.js?v=navigation-cleanup-20261029" in html_text
+    assert "assets/site.js?v=site-labels-20261029" in html_text
     assert "window.vllmHustIssuesDataUrl" in html_text
     assert "./data/issues.json" in html_text
     assert "navIssues: 'Issues'" in site_js
