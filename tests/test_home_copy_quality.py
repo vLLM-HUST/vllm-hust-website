@@ -121,8 +121,10 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     assert "scenarioCount" in HOME_CATALOG_SCRIPT
     assert "mod-taxonomy.json" in HOME_CATALOG_SCRIPT
     assert "performanceResults" not in CATALOG_SCRIPT
-    assert "unverified gains remain unclaimed" in INDEX
-    assert "未验证收益不会被写成有效优化" in INDEX
+    assert "activation records, and measured results" in INDEX
+    assert "启用记录与实测结果" in INDEX
+    assert "unverified gains remain unclaimed" not in INDEX
+    assert "未验证收益不会被写成有效优化" not in INDEX
 
 
 def test_homepage_uses_lifecycle_and_evidence_language() -> None:

@@ -14,14 +14,14 @@
             navServingPlan: '3. Capacity & cost',
             navNews: 'News',
             navContributors: 'Contributors',
-            navMembers: 'Members',
+            navMembers: 'Organization members',
             navConferences: 'Conferences',
             navCourses: 'Courses',
             navIssues: 'Issues',
             navProducts: 'Products',
             navEngine: 'Engine',
             navProjects: 'Projects',
-            navPlugins: 'Ecosystem',
+            navPlugins: 'MOD catalog',
             navPublications: 'Papers & news',
             navPerformance: 'Performance data',
             navCommunity: 'Community',
@@ -37,6 +37,7 @@
             footerPublications: 'Papers & news',
             footerPerformance: 'Performance data',
             footerCommunity: 'Community',
+            footerNavigation: 'Footer navigation',
             brandSubtitle: 'Domestic-compute inference engine',
             langToggle: 'ZH',
             langToggleLabel: '切换为中文',
@@ -54,7 +55,7 @@
             navAchievements: '论文与成果',
             navServingPlan: '3. 产能与成本',
             navNews: '新闻',
-            navContributors: '核心成员',
+            navContributors: '贡献者',
             navMembers: '组织成员',
             navConferences: '会议',
             navCourses: '课程',
@@ -62,7 +63,7 @@
             navProducts: '产品',
             navEngine: '引擎',
             navProjects: '项目',
-            navPlugins: '生态架构',
+            navPlugins: 'MOD 目录',
             navPublications: '论文与新闻',
             navPerformance: '性能数据',
             navCommunity: '社区',
@@ -78,9 +79,37 @@
             footerPublications: '论文与新闻',
             footerPerformance: '性能数据',
             footerCommunity: '社区',
+            footerNavigation: '页脚导航',
             brandSubtitle: '面向国产算力的推理引擎',
             langToggle: 'EN',
             langToggleLabel: 'Switch to English',
+        },
+    };
+
+    const PAGE_COPY = {
+        'betterscale.html': {
+            en: { title: 'BetterScale · vLLM-HUST', 'footer-copy': 'BetterScale · Measurements: September 2026.' },
+            zh: { title: 'BetterScale · vLLM-HUST', 'footer-copy': 'BetterScale · 测量时间：2026 年 9 月。' },
+        },
+        'traceloom.html': {
+            en: { title: 'TraceLoom · vLLM-HUST', 'footer-copy': 'TraceLoom · September 2026.' },
+            zh: { title: 'TraceLoom · vLLM-HUST', 'footer-copy': 'TraceLoom · 2026 年 9 月。' },
+        },
+        'index.html': {
+            en: { title: 'Tests & results · vLLM-HUST', 'footer-copy': 'Tests, results and cost.' },
+            zh: { title: '测试与结果 · vLLM-HUST', 'footer-copy': '测试、结果与成本。' },
+        },
+        'b0-b1.html': {
+            en: { title: 'B0/B1 results · vLLM-HUST', 'footer-copy': 'Tests, results and cost.' },
+            zh: { title: 'B0/B1 大纲对比 · vLLM-HUST', 'footer-copy': '测试、结果与成本。' },
+        },
+        'dataset-introductions.html': {
+            en: { title: 'Designated dataset tests · vLLM-HUST', 'footer-copy': 'Dataset sources, test instructions and evaluation tools.' },
+            zh: { title: '指定数据集测试 · vLLM-HUST', 'footer-copy': '数据集来源、测试说明与评测工具。' },
+        },
+        'serving-plan.html': {
+            en: { 'footer-copy': 'Capacity & cost · Inputs stay in your browser.' },
+            zh: { 'footer-copy': '产能与成本 · 输入仅在当前浏览器内计算。' },
         },
     };
 
@@ -108,7 +137,8 @@
 
     function applyPageI18n(lang) {
         const pageDict = window.vllmHustPageDict || {};
-        const dict = pageDict[lang] || pageDict.en || {};
+        const filename = window.location.pathname.split('/').pop() || 'index.html';
+        const dict = { ...(PAGE_COPY[filename]?.[lang] || {}), ...(pageDict[lang] || pageDict.en || {}) };
         Object.entries(dict).forEach(([key, value]) => {
             if (key === 'title') {
                 document.title = value;
@@ -167,6 +197,7 @@
             node.textContent = common.brandSubtitle;
         });
         applyPageI18n(lang);
+        document.querySelector('.site-directory-links')?.setAttribute('aria-label', common.footerNavigation);
         window.dispatchEvent(new CustomEvent('vllm-hust:langchange', { detail: { lang } }));
     }
 
