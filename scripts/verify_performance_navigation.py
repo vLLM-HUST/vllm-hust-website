@@ -310,6 +310,32 @@ def main():
                             ).to_have_attribute(
                                 "href", f"./ecosystem-archive.html#{section_id}"
                             )
+                            if section_id == "stack":
+                                expect(page.locator("#stack-title")).to_contain_text(
+                                    "vLLM-HUST"
+                                )
+                                expect(page.locator("#stack-summary")).to_contain_text(
+                                    "我们的重点是各类 MOD 插件优化。"
+                                    if language == "zh"
+                                    else "Our focus is optimization through MOD plugins."
+                                )
+                                expect(page.locator("#stack-detail")).to_contain_text(
+                                    "vLLM-Ascend-HUST"
+                                )
+                                for repo in ("vllm-hust", "vllm-ascend-hust"):
+                                    expect(
+                                        page.locator(
+                                            f'#stack a[href="https://github.com/vLLM-HUST/{repo}"]'
+                                        )
+                                    ).to_be_visible()
+                                assert (
+                                    "gennova"
+                                    not in page.locator("body").inner_text().lower()
+                                )
+                                page.locator("#stack").screenshot(
+                                    path=OUTPUT
+                                    / f"engine-{width}-{language}-{theme}.png"
+                                )
                         # Hash-only navigation updates the current section without a reload.
                         page.evaluate("location.hash = 'products'")
                         expect(
