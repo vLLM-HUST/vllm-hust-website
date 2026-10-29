@@ -26,7 +26,7 @@
       </a>
       <div class="nav-links">
         <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
-        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">Ecosystem</a>
+        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">MOD catalog</a>
         <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
         <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
         <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
@@ -145,7 +145,7 @@
         <a href="./plugins.html"><span>01 / MOD</span><strong id="stack-mod-title">MOD plugins</strong><p id="stack-mod-copy">Our main focus: optimization plugins, with their scope, setup, and measured results.</p><em id="stack-catalog-link">Explore MODs →</em></a>
         <a href="https://github.com/vLLM-HUST/vllm-hust"><span>02 / VLLM</span><strong>vLLM-HUST</strong><p id="stack-core-copy">The vLLM fork where engine changes required by MODs are maintained.</p><em id="stack-core-link">Open vLLM fork ↗</em></a>
         <a href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span>03 / ASCEND</span><strong>vLLM-Ascend-HUST</strong><p id="stack-ascend-copy">The vLLM-Ascend fork where Ascend backend changes required by MODs are maintained.</p><em id="stack-ascend-link">Open Ascend fork ↗</em></a>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / EVIDENCE</span><strong id="stack-benchmark-title">Benchmark evidence</strong><p id="stack-benchmark-copy">Check configurations and raw results; plugin availability alone is not proof of a performance gain.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark"><span>04 / EVIDENCE</span><strong id="stack-benchmark-title">Benchmark evidence</strong><p id="stack-benchmark-copy">Test configurations, measured results, and original records.</p><em id="stack-benchmark-link">Open benchmark ↗</em></a>
       </div>
       <p><a id="stack-matrix-link" href="./dataset-validation.html">Full measurement matrix: current and historical configurations →</a></p>
     </section>
@@ -153,7 +153,7 @@
     <section class="execution-section execution-atlas" id="projects">
       <div class="execution-section-head">
         <div><p id="atlas-eyebrow" class="execution-eyebrow">MOD portfolio</p><h2 id="atlas-title">Explore 40 MODs from offline preparation and service startup through request admission, prefill, decode, state and service lifecycle, and observability.</h2></div>
-        <p id="atlas-summary">Each card separates availability, scope, activation evidence, and performance evidence; unverified gains remain unclaimed.</p>
+        <p id="atlas-summary">Each card shows availability, scope, activation records, and measured results.</p>
       </div>
       <a class="mod-portfolio-brief" href="./plugins.html#plugin-catalog" aria-labelledby="mod-portfolio-title">
         <span class="mod-portfolio-count" data-home-mod-count aria-hidden="true">40</span>
@@ -262,10 +262,10 @@
         'stack-core-copy': 'The vLLM fork where engine changes required by MODs are maintained.',
         'stack-ascend-copy': 'The vLLM-Ascend fork where Ascend backend changes required by MODs are maintained.',
         'stack-catalog-link': 'Explore MODs →', 'stack-core-link': 'Open vLLM fork ↗', 'stack-ascend-link': 'Open Ascend fork ↗',
-        'stack-benchmark-title': 'Benchmark evidence', 'stack-benchmark-copy': 'Check configurations and raw results; plugin availability alone is not proof of a performance gain.', 'stack-benchmark-link': 'Open benchmark ↗',
+        'stack-benchmark-title': 'Benchmark evidence', 'stack-benchmark-copy': 'Test configurations, measured results, and original records.', 'stack-benchmark-link': 'Open benchmark ↗',
         'stack-matrix-link': 'Full measurement matrix: current and historical configurations →',
         'atlas-eyebrow': 'MOD portfolio', 'atlas-title': 'Explore 40 MODs from offline preparation and service startup through request admission, prefill, decode, state and service lifecycle, and observability.',
-        'atlas-summary': 'Each card separates availability, scope, activation evidence, and performance evidence; unverified gains remain unclaimed.',
+        'atlas-summary': 'Each card shows availability, scope, activation records, and measured results.',
         'mod-portfolio-title': 'Open the complete MOD catalog',
         'mod-portfolio-copy': 'Compare MODs by lifecycle phase, scenario, platform, and readiness, with maintainers, setup, evidence labels, and public results.',
         'mechanism-control-title': 'Control & state', 'mechanism-control-copy': 'Admission, scheduling, and KV lifecycle.',
@@ -314,10 +314,10 @@
         'stack-core-copy': '基于上游 vLLM，集中维护 MOD 所需的引擎侧改动。',
         'stack-ascend-copy': '基于上游 vLLM-Ascend，集中维护 MOD 所需的昇腾后端改动。',
         'stack-catalog-link': '查看 MOD 目录 →', 'stack-core-link': '查看 vLLM 分支 ↗', 'stack-ascend-link': '查看 Ascend 分支 ↗',
-        'stack-benchmark-title': '实测证据', 'stack-benchmark-copy': '核对测试配置与原始结果；插件可用不等于已经证明性能提升。', 'stack-benchmark-link': '打开 Benchmark ↗',
+        'stack-benchmark-title': '实测证据', 'stack-benchmark-copy': '查看测试配置、实测结果与原始记录。', 'stack-benchmark-link': '打开 Benchmark ↗',
         'stack-matrix-link': '完整实测矩阵：当前与历史配置 →',
         'atlas-eyebrow': 'MOD 项目组合', 'atlas-title': '探索 40 个 MOD：从离线准备、服务启动到请求准入、Prefill、Decode、状态与服务生命周期及可观测性。',
-        'atlas-summary': '每张卡片分别说明可用性、适用范围、启用依据与性能证据；未验证收益不会被写成有效优化。',
+        'atlas-summary': '每张卡片展示可用性、适用范围、启用记录与实测结果。',
         'mod-portfolio-title': '打开完整 MOD 目录',
         'mod-portfolio-copy': '按生命周期阶段、场景、平台与成熟度比较 MOD，并查看维护者、配置、证据标签与公开结果。',
         'mechanism-control-title': '控制与状态', 'mechanism-control-copy': '请求准入、调度与 KV 生命周期。',
@@ -339,9 +339,9 @@
       }
     };
   </script>
-  <script src="./assets/site.js?v=navigation-cleanup-20261029"></script>
+  <script src="./assets/site.js?v=site-labels-20261029"></script>
   <script src="./assets/ecosystem-catalog.js?v=mod-count-20261010"></script>
-  <script src="./assets/home-catalog.js?v=org-boundary-20261013"></script>
+  <script src="./assets/home-catalog.js?v=site-labels-20261029"></script>
   <script src="./assets/product-catalog.js?v=0.3.7"></script>
   <script src="./assets/home-disclosure.js?v=0.3.7"></script>
 </body>
