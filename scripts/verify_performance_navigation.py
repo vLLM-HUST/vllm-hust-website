@@ -61,7 +61,38 @@ def main():
                                 )
                                 == LINKS
                             )
-                            assert page.locator(".site-nav .nav-group").count() == 5
+                            assert page.locator(".site-nav .nav-group").count() == 4
+                            expect(
+                                page.locator('.site-nav [data-nav-group="engine"]')
+                            ).to_have_count(0)
+                            expect(
+                                page.locator(
+                                    '.nav-links > a[href="./ecosystem-archive.html#stack"]'
+                                )
+                            ).to_have_count(1)
+                            expect(
+                                page.locator(".site-nav .brand-link")
+                            ).to_have_attribute("href", "./index.html")
+                            if name != "index.html":
+                                current = page.locator(
+                                    '.benchmark-tabs [aria-current="page"]'
+                                )
+                                expect(current).to_have_count(1)
+                                expect(current).to_have_attribute("href", "./" + name)
+                                expect(current).to_have_class("active")
+                                assert (
+                                    current.evaluate(
+                                        "e=>getComputedStyle(e).backgroundColor"
+                                    )
+                                    == "rgb(125, 211, 252)"
+                                )
+                                assert (
+                                    current.evaluate("e=>getComputedStyle(e).color")
+                                    == "rgb(4, 17, 29)"
+                                )
+                                expect(
+                                    page.locator(".benchmark-tabs a").nth(2)
+                                ).to_contain_text("3.")
                             assert (
                                 page.locator(
                                     '.site-nav a[href="./plugins.html"]'
@@ -96,6 +127,12 @@ def main():
                             )
                             if width == 390:
                                 page.locator("#navToggle").click()
+                                direct = page.locator(".nav-links > a")
+                                expect(direct).to_have_count(4)
+                                boxes = [link.bounding_box() for link in direct.all()]
+                                assert boxes[0]["y"] == boxes[1]["y"]
+                                assert boxes[2]["y"] == boxes[3]["y"]
+                                assert boxes[2]["y"] > boxes[0]["y"]
                             for group in page.locator(".site-nav .nav-group").all():
                                 group.locator("summary").click()
                                 assert group.locator("a").first.is_visible()
@@ -268,6 +305,44 @@ def main():
                                 wait_until="networkidle",
                             )
                             assert page.locator(f"#{section_id}").is_visible()
+                            expect(
+                                page.locator('.nav-links [aria-current="location"]')
+                            ).to_have_attribute(
+                                "href", f"./ecosystem-archive.html#{section_id}"
+                            )
+                            if section_id == "stack":
+                                expect(page.locator("#stack-title")).to_contain_text(
+                                    "vLLM-HUST"
+                                )
+                                expect(page.locator("#stack-summary")).to_contain_text(
+                                    "我们的重点是各类 MOD 插件优化。"
+                                    if language == "zh"
+                                    else "Our focus is optimization through MOD plugins."
+                                )
+                                expect(page.locator("#stack-detail")).to_contain_text(
+                                    "vLLM-Ascend-HUST"
+                                )
+                                for repo in ("vllm-hust", "vllm-ascend-hust"):
+                                    expect(
+                                        page.locator(
+                                            f'#stack a[href="https://github.com/vLLM-HUST/{repo}"]'
+                                        )
+                                    ).to_be_visible()
+                                assert (
+                                    "gennova"
+                                    not in page.locator("body").inner_text().lower()
+                                )
+                                page.locator("#stack").screenshot(
+                                    path=OUTPUT
+                                    / f"engine-{width}-{language}-{theme}.png"
+                                )
+                        # Hash-only navigation updates the current section without a reload.
+                        page.evaluate("location.hash = 'products'")
+                        expect(
+                            page.locator('.nav-links [aria-current="location"]')
+                        ).to_have_attribute("href", "./ecosystem-archive.html#products")
+                        page.locator(".brand-link").click()
+                        expect(page).to_have_url(f"{base}/index.html")
                         context.close()
             # A missing publication cannot become an empty "passed" dashboard.
             page = browser.new_page()
