@@ -42,6 +42,21 @@ async def run(args):
                     )
                     assert response.status == 200
                     assert await page.locator("main").is_visible()
+                    await expect(
+                        page.locator(".site-nav .brand-link")
+                    ).to_have_attribute("href", "./index.html")
+                    current_step = page.locator('.benchmark-tabs [aria-current="page"]')
+                    if filename in (
+                        "dataset-introductions.html",
+                        "b0-b1.html",
+                        "serving-plan.html",
+                    ):
+                        await expect(current_step).to_have_count(1)
+                        await expect(current_step).to_have_attribute(
+                            "href", "./" + filename
+                        )
+                    else:
+                        await expect(current_step).to_have_count(0)
                     assert await page.locator(".brand-mark").inner_text() == "V", (
                         filename
                     )
