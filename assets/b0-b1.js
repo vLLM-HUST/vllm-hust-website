@@ -35,7 +35,7 @@
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('方法与记录','Methods & records')}</summary><p>${escape(ref.model)} · ${escape(ref.dtype)} · ${escape(ref.device)} × ${ref.participating_chips} · ${escape(ref.dataset)}</p>
       ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('效率 η','Efficiency η'),t('中期 50%','Midterm 50%'),t('最终 90%','Final 90%')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),number(ref[arm].eta_percent)+'%',...threshold(ref[arm].eta_percent)]))}
       <p>${t('实际运行版本','Actual runtime versions')}: B0 ${escape(pair.identities.B0)}; B1 ${escape(pair.identities.B1)}</p>
-      <p class="focus-status">${t('参考修订中：共享实现的独立重复尚未建立工况能力强度，旧参考和达标判定已退出当前结论。同轮F/T测量保留；新参考需独立推导与整链实现见证。','Reference under revision: independent repeats of the shared implementation did not establish workload-capacity strength. The old reference and attainment verdicts are withdrawn from current conclusions. Same-run F/T measurements are retained; the replacement needs independent derivation and a whole-chain execution witness.')}</p>
+      <p class="focus-status">${t('参考修订中：独立标定的B1模型已回验；模型诊断与正式无插桩验收分开。仍需B0路径绑定、适用计时与同预算质量。','Reference under revision: the independently calibrated B1 model was reproduced. Model diagnostics are separate from uninstrumented acceptance. B0 path binding, applicable timing and same-budget quality remain open.')}</p>
       <details><summary>${t('同配置质量与测量范围','Configuration-bound quality and measurement scope')}</summary>${table([t('方案','Arm'),t('正确 / 总题数','Correct / total'),t('长度终止','Length stops')],[['B0',`${quality.b0.correct} / ${quality.b0.total}`,quality.b0.truncated],['B1',`${quality.b1.candidate_correct} / ${quality.b0.total}`,quality.b1.candidate_truncated]])}<p>${t('质量输出预算','Quality output budget')}: ${quality.output_limit}; ${t('计量输出预算','Measurement output budget')}: ${pair.workload.output_budget}. ${t('固定子集，不代表全量或统计非劣结论。','A fixed subset, not a full-corpus or statistical noninferiority finding.')}</p></details>${evidence('m01-verdict')}</details>
       <details class="comparison-method focus-result" id="method-2"><summary>${titles[1]} · ${t('方法与记录','Methods & records')}</summary><p>${t('门槛：吞吐提升 ≥10%；逐请求平均 TTFT、TPOT 分别改善 ≥5%，同时满足质量与 SLO。当前展示 SWE-prefix-reuse、C16、900 秒既有窗口。','Targets: throughput +10% or more; request-weighted mean TTFT and TPOT each improve by at least 5%, with matched quality and SLO. Existing SWE-prefix-reuse C16 windows of 900 seconds are shown.')}</p>
       ${table([t('指标','Metric'),'B0','B1',t('描述性变化','Descriptive change')],[[t('输出 token/秒','Output tokens/s'),number(c16.window_tokens[0]/latency.arms[0].measurement_seconds),number(c16.window_tokens[1]/latency.arms[1].measurement_seconds),'+'+number(c16.descriptive_gain_percent)+'%'],...['ttft','tpot'].map(k=>[k.toUpperCase()+t(' 均值 (ms)',' mean (ms)'),number(latency.arms[0].window[k].mean_seconds*1000),number(latency.arms[1].window[k].mean_seconds*1000),'-'+number(latency.descriptive_reduction_percent[k])+'%'])])}
@@ -59,16 +59,54 @@
       <p><a href="./serving-plan.html">${t('进入产能与成本估算 →','Open capacity and cost estimates →')}</a> · ${t('估算基于输入假设，不是本项验收成绩。','Estimates depend on inputs; they are not an acceptance result.')}</p>${evidence('milestone-v15')}</details>`;
     const row=(name,b0,b1,status,gap)=>`<div class="comparison-row"><h3>${escape(name)}</h3><dl>${[['B0',b0],['B1',b1],[t('中期门槛 / 当前判定','Midterm target / verdict'),status],[t('还缺什么','Outstanding evidence'),gap]].map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl></div>`;
     const group=(i,rows,note='')=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2>${rows}${note?`<p class="comparison-caveat">${escape(note)}</p>`:''}<a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a></section>`;
-    const numeric=t('数值达到；完整验收待核验','Numeric target met; full acceptance pending');
-    const c16Gap=t('B1 全部资源占用、配对任务质量与 SLO；负载种子差异需核验。','Full B1 resource occupancy, paired task quality and SLO; assess load-seed differences.');
-    const unavailable=t('尚无完整配对实测值','No complete paired measurement');
     root.innerHTML=`<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('当前结果与中期进度','Current results & midterm progress')}</h2>
       <p class="comparison-context">${escape(data.version)} · ${t('B0 固定 0.18/0.18；B1 按工况分别记录。数值达标不等于整体验收完成。','B0 fixed at 0.18/0.18; B1 recorded per workload. Numeric success is not full acceptance.')}</p>
-      ${group(0,row(t('有效算力与效率 η','Effective compute & efficiency η'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,t('参考修订中；η 与中期/最终达标判定未确定。','Reference under revision; eta and both stage verdicts are unresolved.'),t('独立推导的工况能力依据、整链见证，以及更强候选的同轮F/T与身份绑定。','Independently justified workload capacity, a whole-chain witness, and stronger candidates’ same-run F/T and identity bindings.')),t('同轮有效算力描述性提升','Descriptive same-run compute gain')+` +${number(ref.paired_C_gain_percent)}%。 `+t('中期门槛50%，最终门槛90%；不是当前达成率。','Midterm target 50%, final target 90%; these are not current attainment rates.'))}
-      ${group(1,row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(c16.window_tokens[0]/latency.arms[0].measurement_seconds),number(c16.window_tokens[1]/latency.arms[1].measurement_seconds),t('提升 ≥10%','Gain ≥10%')+` → +${number(c16.descriptive_gain_percent)}%；`+numeric,c16Gap)+['ttft','tpot'].map(k=>row(k.toUpperCase()+t(' 逐请求均值（ms）',' request-weighted mean (ms)'),number(latency.arms[0].window[k].mean_seconds*1000),number(latency.arms[1].window[k].mean_seconds*1000),t('降低 ≥5%','Reduction ≥5%')+` → −${number(latency.descriptive_reduction_percent[k])}%；`+numeric,c16Gap)).join(''),t('SWE-prefix-reuse · C16 · 900 秒窗口；以上为描述性改善，与有效算力项使用不同 B1 配置。','SWE-prefix-reuse · C16 · 900-second windows; descriptive improvements using a different B1 deployment from effective compute.'))}
-      ${group(2,row(t('五项数据集与长上下文稳定性','Five-dataset & long-context stability'),unavailable,unavailable,t('尚不能判定达到中期门槛','Midterm target not yet demonstrated'),t('五项任务异常核查、实际 ≥16K 连续区间、可比 4K 负载及 TTFT/TPOT P95/P99 窗口统计。','Anomaly coverage across five datasets, actual ≥16K continuous intervals, comparable 4K loads and windowed TTFT/TPOT P95/P99.')),t('已有质量结果不等于稳定性结论：FrontierScience 原冻结候选两个赛道均下降；HLE 已有指定 B0 评分，缺同配置 B1 配对。详见记录。','Existing quality scores do not establish stability: the frozen FrontierScience candidate declined on both tracks; HLE has designated B0 scores without a matched B1. See records.'))}
-      ${group(3,row(t('每百万输出 token 成本（元）','Cost per million output tokens (CNY)'),unavailable,unavailable,t('降低 ≥10%：尚不能判定','Reduction ≥10%: not yet demonstrated'),t('固定 B0 的可比配对、综合月费与折算天数、同区间成功请求用量。','Comparable fixed-B0 pairing, all-in monthly fee, month-day basis and successful usage over matched intervals.'))+row(t('高负载芯片平均利用率','Mean chip utilization under high load'),unavailable,unavailable,t('明显优于基线：尚不能判定','Clearly better than baseline: not yet demonstrated'),t('可比高负载下的两臂时长加权利用率与资源占用记录。','Time-weighted utilization and resource occupancy for both arms under comparable high load.')),t('产能与成本页为输入假设下的估算，不能替代此处实测验收。','The capacity and cost page estimates from inputs; it does not replace measured acceptance.'))}
+      <section id="metric-1"></section>
+      <section id="metric-2"></section>
+      <section id="metric-3"></section>
+      <section id="metric-4"></section>
       </section><section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('详细方法、证据与历史记录','Detailed methods, evidence & historical records')}</h2>${methods}</section>`;
+    const completed=data.acceptance_completion;
+    const serving=completed.recovered_serving;
+    const diagnostic=completed.reference.graph_recomputation[0];
+    const b0Phases=completed.b0_continuous.phases.filter(p=>p.name.endsWith('-formal'));
+    const evidencePath='reports/acceptance-completion-20261029/';
+    const currentLinks=evidence('acceptance-completion');
+    const qualityGap=t('同预算评分 B0 21/200、B1 19/200；质量与 SLO 未闭合。','Same-budget scores: B0 21/200, B1 19/200; quality and SLO remain unresolved.');
+    root.querySelector('#metric-1').outerHTML=group(0,
+      row(t('实测有效算力','Measured effective compute'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,
+        t('正式 η 修订中；尚不能判定通过','Formal eta under revision; acceptance not established'),
+        t('B0 独立参考绑定、无插桩计时与同预算质量。','B0 reference binding, uninstrumented timing and same-budget quality.'))+
+      row(t('独立标定模型诊断','Independent calibration model diagnostic'),t('参考尚未绑定','Reference not yet bound'),`${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
+        `${number(diagnostic.efficiency_percent)}% · `+t('对原计数轮的诊断，不是正式 η','Diagnostic against the counted run, not formal eta'),
+        t('三场景为敏感性，不是置信区间。','Three scenarios are sensitivity analysis, not a confidence interval.')),
+      t('中期门槛50%，最终门槛90%；正式参考仍在修订。','Midterm target: 50%; final target: 90%. The formal reference remains under revision.'));
+    root.querySelector('#metric-2').outerHTML=group(1,
+      [['output_tokens_per_second',t('输出吞吐（token/s）','Output throughput (tokens/s)')],['equal_request_mean_TTFT_ms',t('平均 TTFT（ms）','Mean TTFT (ms)')],['equal_request_mean_TPOT_ms',t('平均 TPOT（ms/token）','Mean TPOT (ms/token)')]].map(([key,label])=>
+        row(label,number(serving.arms.B0[key]),number(serving.arms.B1[key]),t('服务测量已复算；完整验收未通过','Serving metrics recomputed; full acceptance not established'),qualityGap)).join(''),
+      t('固定200请求、out256、各保留两卡；B1为0.28.1/Ascend0.25.1rc2开发栈。C16记录在详情中另列。','Fixed 200 requests, out256, two reserved cards per arm; B1 uses the 0.28.1/Ascend 0.25.1rc2 development stack. C16 records remain separate in details.'));
+    root.querySelector('#metric-3').outerHTML=group(2,
+      row(t('4K / 16K 连续运行','4K / 16K continuous operation'),
+        t(`${b0Phases[0].requests} / ${b0Phases[1].requests} 请求，零失败`,`${b0Phases[0].requests} / ${b0Phases[1].requests} requests, no failures`),
+        t('24个预热成功；正式4K的8请求失败；16K未执行','24 warmup successes; 8 formal 4K failures; 16K not run'),
+        t('该 B1 合成压力配置实测失败','This B1 synthetic stress configuration failed'),
+        t('状态卸载锁页主机内存分配故障；需修复后重新验证。','Pinned host allocation failed during state offload; repair and revalidation required.'))+
+      row(t('16K / 32K 检索','16K / 32K retrieval'),'6 / 6','6 / 6',t('检索通过，与连续稳定性分开','Retrieval passed, separate from continuous stability'),t('五任务原记录已审计；HLE旧退出缺失和Agent上下文失败保留。','Five-task records audited; HLE unknown old exit and Agent context failures retained.')),
+      t('实际输入4115/16407 token，C8闭环，正式发起300秒并完整排空；合成压力不替代五任务质量。','Actual 4115/16407 input tokens, C8 closed loop, 300-second formal submission plus drain; synthetic stress is not five-task quality.'));
+    root.querySelector('#metric-4').outerHTML=group(3,
+      row(t('每百万输出 token 租赁估算（元）','Rental estimate per million output tokens (CNY)'),
+        number(serving.arms.B0.compute_rental_CNY_per_million_output_tokens),number(serving.arms.B1.compute_rental_CNY_per_million_output_tokens),
+        t('算术降低','Arithmetic reduction')+` ${number(serving.improvements_percent.same_rate_compute_rental_cost)}%；`+t('不是业务验收通过','not business acceptance'),qualityGap)+
+      row(t('原成本区间利用率','Utilization over the original cost interval'),t('条件界限9.4245–16.7177%，非精确点','Conditional bounds 9.4245–16.7177%, not an exact point'),
+        number(serving.arms.B1.same_interval_ai_core_utilization.mean_percent)+'%',t('精确配对仍未闭合','Exact paired comparison remains open'),
+        t('B0原轮缺同轮时钟桥；不能借用新连续轮填数。','B0 lacks a same-run clock bridge; new continuous data cannot fill the old run.')),
+      t('天翼云类似双卡910B报价36908元/月；30天分析假设，云盘/公网另计。不是本机账单。','Analogous CTYun dual 910B quote: CNY 36908/month; 30-day analysis assumption, disk/network extra. Not this machine’s bill.'));
+    const primaryEvidence=['reference-method.md','out256-quality-audit.json','continuous-summary.json','README.md'];
+    for (const id of [1,2,3,4]) root.querySelector('#metric-'+id).insertAdjacentHTML('beforeend',`<p class="focus-source"><a href="${source(evidencePath+primaryEvidence[id-1])}">${t('原始证据与复算','Original evidence and recomputation')}</a></p>`);
+    root.querySelector('#method-1').insertAdjacentHTML('beforeend',`<p>${t('B1模型参考时间','B1 modeled reference time')}: ${number(diagnostic.reference_seconds)} s · ${number(diagnostic.efficiency_percent)}% · <a href="${source(evidencePath+'reference-method.md')}">${t('参考推导与适用范围','Derivation and applicability')}</a></p>`);
+    root.querySelector('#method-3').insertAdjacentHTML('beforeend',sectionTables('acceptance-completion',[0])+currentLinks);
+    root.querySelector('#method-4 .focus-status').textContent=t('固定B0请求集合与公开类似机器报价已恢复，租赁估算降低46.4178%。原out256质量21/200对19/200、B0精确时钟桥及业务适用性仍未闭合。','Fixed-B0 request usage and analogous public pricing were recovered; rental arithmetic falls46.4178%. Out256 quality21/200 versus19/200, exact B0 clock alignment and business applicability remain unresolved.');
+    root.querySelector('#method-4').insertAdjacentHTML('beforeend',`<p><a href="${source('reports/acceptance-gaps-20261029/README.md')}">${t('公开报价、原始用量与成本复算','Public pricing, original usage and cost recomputation')}</a></p>`);
     root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',()=>{
       const details=root.querySelector(link.getAttribute('href'));
       details.open=true;
@@ -98,8 +136,9 @@
       if(hash!==entry.sha256||raw.byteLength!==entry.bytes)throw Error('Publication identity mismatch');
       return JSON.parse(new TextDecoder().decode(raw));
     };
-    const [d,runs]=await Promise.all(['data/midterm-v101.json','data/leaderboard_frontier_swe_evidence.json'].map(fetchVerified));
-    if(d.schema!=='midterm-publication/v1'||d.version!=='V1.01')throw Error('Invalid report');
+    const [d,runs]=await Promise.all(['data/midterm-v102.json','data/leaderboard_frontier_swe_evidence.json'].map(fetchVerified));
+    if(d.schema!=='midterm-publication/v1'||d.version!=='V1.02')throw Error('Invalid report');
+    if(d.acceptance_completion?.continuous?.status!=='B0_completed_B1_measured_host_allocation_failure'||d.acceptance_completion.continuous.paired_continuous_stability_pass!==false)throw Error('Invalid completion evidence');
     const ref=d.wholechain_reference;
     if(ref?.status!=='reference_under_revision'||ref.reference_qualified!==false||ref.reference_C_TFLOPS_per_chip!==null)throw Error('Invalid reference revision');
     for(const arm of ['B0','B1']) if(ref[arm]?.eta_percent!==null||ref[arm]?.eta_target_met!==null||!Number.isFinite(ref[arm]?.own_C)||ref[arm].own_C!==ref[arm].ownF/(ref.participating_chips*ref[arm].own_T_seconds*1e12))throw Error('Invalid same-run measurement');

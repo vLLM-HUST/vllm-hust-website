@@ -176,11 +176,11 @@ def main():
                                 assert page.locator("#all-sources").is_hidden()
                             elif name == "b0-b1.html":
                                 page.wait_for_selector(
-                                    '#comparison[data-loaded="V1.01"]'
+                                    '#comparison[data-loaded="V1.02"]'
                                 )
                                 overview = page.locator(".comparison-overview")
                                 assert page.locator(".comparison-group").count() == 4
-                                assert page.locator(".comparison-row").count() == 7
+                                assert page.locator(".comparison-row").count() == 9
                                 assert (
                                     page.locator(".comparison-method[open]").count()
                                     == 0
@@ -195,18 +195,22 @@ def main():
                                 for value in (
                                     "3.8407",
                                     "7.1042",
-                                    "84.9705%",
                                     "50%",
                                     "90%",
-                                    "247.2656",
-                                    "885.9611",
-                                    "258.3035%",
-                                    "1685.4442",
-                                    "365.0111",
-                                    "78.3433%",
-                                    "71.2462",
-                                    "17.9418",
-                                    "74.8172%",
+                                    "19.0819",
+                                    "37.2302%",
+                                    "215.0116",
+                                    "401.2743",
+                                    "154605.0625",
+                                    "86876.8906",
+                                    "66.5920",
+                                    "33.0916",
+                                    "66.2253",
+                                    "35.4849",
+                                    "46.4178%",
+                                    "21/200",
+                                    "19/200",
+                                    "153 / 73",
                                 ):
                                     assert value in current, value
                                 for withdrawn in ("54.0301%", "99.9397%", "7.1085"):
@@ -215,13 +219,16 @@ def main():
                                     "修订中" if language == "zh" else "under revision"
                                 ) in current
                                 assert (
-                                    "尚不能判定"
+                                    "不是业务验收通过"
                                     in page.locator("#metric-4").inner_text()
                                     if language == "zh"
-                                    else "not yet demonstrated"
+                                    else "not business acceptance"
                                     in page.locator("#metric-4").inner_text()
                                 )
-                                assert "FrontierScience" in current and "HLE" in current
+                                assert "HLE" in current
+                                assert (
+                                    "锁页" if language == "zh" else "Pinned host"
+                                ) in current
                                 # Every metric exposes both measurements, verdict and gaps
                                 # without opening details or horizontal scrolling on mobile.
                                 for row in page.locator(".comparison-row").all():
@@ -266,6 +273,22 @@ def main():
                                     in page.locator("#method-1").inner_text()
                                 )
                                 page.locator(
+                                    "#metric-2 .comparison-detail-link"
+                                ).click()
+                                c16 = page.locator("#method-2").inner_text()
+                                for value in (
+                                    "247.2656",
+                                    "885.9611",
+                                    "258.3035%",
+                                    "1685.4442",
+                                    "365.0111",
+                                    "78.3433%",
+                                    "71.2462",
+                                    "17.9418",
+                                    "74.8172%",
+                                ):
+                                    assert value in c16, value
+                                page.locator(
                                     "#metric-3 .comparison-detail-link"
                                 ).click()
                                 stability = page.locator("#method-3").inner_text()
@@ -279,7 +302,7 @@ def main():
                                 # Screenshot the default result-first view after interaction.
                                 page.goto(f"{base}/{name}", wait_until="networkidle")
                                 page.wait_for_selector(
-                                    '#comparison[data-loaded="V1.01"]'
+                                    '#comparison[data-loaded="V1.02"]'
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
@@ -350,7 +373,7 @@ def main():
                         context.close()
             # A missing publication cannot become an empty "passed" dashboard.
             page = browser.new_page()
-            page.route("**/data/midterm-v101.json", lambda route: route.abort())
+            page.route("**/data/midterm-v102.json", lambda route: route.abort())
             page.goto(f"{base}/b0-b1.html")
             page.wait_for_function(
                 "document.querySelector('#comparison').textContent.includes('retry') || document.querySelector('#comparison').textContent.includes('重试')"
