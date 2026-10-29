@@ -62,7 +62,7 @@
     ]);
     const rowSources = (section, tableIndex) => {
         if (section.id === 'm01-verdict') {
-            const suffix = 'wholechain-reference-20261025/summary.json';
+            const suffix = 'm01-reference-revision-20261029/summary.json';
             return [section.evidence.find(source => source.path.endsWith(suffix))];
         }
         if (section.id === 'v15-remaining' && tableIndex === 0) {
@@ -107,18 +107,18 @@
     }
     window.addEventListener('vllm-hust:langchange', render);
     render();
-    Promise.all(['./data/midterm-v099.json', './data/benchmark-source-manifest.json'].map(url =>
+    Promise.all(['./data/midterm-v101.json', './data/benchmark-source-manifest.json'].map(url =>
         fetch(url, { cache: 'no-cache' }).then(response => { if (!response.ok) throw Error('Report unavailable'); return response.json(); })))
         .then(([value, manifest]) => {
             if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid publication');
             publicationCommit = manifest.commit;
-            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V0.99' ||
+            if (value.schema !== 'midterm-publication/v1' || value.version !== 'V1.01' ||
                 !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/[a-f0-9]{40}\//.test(value.report_url)) throw Error('Invalid report source');
             const reference = value.wholechain_reference;
-            if (value.m01_method?.method_version !== 'wholechain-20261025' || !reference?.reference_qualified || !reference.all_frozen_applicability_checks_pass || !Number.isFinite(reference.reference_C_TFLOPS_per_chip) || reference.reference_C_TFLOPS_per_chip <= 0) throw Error('Invalid current M01 reference');
+            if (value.m01_method?.method_version !== 'reference-revision-20261029' || reference?.status !== 'reference_under_revision' || reference.reference_qualified !== false || reference.reference_C_TFLOPS_per_chip !== null) throw Error('Invalid current M01 revision');
             for (const arm of ['B0', 'B1']) {
                 const result = reference[arm];
-                if (!result || !Number.isFinite(result.eta_percent) || result.eta_percent !== 100 * result.own_C / reference.reference_C_TFLOPS_per_chip || result.eta_target_met !== (result.eta_percent >= 90)) throw Error('Invalid paired M01 attainment');
+                if (!result || result.eta_percent !== null || result.eta_target_met !== null || !Number.isFinite(result.own_C) || result.own_C !== result.ownF / (reference.participating_chips * result.own_T_seconds * 1e12)) throw Error('Invalid paired M01 measurement');
             }
             if (value.m01_method.current?.efficiency_percent !== reference.B1.eta_percent || value.m01_method.current?.passed !== reference.B1.eta_target_met) throw Error('Inconsistent current M01 status');
             const method = value.m01_method;

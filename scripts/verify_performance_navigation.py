@@ -176,7 +176,7 @@ def main():
                                 assert page.locator("#all-sources").is_hidden()
                             elif name == "b0-b1.html":
                                 page.wait_for_selector(
-                                    '#comparison[data-loaded="V0.99"]'
+                                    '#comparison[data-loaded="V1.01"]'
                                 )
                                 overview = page.locator(".comparison-overview")
                                 assert page.locator(".comparison-group").count() == 4
@@ -195,8 +195,7 @@ def main():
                                 for value in (
                                     "3.8407",
                                     "7.1042",
-                                    "54.0301%",
-                                    "99.9397%",
+                                    "84.9705%",
                                     "50%",
                                     "90%",
                                     "247.2656",
@@ -210,6 +209,11 @@ def main():
                                     "74.8172%",
                                 ):
                                     assert value in current, value
+                                for withdrawn in ("54.0301%", "99.9397%", "7.1085"):
+                                    assert withdrawn not in current
+                                assert (
+                                    "修订中" if language == "zh" else "under revision"
+                                ) in current
                                 assert (
                                     "尚不能判定"
                                     in page.locator("#metric-4").inner_text()
@@ -275,7 +279,7 @@ def main():
                                 # Screenshot the default result-first view after interaction.
                                 page.goto(f"{base}/{name}", wait_until="networkidle")
                                 page.wait_for_selector(
-                                    '#comparison[data-loaded="V0.99"]'
+                                    '#comparison[data-loaded="V1.01"]'
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
@@ -346,7 +350,7 @@ def main():
                         context.close()
             # A missing publication cannot become an empty "passed" dashboard.
             page = browser.new_page()
-            page.route("**/data/midterm-v099.json", lambda route: route.abort())
+            page.route("**/data/midterm-v101.json", lambda route: route.abort())
             page.goto(f"{base}/b0-b1.html")
             page.wait_for_function(
                 "document.querySelector('#comparison').textContent.includes('retry') || document.querySelector('#comparison').textContent.includes('重试')"
