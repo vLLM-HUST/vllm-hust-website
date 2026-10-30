@@ -1,0 +1,54 @@
+name: MOD effects public browser
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Optional deployed URL for post-deploy verification
+        required: false
+        default: ''
+permissions:
+  contents: read
+jobs:
+  plugin-effects-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: website
+      - uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: c7e0ad58ec9f5793f91509a8783e26ccbe1a04fe # pragma: allowlist secret
+          path: benchmark
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+            scripts/build_public_site.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assemble the public projection
+        run: |
+          python benchmark/scripts/sync_website_publication.py publish --revision "$(git -C benchmark rev-parse HEAD)" --website website
+          python benchmark/scripts/build_public_site.py --website website --output public-site --policy-revision 391f237f54fed9a68e66430e72d31f5d2c000877
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify all visible MOD results, languages, themes and viewports
+        env:
+          VERIFY_URL: ${{ inputs.url || 'http://127.0.0.1:8797' }}
+        run: |
+          python -m http.server 8797 --bind 127.0.0.1 --directory public-site > /tmp/plugin-browser-server.log 2>&1 &
+          plugin_server_pid=$!
+          trap 'kill "$plugin_server_pid"' EXIT
+          python website/scripts/verify_plugin_effects_browser.py --url "$VERIFY_URL" --output output/plugin-effects
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: plugin-effects-browser-evidence
+          path: output/plugin-effects/
