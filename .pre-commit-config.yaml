@@ -17,7 +17,7 @@ repos:
   - id: check-toml
   - id: check-added-large-files
     args: ["--maxkb=1000"]
-    exclude: ^reports/frontier-managed-(tiering|mooncake)-20260926/(native|tiering|mooncake)-c16-requests\.jsonl\.gz$
+    exclude: ^(reports/frontier-managed-(tiering|mooncake)-20260926/(native|tiering|mooncake)-c16-requests\.jsonl\.gz|downloads/swe-bench-pro/crane-v0\.20\.3-linux-arm64\.tar\.gz)$
   - id: check-added-large-files
     name: check bounded C16 raw request artifacts
     # Complete measured streams, gzip-compressed and SHA256-checked by CI.
@@ -37,9 +37,11 @@ repos:
   rev: v0.15.2
   hooks:
   - id: ruff
+    exclude: ^downloads/swe-bench-pro/
     name: ruff check
     args: [--fix]
   - id: ruff-format
+    exclude: ^downloads/swe-bench-pro/
     name: ruff format
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
