@@ -655,7 +655,12 @@ def main():
                         if row["id"] == source["default_observation_id"]
                     )
                     url = observation.get("url", source["url"])
-                    link = card.locator(f".plugin-performance a[href='{url}']")
+                    selector = (
+                        ".plugin-technical-details"
+                        if observation.get("diagnostic_only")
+                        else ".plugin-performance"
+                    )
+                    link = card.locator(f"{selector} a[href='{url}']")
                     expect(link).to_have_count(1)
                     checked.append(source["id"])
                 assert {

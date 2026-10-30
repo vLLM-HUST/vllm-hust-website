@@ -444,8 +444,8 @@ vllm-hust-ext extension check org.vllm-hust.kv-tiering`
     "simllm-migration": {
       title_en: "Install and start SimLLM",
       title_zh: "安装并启动 SimLLM",
-      note_en: "Use the exact tested vLLM Ascend host and Qwen3.5 settings. The published gain is specific to a fixed-card, one-output-token similarity workload and primarily reflects prefill reuse.",
-      note_zh: "请使用精确匹配的 vLLM Ascend 宿主与 Qwen3.5 配置。已发布收益来自固定卡、单输出 token 的相似任务负载，主要反映 prefill 复用。",
+      note_en: "Approximate reuse failed the targeted answer-fidelity diagnostic (5/12 versus 12/12 with the plugin disabled). Keep it disabled for accuracy-sensitive tasks; inspect the evidence and exact tested host before enabling experimental reuse.",
+      note_zh: "近似复用未通过定向答案正确性诊断（5/12，对照禁用为 12/12）。精度敏感任务保持禁用；实验性启用前先查看证据与实际宿主配置。",
       command: `python -m pip install "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@main"
 python -m pip install "git+https://github.com/vLLM-HUST/vllm-ascend-simllm-hust.git@1110fe5b1a029bcaed3efd8dba0b2801c4287e75"
 vllm-hust-ext extension check org.vllm-hust.simllm
@@ -1111,7 +1111,7 @@ vllm-hust-ext extension check ${extensionId}`
     const zh = language() === "zh";
     const format = value => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
     const measured = result && Number.isFinite(result.gain);
-    const value = measured ? format(result.gain) : (zh ? "缺数据" : "No data");
+    const value = measured ? format(result.gain) : (zh ? "诊断记录" : "Diagnostic record");
     panel.append(element("strong", measured && result.gain < 0 ? "performance-negative" : "", value));
     if (measured) {
       panel.append(element("span", "", [
@@ -1150,7 +1150,6 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function publicEffectPanel(item) {
-    if (performanceResults.has(item.id)) return null;
     const result = local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
     const panel = element("section", `plugin-public-effect effect-${item.public_effect_status}`);
@@ -1215,9 +1214,12 @@ vllm-hust-ext extension check ${extensionId}`
     if (phases) card.append(phases);
     const scenarios = scenarioTags(item);
     if (scenarios) card.append(scenarios);
-    if (isPerformanceCandidate(item)) {
-      card.append(performancePanel(performanceResults.get(item.id)));
+    const performance = performanceResults.get(item.id);
+    if (isPerformanceCandidate(item) && Number.isFinite(performance?.gain)) {
+      card.append(performancePanel(performance));
     }
+    const publicEffect = publicEffectPanel(item);
+    if (publicEffect) card.append(publicEffect);
     const community = communityPanel(item)
       || document.getElementById(`community-${item.id}`)?.content.firstElementChild.cloneNode(true);
     const compatibility = compatibilityPanel(item);
@@ -1231,8 +1233,14 @@ vllm-hust-ext extension check ${extensionId}`
     if (projectComponents) detailBody.append(projectComponents);
     if (community) detailBody.append(community);
     if (compatibility) detailBody.append(compatibility);
-    const publicEffect = publicEffectPanel(item);
-    if (publicEffect) detailBody.append(publicEffect);
+    if (performance?.diagnostic_only && performance.url) {
+      const diagnostic = element("a", "plugin-public-effect-link", language() === "zh"
+        ? "历史吞吐诊断原件 ↗" : "Historical throughput diagnostic ↗");
+      diagnostic.href = performance.url;
+      diagnostic.target = "_blank";
+      diagnostic.rel = "noopener noreferrer";
+      detailBody.append(diagnostic);
+    }
     const compatibilityDetailsBlock = compatibilityDetails(item);
     if (compatibilityDetailsBlock) detailBody.append(compatibilityDetailsBlock);
     const facts = element("dl", "plugin-component-facts");
@@ -1406,7 +1414,8 @@ vllm-hust-ext extension check ${extensionId}`
       const item = project.primary;
       const matchesModel = !isPerformanceCandidate(item) || !selectedModel
         || (performanceResults.get(item.id)?.modelLabel === selectedModel
-          && Number.isFinite(performanceResults.get(item.id)?.gain));
+          && (Number.isFinite(performanceResults.get(item.id)?.gain)
+            || performanceResults.get(item.id)?.diagnostic_only));
       return matchesComponent && matchesModel;
     }).map((project) => ({
       ...project,
@@ -1536,7 +1545,7 @@ vllm-hust-ext extension check ${extensionId}`
     }),
     fetchModTaxonomy(catalog.dataset.taxonomy),
     Promise.all([
-      fetch("./data/plugin-performance.json?v=configuration-scope-20261010", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
+      fetch("./data/plugin-performance.json?v=effects-20261030", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])

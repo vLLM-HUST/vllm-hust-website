@@ -6,6 +6,14 @@ const data = JSON.parse(fs.readFileSync('data/plugin-performance.json'));
 const frontier = JSON.parse(fs.readFileSync('data/leaderboard_frontier.json'));
 const points = new Map(frontier.points.map(point => [point.id, point]));
 
+test('empty withdrawn comparison sets do not suppress unrelated public measurements', () => {
+  const projected = structuredClone(data);
+  projected.comparison_sets.push({baseline_series_id: 'withdrawn-native', observation_ids: []});
+  assert.equal(M.summarize(projected, frontier).get('pegaflow-vllm-connectors').gain.toFixed(2), '6.34');
+  projected.comparison_sets.at(-1).observation_ids = ['unexpected-consumer'];
+  assert.throws(() => M.summarize(projected, frontier), /Native series/);
+});
+
 test('every Frontier gain is computed from five points in a declared comparison set', () => {
   const results = M.summarize(data, frontier);
   const measured = [...results.values()].filter(result => result.source === 'frontier');
@@ -55,7 +63,11 @@ test('published paired runs expose both gains and regressions without precompute
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 13);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
+  const diagnostic = results.get('simllm-migration');
+  assert.equal(diagnostic.gain, null);
+  assert.equal(diagnostic.diagnostic_only, true);
+  assert.equal(diagnostic.published_comparisons.length, 2);
 });
 
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
@@ -289,9 +301,9 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'simllm-migration', 'bidkv', 'pipeline-microbatch-migration',
+    'vspec', 'betterscale', 'bidkv', 'pipeline-microbatch-migration',
     'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'dla', 'kv-tiering-migration',
-    'kvcompress-ascend', 'diffspec', 'latchmoe'
+    'kvcompress-ascend', 'diffspec', 'latchmoe', 'simllm-migration'
   ]);
 });
 
