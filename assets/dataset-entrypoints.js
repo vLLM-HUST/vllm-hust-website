@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = '39fcc34ae0f0e3462f56ede620c95529038b91b2'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
+  const AGENT_REV = 'fa035e5ced6a330bbf07dc1e1028473ce3015987'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
@@ -113,6 +113,7 @@
     appendStep(swe, t('2. Pinned bootstrap, then one explicit run', '2. 固定 bootstrap，然后显式运行'),
       `MODEL_API=https://MODEL_HOST/v1
 MODEL_NAME=openai/SERVED_MODEL_NAME
+export PIP_INDEX_URL="\${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
 BASE=https://coder.sage.org.ai:9443/swe-bench-pro-artifacts
 REV=33efa2a4ce065bcd6d25ab387ddffd85b3826a3f # pragma: allowlist secret
 BUNDLE_SHA=fcf21b81bc91e569ab57ebb43791a0a4b7b1b8678dd5dc3487ad931c57e5e7b8 # pragma: allowlist secret
