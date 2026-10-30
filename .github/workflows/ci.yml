@@ -60,6 +60,20 @@ jobs:
           bash -n hooks/pre-push
           grep -q 'ln -sf "../../hooks/pre-commit"' quickstart.sh
           grep -q 'ln -sf "../../hooks/pre-push"' quickstart.sh
+      - name: Checkout merged public visibility policy
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: fbe5a4e9d1372600a873efb92eefbb42efd12307 # pragma: allowlist secret
+          path: .publication-policy
+          persist-credentials: false
+          sparse-checkout: scripts/build_public_site.py
+          sparse-checkout-cone-mode: false
+      - name: Build and validate public visibility projection
+        run: |
+          python .publication-policy/scripts/build_public_site.py \
+            --website . --output "$RUNNER_TEMP/public-site" \
+            --policy-revision fbe5a4e9d1372600a873efb92eefbb42efd12307
 
   browser:
     runs-on: ubuntu-latest
@@ -106,9 +120,6 @@ jobs:
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_clarity_browser.py --url http://127.0.0.1:8769
           python scripts/verify_public_pages_browser.py --url http://127.0.0.1:8769
-          python scripts/verify_betterscale_browser.py --url http://127.0.0.1:8769
-          python scripts/verify_traceloom_browser.py --url http://127.0.0.1:8769
-          python scripts/verify_gennova_browser.py --url http://127.0.0.1:8769
           python scripts/verify_incubation_delisting.py --url http://127.0.0.1:8769
           python scripts/verify_performance_navigation.py
           python scripts/verify_acceptance_completion_browser.py --url http://127.0.0.1:8769
@@ -125,32 +136,7 @@ jobs:
             output/playwright/site-repair/
             output/playwright/clarity/
             output/playwright/public-pages/
-            output/playwright/betterscale/
-            output/playwright/traceloom/
-            output/playwright/gennova/
             output/playwright/incubation-delisting/
             output/playwright/performance-navigation/
             output/playwright/evidence-links/
             output/playwright/all-page-links/
-
-  betterscale-package:
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Assemble and inspect the public ARM package on CPU (no native loading)
-        run: |
-          python -m pip wheel --no-deps vllm-betterscale==0.5.1 --wheel-dir /tmp/betterscale-wheels
-          python -m pip install --no-deps --target /tmp/betterscale-package --platform linux_aarch64 --only-binary=:all: /tmp/betterscale-wheels/*.whl
-          echo "PYTHONPATH=/tmp/betterscale-package" >> "$GITHUB_ENV"
-      - name: Verify wheel and displayed TP8 / DP8 launch contracts (CPU only)
-        run: python scripts/check_betterscale_install.py --output betterscale-launch-commands.json
-      - uses: actions/upload-artifact@v4
-        with:
-          name: betterscale-checked-launch-commands
-          path: betterscale-launch-commands.json
