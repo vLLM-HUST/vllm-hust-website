@@ -25,7 +25,7 @@
     const latency=data.c16_equal_request_latency;
     const runs=latency.arms.map(arm=>runEvidence.runs.find(r=>r.run_id===arm.run_id));
     const config=runs[1].configuration;
-    const quality=data.current_summary.quality;
+    const quality=(data.historical_current_summary_v102 || data.current_summary).quality;
     const titles=[t('3.4.1 单芯片有效算力','3.4.1 Effective compute per chip'),t('3.4.2 吞吐与时延','3.4.2 Throughput & latency'),t('3.4.3 数据集与长上下文稳定性','3.4.3 Dataset & long-context stability'),t('3.4.4 单位 token 成本','3.4.4 Cost per token')];
     const threshold=eta=>Number.isFinite(eta)?[eta>=50?t('达到数值门槛','Meets numeric threshold'):t('未达到','Below threshold'),eta>=90?t('达到数值门槛','Meets numeric threshold'):t('未达到','Below threshold')]:[t('修订中','Under revision'),t('修订中','Under revision')];
     const methods=`<details class="comparison-method focus-note"><summary>${t('版本定义、阶段门槛与报告来源','Version definitions, stage thresholds and report sources')}</summary><p>${t('B0 固定为 vLLM 0.18 + vLLM-Ascend 0.18。B1 为各工况当前已实测最优的 vLLM-HUST 优化配置，基座版本不限；以下各项结果分别绑定实际版本、配置与证据。','B0 is fixed at vLLM 0.18 + vLLM-Ascend 0.18. B1 is the best measured vLLM-HUST configuration for each workload, with no base-version restriction; results bind their own versions, settings and evidence.')}</p>
@@ -107,6 +107,35 @@
     root.querySelector('#method-3').insertAdjacentHTML('beforeend',sectionTables('acceptance-completion',[0])+currentLinks);
     root.querySelector('#method-4 .focus-status').textContent=t('固定B0请求集合与公开类似机器报价已恢复，租赁估算降低46.4178%。原out256质量21/200对19/200、B0精确时钟桥及业务适用性仍未闭合。','Fixed-B0 request usage and analogous public pricing were recovered; rental arithmetic falls46.4178%. Out256 quality21/200 versus19/200, exact B0 clock alignment and business applicability remain unresolved.');
     root.querySelector('#method-4').insertAdjacentHTML('beforeend',`<p><a href="${source('reports/acceptance-gaps-20261029/README.md')}">${t('公开报价、原始用量与成本复算','Public pricing, original usage and cost recomputation')}</a></p>`);
+    if (data.full_answer_joint) {
+      root.querySelector('#metric-1 .comparison-row h3').textContent=t('实测有效算力（原out256计数工况）','Measured effective compute (prior out256 counted workload)');
+      const joint=data.full_answer_joint, [a,b]=joint.arms;
+      const continuous=data.packed_continuous;
+      const newPath='reports/full-answer-joint-20261030/';
+      const qualityScope=joint.quality_observation.fixed_subset_correct_count_not_lower
+        ? t('本轮固定子集正确数未下降；不是全集或统计非劣结论。','No lower correct count on the fixed subset; not full-corpus or statistical noninferiority.')
+        : t('本轮候选正确数下降，未通过质量比较。','Candidate correct count fell; quality comparison failed.');
+      const numeric=(value,target)=>`${number(value)}% · `+(value>=target?t('达到数值门槛','Meets numeric target'):t('未达到数值门槛','Below numeric target'));
+      root.querySelector('#metric-2').outerHTML=group(1,
+        row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/200 · ${a.truncated}`,`${b.correct}/200 · ${b.truncated}`,qualityScope,t('原评分器、全部200题；截断与逐题退步保留。','Original scorer and all200 tasks; length stops and paired regressions retained.'))+
+        row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(a.output_tokens_per_second),number(b.output_tokens_per_second),numeric(joint.output_throughput_change_percent,10),qualityScope)+
+        ['ttft_ms','tpot_ms'].map(key=>row(key==='ttft_ms'?t('平均 TTFT（ms）','Mean TTFT (ms)'):t('平均 TPOT（ms/token）','Mean TPOT (ms/token)'),number(a.timing[key].mean),number(b.timing[key].mean),numeric(joint.latency_reduction_percent[key],5),t('相同突发到达；不外推交互式SLO。','Matched burst arrivals; not an interactive-SLO claim.'))).join(''),
+        t('MMLU-Pro固定200题，完整回答上限8192；两张910B2。B1候选为0.28.1/Ascend0.25.1rc2开发栈，主机State预算4GiB/rank。','MMLU-Pro fixed200, full-answer cap8192; two910B2 cards. B1 candidate uses0.28.1/Ascend0.25.1rc2 with4GiB/rank host State.'));
+      const phaseText=arm=>continuous[arm].phases.filter(p=>p.name.endsWith('formal')).map(p=>p.requests).join(' / ')+t(' 请求，零失败',' requests, no failures');
+      root.querySelector('#metric-3').outerHTML=group(2,
+        row(t('4K / 16K 连续窗口','4K / 16K continuous windows'),phaseText('b0'),phaseText('b1'),t('两臂窗口完成；吞吐和尾时延见详情','Both arms completed; throughput and tails in details'),t('五任务全范围稳定性仍有原缺项；合成窗口不替代任务质量。','Original five-task coverage gaps remain; synthetic windows are not task quality.'))+
+        row(t('16K / 32K 检索（既有配置）','16K / 32K retrieval (prior configuration)'),'6 / 6','6 / 6',t('原检索结果保留','Prior retrieval results retained'),t('不同于本轮4GiB主机State配置，未重复检索测试。','Separate from the current4GiB host-State configuration; retrieval was not rerun.')),
+        t('实际输入4115/16407 token、C8、out256；60秒预热、300秒正式发起后完整排空。旧分配失败保留。','Actual4115/16407 input tokens, C8, out256;60-second warmup and300-second formal arrivals plus full drain. Prior allocation failures retained.'));
+      root.querySelector('#metric-4').outerHTML=group(3,
+        row(t('每百万输出 token 租赁估算（元）','Rental estimate per million output tokens (CNY)'),number(a.cost.cny_per_million_output_tokens),number(b.cost.cny_per_million_output_tokens),numeric(joint.rental_cost_reduction_percent,10),qualityScope)+
+        row(t('同请求区间 AI Core 采样均值','AI Core sample mean over the same request interval'),number(a.utilization.mean_percent)+'%',number(b.utilization.mean_percent)+'%',t('双卡同期采样，覆盖范围已复核','Synchronized two-card samples; coverage audited'),t('报告采样均值及逐卡值，不将采样当作精确物理利用率。','Sample means and per-card values, not exact physical utilization.')),
+        t('天翼云类似双卡910B报价36908元/月、30天分析约定；云盘/公网另计，不是本机账单。分母含答错及长度终止的已完成输出。','Analogous CTYun dual910B: CNY36908/month and a30-day convention; disk/network extra, not this host’s bill. Completed output includes incorrect and length-stopped answers.'));
+      for (const id of [2,3,4]) root.querySelector('#metric-'+id).insertAdjacentHTML('beforeend',`<p class="focus-source"><a href="${source(newPath+(id===3?'continuous-summary.json':'joint-summary.json'))}">${t('本轮原始证据与复算','Current original evidence and recomputation')}</a></p>`);
+      root.querySelector('#method-2 > summary').insertAdjacentHTML('afterend',`<h3>${t('完整回答联合测量','Full-answer joint measurement')}</h3>${sectionTables('full-answer-joint',[0])}${evidence('full-answer-joint')}<h3>${t('既有 C16 记录','Prior C16 records')}</h3>`);
+      root.querySelector('#method-3 > summary').insertAdjacentHTML('afterend',`<h3>${t('本轮4K/16K连续窗口','Current4K/16K continuous windows')}</h3>${sectionTables('full-answer-joint',[1])}${evidence('full-answer-joint')}<p>${t('以下保留五任务范围与旧配置失败，V1.02的失败不改写为本轮结果。','Five-task scope and prior configuration failures follow; V1.02 failures are not rewritten as this run.')}</p>`);
+      root.querySelector('#method-4 .focus-status').textContent=t('本轮固定200题完整回答已同步采齐费用用量、质量及双卡利用率。结果按公开类似机型报价复算，逐题和生命周期统计见原件。下面旧成本链接保留原out256范围。','The fixed200 full-answer run jointly captured usage, quality and two-card utilization. Costs use analogous public pricing; per-task and lifecycle metrics are linked. The old cost link below retains its out256 scope.');
+      root.querySelector('#method-4').insertAdjacentHTML('beforeend',evidence('full-answer-joint'));
+    }
     root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',()=>{
       const details=root.querySelector(link.getAttribute('href'));
       details.open=true;
@@ -136,8 +165,10 @@
       if(hash!==entry.sha256||raw.byteLength!==entry.bytes)throw Error('Publication identity mismatch');
       return JSON.parse(new TextDecoder().decode(raw));
     };
-    const [d,runs]=await Promise.all(['data/midterm-v102.json','data/leaderboard_frontier_swe_evidence.json'].map(fetchVerified));
-    if(d.schema!=='midterm-publication/v1'||d.version!=='V1.02')throw Error('Invalid report');
+    const [d,runs]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json'].map(fetchVerified));
+    if(d.schema!=='midterm-publication/v1'||d.version!=='V1.03')throw Error('Invalid report');
+    const joint=d.full_answer_joint;
+    if(joint?.same_run_quality_and_performance!==true||joint.protocol?.max_completion_tokens!==8192||joint.arms?.length!==2||joint.arms[0].role!=='B0'||joint.arms[1].role!=='B1'||joint.arms.some(a=>a.completed!==200||a.failed!==0)||!d.packed_continuous)throw Error('Invalid full-answer pair');
     if(d.acceptance_completion?.continuous?.status!=='B0_completed_B1_measured_host_allocation_failure'||d.acceptance_completion.continuous.paired_continuous_stability_pass!==false)throw Error('Invalid completion evidence');
     const ref=d.wholechain_reference;
     if(ref?.status!=='reference_under_revision'||ref.reference_qualified!==false||ref.reference_C_TFLOPS_per_chip!==null)throw Error('Invalid reference revision');

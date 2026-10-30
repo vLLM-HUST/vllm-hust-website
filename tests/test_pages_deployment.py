@@ -24,11 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 2
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #517 adds the reviewed W4A8 + GDN W8A8 single-chip curve.
+    # Benchmark #569 adds the reviewed fixed018 full-answer joint measurement.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "34b4244c5451ded3b1d612db48ded269b6687699"  # pragma: allowlist secret
+        "0bc5f043d4707601ae15c47b77ac2649f21ad668"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     for filename in (

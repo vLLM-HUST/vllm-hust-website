@@ -1,4 +1,4 @@
-"""V1.02 evidence/failure disclosure across languages, viewports and themes."""
+"""Same-run current results and retained failures in all presentation variants."""
 
 import argparse
 import json
@@ -18,6 +18,13 @@ def main():
     receipts = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(args=["--no-sandbox"])
+        request = pw.request.new_context()
+        response = request.get(args.url.rstrip("/") + "/data/midterm-v103.json")
+        assert response.ok
+        report = response.json()
+        assert report["version"] == "V1.03"
+        a, b = report["full_answer_joint"]["arms"]
+        request.dispose()
         for width in (390, 1440):
             for language in ("zh", "en"):
                 for theme in ("light", "dark"):
@@ -43,25 +50,26 @@ def main():
                         assert response.status == 200
                         if filename == "b0-b1.html":
                             expect(page.locator("#comparison")).to_have_attribute(
-                                "data-loaded", "V1.02", timeout=30000
+                                "data-loaded", "V1.03", timeout=30000
                             )
                             target = page.locator(".comparison-overview")
                             for text in (
                                 "19.0819",
                                 "37.2302%",
-                                "21/200",
-                                "19/200",
+                                f"{a['correct']}/200",
+                                f"{b['correct']}/200",
                                 "153 / 73",
-                                "66.2253",
-                                "35.4849",
+                                "408 / 183",
+                                f"{a['cost']['cny_per_million_output_tokens']:.4f}",
+                                f"{b['cost']['cny_per_million_output_tokens']:.4f}",
                             ):
                                 expect(target).to_contain_text(text)
                             expect(target).to_contain_text(
-                                "实测失败"
+                                "两臂窗口完成"
                                 if language == "zh"
-                                else "configuration failed"
+                                else "Both arms completed"
                             )
-                            expect(target).to_contain_text(
+                            expect(target).not_to_contain_text(
                                 "16K未执行" if language == "zh" else "16K not run"
                             )
                             expect(target).not_to_contain_text("99.9397")
@@ -69,22 +77,31 @@ def main():
                             assert target.locator(".focus-source a").count() == 4
                         else:
                             expect(page.locator("#midterm-report")).to_have_attribute(
-                                "data-loaded", "V1.02", timeout=30000
+                                "data-loaded", "V1.03", timeout=30000
                             )
                             page.locator("#report-details > summary").click()
-                            target = page.locator("#midterm-acceptance-completion")
+                            target = page.locator("#midterm-full-answer-joint")
                             expect(target).to_be_visible()
                             expect(target.locator("h3")).to_have_text(
-                                "当前证据与缺口清单"
+                                "完整回答联合补测"
                                 if language == "zh"
-                                else "Current evidence and remaining gaps"
+                                else "Full-answer joint measurement"
                             )
-                            for text in ("19.0819", "37.2302%", "21/200", "19/200"):
+                            for text in (
+                                f"{a['correct']}/200",
+                                f"{b['correct']}/200",
+                                "408",
+                                "183",
+                            ):
                                 expect(target).to_contain_text(text)
-                            assert target.locator("tbody tr").count() == 3
+                            assert target.locator("tbody tr").count() == 10
                             assert target.locator("a.raw-evidence").evaluate_all(
-                                "aa=>aa.every(a=>a.href.endsWith('/continuous-summary.json'))"
+                                r"aa=>aa.every(a=>/\/(joint|continuous)-summary.json$/.test(a.href))"
                             )
+                            retained = page.locator("#midterm-acceptance-completion")
+                            for text in ("19.0819", "37.2302%", "21/200", "19/200"):
+                                expect(retained).to_contain_text(text)
+                            expect(retained).to_contain_text("16K")
                         expect(target).not_to_contain_text("undefined")
                         assert target.locator("a").evaluate_all(
                             r"aa=>aa.filter(a=>a.closest('.focus-source')||a.closest('.midterm-evidence')).every(a=>/^https:\/\/github.com\/vLLM-HUST\/vllm-hust-benchmark\/(blob|tree)\/[a-f0-9]{40}\//.test(a.href))"
