@@ -90,6 +90,14 @@ def main():
                     expect(simllm).to_contain_text("5/12")
                     expect(simllm).to_contain_text("12/12")
                     expect(simllm.locator(".plugin-performance")).to_have_count(0)
+                    for component_id, value in (
+                        ("pegaflow-vllm-connectors", "+6.34%"),
+                        ("bidkv", "+13.83%"),
+                        ("kvcompress-ascend", "-3.55%"),
+                    ):
+                        expect(
+                            page.locator(f"#{component_id} .plugin-performance")
+                        ).to_contain_text(value)
                     assert (
                         "No data"
                         not in page.locator("[data-plugin-catalog]").inner_text()
