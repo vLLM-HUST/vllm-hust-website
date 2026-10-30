@@ -22,7 +22,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
         for step in build["steps"]
         if step.get("uses", "").startswith("actions/checkout@")
     ]
-    assert len(checkouts) == 2
+    assert len(checkouts) == 3
     assert checkouts[0]["with"]["ref"] == "main"
     # Benchmark #569 adds the reviewed fixed018 full-answer joint measurement.
     # Freeze the same reviewed data identity across
@@ -31,6 +31,13 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
         "0bc5f043d4707601ae15c47b77ac2649f21ad668"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
+    policy_revision = (
+        "fbe5a4e9d1372600a873efb92eefbb42efd12307"  # pragma: allowlist secret
+    )
+    assert checkouts[2]["with"]["ref"] == policy_revision
+    assert checkouts[2]["with"]["repository"] == "vLLM-HUST/vllm-hust-benchmark"
+    assert checkouts[2]["with"]["sparse-checkout"] == "scripts/build_public_site.py"
+    assert checkouts[2]["with"]["path"] == "publication-policy"
     for filename in (
         "ci.yml",
         "midterm-browser.yml",
@@ -45,7 +52,12 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
                     step.get("with", {}).get("repository")
                     == "vLLM-HUST/vllm-hust-benchmark"
                 ):
-                    assert step["with"]["ref"] == benchmark_revision
+                    expected = (
+                        policy_revision
+                        if step["with"].get("path") == ".publication-policy"
+                        else benchmark_revision
+                    )
+                    assert step["with"]["ref"] == expected
     assert all(step["with"]["persist-credentials"] == "false" for step in checkouts)
     assert checkouts[1]["with"]["repository"] == "vLLM-HUST/vllm-hust-benchmark"
     scripts = "\n".join(step.get("run", "") for step in build["steps"])
@@ -55,6 +67,21 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     assert '--revision "$benchmark_commit"' in scripts
     assert "test_benchmark_publication.py" in scripts
     assert "git push" not in scripts and "git commit" not in scripts
+    assert "build_public_site.py" in scripts
+    assert "--website website --output public-site" in scripts
+    steps = build["steps"]
+    projection = next(
+        i
+        for i, step in enumerate(steps)
+        if "build_public_site.py" in step.get("run", "")
+    )
+    upload = next(
+        i
+        for i, step in enumerate(steps)
+        if step.get("uses", "").startswith("actions/upload-pages-artifact@")
+    )
+    assert projection < upload
+    assert steps[upload]["with"]["path"] == "public-site"
     deploy = workflow["jobs"]["deploy"]
     assert deploy["needs"] == "build"
     assert deploy["permissions"] == {"pages": "write", "id-token": "write"}
