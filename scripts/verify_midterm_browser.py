@@ -12,6 +12,21 @@ from playwright.sync_api import expect, sync_playwright
 SCENARIO = "qwen35-35b-a3b-bf16-tp2-school028-mmlu-inf-out256"
 
 
+def preserve_publication_manifest(raw, output):
+    """Retain fetched bytes; do not substitute a locally assembled manifest."""
+    manifest = json.loads(raw)
+    assert manifest["schema"] == "benchmark-website-publication/v1"
+    assert manifest["repository"] == "vLLM-HUST/vllm-hust-benchmark"
+    assert manifest["status"] == "published-source"
+    path = output / "production-manifest.json"
+    path.write_bytes(raw)
+    return manifest, {
+        "file": path.name,
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:8769")
@@ -32,7 +47,9 @@ def main():
             f"{args.url}/data/benchmark-source-manifest.json"
         )
         assert manifest_response.ok
-        manifest = manifest_response.json()
+        manifest, manifest_receipt = preserve_publication_manifest(
+            manifest_response.body(), output
+        )
         entry = next(
             f
             for f in manifest["files"]
@@ -65,6 +82,7 @@ def main():
                     "benchmark_commit": manifest["commit"],
                     "report_url": report["report_url"],
                     "file": entry,
+                    "manifest": manifest_receipt,
                 },
                 indent=2,
             )
