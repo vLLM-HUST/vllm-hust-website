@@ -24,11 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 3
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #569 adds the reviewed fixed018 full-answer joint measurement.
+    # Benchmark #572 refreshes MOD effects and preserves the joint measurement.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "0bc5f043d4707601ae15c47b77ac2649f21ad668"  # pragma: allowlist secret
+        "c7e0ad58ec9f5793f91509a8783e26ccbe1a04fe"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
@@ -42,6 +42,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
         "ci.yml",
         "midterm-browser.yml",
         "sync-plugin-workshop-metadata.yml",
+        "plugin-effects-browser.yml",
     ):
         source = yaml.load(
             (ROOT / ".github/workflows" / filename).read_text(), Loader=yaml.BaseLoader

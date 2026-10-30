@@ -155,7 +155,7 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
         "capability": "kv_management",
         "phases": ["prefill", "state_lifecycle"],
         "lifecycle": "implemented_restricted",
-        "evidence": "measured_beneficial",
+        "evidence": "measured_not_beneficial",
     }
 
 
@@ -199,20 +199,20 @@ def test_mod_page_excludes_intellistream_repositories() -> None:
         assert component["latest_result"] in component["public_effect_url"]
 
 
-def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() -> None:
+def test_simllm_keeps_history_but_surfaces_failed_answer_diagnostic() -> None:
     component = by_id("simllm-migration")
     assert component["public_surface"] is True
     assert component["maturity"] == "experimental"
     assert component["evidence_level"] == "performance_verified"
-    assert component["public_effect_status"] == "beneficial"
-    legacy = "https://github.com/vLLM-HUST/vllm-ascend-simllm-hust/pull/5"
+    assert component["public_effect_status"] == "not-beneficial-in-tested-cell"
     canonical = re.fullmatch(
         r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
-        r"archive/mod-git-20261022/website-source-vllm-ascend-simllm-hust/snapshot/"
-        r"benchmarks/results/qwen35_latency_20261008/README\.md",
+        r"reports/simllm-issue3-targeted-20261030/README\.md",
         component["public_effect_url"],
     )
-    assert component["public_effect_url"] == legacy or canonical
+    assert canonical
+    assert "5/12" in component["public_effect_en"]
+    assert "12/12" in component["public_effect_zh"]
     assert component["compatibility"]["status"] == "experimental"
     assert (
         "one-output-token similarity replay" in component["compatibility"]["models"][0]
@@ -223,6 +223,7 @@ def test_simllm_is_reactivated_with_scoped_runtime_and_performance_evidence() ->
         if item["id"] == "simllm-migration"
     )
     comparisons = performance["observations"][0]["comparisons"]
+    assert performance["observations"][0]["diagnostic_only"] is True
     assert [(item["baseline"], item["candidate"]) for item in comparisons] == [
         (5.1964, 6.2558),
         (5.2563, 6.2435),
@@ -917,10 +918,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert (
-        'data-taxonomy="./data/mod-taxonomy.json?v=state-scheduler-archive-20261018"'
-        in PAGE
-    )
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=effects-20261030"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -1211,8 +1209,8 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=clarity-20261024" in PAGE
-    assert "plugins-page.js?v=site-labels-20261029" in PAGE
+    assert "plugins.css?v=effects-20261030" in PAGE
+    assert "plugins-page.js?v=effects-20261030" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1262,9 +1260,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=state-scheduler-archive-20261018"' in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=effects-20261030"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
@@ -1762,7 +1758,7 @@ def test_performance_evidence_cannot_override_the_publication_gate():
         "latchmoe",
         "vspec",
     }
-    assert "performanceResults.has(item.id)" in SCRIPT
+    assert "if (performanceResults.has(item.id)) return null" not in SCRIPT
     assert 'item.public_surface !== false || kind === "retired"' in SCRIPT
     assert "isPerformanceCandidate(item)" in SCRIPT
     performance_ids = {item["id"] for item in PLUGIN_PERFORMANCE["entries"]}
@@ -1823,8 +1819,8 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
 
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
-    assert "plugin-performance.js?v=ecpa-final-20261009" in PAGE
-    assert "plugin-performance.json?v=configuration-scope-20261010" in SCRIPT
+    assert "plugin-performance.js?v=effects-20261030" in PAGE
+    assert "plugin-performance.json?v=effects-20261030" in SCRIPT
     assert "leaderboard_frontier.json?v=ecpa-final-20261009" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
     assert "benchmark-settings-20260929" not in SCRIPT
@@ -1893,7 +1889,9 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
     assert MOD_TAXONOMY["components"]["ascend-quant-toolkit"]["kind"] == "tool_mod"
     assert MOD_TAXONOMY["components"]["slicegpt-migration"]["kind"] == "tool_mod"
     assert MOD_TAXONOMY["components"]["clm-lifecycle"]["kind"] == "control_plane"
-    assert "if (isPerformanceCandidate(item))" in SCRIPT
+    assert (
+        "isPerformanceCandidate(item) && Number.isFinite(performance?.gain)" in SCRIPT
+    )
     assert '["tool_mod", copy().toolMods]' in SCRIPT
     assert "!isPerformanceCandidate(item)" in SCRIPT
 

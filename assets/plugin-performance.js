@@ -63,6 +63,9 @@
       if (!set.baseline_series_id || !Array.isArray(set.observation_ids)) {
         throw new Error('Invalid comparison set');
       }
+      // Public projection may withhold every observation in a comparison set.
+      // An empty set has no consumers; nonempty sets still require exact Native data.
+      if (!set.observation_ids.length) continue;
       const baseline = series(frontier, set.baseline_series_id, data.concurrencies, []);
       if (!baseline || !identity(baseline[0], frontier)
           || baseline.some(point => identity(point, frontier) !== identity(baseline[0], frontier))) {
@@ -122,7 +125,7 @@
         const modelLabel = baseline
           ? frontier.cohorts.find(cohort => cohort.id === baseline[0].cohort_id)?.model.label
           : published?.[0].model_label || null;
-        return { ...observation, gain,
+        return { ...observation, gain: observation.diagnostic_only ? null : gain,
           count: comparisons.length || (published ? published.length : 0), comparisons,
           published_comparisons: published || [], baseline_series_id: baselineSeriesId || null,
           modelLabel, cohortId: baseline?.[0].cohort_id || null,
@@ -159,7 +162,7 @@
   function models(data, frontier) {
     return [...new Set([...derive(data, frontier).values()]
       .flatMap(result => result.observations)
-      .filter(result => Number.isFinite(result.gain) && result.modelLabel)
+      .filter(result => (Number.isFinite(result.gain) || result.diagnostic_only) && result.modelLabel)
       .map(result => result.modelLabel))].sort((left, right) => left.localeCompare(right));
   }
   function compare(left, right, results) {
