@@ -918,10 +918,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert (
-        'data-taxonomy="./data/mod-taxonomy.json?v=effects-20261030"'
-        in PAGE
-    )
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=effects-20261030"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -1263,9 +1260,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_docs_owned_registry() -> None:
-    assert (
-        'data-source="./data/ecosystem.json?v=effects-20261030"' in PAGE
-    )
+    assert 'data-source="./data/ecosystem.json?v=effects-20261030"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
