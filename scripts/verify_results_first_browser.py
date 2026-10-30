@@ -42,7 +42,7 @@ def main():
                             "data-loaded", "true"
                         )
                         expect(page.locator("#midterm-report")).to_have_attribute(
-                            "data-loaded", "V1.02"
+                            "data-loaded", "V1.03"
                         )
                         assert not page.locator("#report-details").evaluate(
                             "e => e.open"
@@ -50,34 +50,43 @@ def main():
                         assert not page.locator("#current-configuration").evaluate(
                             "e => e.open"
                         )
-                        expect(page.locator(".result-date")).to_have_text("V1.02")
+                        expect(page.locator(".result-date")).to_have_text("V1.03")
                         source = page.evaluate(
-                            "async () => (await fetch('./data/dataset_validation_qwen35_mmlu_school028_inf_out256.json')).json()"
+                            "async () => (await fetch('./data/midterm-v103.json')).json()"
                         )
+                        arms = source["full_answer_joint"]["arms"]
                         related = page.locator("#result-related-evidence")
                         assert not related.evaluate("e => e.open")
                         if filename == "dataset-validation.html":
                             expect(page.locator(".result-metrics")).to_be_hidden()
                             related.locator("summary").click()
-                        for metric in source["results"]:
-                            card = page.locator(
-                                f'[data-metric="{metric["metric_id"]}"]'
-                            )
+                        for metric, values in (
+                            (
+                                "output_token_throughput",
+                                [a["output_tokens_per_second"] for a in arms],
+                            ),
+                            (
+                                "ttft_mean",
+                                [a["timing"]["ttft_ms"]["mean"] for a in arms],
+                            ),
+                            (
+                                "tpot_mean",
+                                [a["timing"]["tpot_ms"]["mean"] for a in arms],
+                            ),
+                        ):
+                            card = page.locator(f'[data-metric="{metric}"]')
                             expect(card).to_be_visible()
-                            for value in (metric["value"],):
+                            for value in values:
                                 formatted = page.evaluate(
                                     "v => v.toLocaleString('en-US', {maximumFractionDigits:2})",
                                     value,
                                 )
                                 expect(card).to_contain_text(formatted)
-                            assert card.locator("a.raw-evidence").count() == 1
-                            expect(
-                                card.locator(".result-pair strong")
-                            ).not_to_have_text("—")
+                            assert card.locator("a.raw-evidence").count() == 2
+                            for strong in card.locator(".result-pair strong").all():
+                                expect(strong).not_to_have_text("—")
                             expect(card.locator(".result-pair")).to_contain_text("B1")
-                            expect(card.locator(".result-pair")).not_to_contain_text(
-                                "B0"
-                            )
+                            expect(card.locator(".result-pair")).to_contain_text("B0")
                             assert card.locator("a").evaluate_all(
                                 "aa => aa.every(a => /^https:\\/\\/github.com\\/vLLM-HUST\\/vllm-hust-benchmark\\/(blob|tree)\\/[a-f0-9]{40}\\//.test(a.href))"
                             )
@@ -88,13 +97,15 @@ def main():
                             "0.25.1rc2"
                         )
                         expect(page.locator(".result-comparison-note")).to_contain_text(
-                            "不计算收益" if lang == "zh" else "gain not calculated"
+                            "同一轮响应"
+                            if lang == "zh"
+                            else "same200 full-answer responses"
                         )
                         expect(page.locator(".result-quality")).to_contain_text(
-                            "151/200"
+                            f"{arms[0]['correct']}/200"
                         )
                         expect(page.locator(".result-quality")).to_contain_text(
-                            "156/200"
+                            f"{arms[1]['correct']}/200"
                         )
                         if filename == "dataset-validation.html":
                             related.locator("summary").click()
@@ -161,7 +172,7 @@ def main():
                                 )
                                 route.continue_()
 
-                            page.route("**/data/midterm-v102.json", delayed_report)
+                            page.route("**/data/midterm-v103.json", delayed_report)
                         page.goto(f"{args.url}/{filename}#midterm-m01-verdict")
                         expect(page.locator("#midterm-m01-verdict")).to_be_visible()
                         verdict = page.locator("#midterm-m01-verdict")

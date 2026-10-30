@@ -176,11 +176,11 @@ def main():
                                 assert page.locator("#all-sources").is_hidden()
                             elif name == "b0-b1.html":
                                 page.wait_for_selector(
-                                    '#comparison[data-loaded="V1.02"]'
+                                    '#comparison[data-loaded="V1.03"]'
                                 )
                                 overview = page.locator(".comparison-overview")
                                 assert page.locator(".comparison-group").count() == 4
-                                assert page.locator(".comparison-row").count() == 9
+                                assert page.locator(".comparison-row").count() == 10
                                 assert (
                                     page.locator(".comparison-method[open]").count()
                                     == 0
@@ -192,6 +192,9 @@ def main():
                                     ).bounding_box()["y"]
                                 )
                                 current = overview.inner_text()
+                                joint = page.evaluate(
+                                    "async () => (await (await fetch('./data/midterm-v103.json')).json()).full_answer_joint"
+                                )
                                 for value in (
                                     "3.8407",
                                     "7.1042",
@@ -199,18 +202,18 @@ def main():
                                     "90%",
                                     "19.0819",
                                     "37.2302%",
-                                    "215.0116",
-                                    "401.2743",
-                                    "154605.0625",
-                                    "86876.8906",
-                                    "66.5920",
-                                    "33.0916",
-                                    "66.2253",
-                                    "35.4849",
-                                    "46.4178%",
-                                    "21/200",
-                                    "19/200",
                                     "153 / 73",
+                                    "408 / 183",
+                                    "8192",
+                                    *[f"{arm['correct']}/200" for arm in joint["arms"]],
+                                    *[
+                                        f"{arm['output_tokens_per_second']:.4f}"
+                                        for arm in joint["arms"]
+                                    ],
+                                    *[
+                                        f"{arm['cost']['cny_per_million_output_tokens']:.4f}"
+                                        for arm in joint["arms"]
+                                    ],
                                 ):
                                     assert value in current, value
                                 for withdrawn in ("54.0301%", "99.9397%", "7.1085"):
@@ -219,15 +222,15 @@ def main():
                                     "修订中" if language == "zh" else "under revision"
                                 ) in current
                                 assert (
-                                    "不是业务验收通过"
+                                    "不是本机账单"
                                     in page.locator("#metric-4").inner_text()
                                     if language == "zh"
-                                    else "not business acceptance"
+                                    else "not this host’s bill"
                                     in page.locator("#metric-4").inner_text()
                                 )
-                                assert "HLE" in current
+                                assert "4GiB/rank" in current
                                 assert (
-                                    "锁页" if language == "zh" else "Pinned host"
+                                    "五任务" if language == "zh" else "five-task"
                                 ) in current
                                 # Every metric exposes both measurements, verdict and gaps
                                 # without opening details or horizontal scrolling on mobile.
@@ -302,7 +305,7 @@ def main():
                                 # Screenshot the default result-first view after interaction.
                                 page.goto(f"{base}/{name}", wait_until="networkidle")
                                 page.wait_for_selector(
-                                    '#comparison[data-loaded="V1.02"]'
+                                    '#comparison[data-loaded="V1.03"]'
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
@@ -373,7 +376,7 @@ def main():
                         context.close()
             # A missing publication cannot become an empty "passed" dashboard.
             page = browser.new_page()
-            page.route("**/data/midterm-v102.json", lambda route: route.abort())
+            page.route("**/data/midterm-v103.json", lambda route: route.abort())
             page.goto(f"{base}/b0-b1.html")
             page.wait_for_function(
                 "document.querySelector('#comparison').textContent.includes('retry') || document.querySelector('#comparison').textContent.includes('重试')"
