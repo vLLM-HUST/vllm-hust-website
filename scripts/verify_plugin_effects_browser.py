@@ -1,4 +1,4 @@
-"""Check every rendered MOD's current result and source in eight display modes."""
+"""Check every MOD's people, current result and source in eight display modes."""
 
 import argparse
 import hashlib
@@ -6,6 +6,51 @@ import json
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
+
+
+def check_people(page, components, metadata, lang):
+    checked = []
+    for card in page.locator(".plugin-card").all():
+        component = components[card.get_attribute("id")]
+        record = metadata.get(component["id"], {})
+        maintainers = record.get("maintainers", [])
+        logins = [person["login"] for person in maintainers] or component.get(
+            "maintainers", []
+        )
+        advisors = record.get("advisors", component.get("advisors", []))
+        if component.get("advisors") == []:
+            advisors = []
+        expect(card.locator("details[open]")).to_have_count(0)
+        if not logins and not advisors:
+            continue
+        panel = card.locator(":scope > .plugin-community")
+        expect(panel).to_be_visible()
+        expect(panel.locator(".plugin-maintainer")).to_have_count(len(logins))
+        for login in logins:
+            person = next((p for p in maintainers if p["login"] == login), {})
+            link = panel.locator(
+                f'a.plugin-maintainer[href="{person.get("profile_url", f"https://github.com/{login}")}"]'
+            )
+            expect(link).to_be_visible()
+            expect(link).to_contain_text(f"@{login}")
+            if person.get("name"):
+                expect(link).to_contain_text(person["name"])
+        for advisor in advisors:
+            selector = (
+                ".plugin-external-advisors"
+                if advisor.get("relationship") == "external_contributor"
+                else ".plugin-advisors"
+            )
+            expect(panel.locator(selector)).to_be_visible()
+            expect(panel.locator(selector)).to_contain_text(
+                advisor.get(f"name_{lang}") or advisor["name_en"]
+            )
+        if component.get("advisors") == []:
+            expect(panel.locator(".plugin-advisors")).to_have_count(0)
+        expect(panel.locator(".plugin-repo-metrics")).to_have_count(0)
+        checked.append(component["id"])
+    assert "simllm-migration" in checked
+    return checked
 
 
 def main():
@@ -46,6 +91,7 @@ def main():
                         "ecosystem.json",
                         "plugin-performance.json",
                         "mod-taxonomy.json",
+                        "plugin-workshop-metadata.json",
                     ):
                         response = context.request.get(f"{args.url}/data/{name}")
                         assert response.ok
@@ -63,6 +109,12 @@ def main():
                         c["id"]: c for c in payloads["ecosystem.json"]["components"]
                     }
                     checked = []
+                    people_checked = check_people(
+                        page,
+                        components,
+                        payloads["plugin-workshop-metadata.json"]["plugins"],
+                        lang,
+                    )
                     for card in page.locator(".plugin-card").all():
                         component = components[card.get_attribute("id")]
                         result = component.get(f"public_effect_{lang}")
@@ -124,6 +176,7 @@ def main():
                             "language": lang,
                             "theme": theme,
                             "cards": checked,
+                            "people_cards": people_checked,
                             "manifest_sha256": hashlib.sha256(manifest_raw).hexdigest(),
                             "source_commit": manifest["commit"],
                             "projection": manifest.get("projection"),
@@ -131,13 +184,21 @@ def main():
                         }
                     )
                     (args.output / "manifest.json").write_bytes(manifest_raw)
+                    page.locator("#langToggle").click()
+                    switched = check_people(
+                        page,
+                        components,
+                        payloads["plugin-workshop-metadata.json"]["plugins"],
+                        "en" if lang == "zh" else "zh",
+                    )
+                    assert switched == people_checked
                     context.close()
         browser.close()
     (args.output / "verification.json").write_text(
         json.dumps(receipts, ensure_ascii=False, indent=2) + "\n"
     )
     print(
-        f"PASS: {len(receipts)} modes; all current effect panels visible with exact evidence links"
+        f"PASS: {len(receipts)} modes; MOD people and effects visible with exact links"
     )
 
 
