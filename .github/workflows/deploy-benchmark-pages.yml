@@ -49,6 +49,8 @@ jobs:
           python benchmark/scripts/sync_website_publication.py check \
             --revision "$benchmark_commit" --website website
       - name: Validate publication and presentation
+        env:
+          GH_TOKEN: ${{ github.token }}
         working-directory: website
         run: |
           python scripts/assemble_dataset_entrypoints.py
@@ -56,10 +58,24 @@ jobs:
           python -m pytest -q tests/test_benchmark_publication.py
           python -m pytest -q tests/test_dataset_entrypoints.py
           node --test tests/loader_publication_identity.test.cjs tests/b1_definition.test.cjs tests/mmlu_pro_handoff.test.cjs tests/dataset_validation_b0.test.cjs
+      - name: Checkout merged public visibility policy
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: 391f237f54fed9a68e66430e72d31f5d2c000877 # pragma: allowlist secret
+          path: publication-policy
+          persist-credentials: false
+          sparse-checkout: scripts/build_public_site.py
+          sparse-checkout-cone-mode: false
+      - name: Build and validate public visibility projection
+        run: |
+          python publication-policy/scripts/build_public_site.py \
+            --website website --output public-site \
+            --policy-revision 391f237f54fed9a68e66430e72d31f5d2c000877
       - name: Upload assembled site without committing generated data
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website
+          path: public-site
   deploy:
     needs: build
     runs-on: ubuntu-latest
