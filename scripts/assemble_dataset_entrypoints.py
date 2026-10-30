@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -13,6 +14,17 @@ SOURCE = "docs/dataset-entrypoints/dataset-entrypoints-v1.json"
 TERMINAL_REVISION = "d31b20c3b4f1dae120fe7fb5e62dac9f83433716"  # pragma: allowlist secret - public canonical commit
 TERMINAL_SHA256 = "e0c4c9554b096d9ac9cd66d5126e686ac1724c372ca3d3b14b588befca624d15"  # pragma: allowlist secret - public evidence digest
 TERMINAL_SOURCE = "docs/terminal-arm64-acceptance/acceptance-v1.json"
+
+
+def github_headers():
+    headers = {
+        "Accept": "application/vnd.github.raw+json",
+        "User-Agent": "vllm-hust-navigation-build",
+    }
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def main():
@@ -31,10 +43,7 @@ def main():
     else:
         request = Request(
             f"https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/{SOURCE}?ref={REVISION}",
-            headers={
-                "Accept": "application/vnd.github.raw+json",
-                "User-Agent": "vllm-hust-navigation-build",
-            },
+            headers=github_headers(),
         )
         with urlopen(request, timeout=60) as response:
             raw = response.read(1_000_001)
@@ -64,10 +73,7 @@ def main():
     else:
         request = Request(
             f"https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/{TERMINAL_SOURCE}?ref={TERMINAL_REVISION}",
-            headers={
-                "Accept": "application/vnd.github.raw+json",
-                "User-Agent": "vllm-hust-navigation-build",
-            },
+            headers=github_headers(),
         )
         with urlopen(request, timeout=60) as response:
             terminal_raw = response.read(100_001)

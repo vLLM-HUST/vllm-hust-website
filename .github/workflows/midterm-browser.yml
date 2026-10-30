@@ -28,6 +28,8 @@ jobs:
         with:
           python-version: '3.11'
       - name: Assemble benchmark publication
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python _benchmark/scripts/sync_website_publication.py publish --revision "$(git -C _benchmark rev-parse HEAD)" --website .
           python scripts/assemble_dataset_entrypoints.py
