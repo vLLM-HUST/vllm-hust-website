@@ -1018,9 +1018,9 @@ def test_workshop_renders_synced_metadata_without_hardcoded_counts() -> None:
     assert 'fetch(catalog.dataset.metadata, { cache: "no-cache" })' in SCRIPT
     assert "function communityPanel(item)" in SCRIPT
     assert "metadata.maintainers.forEach" in SCRIPT
-    assert "metadata.metrics.stars" in SCRIPT
-    assert "metadata.metrics.open_pull_requests" in SCRIPT
-    assert "metadata.metrics.forks" in SCRIPT
+    assert "metadata.metrics?.stars" in SCRIPT
+    assert "metadata.metrics?.open_pull_requests" in SCRIPT
+    assert "metadata.metrics?.forks" in SCRIPT
     assert "metadata.advisors" in SCRIPT
     assert ".plugin-maintainer" in STYLES
     assert ".plugin-advisors" in STYLES
@@ -1208,9 +1208,21 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
     )
 
 
+def test_people_are_visible_without_expanding_technical_details() -> None:
+    assert "if (community) card.append(community);" in SCRIPT
+    assert "detailBody.append(community)" not in SCRIPT
+    assert SCRIPT.index("if (community) card.append(community);") < SCRIPT.index(
+        "const phases = phaseTags(item);"
+    )
+    assert 'community?.querySelector(".plugin-repo-metrics")' in SCRIPT
+    assert "if (repositoryMetrics) detailBody.append(repositoryMetrics);" in SCRIPT
+    assert "advisors: item.advisors || []" in SCRIPT
+    assert "!metadata.metrics) return null" not in SCRIPT
+
+
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=effects-20261030" in PAGE
-    assert "plugins-page.js?v=effects-20261030" in PAGE
+    assert "plugins-page.js?v=people-20261030" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES

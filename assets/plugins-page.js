@@ -933,8 +933,16 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function communityPanel(item) {
-    const metadata = workshopMetadata[item.id];
-    if (!metadata || !Array.isArray(metadata.maintainers) || !metadata.metrics) return null;
+    const metadata = workshopMetadata[item.id] || ((item.maintainers?.length || item.advisors?.length) ? {
+      maintainers: (item.maintainers || []).map((login) =>
+        Object.values(workshopMetadata).flatMap((record) => record.maintainers || [])
+          .find((person) => person.login === login) || {
+          login, name: login, profile_url: `https://github.com/${login}`,
+          avatar_url: `https://github.com/${login}.png`
+        }),
+      advisors: item.advisors || []
+    } : null);
+    if (!metadata || !Array.isArray(metadata.maintainers)) return null;
 
     const panel = element("section", "plugin-community");
     const people = element("div", "plugin-maintainers");
@@ -991,9 +999,9 @@ vllm-hust-ext extension check ${extensionId}`
 
     const metrics = element("div", "plugin-repo-metrics");
     [
-      [copy().stars, metadata.metrics.stars, `${metadata.repository_url}/stargazers`],
-      [copy().pullRequests, metadata.metrics.open_pull_requests, `${metadata.repository_url}/pulls`],
-      [copy().forks, metadata.metrics.forks, `${metadata.repository_url}/forks`]
+      [copy().stars, metadata.metrics?.stars, `${metadata.repository_url}/stargazers`],
+      [copy().pullRequests, metadata.metrics?.open_pull_requests, `${metadata.repository_url}/pulls`],
+      [copy().forks, metadata.metrics?.forks, `${metadata.repository_url}/forks`]
     ].forEach(([label, value, href]) => {
       const link = element(value == null ? "span" : "a", "plugin-repo-metric");
       if (value != null) link.href = href;
@@ -1005,7 +1013,7 @@ vllm-hust-ext extension check ${extensionId}`
     panel.append(people);
     if (!noAdvisor && (internalAdvisors.length || !externalAdvisors.length)) panel.append(advisors);
     if (externalAdvisors.length) panel.append(externalRelationships);
-    panel.append(metrics);
+    if (metadata.metrics && metadata.repository_url) panel.append(metrics);
     return panel;
   }
 
@@ -1209,6 +1217,11 @@ vllm-hust-ext extension check ${extensionId}`
 
     const summary = local(item, "catalog_project_summary") || local(item, "summary");
     card.append(cover, top, element("h3", "", displayName), element("p", "plugin-summary", summary));
+    const community = communityPanel(item)
+      || document.getElementById(`community-${item.id}`)?.content.firstElementChild.cloneNode(true);
+    const repositoryMetrics = community?.querySelector(".plugin-repo-metrics");
+    repositoryMetrics?.remove();
+    if (community) card.append(community);
     const projectComponents = projectComponentsPanel(projectItems);
     const phases = phaseTags(item);
     if (phases) card.append(phases);
@@ -1220,8 +1233,6 @@ vllm-hust-ext extension check ${extensionId}`
     }
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) card.append(publicEffect);
-    const community = communityPanel(item)
-      || document.getElementById(`community-${item.id}`)?.content.firstElementChild.cloneNode(true);
     const compatibility = compatibilityPanel(item);
     // Keep status visible; full runtime identities and requirements remain expandable.
     if (compatibility) card.append(compatibility.querySelector('.plugin-compatibility-head').cloneNode(true));
@@ -1231,7 +1242,7 @@ vllm-hust-ext extension check ${extensionId}`
     details.append(element("summary", "", copy().details));
     const detailBody = element("div", "plugin-technical-body");
     if (projectComponents) detailBody.append(projectComponents);
-    if (community) detailBody.append(community);
+    if (repositoryMetrics) detailBody.append(repositoryMetrics);
     if (compatibility) detailBody.append(compatibility);
     if (performance?.diagnostic_only && performance.url) {
       const diagnostic = element("a", "plugin-public-effect-link", language() === "zh"
