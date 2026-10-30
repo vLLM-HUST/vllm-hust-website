@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = 'fa035e5ced6a330bbf07dc1e1028473ce3015987'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
+  const AGENT_REV = '0531845b8b20b0c91acffd253ed3234ad38a692d'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
@@ -105,6 +105,8 @@
     const sweLinks = el('p', undefined, 'entry-links');
     sweLinks.append(link(t('Coder workspace instructions', 'Coder 工作区操作说明'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md#coder-上的执行结构docker-in-docker-沙箱'), link(t('Complete run and grading guide', '完整运行与评分指南'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md'), link(t('Platform assistant (optional)', '平台助手（可选）'), OPS + 'references/swe-bench-pro.md'));
     swe.append(sweLinks);
+    swe.append(el('p', t('Platform status, 2026-10-31: the CPU template is visible to ordinary users, but creating a new 20 GiB workspace is currently blocked by the full namespace storage quota (4625 / 4625 GiB). Administrators must make approved capacity available. The grading-directory mount is repaired in template cpu-grade-bind-1031-1fd0da18; the guide reports environment readiness, Agent submission and official grading separately.',
+      '平台状态（2026-10-31）：普通用户可见 CPU 模板，但新建 20 GiB 工作区当前被已满的存储配额（4625 / 4625 GiB）阻塞，需管理员按容量审批流程释放或增加额度。评分目录挂载已在 cpu-grade-bind-1031-1fd0da18 模板修复；环境就绪、Agent 提交及官方评分分别见完整指南。')));
     appendStep(swe, t('1. Create your Coder CPU workspace', '1. 创建自己的 Coder CPU 工作区'), null,
       t('In Coder, create a workspace from the published swe-bench-pro-cpu template and open its terminal. Use your model API with the commands below. The template provides the isolated Docker environment. A platform assistant can optionally help prepare the workspace. The starter runs one NodeBB V1 task; the lock covers eight tasks, not the entire dataset.',
         '在 Coder 中选择已发布的 swe-bench-pro-cpu 模板创建工作区，打开终端，填写自己的模型 API 和模型名执行下方命令；需要鉴权时，先在终端设置 MODEL_API_KEY，再追加 --api-key-env MODEL_API_KEY。模板提供独立 Docker 环境；也可以让平台助手代为准备。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
