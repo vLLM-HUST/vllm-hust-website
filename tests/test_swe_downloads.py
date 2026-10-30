@@ -10,5 +10,5 @@ def test_published_crane_matches_frozen_official_arm64_release():
     assert archive.stat().st_size == 14012994
     assert (
         hashlib.sha256(archive.read_bytes()).hexdigest()
-        == "d2235f7779cd39c6e40f43701d2512c997409f629fb53e621ede0d57d3f995e2"
+        == "d2235f7779cd39c6e40f43701d2512c997409f629fb53e621ede0d57d3f995e2"  # pragma: allowlist secret
     )

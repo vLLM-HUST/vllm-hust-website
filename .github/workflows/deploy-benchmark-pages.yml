@@ -56,7 +56,7 @@ jobs:
           python scripts/assemble_dataset_entrypoints.py
           python -m pip install pytest
           python -m pytest -q tests/test_benchmark_publication.py
-          python -m pytest -q tests/test_dataset_entrypoints.py
+          python -m pytest -q tests/test_dataset_entrypoints.py tests/test_swe_downloads.py
           node --test tests/loader_publication_identity.test.cjs tests/b1_definition.test.cjs tests/mmlu_pro_handoff.test.cjs tests/dataset_validation_b0.test.cjs
       - name: Checkout merged public visibility policy
         uses: actions/checkout@v4
