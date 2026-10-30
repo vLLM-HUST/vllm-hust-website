@@ -919,7 +919,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
     assert (
-        'data-taxonomy="./data/mod-taxonomy.json?v=state-scheduler-archive-20261018"'
+        'data-taxonomy="./data/mod-taxonomy.json?v=effects-20261030"'
         in PAGE
     )
     assert "async function fetchModTaxonomy(url)" in SCRIPT
@@ -1212,8 +1212,8 @@ def test_quantization_entries_preserve_runtime_boundaries() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=clarity-20261024" in PAGE
-    assert "plugins-page.js?v=site-labels-20261029" in PAGE
+    assert "plugins.css?v=effects-20261030" in PAGE
+    assert "plugins-page.js?v=effects-20261030" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1264,7 +1264,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 def test_page_consumes_the_docs_owned_registry() -> None:
     assert (
-        'data-source="./data/ecosystem.json?v=state-scheduler-archive-20261018"' in PAGE
+        'data-source="./data/ecosystem.json?v=effects-20261030"' in PAGE
     )
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
@@ -1824,8 +1824,8 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
 
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
-    assert "plugin-performance.js?v=ecpa-final-20261009" in PAGE
-    assert "plugin-performance.json?v=configuration-scope-20261010" in SCRIPT
+    assert "plugin-performance.js?v=effects-20261030" in PAGE
+    assert "plugin-performance.json?v=effects-20261030" in SCRIPT
     assert "leaderboard_frontier.json?v=ecpa-final-20261009" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
     assert "benchmark-settings-20260929" not in SCRIPT
