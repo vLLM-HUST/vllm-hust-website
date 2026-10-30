@@ -98,7 +98,12 @@
       const [b0, b1] = joint.arms;
       const jointUrl = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${reportData.source_commit}/reports/full-answer-joint-20261030/joint-summary.json`;
       const valueLink = value => `<a class="raw-evidence" href="${jointUrl}">${number(value)}</a>`;
-      section.querySelector('.result-eyebrow').textContent = zh ? '完整回答联合测量 · 同轮质量、性能与成本' : 'FULL-ANSWER JOINT MEASUREMENT · SAME-RUN QUALITY, PERFORMANCE & COST';
+      section.querySelector('.result-eyebrow').textContent = qualityPage
+        ? (zh ? '固定200题 · 完整回答配对' : 'FIXED 200 · FULL-ANSWER PAIR')
+        : (zh ? '完整回答联合测量 · 同轮质量、性能与成本' : 'FULL-ANSWER JOINT MEASUREMENT · SAME-RUN QUALITY, PERFORMANCE & COST');
+      section.querySelector('.result-boundary').textContent = zh
+        ? 'B0：vLLM 0.18 / vLLM-Ascend 0.18。B1：0.28.1 / 0.25.1rc2 开发栈，4GiB/rank 主机状态预算。'
+        : 'B0: vLLM 0.18 / vLLM-Ascend 0.18. B1: 0.28.1 / 0.25.1rc2 development stack; 4GiB/rank host State.';
       section.querySelector('.result-reference').innerHTML = `<a href="#midterm-m01-verdict">${zh ? 'M01 · 原 out256 计数工况，参考修订中' : 'M01 · Prior out256 counted workload; reference under revision'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片；不是本轮8192回答的算力。' : 'chip; not compute measured from this8192-answer run.'}</small>`;
       section.querySelector('.result-context').textContent = 'Qwen3.5-35B-A3B · BF16 · TP2 · 200 ' + (zh ? '请求' : 'requests') + ' · out8192 · Ascend 910B2 × 2';
       section.querySelector('.result-comparison-note').textContent = zh
@@ -116,7 +121,7 @@
         : (zh ? '本轮候选正确数下降，未通过质量比较' : 'Candidate correct count fell; quality comparison failed');
       section.querySelector('.result-quality').innerHTML = `<strong>${zh ? '同轮质量 · out8192' : 'Same-run quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${jointUrl}">${b0.correct}/200</a></span><span>${zh ? 'B1 候选' : 'B1 candidate'}: <a class="raw-evidence" href="${jointUrl}">${b1.correct}/200</a></span><small>${escape(qualityText)} · ${zh ? '长度终止' : 'Length stops'} ${b0.truncated}/${b1.truncated}</small>`;
       section.querySelector('.result-selection').innerHTML = `${zh ? '每百万输出 token 租赁估算' : 'Rental estimate per million output tokens'}: ${valueLink(b0.cost.cny_per_million_output_tokens)} → ${valueLink(b1.cost.cny_per_million_output_tokens)} CNY. ${zh ? '公开类似机型报价；不是本机账单。' : 'Public analogous-machine pricing; not this machine’s invoice.'}`;
-      section.querySelector('#current-configuration > summary').textContent = zh ? '历史 out256 候选对比与原始证据' : 'Historical out256 candidate comparisons & evidence';
+      section.querySelector('#current-configuration > summary').textContent = zh ? '历史 out256 候选与证据' : 'Prior out256 candidates & evidence';
       section.querySelector('.result-next').insertAdjacentHTML('afterbegin', `<a href="#midterm-full-answer-joint">${zh ? '本轮配置、连续测试与原始数据' : 'Current configuration, continuous tests & original data'}</a>`);
     }
     // Keep the two entry pages task-specific without dropping evidence or anchors.
@@ -124,7 +129,7 @@
     related.id = 'result-related-evidence';
     related.open = Boolean(relatedExpanded);
     related.innerHTML = `<summary>${qualityPage
-      ? (zh ? '服务性能、M01 与其他验证进展' : 'Serving performance, M01 & other validation')
+      ? (zh ? '服务性能与其他验证' : 'Performance & other validation')
       : (zh ? 'M01 与其他验证进展' : 'M01 & other validation')}</summary>`;
     const secondary = qualityPage
       ? ['.result-reference', '.result-comparison-note', '.result-metrics', '.result-selection', '.result-next']
@@ -137,8 +142,8 @@
       const matrixBoundary = document.createElement('p');
       matrixBoundary.className = 'result-chart-boundary';
       matrixBoundary.textContent = zh
-        ? '下方保留各 MOD 既有配置的验证矩阵；以各表工况为准，不与本轮完整回答结果拼接。'
-        : 'The matrices below retain prior MOD configurations. Use each table’s workload; do not combine them with the full-answer results above.';
+        ? '下方：其他 MOD 的既有工况，配置见各表。'
+        : 'Below: prior MOD workloads, with their own configurations.';
       section.append(matrixBoundary);
     } else {
       const boundary = document.createElement('p');
