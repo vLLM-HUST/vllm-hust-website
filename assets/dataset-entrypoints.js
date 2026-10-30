@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = 'd5131560102ae0dabd7e69926faa908614b67922'; // pragma: allowlist secret - reviewed public source revision
+  const AGENT_REV = '4f072c6de73f07d47a0a2eccfdfbc96e4ab43417'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
@@ -107,16 +107,30 @@
     swe.append(sweLinks);
     appendStep(swe, t('1. Create your Coder CPU workspace', '1. 创建自己的 Coder CPU 工作区'), null,
       t('In Coder, create a workspace from the published swe-bench-pro-cpu template and open its terminal. Use your model API with the commands below. The template provides the isolated Docker environment. A platform assistant can optionally help prepare the workspace. The starter runs one NodeBB V1 task; the lock covers eight tasks, not the entire dataset.',
-        '在 Coder 中选择已发布的 swe-bench-pro-cpu 模板创建工作区，打开终端，使用自己的模型 API 执行下方命令。模板提供独立 Docker 环境；也可以让平台助手代为准备。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
+        '在 Coder 中选择已发布的 swe-bench-pro-cpu 模板创建工作区，打开终端，填写自己的模型 API 和模型名执行下方命令；需要鉴权时，先在终端设置 MODEL_API_KEY，再追加 --api-key-env MODEL_API_KEY。模板提供独立 Docker 环境；也可以让平台助手代为准备。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
     swe.append(code(t('Use npu-private-cloud-ops to prepare SWE-bench Pro on my authorized platform. Discover the CPU template and existing model service; complete the pinned environment and input checks. Return the workspace entry, exact command and result paths. Keep the official tested Agent unchanged. Report preparation, Agent submission and official grading separately.',
       '请使用 npu-private-cloud-ops，在我有权使用的平台准备 SWE-bench Pro。发现 CPU 模板和已有模型服务，完成固定环境与输入检查，交付工作区入口、实际命令和结果位置。保持被测官方 Agent 不变，分别报告环境就绪、Agent 提交和官方评分。')));
     appendStep(swe, t('2. Pinned bootstrap, then one explicit run', '2. 固定 bootstrap，然后显式运行'),
-      `curl --fail --location -H 'Accept: application/vnd.github.raw+json' 'https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/scripts/bootstrap_swe_bench_pro.py?ref=${AGENT_REV}' --output bootstrap_swe_bench_pro.py\npython3 bootstrap_swe_bench_pro.py --source-revision ${AGENT_REV} --work "$HOME/swe-pro-first" --model-api https://MODEL_HOST/v1 --model-name openai/SERVED_MODEL_NAME --api-key-env MODEL_API_KEY --run`,
+      `MODEL_API=https://MODEL_HOST/v1
+MODEL_NAME=openai/SERVED_MODEL_NAME
+BASE=https://vllm-hust.sage.org.ai/downloads/swe-bench-pro
+REV=33efa2a4ce065bcd6d25ab387ddffd85b3826a3f # pragma: allowlist secret
+BUNDLE_SHA=fcf21b81bc91e569ab57ebb43791a0a4b7b1b8678dd5dc3487ad931c57e5e7b8 # pragma: allowlist secret
+curl --fail --location "$BASE/$REV/bootstrap_swe_bench_pro.py" --output bootstrap_swe_bench_pro.py
+echo 'f4700673883af8447442c89193881efa314649cb949b2fdca00bf8ea88fecea9  bootstrap_swe_bench_pro.py' | sha256sum --check # pragma: allowlist secret
+python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
+  --source-bundle-url "$BASE/$REV/runtime.tar.gz" \\
+  --source-bundle-sha256 "$BUNDLE_SHA" \\
+  --crane-archive-url "$BASE/crane-v0.20.3-linux-arm64.tar.gz" \\
+  --work "$HOME/swe-pro-first" --model-api "$MODEL_API" --model-name "$MODEL_NAME" --run`,
       t('Linux ARM64, Python 3.10+, an isolated Docker daemon, reachable pinned dataset/task images and sufficient disk are required. Use a new absolute private work path. Omitting --run prepares only; an existing owned directory needs --resume with the same identity. Submission and official grading are separate; a submitted patch is not a passing score.',
         '需要 Linux ARM64、Python 3.10+、隔离 Docker daemon、可访问的固定数据/任务镜像和足够磁盘。使用新的绝对私有工作路径；省略 --run 只准备，已有目录需以同身份 --resume。提交与官方评分分开，有 patch 不代表判对。'));
-    appendStep(swe, t('3. Inspect the Agent result, then grade the saved patch', '3. 检查 Agent 结果，再对保存的补丁独立评分'), null,
-      t('Read the per-task report, trajectory, patch and batch report. Submitted is not resolved; quality_score: null means ungraded. Follow section 5 of the complete guide to install the fixed official grader and run grade in a fresh container. Preserve grading-status.json, patch-application evidence and official outputs. Ops prepares the environment; it is not added to the tested Agent as a solving skill.',
-        '读取逐题 report、轨迹、patch 和 batch report。Submitted 不等于修复成功，quality_score: null 表示未评分。按完整指南第 5 节准备固定官方评分器，在新容器执行 grade，保存 grading-status.json、补丁应用证据和官方输出。ops 负责环境，不作为修题技能注入被测 Agent。'));
+    appendStep(swe, t('3. Inspect the Agent result, then grade the saved patch', '3. 检查 Agent 结果，再对保存的补丁独立评分'), `WORK="$HOME/swe-pro-first"
+"$WORK/client/bin/python" -m vllm_hust_benchmark.swe_bench_pro grade \\
+  --settings "$WORK/settings-private.json" --inputs "$WORK/inputs" \\
+  --batch-directory "$WORK/run" --output "$WORK/grade-001"`,
+      t('Read the per-task report, trajectory, patch and batch report. Submitted is not resolved; quality_score: null means ungraded. Bootstrap includes local official-grading dependencies. Run the command above to grade the saved patch in a fresh container. Preserve grading-status.json, patch-application evidence and official outputs. Ops prepares the environment; it is not added to the tested Agent as a solving skill.',
+        '读取逐题 report、轨迹、patch 和 batch report。Submitted 不等于修复成功，quality_score: null 表示未评分。bootstrap 已安装本地官方评分依赖；使用上述命令在新容器执行 grade，保存 grading-status.json、补丁应用证据和官方输出。ops 负责环境，不作为修题技能注入被测 Agent。'));
     swe.append(el('p', t('Dataset: ScaleAI/SWE-bench_Pro v1, not SWE-bench Verified or V2. Task repositories and images retain their own licenses.', '数据为 ScaleAI/SWE-bench_Pro v1，不是 SWE-bench Verified 或 V2；任务仓库与镜像遵循各自许可。')));
     const terminal = section('TERMINAL_BENCH_2_1', 'Terminal-Bench 2.1 / Harbor', t('Start with the native ARM64 OpenSSL task in your authorized CPU workspace. Current results, setup and scoring are shown first; batch configuration is below.',
       '先在本人获授权 CPU 工作区运行原生 ARM64 OpenSSL 单题。先看当前实测、使用入口和评分，批次详细配置在下方展开。'), root);
