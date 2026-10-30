@@ -2,6 +2,8 @@
 
 import json
 import hashlib
+import re
+import tarfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,8 +46,9 @@ def test_real_page_not_redirect_and_three_layers():
     assert "scoring=NOT_RUN" in js
     assert "request_replay" in js
     assert "harbor run -c" in json.dumps(DATA)
-    assert "bootstrap_swe_bench_pro.py?ref=${AGENT_REV}" in js
-    assert "--source-revision ${AGENT_REV}" in js
+    assert "--source-bundle-url" in js
+    assert "--source-bundle-sha256" in js
+    assert "--crane-archive-url" in js
 
 
 def test_public_projection_has_no_operational_private_paths():
@@ -82,3 +85,32 @@ def test_coder_guide_has_one_user_workflow_without_unrelated_api_warning():
     assert "请 ops 准备 CPU 执行工作区" not in js
     assert "1. 创建自己的 Coder CPU 工作区" in js
     assert "平台助手（可选）" in js
+
+
+def test_swe_self_service_commands_resolve_to_verified_published_assets():
+    js = (ROOT / "assets/dataset-entrypoints.js").read_text()
+    revision = re.search(r"^REV=([a-f0-9]{40})", js, re.M)[1]
+    bundle_sha = re.search(r"^BUNDLE_SHA=([a-f0-9]{64})", js, re.M)[1]
+    script_sha = re.search(r"echo '([a-f0-9]{64})  bootstrap_swe_bench_pro.py'", js)[1]
+    folder = ROOT / "downloads/swe-bench-pro" / revision
+    bundle = folder / "runtime.tar.gz"
+    assert hashlib.sha256(bundle.read_bytes()).hexdigest() == bundle_sha
+    assert (
+        hashlib.sha256((folder / "bootstrap_swe_bench_pro.py").read_bytes()).hexdigest()
+        == script_sha
+    )
+    with tarfile.open(bundle) as archive:
+        manifest = json.load(archive.extractfile("source-bundle.json"))
+        assert manifest["commit"] == revision
+        for name, expected in manifest["files"].items():
+            assert (
+                hashlib.sha256(archive.extractfile(name).read()).hexdigest() == expected
+            )
+        for module in (
+            "swe_submodule_fixture.py",
+            "swe_bench_pro_grading.py",
+            "swe_patch_state.py",
+        ):
+            assert "src/vllm_hust_benchmark/" + module in manifest["files"]
+    assert '--batch-directory "$WORK/run"' in js
+    assert '--output "$WORK/grade-001"' in js
