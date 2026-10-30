@@ -29,3 +29,17 @@ def test_nested_locators_and_release_links_are_retained():
         "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/abc/archive/example",
         release,
     }
+
+
+def test_report_audit_follows_all_current_loaders_and_joint_evidence():
+    for name in ("midterm-report.js", "current-measurements.js", "b0-b1.js"):
+        assert AUDIT.CURRENT_REPORT in (ROOT / "assets" / name).read_text()
+    report = json.loads((ROOT / "data" / AUDIT.CURRENT_REPORT).read_text())
+    assert report["version"] == AUDIT.CURRENT_VERSION
+    urls = AUDIT.evidence_urls(report, report["source_commit"])
+    for name in (
+        "joint-summary.json",
+        "continuous-summary.json",
+        "original-telemetry.tar.gz",
+    ):
+        assert any(url.endswith("/full-answer-joint-20261030/" + name) for url in urls)

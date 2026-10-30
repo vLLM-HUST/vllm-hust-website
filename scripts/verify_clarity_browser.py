@@ -118,12 +118,26 @@ def main():
                                 )
                             related.locator("summary").click()
                             expect(page.locator(".result-metric")).to_have_count(3)
-                            expect(page.locator(".result-pair strong")).to_have_count(3)
+                            expect(page.locator(".result-pair strong")).to_have_count(6)
+                            for card in page.locator(".result-metric").all():
+                                expect(card.locator(".result-pair")).to_contain_text(
+                                    "B0"
+                                )
+                                expect(card.locator(".result-pair")).to_contain_text(
+                                    "B1"
+                                )
+                                expect(card.locator("a.raw-evidence")).to_have_count(2)
+                                for value in card.locator("strong").all():
+                                    expect(value).not_to_have_text("—")
                             expect(
                                 page.locator(".result-comparison-note")
-                            ).to_contain_text("B0")
+                            ).to_contain_text(
+                                "同一轮响应"
+                                if lang == "zh"
+                                else "same200 full-answer responses"
+                            )
                             assert page.locator(".result-metrics").evaluate(
-                                "e => e.getBoundingClientRect().height < 340"
+                                "e => e.getBoundingClientRect().height < (innerWidth < 600 ? 660 : 340)"
                             )
                             expect(page.locator(".cosmic-background")).to_be_hidden()
                             selectors = [
