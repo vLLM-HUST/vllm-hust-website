@@ -1,0 +1,137 @@
+"""Check every rendered MOD's current result and source in eight display modes."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+from playwright.sync_api import expect, sync_playwright
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--url", required=True)
+    parser.add_argument(
+        "--output", type=Path, default=Path("output/playwright/plugin-effects")
+    )
+    args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=True)
+    receipts = []
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        for width in (390, 1440):
+            for lang in ("zh", "en"):
+                for theme in ("light", "dark"):
+                    context = browser.new_context(
+                        viewport={"width": width, "height": 1000}, color_scheme=theme
+                    )
+                    context.add_init_script(
+                        f"localStorage.setItem('vllm-hust_lang', '{lang}')"
+                    )
+                    page = context.new_page()
+                    errors = []
+                    page.on("pageerror", lambda error: errors.append(str(error)))
+                    page.goto(f"{args.url}/plugins.html", wait_until="networkidle")
+                    expect(
+                        page.locator("#simllm-migration .plugin-public-effect")
+                    ).to_be_visible()
+                    response = context.request.get(
+                        f"{args.url}/data/benchmark-source-manifest.json"
+                    )
+                    assert response.ok
+                    manifest_raw = response.body()
+                    manifest = response.json()
+                    payloads = {}
+                    for name in (
+                        "ecosystem.json",
+                        "plugin-performance.json",
+                        "mod-taxonomy.json",
+                    ):
+                        response = context.request.get(f"{args.url}/data/{name}")
+                        assert response.ok
+                        identity = next(
+                            row
+                            for row in manifest["files"]
+                            if row["website_path"] == f"data/{name}"
+                        )
+                        assert (
+                            hashlib.sha256(response.body()).hexdigest()
+                            == identity["sha256"]
+                        )
+                        payloads[name] = response.json()
+                    components = {
+                        c["id"]: c for c in payloads["ecosystem.json"]["components"]
+                    }
+                    checked = []
+                    for card in page.locator(".plugin-card").all():
+                        component = components[card.get_attribute("id")]
+                        result = component.get(f"public_effect_{lang}")
+                        if not result or not component.get("public_effect_url"):
+                            continue
+                        panel = card.locator(":scope > .plugin-public-effect")
+                        expect(panel).to_be_visible()
+                        expect(panel.locator("p")).to_have_text(result)
+                        assert panel.locator("p").evaluate(
+                            "e => e.scrollHeight <= e.clientHeight + 1"
+                        )
+                        expect(panel.locator("a")).to_have_attribute(
+                            "href", component["public_effect_url"]
+                        )
+                        checked.append(component["id"])
+                    assert {
+                        "simllm-migration",
+                        "pyramidkv-ascend-migration",
+                        "vllm-hust-opset",
+                        "request-lifecycle-profiler",
+                        "kvcompress-ascend",
+                        "pegaflow-vllm-connectors",
+                    } <= set(checked)
+                    simllm = page.locator("#simllm-migration")
+                    expect(simllm).to_contain_text("5/12")
+                    expect(simllm).to_contain_text("12/12")
+                    expect(simllm.locator(".plugin-performance")).to_have_count(0)
+                    assert (
+                        "No data"
+                        not in page.locator("[data-plugin-catalog]").inner_text()
+                    )
+                    assert (
+                        "缺数据"
+                        not in page.locator("[data-plugin-catalog]").inner_text()
+                    )
+                    assert page.evaluate(
+                        "document.documentElement.scrollWidth <= innerWidth + 1"
+                    )
+                    assert not errors, errors
+                    stem = f"{width}-{lang}-{theme}"
+                    simllm.screenshot(path=str(args.output / f"simllm-{stem}.png"))
+                    page.locator("#pyramidkv-ascend-migration").screenshot(
+                        path=str(args.output / f"pyramidkv-{stem}.png")
+                    )
+                    page.screenshot(
+                        path=str(args.output / f"catalog-{stem}.png"), full_page=True
+                    )
+                    receipts.append(
+                        {
+                            "width": width,
+                            "language": lang,
+                            "theme": theme,
+                            "cards": checked,
+                            "manifest_sha256": hashlib.sha256(manifest_raw).hexdigest(),
+                            "source_commit": manifest["commit"],
+                            "projection": manifest.get("projection"),
+                            "errors": errors,
+                        }
+                    )
+                    (args.output / "manifest.json").write_bytes(manifest_raw)
+                    context.close()
+        browser.close()
+    (args.output / "verification.json").write_text(
+        json.dumps(receipts, ensure_ascii=False, indent=2) + "\n"
+    )
+    print(
+        f"PASS: {len(receipts)} modes; all current effect panels visible with exact evidence links"
+    )
+
+
+if __name__ == "__main__":
+    main()
