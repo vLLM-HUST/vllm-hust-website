@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 34b4244c5451ded3b1d612db48ded269b6687699 # pragma: allowlist secret
+          ref: 0bc5f043d4707601ae15c47b77ac2649f21ad668 # pragma: allowlist secret
           path: _benchmark
           sparse-checkout: |
             website-publication
@@ -38,7 +38,7 @@ jobs:
         run: |
           python -m playwright install --with-deps chromium
       - name: Verify default scenario, report sections, languages and mobile layout
-        timeout-minutes: 8
+        timeout-minutes: 12
         env:
           VERIFY_URL: ${{ inputs.url || 'http://127.0.0.1:8769' }}
           GH_TOKEN: ${{ github.token }}
@@ -48,6 +48,7 @@ jobs:
           trap 'kill "$website_server_pid"' EXIT
           python scripts/verify_midterm_browser.py --url "$VERIFY_URL"
           python scripts/verify_results_first_browser.py --url "$VERIFY_URL"
+          python scripts/verify_acceptance_completion_browser.py --url "$VERIFY_URL" --output output/playwright/midterm/joint-acceptance
       - uses: actions/upload-artifact@v4
         if: always()
         with:

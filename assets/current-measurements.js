@@ -93,6 +93,32 @@
       <details><summary>${zh ? '同工况候选吞吐对比' : 'Same-workload candidate throughput'} (token/s)</summary><ul class="measurement-bars">${bars}</ul></details>
       <p>${zh ? '200 请求、out256 服务性能；不代表完整数据集准确率。有效算力核算进展见报告，不计作新增性能点。' : '200-request out256 serving performance, not full-dataset accuracy. Effective-compute accounting is documented in the report, not counted as new performance points.'}</p>
       <p><a href="${matrixPath}">${zh ? '查看配对矩阵与候选证据' : 'Paired matrix and candidate evidence'}</a> · <a href="${dataPath}">${zh ? '原始数据' : 'Source data'}</a>${safeReport ? ` · <a href="${escape(report)}">${zh ? '中文测试报告' : 'Chinese test report'}</a>` : ''}</p></details>`;
+    if (reportData.full_answer_joint) {
+      const joint = reportData.full_answer_joint;
+      const [b0, b1] = joint.arms;
+      const jointUrl = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${reportData.source_commit}/reports/full-answer-joint-20261030/joint-summary.json`;
+      const valueLink = value => `<a class="raw-evidence" href="${jointUrl}">${number(value)}</a>`;
+      section.querySelector('.result-eyebrow').textContent = zh ? '完整回答联合测量 · 同轮质量、性能与成本' : 'FULL-ANSWER JOINT MEASUREMENT · SAME-RUN QUALITY, PERFORMANCE & COST';
+      section.querySelector('.result-reference').innerHTML = `<a href="#midterm-m01-verdict">${zh ? 'M01 · 原 out256 计数工况，参考修订中' : 'M01 · Prior out256 counted workload; reference under revision'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片；不是本轮8192回答的算力。' : 'chip; not compute measured from this8192-answer run.'}</small>`;
+      section.querySelector('.result-context').textContent = 'Qwen3.5-35B-A3B · BF16 · TP2 · 200 ' + (zh ? '请求' : 'requests') + ' · out8192 · Ascend 910B2 × 2';
+      section.querySelector('.result-comparison-note').textContent = zh
+        ? '同一200题完整回答：质量、时延、吞吐、利用率和成本来自同一轮响应。'
+        : 'The same200 full-answer responses supply quality, latency, throughput, utilization and cost.';
+      const definitions = [
+        ['output_token_throughput', zh ? '输出吞吐' : 'Output throughput', 'token/s', arm => arm.output_tokens_per_second],
+        ['ttft_mean', zh ? '平均首 token 延迟' : 'Mean TTFT', 'ms', arm => arm.timing.ttft_ms.mean],
+        ['tpot_mean', zh ? '平均 token 间延迟' : 'Mean TPOT', 'ms/token', arm => arm.timing.tpot_ms.mean]
+      ];
+      section.querySelector('.result-metrics').innerHTML = definitions.map(([id, label, unit, get]) =>
+        `<article class="result-metric" data-metric="${id}"><h3>${label} <small>${unit}</small></h3><div class="result-pair"><div><span>B0 · 0.18/0.18</span><strong>${valueLink(get(b0))}</strong></div><div><span>${zh ? 'B1 候选' : 'B1 candidate'} · 0.28.1/0.25.1rc2</span><strong>${valueLink(get(b1))}</strong></div></div></article>`).join('');
+      const qualityText = joint.quality_observation.fixed_subset_correct_count_not_lower
+        ? (zh ? '本轮固定子集正确数未下降' : 'No lower correct count on this fixed subset')
+        : (zh ? '本轮候选正确数下降，未通过质量比较' : 'Candidate correct count fell; quality comparison failed');
+      section.querySelector('.result-quality').innerHTML = `<strong>${zh ? '同轮质量 · out8192' : 'Same-run quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${jointUrl}">${b0.correct}/200</a></span><span>${zh ? 'B1 候选' : 'B1 candidate'}: <a class="raw-evidence" href="${jointUrl}">${b1.correct}/200</a></span><small>${escape(qualityText)} · ${zh ? '长度终止' : 'Length stops'} ${b0.truncated}/${b1.truncated}</small>`;
+      section.querySelector('.result-selection').innerHTML = `${zh ? '每百万输出 token 租赁估算' : 'Rental estimate per million output tokens'}: ${valueLink(b0.cost.cny_per_million_output_tokens)} → ${valueLink(b1.cost.cny_per_million_output_tokens)} CNY. ${zh ? '公开类似机型报价；不是本机账单。' : 'Public analogous-machine pricing; not this machine’s invoice.'}`;
+      section.querySelector('#current-configuration > summary').textContent = zh ? '历史 out256 候选对比与原始证据' : 'Historical out256 candidate comparisons & evidence';
+      section.querySelector('.result-next').insertAdjacentHTML('afterbegin', `<a href="#midterm-full-answer-joint">${zh ? '本轮配置、连续测试与原始数据' : 'Current configuration, continuous tests & original data'}</a>`);
+    }
     // Keep the two entry pages task-specific without dropping evidence or anchors.
     const related = document.createElement('details');
     related.id = 'result-related-evidence';
@@ -108,6 +134,12 @@
     if (qualityPage) {
       section.classList.add('quality-summary');
       section.querySelector('.result-context').textContent = `${data.scenario.model} · ${data.scenario.precision} · TP2 · 200 ${zh ? '题固定子集' : 'fixed tasks'} · out8192`;
+      const matrixBoundary = document.createElement('p');
+      matrixBoundary.className = 'result-chart-boundary';
+      matrixBoundary.textContent = zh
+        ? '下方保留各 MOD 既有配置的验证矩阵；以各表工况为准，不与本轮完整回答结果拼接。'
+        : 'The matrices below retain prior MOD configurations. Use each table’s workload; do not combine them with the full-answer results above.';
+      section.append(matrixBoundary);
     } else {
       const boundary = document.createElement('p');
       boundary.className = 'result-chart-boundary';
@@ -120,13 +152,15 @@
   }
   window.addEventListener('vllm-hust:langchange', render);
   render();
-  Promise.all([dataPath, './data/midterm-v102.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
+  Promise.all([dataPath, './data/midterm-v103.json'].map(path => fetch(path, { cache: 'no-cache' }).then(response => {
     if (!response.ok) throw new Error('Measurement data unavailable');
     return response.json();
   }))).then(([value, report]) => {
-    if (report.version !== 'V1.02' || report.comparison_contract?.b0?.fixed !== true ||
+    if (report.version !== 'V1.03' || report.comparison_contract?.b0?.fixed !== true ||
         report.comparison_contract.b0.vllm !== '0.18' || report.comparison_contract.b0.vllm_ascend !== '0.18' ||
         !/^[a-f0-9]{40}$/.test(report.source_commit) || !report.current_summary?.quality) throw Error('Invalid comparison identity');
+    const joint=report.full_answer_joint;
+    if(joint?.same_run_quality_and_performance!==true||joint.protocol?.max_completion_tokens!==8192||joint.arms?.length!==2||joint.arms[0].role!=='B0'||joint.arms[1].role!=='B1'||joint.arms.some(a=>a.completed!==200||a.failed!==0)||report.current_summary.quality.b0.correct!==joint.arms[0].correct||report.current_summary.quality.b1.candidate_correct!==joint.arms[1].correct)throw Error('Invalid joint summary');
     data = value; reportData = report; render();
   }).catch(() => { failed = true; data = null; render(); });
 })();
