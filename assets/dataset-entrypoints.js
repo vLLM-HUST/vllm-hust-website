@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = '0531845b8b20b0c91acffd253ed3234ad38a692d'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
+  const AGENT_REV = '843348f93d1391d8896385f0127ba3cb0bbf234b'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
@@ -105,8 +105,8 @@
     const sweLinks = el('p', undefined, 'entry-links');
     sweLinks.append(link(t('Coder workspace instructions', 'Coder 工作区操作说明'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md#coder-上的执行结构docker-in-docker-沙箱'), link(t('Complete run and grading guide', '完整运行与评分指南'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md'), link(t('Platform assistant (optional)', '平台助手（可选）'), OPS + 'references/swe-bench-pro.md'));
     swe.append(sweLinks);
-    swe.append(el('p', t('Platform status, 2026-10-31: the CPU template is visible to ordinary users, but creating a new 20 GiB workspace is currently blocked by the full namespace storage quota (4625 / 4625 GiB). Administrators must make approved capacity available. The grading-directory mount is repaired in template cpu-grade-bind-1031-1fd0da18; the guide reports environment readiness, Agent submission and official grading separately.',
-      '平台状态（2026-10-31）：普通用户可见 CPU 模板，但新建 20 GiB 工作区当前被已满的存储配额（4625 / 4625 GiB）阻塞，需管理员按容量审批流程释放或增加额度。评分目录挂载已在 cpu-grade-bind-1031-1fd0da18 模板修复；环境就绪、Agent 提交及官方评分分别见完整指南。')));
+    swe.append(el('p', t('Platform status, 2026-10-31: the storage admission block is resolved. An ordinary account created a fresh 20 GiB workspace with an initially empty Docker daemon; pinned bootstrap preparation and the grading-directory bind probe passed. The guide records environment readiness, the existing Agent submission outcome and official grading separately. Later workspace requests remain subject to live capacity.',
+      '平台状态（2026-10-31）：存储准入阻塞已解除。普通账号新建 20 GiB 工作区，初始 Docker 镜像为空，固定 bootstrap 准备和评分目录挂载探针均通过。完整指南分别记录环境就绪、已有 Agent 提交结果和官方评分；后续工作区申请仍以平台实时容量为准。')));
     appendStep(swe, t('1. Create your Coder CPU workspace', '1. 创建自己的 Coder CPU 工作区'), null,
       t('In Coder, create a workspace from the published swe-bench-pro-cpu template and open its terminal. Use your model API with the commands below. The template provides the isolated Docker environment. A platform assistant can optionally help prepare the workspace. The starter runs one NodeBB V1 task; the lock covers eight tasks, not the entire dataset.',
         '在 Coder 中选择已发布的 swe-bench-pro-cpu 模板创建工作区，打开终端，填写自己的模型 API 和模型名执行下方命令；需要鉴权时，先在终端设置 MODEL_API_KEY，再追加 --api-key-env MODEL_API_KEY。模板提供独立 Docker 环境；也可以让平台助手代为准备。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
@@ -137,6 +137,8 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     swe.append(el('p', t('Dataset: ScaleAI/SWE-bench_Pro v1, not SWE-bench Verified or V2. Task repositories and images retain their own licenses.', '数据为 ScaleAI/SWE-bench_Pro v1，不是 SWE-bench Verified 或 V2；任务仓库与镜像遵循各自许可。')));
     const terminal = section('TERMINAL_BENCH_2_1', 'Terminal-Bench 2.1 / Harbor', t('Start with the native ARM64 OpenSSL task in your authorized CPU workspace. Current results, setup and scoring are shown first; batch configuration is below.',
       '先在本人获授权 CPU 工作区运行原生 ARM64 OpenSSL 单题。先看当前实测、使用入口和评分，批次详细配置在下方展开。'), root);
+    terminal.append(el('p', t('Self-service status, 2026-10-31: the OpenSSL single-task workflow has passed in an existing authorized workspace. Terminal preparation, controls, Agent execution and grading from a newly created ordinary-user workspace are not yet validated. The SWE workspace repair does not establish Terminal or full-dataset readiness.',
+      '自助入口状态（2026-10-31）：OpenSSL 单题已在已有获授权工作区验收通过；普通用户新建工作区后的 Terminal 准备、正负控制、Agent 执行与评分尚未完成全流程验收。SWE 工作区修复不等于 Terminal 或全量数据集已就绪。')));
     const result = el('div', undefined, 'terminal-current-result'); result.id = 'terminal-current-result';
     result.append(el('h4', t('Current single-task result', '当前单题实测')));
     const ev = terminalEvidence;
@@ -151,7 +153,7 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     result.append(el('p', `${ev.task_id} · ${ev.runtime.model} · vLLM ${ev.runtime.vllm} / Ascend ${ev.runtime.vllm_ascend}`));
     result.append(el('p', t('Scope: one fresh task and original verifier in an existing ARM64 CPU workspace. Controls are separate from model quality. This does not validate all 89 tasks, a new-account workspace setup, or B0/B1 performance.', '范围：已有 ARM64 CPU 工作区中的一次全新任务与原评分器。正负控制与模型成绩分开；不代表全部 89 题、新账号创建工作区或 B0/B1 性能配对通过。')));
     const currentLinks = el('p', undefined, 'entry-links');
-    const terminalBase = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${terminalSource.commit}/`;
+    const terminalBase = AGENT_BASE;
     currentLinks.append(link(t('Complete ARM64 guide', 'ARM64 完整使用指南'), terminalBase + 'docs/TERMINAL_BENCH_ARM64.zh-CN.md'), link(t('Acceptance evidence', '验收记录与证据'), './assets/data/terminal-arm64-acceptance-v1.json'), link(t('Ops skill', 'ops skill 运维入口'), OPS + 'SKILL.md')); result.append(currentLinks); terminal.append(result);
     appendStep(terminal, t('1. Ask ops to prepare your workspace and model profile', '1. 让 ops 准备本人工作区与模型配置'),
       t('Use npu-private-cloud-ops to run the Terminal-Bench 2.1 ARM64 OpenSSL task in my authorized CPU workspace with my existing model service. Fill the persistent run directory and private model profile, run the official controls, then one real Agent and verifier. Return the workspace entry, filled commands and result path. Keep ops outside the tested Agent.', '请使用 npu-private-cloud-ops，在我获授权的 ARM64 CPU 工作区沿用已有模型服务，运行 Terminal-Bench 2.1 OpenSSL 单题。自动填妥持久运行目录和私有模型配置，先跑原评分器正负控制，再跑一次真实 Agent 与评分。返回工作区入口、已填好的命令和结果路径；ops 不加入被测 Agent。'),
