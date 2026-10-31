@@ -1,6 +1,8 @@
 """Exercise the final public B0/B1 artifact, including fail-closed checks."""
 
 import argparse
+import copy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -33,6 +35,10 @@ def verify(url, output):
         missing = {
             arm["run_id"] for arm in report["c16_equal_request_latency"]["arms"]
         } - {run["run_id"] for run in runs["runs"]}
+        assert not missing, missing
+        assert {
+            arm["run_id"] for arm in report["c16_equal_request_latency"]["arms"]
+        } <= set(manifest["projection"]["public_run_ids"])
         results = []
         for language in ("zh", "en"):
             for width in (390, 1440):
@@ -54,12 +60,11 @@ def verify(url, output):
                     expect(root.locator("#metric-2")).to_contain_text(
                         f"{arm['correct']}/200"
                     )
-                if missing:
-                    expect(root.locator("#method-2")).to_contain_text(
-                        "历史 C16 对照当前未公开。"
-                        if language == "zh"
-                        else "The historical C16 comparison is not currently published."
-                    )
+                expect(root.locator("#method-2")).to_contain_text("betterscale")
+                expect(root.locator("#method-2")).not_to_contain_text(
+                    "not currently published"
+                )
+                expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 text = root.inner_text()
                 assert "undefined" not in text and "NaN" not in text
                 assert page.evaluate(
@@ -78,9 +83,7 @@ def verify(url, output):
                 expect(root.locator(".comparison-group")).to_have_count(4)
                 results.append({"language": language, "width": width, "sections": 4})
                 page.close()
-        failures = ["modified-data", "unavailable-data"]
-        if missing:
-            failures += ["missing-unprojected-identity", "unknown-projection"]
+        failures = ["modified-data", "unavailable-data", "missing-c16-identity"]
         for case in failures:
             page = context.new_page()
             page.add_init_script("localStorage.setItem('vllm-hust_lang', 'zh')")
@@ -96,11 +99,29 @@ def verify(url, output):
                     ),
                 )
             else:
-                altered = dict(manifest)
-                if case == "missing-unprojected-identity":
-                    altered.pop("projection")
-                else:
-                    altered["projection"] = {"policy": "unknown", "revision": "a" * 40}
+                altered = copy.deepcopy(manifest)
+                missing_id = report["c16_equal_request_latency"]["arms"][1]["run_id"]
+                incomplete = copy.deepcopy(runs)
+                incomplete["runs"] = [
+                    r for r in incomplete["runs"] if r["run_id"] != missing_id
+                ]
+                incomplete_raw = json.dumps(incomplete).encode()
+                entry = next(
+                    e
+                    for e in altered["files"]
+                    if e["website_path"]
+                    == "data/leaderboard_frontier_swe_evidence.json"
+                )
+                entry.update(
+                    sha256=hashlib.sha256(incomplete_raw).hexdigest(),
+                    bytes=len(incomplete_raw),
+                )
+                page.route(
+                    "**/data/leaderboard_frontier_swe_evidence.json",
+                    lambda route, _request, body=incomplete_raw: route.fulfill(
+                        content_type="application/json", body=body
+                    ),
+                )
                 page.route(
                     "**/data/benchmark-source-manifest.json",
                     lambda route, _request, altered=altered: route.fulfill(
