@@ -166,7 +166,7 @@ def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
 
 
 def test_all_data_files_match_the_benchmark_publication_manifest():
-    assert "b0-b1.js?v=public-comparison-20261031" in (ROOT / "b0-b1.html").read_text()
+    assert "b0-b1.js?v=c16-restored-20261031" in (ROOT / "b0-b1.html").read_text()
     manifest_path = ROOT / "data/benchmark-source-manifest.json"
     manifest = json.loads(manifest_path.read_text())
     assert manifest["repository"] == "vLLM-HUST/vllm-hust-benchmark"
@@ -509,3 +509,4 @@ def test_circuit_null_and_byte_diagnostic_are_not_new_scores():
         "reports/terminal-break-filter-byte-diagnostic-20261027/summary.json",
     ):
         assert repr(path) in loader
+
