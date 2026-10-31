@@ -509,4 +509,3 @@ def test_circuit_null_and_byte_diagnostic_are_not_new_scores():
         "reports/terminal-break-filter-byte-diagnostic-20261027/summary.json",
     ):
         assert repr(path) in loader
-
