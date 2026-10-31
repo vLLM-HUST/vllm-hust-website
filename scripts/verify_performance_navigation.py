@@ -67,7 +67,7 @@ def main():
                             ).to_have_count(0)
                             expect(
                                 page.locator(
-                                    '.nav-links > a[href="./ecosystem-archive.html#stack"]'
+                                    '.nav-links > a[href="./index.html#stack"]'
                                 )
                             ).to_have_count(1)
                             expect(
@@ -149,22 +149,17 @@ def main():
                                     page.locator(".site-nav .nav-group[open]")
                                 ).to_have_count(0)
                             if name == "index.html":
-                                assert (
-                                    page.locator("#focus-paths .focus-card").count()
-                                    == 3
+                                expect(page.locator("#home-title")).to_have_text(
+                                    "vLLM-HUST"
                                 )
-                                assert (
-                                    page.locator("#focus-paths a").evaluate_all(
-                                        "ee=>ee.map(e=>e.getAttribute('href'))"
-                                    )
-                                    == LINKS
+                                expect(page.locator("#focus-title")).to_have_count(0)
+                                expect(page.locator("#products")).to_have_count(1)
+                                expect(
+                                    page.locator("#home-data-cta")
+                                ).to_have_attribute(
+                                    "href", "./dataset-introductions.html"
                                 )
-                                assert (
-                                    "50%" in page.locator("#focus-stages").inner_text()
-                                )
-                                assert (
-                                    "90%" in page.locator("#focus-stages").inner_text()
-                                )
+                                assert page.evaluate("scrollY") == 0
                             elif name == "dataset-introductions.html":
                                 assert (
                                     page.locator(
@@ -317,7 +312,7 @@ def main():
                             assert page.evaluate(
                                 "document.documentElement.scrollWidth <= innerWidth + 1"
                             ), (name, width)
-                            if name != "serving-plan.html":
+                            if name not in ("index.html", "serving-plan.html"):
                                 assert page.locator("h1").evaluate(
                                     "e=>getComputedStyle(e).color"
                                 ) == page.locator("body").evaluate(
@@ -329,17 +324,15 @@ def main():
                             )
                             receipts.append([name, width, language, theme, "PASS"])
                         # Restored primary links must reach actual preserved sections.
-                        for section_id in ("products", "projects", "stack"):
+                        for section_id in ("projects", "stack"):
                             page.goto(
-                                f"{base}/ecosystem-archive.html#{section_id}",
+                                f"{base}/index.html#{section_id}",
                                 wait_until="networkidle",
                             )
                             assert page.locator(f"#{section_id}").is_visible()
                             expect(
                                 page.locator('.nav-links [aria-current="location"]')
-                            ).to_have_attribute(
-                                "href", f"./ecosystem-archive.html#{section_id}"
-                            )
+                            ).to_have_attribute("href", f"./index.html#{section_id}")
                             if section_id == "stack":
                                 expect(page.locator("#stack-title")).to_contain_text(
                                     "vLLM-HUST"
@@ -367,10 +360,17 @@ def main():
                                     / f"engine-{width}-{language}-{theme}.png"
                                 )
                         # Hash-only navigation updates the current section without a reload.
-                        page.evaluate("location.hash = 'products'")
+                        page.evaluate("location.hash = 'projects'")
                         expect(
                             page.locator('.nav-links [aria-current="location"]')
-                        ).to_have_attribute("href", "./ecosystem-archive.html#products")
+                        ).to_have_attribute("href", "./index.html#projects")
+                        if width == 390:
+                            page.locator("#navToggle").click()
+                        page.locator(
+                            '.nav-links [data-i18n-common="navProducts"]'
+                        ).click()
+                        expect(page).to_have_url(f"{base}/index.html")
+                        assert page.evaluate("scrollY") == 0
                         page.locator(".brand-link").click()
                         expect(page).to_have_url(f"{base}/index.html")
                         context.close()
