@@ -65,8 +65,8 @@
 
   function special() {
     const root = document.getElementById('entry-quickstarts'); root.replaceChildren();
-    text('entry-run-warning', 'Use these existing clients only when the task needs their token template, judge or media protocol. Local clients connect to your existing service without SSH; they do not install a model server. The examples run one item, not the full dataset.',
-      '只有任务需要对应 token 模板、Judge 或媒体协议时才使用这些已有客户端。客户端在本地连接现有服务，无需 SSH，不安装模型服务；以下只跑一题，不是全量评测。');
+    text('entry-run-warning', "Choose the client for your task, connect your model API, and run one example using the steps below.",
+      "选择对应客户端，连接模型 API，按下方步骤运行一道示例题。");
     const notes = {
       MMLU_PRO: ['MMLU-Pro', 'Token-ID completions and local extraction; not a generic chat-only service.', '需要 token-ID completions 与本地答案提取，不适用于仅支持通用 chat 的服务。'],
       HLE_VERIFIED: ['HLE-Verified', 'Separate solver/judge; images require multimodal input and judging needs Structured Outputs.', '独立 Solver/Judge；图像题需多模态输入，Judge 需 Structured Outputs。'],
@@ -75,24 +75,24 @@
     for (const entry of catalog.primary_entries.filter(e => notes[e.source_id])) {
       const n = notes[entry.source_id]; const item = section(entry.source_id, n[0], t(n[1], n[2]), root);
       appendStep(item, t('Install locally', '本地安装'), entry.install_posix.join('\n'),
-        t('Python 3.9+. Windows activation: .venv\\Scripts\\Activate.ps1. Use one virtual environment per client. Core installation/help were checked; the commands below are not a new data/model validation.',
-          'Python 3.9+，Windows 激活使用 .venv\\Scripts\\Activate.ps1，每个客户端使用独立环境。已检查 core 安装/help，以下命令不是新数据或模型验收。'));
+        t("Python 3.9+. Use one virtual environment per client. On Windows, activate with .venv\\Scripts\\Activate.ps1.",
+          "Python 3.9+，每个客户端使用独立环境。Windows 使用 .venv\\Scripts\\Activate.ps1 激活。"));
       if (entry.source_id === 'MMLU_PRO') {
         appendStep(item, t('Data and preparation dependencies', '数据与准备依赖'), [...entry.prepare_extra_install, ...entry.download_example_not_executed].join('\n'));
-        item.append(el('p', t('Supply ./model-tokenizer with the exact served tokenizer/chat template and ./service/runtime-contract.json from the operator. Freeze the transformers version used for tokenization. The base URL below excludes /v1; the endpoint must accept token IDs at /v1/completions. Do not fabricate server runtime evidence from local packages.',
-          '需提供与服务一致的 ./model-tokenizer tokenizer/chat template，以及运维提供的 ./service/runtime-contract.json；固定分词 transformers 版本。下方 base URL 不含 /v1，服务需支持 /v1/completions 的 token IDs。不能用本地包身份冒充服务环境。')));
+        item.append(el('p', t("Provide ./model-tokenizer with the served tokenizer and chat template, plus ./service/runtime-contract.json from the service operator. Pin the transformers version. The base URL below excludes /v1; the service must accept token IDs at /v1/completions.",
+          "提供与服务一致的 ./model-tokenizer（分词器与 chat template）和运维提供的 ./service/runtime-contract.json，并固定 transformers 版本。下方 base URL 不含 /v1；服务需支持 /v1/completions 的 token IDs。")));
       } else {
         appendStep(item, t('Copy and edit the supplied configuration templates', '复制并修改已有配置模板'), entry.configuration_steps.slice(0, 3).join('\n'),
-          t('Edit run/solver.json and run/judge.json: base_url, model, model_artifact and api_key_env must match your authorized services. Keep request/token/time/concurrency settings explicit; model_artifact is an identity field, not a command to load local weights. Owner-provided runtime contracts can be attached; omitted provenance remains unknown.',
-            '编辑 run/solver.json、run/judge.json 的 base_url、model、model_artifact、api_key_env 为实际获授权服务；明确 request/token/时间/并发设置。model_artifact 为身份记录，不要求本地加载权重。可附运维的真实 runtime contract，缺失时保持未知。'));
+          t("Set base_url, model, model_artifact and api_key_env in run/solver.json and run/judge.json for your services. model_artifact records the model identity. Set request, token, time and concurrency budgets, and attach service runtime details when available.",
+            "在 run/solver.json、run/judge.json 中填写服务的 base_url、model、model_artifact 和 api_key_env；model_artifact 用于记录模型身份。同时设置请求、token、时间与并发预算，有服务运行记录时一并附上。"));
         item.append(code(JSON.stringify({base_url: 'https://MODEL_HOST', model: 'SERVED_MODEL_NAME', model_artifact: 'OWNER_SUPPLIED_MODEL_IDENTITY', api_key_env: 'MODEL_API_KEY'}, null, 2))); // pragma: allowlist secret - environment variable name, not a credential
-        item.append(el('p', t('These are the fields to replace in the complete copied templates, not a complete standalone config. Supply secrets through the named environment variable. Preserve the judge response format from its template.', '上面是完整模板中需要替换的字段，不是独立完整配置。密钥仅通过指定环境变量提供，保留 Judge 模板的响应格式。')));
+        item.append(el('p', t("Replace these fields in the copied templates. Supply the API key through the named environment variable and keep the Judge response format.", "在复制的完整模板中替换以上字段，通过指定环境变量提供 API 密钥，并保留 Judge 响应格式。")));
       }
       appendStep(item, t('Prepare, run one item and summarize', '准备、运行一题并汇总'), entry.minimum_argv.map(a => a.join(' ')).join('\n'),
-        t(entry.outputs, '预期生成计划、请求/回答与汇总；HLE/Frontier 另生成 Judge 评分和报告。保留错误、截断与未解决项，一题结果不能代表全量。'));
-      item.append(el('p', t(entry.scorer_boundary,
-        entry.source_id === 'MMLU_PRO' ? '本地提取未解析答案记错，不采用原随机猜测；token 模板与 few-shot 合同不等同官方榜单复现。' : '使用替代 Judge 和显式评分策略，不等同原作者审核或官方榜单成绩。')));
-      item.append(el('p', t(entry.splits, entry.source_id === 'HLE_VERIFIED' ? 'Gold 668 / Revision 1143；默认 fetch 不含 Uncertain，示例选择 Gold。' : entry.source_id === 'FRONTIERSCIENCE' ? 'Gold Olympiad 100 / Research 60；limit 1 不覆盖两个 track。' : 'test 12032 / validation 70（用于 few-shot 准备）。')));
+        t(entry.outputs, "输出包括计划、请求与回答、运行汇总；HLE 和 FrontierScience 还会生成 Judge 评分及报告。"));
+      item.append(el('p', t(entry.source_id === 'MMLU_PRO' ? 'Answers are extracted locally; unparsed answers count as incorrect. Prompt and few-shot settings are documented in the client guide.' : 'Scoring uses the configured Judge and rubric. See the client guide for the method.',
+        entry.source_id === 'MMLU_PRO' ? "评分采用本地答案提取，未解析答案记错；提示模板与 few-shot 配置见客户端指南。" : "评分采用配置中的 Judge 和评分策略，详细方法见客户端指南。")));
+      item.append(el('p', t(entry.splits, entry.source_id === 'HLE_VERIFIED' ? 'Gold 668 / Revision 1143；默认 fetch 不含 Uncertain，示例选择 Gold。' : entry.source_id === 'FRONTIERSCIENCE' ? "Gold Olympiad 100 / Research 60；示例每次运行一道题。" : 'test 12032 / validation 70（用于 few-shot 准备）。')));
       const links = el('p', undefined, 'entry-links'); links.append(link(t('Official data and terms', '官方数据与条款'), entry.official_data), link(t('Client source', '客户端源码'), entry.client_repository), link(t('Existing results', '已有结果'), './dataset-validation.html'));
       item.append(links);
     }
@@ -100,19 +100,17 @@
 
   function agents() {
     const root = document.getElementById('entry-agent-guides'); root.replaceChildren();
-    const swe = section('SWE_BENCH_PRO', 'SWE-bench-Pro', t('Run the Agent in your Coder CPU/Docker workspace using the published template. The workspace provides a separate task sandbox; connect it to your model API without using the model host Docker socket.',
-      '登录 Coder 后，使用已发布模板创建自己的 CPU/Docker 工作区，按下列步骤运行 Agent。工作区提供独立任务沙箱并连接模型 API，不使用模型宿主机 Docker socket。'), root);
+    const swe = section('SWE_BENCH_PRO', 'SWE-bench-Pro', t("Create a Coder CPU workspace from the published template, connect your model API, and run the Agent in its isolated Docker sandbox.",
+      "在 Coder 中选择模板创建 CPU 工作区，连接模型 API，即可在独立 Docker 沙箱中运行 Agent。"), root);
     const sweLinks = el('p', undefined, 'entry-links');
     sweLinks.append(link(t('Coder workspace instructions', 'Coder 工作区操作说明'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md#coder-上的执行结构docker-in-docker-沙箱'), link(t('Complete run and grading guide', '完整运行与评分指南'), AGENT_BASE + 'docs/SWE_BENCH_PRO.zh-CN.md'), link(t('Platform assistant (optional)', '平台助手（可选）'), OPS + 'references/swe-bench-pro.md'));
     swe.append(sweLinks);
-    swe.append(el('p', t('Platform status, 2026-10-31: the storage admission block is resolved. An ordinary account created a fresh 20 GiB workspace with an initially empty Docker daemon; pinned bootstrap preparation and the grading-directory bind probe passed. The guide records environment readiness, the existing Agent submission outcome and official grading separately. Later workspace requests remain subject to live capacity.',
-      '平台状态（2026-10-31）：存储准入阻塞已解除。普通账号新建 20 GiB 工作区，初始 Docker 镜像为空，固定 bootstrap 准备和评分目录挂载探针均通过。完整指南分别记录环境就绪、已有 Agent 提交结果和官方评分；后续工作区申请仍以平台实时容量为准。')));
+    swe.append(el('p', t("Status · 2026-10-31: workspace creation and environment preparation passed with a fresh ordinary-user workspace. Agent and official grading results are recorded in the complete guide.",
+      "状态 · 2026-10-31：普通用户新建工作区与环境准备已通过验证。Agent 运行结果和官方评分见完整指南。")));
     appendStep(swe, t('1. Create your Coder CPU workspace', '1. 创建自己的 Coder CPU 工作区'), null,
-      t('In Coder, create a workspace from the published swe-bench-pro-cpu template and open its terminal. Use your model API with the commands below. The template provides the isolated Docker environment. A platform assistant can optionally help prepare the workspace. The starter runs one NodeBB V1 task; the lock covers eight tasks, not the entire dataset.',
-        '在 Coder 中选择已发布的 swe-bench-pro-cpu 模板创建工作区，打开终端，填写自己的模型 API 和模型名执行下方命令；需要鉴权时，先在终端设置 MODEL_API_KEY，再追加 --api-key-env MODEL_API_KEY。模板提供独立 Docker 环境；也可以让平台助手代为准备。入门流程运行一道 NodeBB V1 任务，锁定清单覆盖八道，不代表全量数据集。'));
-    swe.append(code(t('Use npu-private-cloud-ops to prepare SWE-bench Pro on my authorized platform. Discover the CPU template and existing model service; complete the pinned environment and input checks. Return the workspace entry, exact command and result paths. Keep the official tested Agent unchanged. Report preparation, Agent submission and official grading separately.',
-      '请使用 npu-private-cloud-ops，在我有权使用的平台准备 SWE-bench Pro。发现 CPU 模板和已有模型服务，完成固定环境与输入检查，交付工作区入口、实际命令和结果位置。保持被测官方 Agent 不变，分别报告环境就绪、Agent 提交和官方评分。')));
-    appendStep(swe, t('2. Pinned bootstrap, then one explicit run', '2. 固定 bootstrap，然后显式运行'),
+      t("Select swe-bench-pro-cpu in Coder, create a workspace and open its terminal. Fill in your model API and model name below. For authentication, export MODEL_API_KEY and append --api-key-env MODEL_API_KEY. The starter runs one NodeBB V1 task.",
+        "在 Coder 中选择 swe-bench-pro-cpu 模板创建工作区，打开终端，填写下方的模型 API 和模型名。需要鉴权时，先设置 MODEL_API_KEY 环境变量，再追加 --api-key-env MODEL_API_KEY。入门流程运行一道 NodeBB V1 任务。"));
+    appendStep(swe, t("2. Prepare the environment and run one task", "2. 准备环境并运行单题"),
       `MODEL_API=https://MODEL_HOST/v1
 MODEL_NAME=openai/SERVED_MODEL_NAME
 export PIP_INDEX_URL="\${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
@@ -126,19 +124,19 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
   --source-bundle-sha256 "$BUNDLE_SHA" \\
   --crane-archive-url "$BASE/crane-v0.20.3-linux-arm64.tar.gz" \\
   --work "$HOME/swe-pro-first" --model-api "$MODEL_API" --model-name "$MODEL_NAME" --run`,
-      t('Linux ARM64, Python 3.10+, an isolated Docker daemon, reachable pinned dataset/task images and sufficient disk are required. Use a new absolute private work path. Omitting --run prepares only; an existing owned directory needs --resume with the same identity. Submission and official grading are separate; a submitted patch is not a passing score.',
-        '需要 Linux ARM64、Python 3.10+、隔离 Docker daemon、可访问的固定数据/任务镜像和足够磁盘。使用新的绝对私有工作路径；省略 --run 只准备，已有目录需以同身份 --resume。提交与官方评分分开，有 patch 不代表判对。'));
+      t("The template supplies Linux ARM64, Python and isolated Docker. Choose a new absolute work path. Omit --run to prepare the environment only; use --resume with matching settings to continue in an existing directory.",
+        "模板提供 Linux ARM64、Python 和独立 Docker。使用新的绝对工作路径；省略 --run 可仅准备环境，继续已有目录时使用相同配置并加上 --resume。"));
     appendStep(swe, t('3. Inspect the Agent result, then grade the saved patch', '3. 检查 Agent 结果，再对保存的补丁独立评分'), `WORK="$HOME/swe-pro-first"
 "$WORK/client/bin/python" -m vllm_hust_benchmark.swe_bench_pro grade \\
   --settings "$WORK/settings-private.json" --inputs "$WORK/inputs" \\
   --batch-directory "$WORK/run" --output "$WORK/grade-001"`,
-      t('Read the per-task report, trajectory, patch and batch report. Submitted is not resolved; quality_score: null means ungraded. Bootstrap includes local official-grading dependencies. Run the command above to grade the saved patch in a fresh container. Preserve grading-status.json, patch-application evidence and official outputs. Ops prepares the environment; it is not added to the tested Agent as a solving skill.',
-        '读取逐题 report、轨迹、patch 和 batch report。Submitted 不等于修复成功，quality_score: null 表示未评分。bootstrap 已安装本地官方评分依赖；使用上述命令在新容器执行 grade，保存 grading-status.json、补丁应用证据和官方输出。ops 负责环境，不作为修题技能注入被测 Agent。'));
-    swe.append(el('p', t('Dataset: ScaleAI/SWE-bench_Pro v1, not SWE-bench Verified or V2. Task repositories and images retain their own licenses.', '数据为 ScaleAI/SWE-bench_Pro v1，不是 SWE-bench Verified 或 V2；任务仓库与镜像遵循各自许可。')));
-    const terminal = section('TERMINAL_BENCH_2_1', 'Terminal-Bench 2.1 / Harbor', t('Start with the native ARM64 OpenSSL task in your authorized CPU workspace. Current results, setup and scoring are shown first; batch configuration is below.',
-      '先在本人获授权 CPU 工作区运行原生 ARM64 OpenSSL 单题。先看当前实测、使用入口和评分，批次详细配置在下方展开。'), root);
-    terminal.append(el('p', t('Self-service status, 2026-10-31: the OpenSSL single-task workflow has passed in an existing authorized workspace. Terminal preparation, controls, Agent execution and grading from a newly created ordinary-user workspace are not yet validated. The SWE workspace repair does not establish Terminal or full-dataset readiness.',
-      '自助入口状态（2026-10-31）：OpenSSL 单题已在已有获授权工作区验收通过；普通用户新建工作区后的 Terminal 准备、正负控制、Agent 执行与评分尚未完成全流程验收。SWE 工作区修复不等于 Terminal 或全量数据集已就绪。')));
+      t("Read the task report, Agent trajectory and patch under the run directory. quality_score: null means grading is pending. The command above runs the official grader in a fresh container and saves grading-status.json, patch application details and test outputs.",
+        "在 run 目录查看任务报告、Agent 轨迹和补丁；quality_score: null 表示待评分。上述命令会在新容器中运行官方评分器，保存 grading-status.json、补丁应用记录和测试输出。"));
+    swe.append(el('p', t("Dataset: ScaleAI/SWE-bench_Pro v1. Task repositories and images retain their own licenses.", "数据版本：ScaleAI/SWE-bench_Pro v1。任务仓库与镜像遵循各自许可。")));
+    const terminal = section('TERMINAL_BENCH_2_1', 'Terminal-Bench 2.1 / Harbor', t("Run the ARM64 OpenSSL task with Harbor. The steps below cover workspace setup, a model run and scoring.",
+      "使用 Harbor 运行 ARM64 OpenSSL 单题。下方提供工作区准备、模型运行和评分步骤。"), root);
+    terminal.append(el('p', t("Status · 2026-10-31: the OpenSSL workflow passed in an existing ARM64 workspace. End-to-end validation in a newly created ordinary-user workspace is pending. Coverage: one task; full-dataset and B0/B1 validation are pending.",
+      "状态 · 2026-10-31：OpenSSL 单题已在已有 ARM64 工作区通过；普通用户新建工作区的全流程待验收。当前覆盖一道任务，全量评测与 B0/B1 对比待完成。")));
     const result = el('div', undefined, 'terminal-current-result'); result.id = 'terminal-current-result';
     result.append(el('h4', t('Current single-task result', '当前单题实测')));
     const ev = terminalEvidence;
@@ -151,58 +149,55 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     }
     table.append(body); result.append(table);
     result.append(el('p', `${ev.task_id} · ${ev.runtime.model} · vLLM ${ev.runtime.vllm} / Ascend ${ev.runtime.vllm_ascend}`));
-    result.append(el('p', t('Scope: one fresh task and original verifier in an existing ARM64 CPU workspace. Controls are separate from model quality. This does not validate all 89 tasks, a new-account workspace setup, or B0/B1 performance.', '范围：已有 ARM64 CPU 工作区中的一次全新任务与原评分器。正负控制与模型成绩分开；不代表全部 89 题、新账号创建工作区或 B0/B1 性能配对通过。')));
     const currentLinks = el('p', undefined, 'entry-links');
     const terminalBase = AGENT_BASE;
     currentLinks.append(link(t('Complete ARM64 guide', 'ARM64 完整使用指南'), terminalBase + 'docs/TERMINAL_BENCH_ARM64.zh-CN.md'), link(t('Acceptance evidence', '验收记录与证据'), './assets/data/terminal-arm64-acceptance-v1.json'), link(t('Ops skill', 'ops skill 运维入口'), OPS + 'SKILL.md')); result.append(currentLinks); terminal.append(result);
     appendStep(terminal, t('1. Ask ops to prepare your workspace and model profile', '1. 让 ops 准备本人工作区与模型配置'),
-      t('Use npu-private-cloud-ops to run the Terminal-Bench 2.1 ARM64 OpenSSL task in my authorized CPU workspace with my existing model service. Fill the persistent run directory and private model profile, run the official controls, then one real Agent and verifier. Return the workspace entry, filled commands and result path. Keep ops outside the tested Agent.', '请使用 npu-private-cloud-ops，在我获授权的 ARM64 CPU 工作区沿用已有模型服务，运行 Terminal-Bench 2.1 OpenSSL 单题。自动填妥持久运行目录和私有模型配置，先跑原评分器正负控制，再跑一次真实 Agent 与评分。返回工作区入口、已填好的命令和结果路径；ops 不加入被测 Agent。'),
-      t('Ops handles Docker, Compose, image access, persistent storage and model credentials. You use your own workspace terminal; no cluster administration is required. The prepared path uses Python 3.12+, 1 CPU/2 GiB per sandbox and an isolated MTU 1400 network.', 'Docker、Compose、镜像访问、持久存储和模型认证由 ops 处理。使用者进入本人工作区终端，不需要集群管理员权限。入口要求 Python 3.12+；每个沙箱 1 核/2 GiB，使用独立 MTU 1400 网络。'));
+      t("Use npu-private-cloud-ops to prepare an ARM64 CPU workspace for the Terminal-Bench 2.1 OpenSSL task. Configure my model API, persistent run directory and private model profile. Run the controls and one model task, then return the workspace link, commands and result paths.", "请使用 npu-private-cloud-ops 准备 Terminal-Bench 2.1 OpenSSL 单题所需的 ARM64 CPU 工作区，配置我的模型 API、持久运行目录和私有模型配置。运行正负控制及一次模型任务，提供工作区链接、命令和结果路径。"),
+      t("Ops prepares Docker, Compose, image access, persistent storage and model credentials. Continue in your workspace terminal. Requirements: Python 3.12+, 1 CPU and 2 GiB per sandbox, with an isolated MTU 1400 network.", "由 ops 准备 Docker、Compose、镜像访问、持久存储和模型认证，随后在本人工作区终端执行。环境要求：Python 3.12+，每个沙箱 1 核、2 GiB，独立网络 MTU 1400。"));
     const download = section('terminal-arm64-download', t('2. Download the fixed entry script', '2. 下载固定版本入口'), t('Ops can perform this step for you. The source revision is fixed to the executed script.', '可由 ops 代为完成，固定到本次实际执行的脚本版本。'), terminal);
     download.append(code(`python3 - <<'PY'\nimport base64, json, urllib.request\nfrom pathlib import Path\nrevision = "${ev.source.bootstrap_commit}"\nurl = "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/scripts/bootstrap_terminal_arm64.py?ref=" + revision\nwith urllib.request.urlopen(url, timeout=120) as response:\n    item = json.load(response)\nPath("bootstrap_terminal_arm64.py").write_bytes(base64.b64decode(item["content"]))\nPY`));
     appendStep(terminal, t('3. Prepare, validate and run once', '3. 准备、控制与一次运行'),
       `python3 bootstrap_terminal_arm64.py prepare --directory "$RUN_DIR"\npython3 bootstrap_terminal_arm64.py controls --directory "$RUN_DIR"\npython3 bootstrap_terminal_arm64.py run --directory "$RUN_DIR" --profile "$MODEL_PROFILE"\npython3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
-      t('Ops supplies RUN_DIR and MODEL_PROFILE with your actual paths. READY only means preparation finished. controls runs fresh empty-answer and reference sandboxes; run executes one model task and the original grader. A started attempt cannot be submitted again in the same directory.', 'RUN_DIR 和 MODEL_PROFILE 由 ops 填为本人实际路径。READY 仅表示准备完成；controls 在新沙箱检查空答案和参考解，run 执行一次模型任务与原评分器。同一目录已启动的任务不能重复提交。'));
+      t("Set RUN_DIR and MODEL_PROFILE to the paths supplied by ops. prepare sets up the environment; controls checks empty-answer and reference solutions in fresh sandboxes; run executes one model task and its grader. Use a new directory for each attempt.", "将 RUN_DIR 和 MODEL_PROFILE 设为 ops 提供的实际路径。prepare 准备环境，controls 在新沙箱检查空答案和参考解，run 执行一次模型任务与评分。每次尝试使用新目录。"));
     appendStep(terminal, t('4. Read the score', '4. 读取评分'), null,
-      t('Open model-receipt.json: reward=1 means this task passed; reward=0 with complete grading is a real quality failure; null reward means unscored. Original trajectories and verifier logs are under jobs/. Fixed budget: 100 turns, 4096 output tokens, 900 seconds for Agent and verifier each; no whole-trial retry. Full settings and upstream internal call retries are documented in the guide.', '查看 model-receipt.json：reward=1 表示此题通过；完整评分得到 reward=0 是真实质量失败；null reward 表示未评分。原轨迹和评分日志位于 jobs/。固定预算为 100 轮、单次最多输出 4096 tokens，Agent 与评分各 900 秒，不重跑整题；完整参数及上游内部调用重试见指南。'));
-    const advanced = section('terminal-advanced', t('Batch configuration and detailed methods', '批次配置与详细方法（展开）'), t('For separately authorized, frozen task sets. The ARM64 single-task result does not qualify these other images or a full batch.', '仅供另行授权并冻结的任务集合使用。ARM64 单题结果不能代替其他镜像或完整批次验收。'), terminal);
+      t("Read model-receipt.json: reward=1 means passed, reward=0 means failed, and null reward means unscored. Trajectories and verifier logs are in jobs/. Budget: 100 turns, 4096 output tokens per call, and 900 seconds each for Agent and verifier. Retry settings are in the guide.", "查看 model-receipt.json：reward=1 为通过，reward=0 为未通过，null reward 为未评分。轨迹和评分日志位于 jobs/。预算为 100 轮、每次输出最多 4096 tokens，Agent 与评分各 900 秒；重试设置见指南。"));
+    const advanced = section('terminal-advanced', t('Batch configuration and detailed methods', '批次配置与详细方法（展开）'), t("Configure a task set and compare B0/B1 runs after completing the single-task workflow.", "完成单题流程后，可按下方方法配置任务集合和 B0/B1 对比。"), terminal);
     const e = catalog.primary_entries.find(x => x.source_id === 'TERMINAL_BENCH_2_1');
     const terminalLinks = el('p', undefined, 'entry-links');
     terminalLinks.append(link(t('Original 2.1 tasks', '原 2.1 任务'), e.official_data), link(t('Existing preparation code', '已有准备程序'), AGENT_BASE + 'scripts/prepare_pyramidkv_terminal.py'), link(t('Harbor configuration', 'Harbor 配置说明'), 'https://docs.harborframework.com/jobs/configs'), link(t('Ops skill', 'ops skill 运维入口'), OPS + 'SKILL.md'));
     advanced.append(terminalLinks);
     appendStep(advanced, t('1. Ops delivers the execution workspace', '1. 由 ops 交付执行工作区'), null,
-      t('The user supplies the authorized platform/account, target model and intended task scope. Ops discovers an isolated Docker + Compose backend, Python 3.12+, image access, persistent storage and connectivity from the Agent to the model API. Size CPU, memory and disk for the original task requirements. A CPU workspace with a Docker client alone is insufficient.',
-        '使用者提供有权使用的平台/账号、目标模型和任务范围。ops 发现或准备独立 Docker + Compose、Python 3.12+、镜像访问、持久存储，以及 Agent 到模型 API 的连通性，按原任务要求配置 CPU、内存和磁盘。只有 Docker 客户端的普通 CPU 工作区不够。'));
-    advanced.append(el('p', t('The existing candidate image audit selects linux/amd64. Use a matching authorized backend for that exact plan. For ARM64 tasks beyond the OpenSSL entry above, ops must separately verify each image, dependencies, oracle and verifier; the SWE ARM template does not prove Terminal compatibility. There is no Terminal-specific recipe in the linked ops skill yet; use this checklist with its platform workflow.',
-      '现有候选镜像审计选择 linux/amd64，复用该方案需匹配的获授权执行后端。上方 OpenSSL 入口以外的 ARM64 任务，仍须由 ops 逐题核验镜像、依赖、oracle 和 verifier；SWE 的 ARM 模板不代表 Terminal 已适配。链接的 ops skill 尚无 Terminal 专项配方，需结合本页步骤使用其平台运维流程。')));
-    advanced.append(code(t('Use npu-private-cloud-ops to prepare Terminal-Bench 2.1 following this page. Discover an authorized CPU sandbox and existing model API. Reuse the pinned source audit and job builder, replace candidate-specific identities, and deliver the actual workspace entry, frozen job files and run/result paths. Verify image architecture, effective limits, oracle/verifier and one model trial before a full batch. Keep ops outside the tested Agent and report unresolved items.',
-      '请使用 npu-private-cloud-ops，按本页流程准备 Terminal-Bench 2.1。发现获授权 CPU 沙箱与已有模型 API，复用固定来源审计和 job 生成器，替换候选方案专属身份，交付实际工作区入口、冻结 job 文件、运行命令与结果路径。全量前验证镜像架构、有效限额、oracle/verifier 和一个模型任务。ops 不加入被测 Agent，未完成项如实列出。')));
+      t("Provide your platform account, target model and task scope. Ops prepares Docker + Compose, Python 3.12+, image access, persistent storage and model API connectivity. Allocate CPU, memory and disk according to task requirements.",
+        "提供平台账号、目标模型和任务范围，由 ops 准备 Docker + Compose、Python 3.12+、镜像访问、持久存储和模型 API 连接，并按任务要求配置 CPU、内存和磁盘。"));
+    advanced.append(el('p', t("The batch plan uses linux/amd64 images. Use a matching backend. For additional ARM64 tasks, verify each image, its dependencies, reference solution and grader.",
+      "批次方案使用 linux/amd64 镜像，请选择对应架构的后端。扩展 ARM64 任务时，逐题检查镜像、依赖、参考解和评分器。")));
     const preparation = section('terminal-preparation', t('2. Fetch, verify and prepare (operator commands)', '2. 获取、校验与准备（运维命令）'), t('Run in a new private workspace. These commands prepare a candidate; they do not run model tasks.', '在新的私有工作目录执行。以下只准备候选方案，不执行模型任务。'), advanced);
     appendStep(preparation, t('Install the pinned client', '安装固定客户端'),
       `git clone https://github.com/vLLM-HUST/vllm-hust-benchmark.git\ncd vllm-hust-benchmark\ngit checkout --detach ${AGENT_REV}\npython3.12 -m venv "$HOME/terminal-client"\n. "$HOME/terminal-client/bin/activate"\npython -m pip install harbor==0.24.0\npython -m pip freeze > "$HOME/terminal-client-requirements.txt"\nharbor run --help\ndocker version\ndocker compose version`,
-      t('Use a fresh client environment, separate from the model server. Ops freezes the resolved dependencies and execution image; installing Harbor alone does not verify the backend.', '使用独立于模型服务的新客户端环境。ops 还需固定解析后的依赖和执行环境镜像；安装 Harbor 不等于后端验收。'));
+      t("Create a separate client environment and record its resolved dependencies and execution image.", "创建独立客户端环境，记录安装的依赖版本和执行环境镜像。"));
     appendStep(preparation, t('Retrieve the fixed task and image metadata, then generate jobs', '获取固定任务与镜像元数据，再生成 job'),
       `python scripts/fetch_pyramidkv_terminal.py --assets "$HOME/terminal-assets"\npython scripts/prepare_pyramidkv_terminal.py --assets "$HOME/terminal-assets" --output "$HOME/terminal-plan" --api-base https://MODEL_HOST/v1 --validate-harbor`,
-      t('Source: terminal-bench-2-1 at 7131e4375048a0e408a8fb404b5f499d726b695b, 89 tasks. The fetcher checks the published source and image metadata; it does not pull image layers. The preparer stages tasks with image digests and creates job-b0.json, job-b1.json, contract.json and source-audit/. It refuses to replace an existing plan. Schema validation is not task execution.',
-        '来源：terminal-bench-2-1 的 7131e4375048a0e408a8fb404b5f499d726b695b，89 道任务。获取器校验已发布的源码与镜像元数据，不下载镜像层。准备器按镜像 digest 暂存任务，生成 job-b0.json、job-b1.json、contract.json 和 source-audit/，拒绝覆盖已有计划。schema 通过不等于任务运行通过。'));
+      t("Source: terminal-bench-2-1 revision 7131e4375048a0e408a8fb404b5f499d726b695b, 89 tasks. The fetcher verifies source and image metadata. The preparer pins image digests and writes job-b0.json, job-b1.json, contract.json and source-audit/ to a new plan directory.",
+        "来源：terminal-bench-2-1，版本 7131e4375048a0e408a8fb404b5f499d726b695b，共 89 道任务。获取器校验源码与镜像元数据；准备器固定镜像 digest，并在新计划目录生成 job-b0.json、job-b1.json、contract.json 和 source-audit/。"));
     appendStep(advanced, t('3. Turn the candidate into the actual run contract', '3. 将候选配置落实为本次实际运行合同'), null,
       t('Ops must edit and validate both jobs before use: actual model_name and /v1 api_base; server-proven context/input/output budgets; Agent/parser/temperature/thinking/summarization settings; attempts, concurrency and unique output directories. Inject OPENAI_API_KEY into the client environment if required, never into a URL or job file. Pull every required image by digest and verify architecture and effective resource limits.',
         'ops 使用前须修改并校验两份 job：真实 model_name 与 /v1 api_base；服务端已确认的上下文、输入和输出预算；Agent、解析器、温度、thinking、压缩策略；尝试次数、并发和独立输出目录。需要认证时将 OPENAI_API_KEY 注入客户端环境，不写入 URL 或 job。逐个按 digest 拉取所需镜像，核实架构与实际资源限额。'));
-    advanced.append(el('p', t('The builder contains PyramidKV names, a model revision and a 32K/4096/100-turn diagnostic protocol. Those are not universal model limits. Preserve the original candidate contract; write a new run contract with the actual identities, final job hashes and changes. Zero token prices in the template are not measured operating cost. B0 means vLLM 0.18 + vLLM-Ascend 0.18; a b0 filename does not switch the server. B1 must record its actual tested optimization and versions.',
-      '生成器含 PyramidKV 名称、模型 revision 和 32K/4096/100 轮诊断协议，不是所有模型的固定上限。保留原候选 contract，另存实际身份、最终 job 哈希和变更说明的运行合同。模板中的零 token 单价不是实测运营成本。B0 必须对应 vLLM 0.18 + vLLM-Ascend 0.18；文件名 b0 不会切换服务。B1 记录实际优化方案与版本。')));
-    const validation = section('terminal-validation', t('Job checks and single-task configurations', 'job 校验与单题配置'), t('After ops has completed step 3, run from the plan directory so relative task paths resolve correctly. The first task is only an entry check, not an architecture or quality claim for the full set.', 'ops 完成第 3 步后，从计划目录执行，确保任务相对路径正确。首题仅用于入口检查，不能代表全部任务的架构兼容性或质量。'), advanced);
+    advanced.append(el('p', t("Update the generated PyramidKV model identity and 32K/4096/100-turn settings for your service. Save the final job hashes and settings as a new run contract. Fill in actual prices for cost analysis. Use vLLM 0.18 + vLLM-Ascend 0.18 for B0, and record the tested optimization and versions for B1.",
+      "按实际服务更新生成器中的 PyramidKV 模型身份和 32K/4096/100 轮设置，将最终 job 哈希及配置另存为运行记录。分析成本时填写实际价格。B0 使用 vLLM 0.18 + vLLM-Ascend 0.18，B1 记录实际优化方案与版本。")));
+    const validation = section('terminal-validation', t('Job checks and single-task configurations', 'job 校验与单题配置'), t("After step 3, run from the plan directory so relative task paths resolve correctly. Start with one task to check the workflow.", "完成第 3 步后，从计划目录执行以正确解析任务相对路径，先运行一道任务检查流程。"), advanced);
     validation.append(code(`cd "$HOME/terminal-plan"\npython - <<'PY'\nimport json\nfrom pathlib import Path\nfrom harbor.models.job.config import JobConfig\nfrom harbor.agents.terminus_2.terminus_2 import Terminus2\nfor name in ('job-b0.json', 'job-b1.json'):\n    job = json.loads(Path(name).read_text())\n    JobConfig.model_validate(job)\n    Terminus2.options_model.model_validate(job['agents'][0]['kwargs'])\n    assert job['tasks'] and not job['verifier']['disable']\njob = json.loads(Path('job-b0.json').read_text())\njob.update(job_name='terminal-smoke', jobs_dir='jobs-smoke', n_attempts=1, n_concurrent_trials=1)\njob['tasks'] = job['tasks'][:1]\nwith open('job-smoke.json', 'x') as f:\n    json.dump(job, f, indent=2)\njob.update(job_name='terminal-oracle', jobs_dir='jobs-oracle', agents=[{'name': 'oracle'}])\nwith open('job-oracle.json', 'x') as f:\n    json.dump(job, f, indent=2)\njob.update(job_name='terminal-nop', jobs_dir='jobs-nop', agents=[{'name': 'nop'}])\nwith open('job-nop.json', 'x') as f:\n    json.dump(job, f, indent=2)\nPY`));
     appendStep(advanced, t('4. Validate the sandbox and verifier, then run one model task', '4. 先验证沙箱与评分器，再跑一个模型任务'),
       `cd "$HOME/terminal-plan"\nharbor run -c job-oracle.json\nharbor run -c job-nop.json\n# After inspecting both verifier artifacts:\nharbor run -c job-smoke.json`,
-      t('Oracle executes the supplied reference solution and must stay separate from model scoring. Inspect its verifier output. The nop job leaves a fresh task untouched to check the negative case; confirm that the chosen task is expected to fail without a solution. If it is not, select a known-failing case before accepting the verifier. Then confirm the model trial actually calls the intended model, executes terminal commands and reaches the verifier. A zero reward with a valid verifier is a real failure; a missing reward or setup error is unresolved. Do not proceed past an environment/verifier fault or silently retry.',
-        'oracle 执行自带参考解，必须与模型评分分开；检查其 verifier 输出。nop job 在新沙箱中不解题，用于负例检查；先确认所选任务在未解答时应失败，否则另选已知失败样例再验收评分器。随后确认模型试跑确实调用目标模型、执行终端命令并进入 verifier。有效评分器产生 0 是真实失败；缺失 reward 或环境错误是未决。环境/评分器故障未解决时不扩大批次，不静默重试。'));
+      t("Run oracle with the reference solution and nop with an empty answer. Check that the verifier accepts the reference and rejects the empty answer; select another negative control if needed. Then run the model task and inspect its API calls, terminal actions and verifier output. Resolve environment or verifier errors before expanding the batch.",
+        "oracle 运行参考解，nop 使用空答案。检查评分器是否接受参考解、拒绝空答案，必要时更换负控制任务。随后运行模型任务，查看 API 调用、终端操作和评分输出；环境或评分器出错时先修复，再扩大批次。"));
     appendStep(advanced, t('5. Run the frozen B0/B1 batch', '5. 运行冻结的 B0/B1 批次'),
       `cd "$HOME/terminal-plan"\n# After verifying and recording the actual B0 service:\nharbor run -c job-b0.json\n# After verifying and recording the actual B1 service:\nharbor run -c job-b1.json`,
-      t('Use the same task IDs, Agent, model weights, input, budgets, resources and scoring policy for the comparison; record any applicable differences. Keep B0/B1 outputs separate and allocate fresh trial sandboxes. Preserve upstream task/test budgets. Freeze repetitions and stopping rules before running; a smoke task does not replace the declared full scope. The project comparison is not an official leaderboard submission.',
-        '比较时对齐任务 ID、Agent、模型权重、输入、预算、资源和评分策略，披露适用差异；B0/B1 分开输出，每次 trial 使用新沙箱。保留原任务/测试预算，运行前冻结重复次数与停止规则；单题试跑不能替代声明的全量范围。项目比较不等于官方榜单提交。'));
+      t("For B0/B1, align task IDs, Agent, model weights, inputs, budgets, resources and scoring policy. Record configuration differences and set repetition counts and stopping rules before running. Save B0/B1 outputs separately and use a fresh sandbox for each trial.",
+        "B0/B1 使用相同的任务 ID、Agent、模型权重、输入、预算、资源与评分策略。记录配置差异，运行前确定重复次数和停止规则。B0/B1 输出分开保存，每次 trial 使用新沙箱。"));
     appendStep(advanced, t('6. Accept and archive the result', '6. 验收与归档结果'), null,
-      t('Keep the final jobs and hashes, source/image/dependency identities, service runtime evidence, per-trial result.json, Agent trajectories, terminal logs and verifier/reward artifacts. Reconcile planned, attempted, scored, passed, failed and errored task counts. Report coverage and the predeclared denominator, retaining errors; never turn null reward into zero or success. Summarize complete B0/B1 pairs only. Store canonical results in the benchmark repository after redaction; the website displays their summary.',
-        '保存最终 job 及哈希、源码/镜像/依赖身份、服务运行证据、逐 trial result.json、Agent 轨迹、终端日志和 verifier/reward 原件。核对计划、尝试、已评分、通过、失败、异常数量，报告覆盖范围和事前确定的分母，保留异常；null reward 不能改成 0 或通过。只对完整 B0/B1 配对汇总。脱敏后的规范结果归档 benchmark 仓库，网站展示摘要。'));
+      t("Archive job files and hashes, source and image versions, service details, per-trial result.json, Agent trajectories and verifier logs. Summarize coverage, scored tasks, passes, failures and errors. Compare complete B0/B1 pairs and archive redacted results in the benchmark repository.",
+        "归档 job 文件及哈希、源码与镜像版本、服务配置、逐 trial result.json、Agent 轨迹和评分日志。汇总覆盖范围、已评分、通过、失败和异常数量，统计完整 B0/B1 配对，并将脱敏结果保存到 benchmark 仓库。"));
   }
 
   function sources() {
@@ -252,6 +247,13 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
   function designated() {
     const root = document.getElementById('designated-cards'); root.replaceChildren();
     const names = {MMLU_PRO: 'MMLU-Pro', HLE_VERIFIED: 'HLE-Verified', SWE_BENCH_PRO: 'SWE-bench-Pro', FRONTIERSCIENCE: 'FrontierScience', TERMINAL_BENCH_2_1: 'TerminalBench 2.1'};
+    const descriptions = {
+      MMLU_PRO: ['Multiple-choice reasoning across academic subjects.', '跨学科多项选择与推理。'],
+      HLE_VERIFIED: ['Expert-level questions with solver and judge scoring.', '专家级题目，使用 Solver 解题、Judge 评分。'],
+      SWE_BENCH_PRO: ['Repository repair with an Agent and official tests.', 'Agent 修复代码仓库，使用官方测试评分。'],
+      FRONTIERSCIENCE: ['Science olympiad and research questions.', '科学奥赛与研究型问答。'],
+      TERMINAL_BENCH_2_1: ['Terminal tasks executed in isolated sandboxes.', '在独立沙箱中完成终端操作任务。']
+    };
     for (const id of Object.keys(names)) {
       const entry = catalog.primary_entries.find(e => e.source_id === id);
       const card = el('article', undefined, 'focus-card'); card.append(el('h2', names[id]));
@@ -259,7 +261,7 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
       card.append(link(t('Official dataset ↗', '原始数据集 ↗'), entry.official_data));
       const scope = entry.splits ? jsonText(entry.splits) : entry.split;
       if (scope) card.append(el('p', scope));
-      if (entry.scorer_boundary) card.append(el('p', entry.scorer_boundary));
+      card.append(el('p', t(...descriptions[id])));
       root.append(card);
     }
   }
@@ -273,7 +275,7 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
       'entry-install-title': ['1. Shared preparation, then a supported runner', '1. 统一准备，再选择已支持的执行入口'],
       'entry-quick-title': ['2. Special scoring and multimodal clients', '2. 特殊评分与多模态客户端'],
       'entry-sandbox-title': ['3. Sandboxes, tools and task graders', '3. 沙箱、工具与任务评分'],
-      'entry-boundary-title': ['Services and integration', '服务与接入边界'],
+      'entry-boundary-title': ['Services and integration', "服务配置"],
       'entry-catalog-title': ['All 118 sources', '全部 118 来源'],
       'entry-catalog-note': ['40 task classes plus 15 separately classified trace, probe, relationship and private assets. 104 provider registrations and 14 unregistered entries. Registration, reading, generation and native grading are separate states; AVAILABLE is limited to each linked receipt, not all records or versions. License metadata is a pinned snapshot, not a new legal/access check.', '40 类任务及另列的 15 项轨迹、探针、跨任务关系和私有资产；104 个 provider 注册来源、14 个未注册项。登记、读取、生成与原生评分是不同状态；AVAILABLE 只限对应回执范围，不表示全记录/版本通过。许可元数据为固定快照，不是新法律/访问审核。'],
       'entry-search-label': ['Search', '搜索'], 'entry-filter-label': ['Entry status', '入口类型'],
@@ -288,7 +290,7 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     for (const pair of [
       [t('Local client', '本地客户端'), t('Existing authorized service URL, exact model, credentials and task budgets. No SSH is needed for HTTP clients; runtime evidence comes from the service owner.', 'HTTP 客户端使用现有获授权服务 URL、真实模型、认证和任务预算，无需 SSH；服务身份由运维提供。')],
       [t('Run the evaluation', '运行方式'), t('Follow the selected dataset guide in your Coder workspace. This page provides installation commands, execution steps and result instructions.', '在自己的 Coder 工作区按对应数据集指南运行。本页提供安装命令、执行步骤和结果查看说明。')],
-      [t('MOD integration', 'MOD 接入'), t('Operators configure the server-side optimization and supported API. Reuse these clients when their contract matches; a new client is not required for each MOD. Do not silently change prompts, budgets or scoring.', '运维配置服务端优化及支持的 API；合同一致时复用客户端，不为每个 MOD 另造客户端，不静默改变提示、预算或评分。')]
+      [t('MOD integration', 'MOD 接入'), t("Configure the optimization and API on the server, then reuse the matching client with the same prompts, budgets and scoring settings.", "在服务端配置优化方案与 API，复用匹配的客户端，保持提示、预算和评分设置一致。")]
     ]) boundary.append(el('dt', pair[0]), el('dd', pair[1]));
     text('entry-load-status', 'Five designated dataset guides loaded.', '已加载指定五项数据集的测试指南。');
     revealHash();
