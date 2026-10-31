@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = '2e74ff7ad9847da467914863d16dd565ab06b6b6'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
+  const AGENT_REV = '43c756c6f1f39c680e4ce35c3490eb0efeccdae5'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
@@ -108,8 +108,8 @@
     swe.append(el('p', t("Status · 2026-10-31: workspace creation and environment preparation passed with a fresh ordinary-user workspace. Agent and official grading results are recorded in the complete guide.",
       "状态 · 2026-10-31：普通用户新建工作区与环境准备已通过验证。Agent 运行结果和官方评分见完整指南。")));
     appendStep(swe, t('1. Create your Coder CPU workspace', '1. 创建自己的 Coder CPU 工作区'), null,
-      t("Select swe-bench-pro-cpu in Coder, create a workspace and open its terminal. Fill in your model API and model name below. For authentication, export MODEL_API_KEY and append --api-key-env MODEL_API_KEY. The starter runs one NodeBB V1 task.",
-        "在 Coder 中选择 swe-bench-pro-cpu 模板创建工作区，打开终端，填写下方的模型 API 和模型名。需要鉴权时，先设置 MODEL_API_KEY 环境变量，再追加 --api-key-env MODEL_API_KEY。入门流程运行一道 NodeBB V1 任务。"));
+      t("Select Agent Benchmark · CPU in Coder, create a workspace and open its terminal. Fill in your model API and model name below. For authentication, export MODEL_API_KEY and append --api-key-env MODEL_API_KEY. The starter runs one NodeBB V1 task.",
+        "在 Coder 中选择 Agent Benchmark · CPU 模板创建工作区，打开终端，填写下方的模型 API 和模型名。需要鉴权时，先设置 MODEL_API_KEY 环境变量，再追加 --api-key-env MODEL_API_KEY。入门流程运行一道 NodeBB V1 任务。"));
     appendStep(swe, t("2. Prepare the environment and run one task", "2. 准备环境并运行单题"),
       `MODEL_API=https://MODEL_HOST/v1
 MODEL_NAME=openai/SERVED_MODEL_NAME
@@ -153,8 +153,8 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     const terminalBase = AGENT_BASE;
     currentLinks.append(link(t('Complete ARM64 guide', 'ARM64 完整使用指南'), terminalBase + 'docs/TERMINAL_BENCH_ARM64.zh-CN.md'), link(t('Self-service acceptance', '新工作区验收记录'), terminalBase + 'docs/terminal-arm64-acceptance/self-service-20261031.json'), link(t('v0.18 result record', 'v0.18 结果记录'), './assets/data/terminal-arm64-acceptance-v1.json'), link(t('Ops skill', 'ops skill 运维入口'), OPS + 'SKILL.md')); result.append(currentLinks); terminal.append(result);
     appendStep(terminal, t('1. Create a Coder workspace', '1. 创建 Coder 工作区'), null,
-      t('Select swe-bench-pro-cpu in Coder, choose at least 20 GiB of home storage, and open the terminal. This CPU template also supports the Terminal task and supplies isolated Docker and Python 3.12.',
-        '在 Coder 中选择 swe-bench-pro-cpu 模板，家目录选择至少 20 GiB，创建后打开终端。这个 CPU 模板也支持 Terminal 单题，提供独立 Docker 和 Python 3.12。'));
+      t('Select Agent Benchmark · CPU in Coder, choose at least 20 GiB of home storage, and open the terminal. This CPU template also supports the Terminal task and supplies isolated Docker and Python 3.12.',
+        '在 Coder 中选择 Agent Benchmark · CPU 模板，家目录选择至少 20 GiB，创建后打开终端。这个 CPU 模板也支持 Terminal 单题，提供独立 Docker 和 Python 3.12。'));
     terminal.append(link(t('Open Coder', '打开 Coder'), 'https://coder.sage.org.ai:9443'));
     const download = section('terminal-arm64-download', t('2. Download the entry script', '2. 下载入口脚本'), t('Download the pinned script and verify its SHA256.', '下载固定脚本并核对 SHA256。'), terminal);
     download.append(code(`SHA=5b468a8a20750148c59f0a112f4bded579bd28abcd0908bea5356c2da6a21871 # pragma: allowlist secret
