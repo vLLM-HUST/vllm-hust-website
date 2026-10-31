@@ -157,7 +157,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">MOD catalog</a>' in text, name
-        assert "assets/site.js?v=product-home-20261031" in text, name
+        assert "assets/site.js?v=public-audit-20261101" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -197,7 +197,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=benchmarks-ia-20261003" in versions
-    assert "assets/site.js?v=product-home-20261031" in versions
+    assert "assets/site.js?v=public-audit-20261101" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
@@ -219,7 +219,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=product-home-20261031" in text
+        assert "assets/site.js?v=public-audit-20261101" in text
         if name not in ("ecosystem-archive.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
