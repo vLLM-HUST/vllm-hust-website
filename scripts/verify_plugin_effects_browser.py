@@ -126,9 +126,27 @@ def main():
                         assert panel.locator("p").evaluate(
                             "e => e.scrollHeight <= e.clientHeight + 1"
                         )
-                        expect(panel.locator("a")).to_have_attribute(
-                            "href", component["public_effect_url"]
-                        )
+                        source_link = panel.locator("a")
+                        if (
+                            source_link.get_attribute("data-repository-access")
+                            == "required"
+                        ):
+                            expect(source_link).to_have_attribute(
+                                "data-repository-url", component["public_effect_url"]
+                            )
+                            expect(source_link).to_have_attribute(
+                                "aria-disabled", "true"
+                            )
+                            assert source_link.get_attribute("href") is None
+                            expect(source_link).to_contain_text(
+                                "需仓库权限"
+                                if lang == "zh"
+                                else "Repository access required"
+                            )
+                        else:
+                            expect(source_link).to_have_attribute(
+                                "href", component["public_effect_url"]
+                            )
                         checked.append(component["id"])
                     assert {
                         "simllm-migration",

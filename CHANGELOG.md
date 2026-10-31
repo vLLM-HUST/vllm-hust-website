@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- 全站检查公开链接、双语和手机页面；需仓库权限的源码入口保留状态说明，补齐折叠标题翻译及成本页缺失的方案标签，并在最终发布产物中检查站内资源链接。
+
 - 将现有产品总览恢复为首页；产品导航从页面顶部打开，保留数据集、B0/B1 与成本入口。
 
 - State Scheduler 撤下性能 MOD 定位，改列为已归档的研究与观测工具；公开 FULL/PIECEWISE、P1、P2 的停止原因。保留原代码、负结果和 0.2.0 下载制品及其校验和，不推荐用于 serving 加速。

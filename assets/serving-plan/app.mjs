@@ -102,7 +102,7 @@ function render() {
         segment.style.height = `${total ? (value / total) * 100 : 0}%`;
         stack.append(segment);
       }
-      col.append(stack, element("b", p.model), element("small", p.provider));
+      col.append(stack, element("b", p.model), element("small", p.provider || t(p.name, sourceEnglish(p.name))));
       $("columns").append(col);
 
     }
@@ -143,13 +143,13 @@ function initialize() {
     check.id = `plan-${p.id}`;
     check.checked = true;
     check.value = p.id;
-    check.setAttribute("aria-label", `${p.model} · ${p.provider} ${p.name}`);
+    check.setAttribute("aria-label", [p.model, p.provider, p.name].filter(Boolean).join(" · "));
     check.addEventListener("change", () => {
       check.checked ? selected.add(p.id) : selected.delete(p.id);
       render();
     });
     const copy = element("div");
-    const label = element("label", `${p.model} · ${p.provider}`);
+    const label = element("label", [p.model, p.provider].filter(Boolean).join(" · "));
     label.htmlFor = check.id;
     const source = element("a", `${p.name} ↗`, "plan-source", `${sourceEnglish(p.name)} ↗`);
     source.href = p.source;
