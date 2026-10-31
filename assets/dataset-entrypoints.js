@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = '843348f93d1391d8896385f0127ba3cb0bbf234b'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
+  const AGENT_REV = 'a05b816b7d205a8e97c2bc0042f4bc52e60601ba'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
@@ -135,10 +135,10 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     swe.append(el('p', t("Dataset: ScaleAI/SWE-bench_Pro v1. Task repositories and images retain their own licenses.", "数据版本：ScaleAI/SWE-bench_Pro v1。任务仓库与镜像遵循各自许可。")));
     const terminal = section('TERMINAL_BENCH_2_1', 'Terminal-Bench 2.1 / Harbor', t("Run the ARM64 OpenSSL task with Harbor. The steps below cover workspace setup, a model run and scoring.",
       "使用 Harbor 运行 ARM64 OpenSSL 单题。下方提供工作区准备、模型运行和评分步骤。"), root);
-    terminal.append(el('p', t("Status · 2026-10-31: the OpenSSL workflow passed in an existing ARM64 workspace. End-to-end validation in a newly created ordinary-user workspace is pending. Coverage: one task; full-dataset and B0/B1 validation are pending.",
-      "状态 · 2026-10-31：OpenSSL 单题已在已有 ARM64 工作区通过；普通用户新建工作区的全流程待验收。当前覆盖一道任务，全量评测与 B0/B1 对比待完成。")));
+    terminal.append(el('p', t("Self-service · 2026-10-31: a new ordinary-user workspace completed setup, Agent execution and original grading. Follow the commands below to run the OpenSSL task.",
+      "自助入口 · 2026-10-31：普通用户新建工作区已完成环境准备、Agent 运行和原评分器验收。按下方命令即可运行 OpenSSL 单题。")));
     const result = el('div', undefined, 'terminal-current-result'); result.id = 'terminal-current-result';
-    result.append(el('h4', t('Current single-task result', '当前单题实测')));
+    result.append(el('h4', t('Recorded v0.18 single-task result · 2026-10-28', 'v0.18 单题记录 · 2026-10-28')));
     const ev = terminalEvidence;
     const table = el('table'); const header = el('tr');
     for (const title of [t('Run', '运行'), 'Reward', t('Tests passed', '评分项通过'), t('Status', '状态')]) header.append(el('th', title));
@@ -151,17 +151,36 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
     result.append(el('p', `${ev.task_id} · ${ev.runtime.model} · vLLM ${ev.runtime.vllm} / Ascend ${ev.runtime.vllm_ascend}`));
     const currentLinks = el('p', undefined, 'entry-links');
     const terminalBase = AGENT_BASE;
-    currentLinks.append(link(t('Complete ARM64 guide', 'ARM64 完整使用指南'), terminalBase + 'docs/TERMINAL_BENCH_ARM64.zh-CN.md'), link(t('Acceptance evidence', '验收记录与证据'), './assets/data/terminal-arm64-acceptance-v1.json'), link(t('Ops skill', 'ops skill 运维入口'), OPS + 'SKILL.md')); result.append(currentLinks); terminal.append(result);
-    appendStep(terminal, t('1. Ask ops to prepare your workspace and model profile', '1. 让 ops 准备本人工作区与模型配置'),
-      t("Use npu-private-cloud-ops to prepare an ARM64 CPU workspace for the Terminal-Bench 2.1 OpenSSL task. Configure my model API, persistent run directory and private model profile. Run the controls and one model task, then return the workspace link, commands and result paths.", "请使用 npu-private-cloud-ops 准备 Terminal-Bench 2.1 OpenSSL 单题所需的 ARM64 CPU 工作区，配置我的模型 API、持久运行目录和私有模型配置。运行正负控制及一次模型任务，提供工作区链接、命令和结果路径。"),
-      t("Ops prepares Docker, Compose, image access, persistent storage and model credentials. Continue in your workspace terminal. Requirements: Python 3.12+, 1 CPU and 2 GiB per sandbox, with an isolated MTU 1400 network.", "由 ops 准备 Docker、Compose、镜像访问、持久存储和模型认证，随后在本人工作区终端执行。环境要求：Python 3.12+，每个沙箱 1 核、2 GiB，独立网络 MTU 1400。"));
-    const download = section('terminal-arm64-download', t('2. Download the fixed entry script', '2. 下载固定版本入口'), t('Ops can perform this step for you. The source revision is fixed to the executed script.', '可由 ops 代为完成，固定到本次实际执行的脚本版本。'), terminal);
-    download.append(code(`python3 - <<'PY'\nimport base64, json, urllib.request\nfrom pathlib import Path\nrevision = "${ev.source.bootstrap_commit}"\nurl = "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/contents/scripts/bootstrap_terminal_arm64.py?ref=" + revision\nwith urllib.request.urlopen(url, timeout=120) as response:\n    item = json.load(response)\nPath("bootstrap_terminal_arm64.py").write_bytes(base64.b64decode(item["content"]))\nPY`));
-    appendStep(terminal, t('3. Prepare, validate and run once', '3. 准备、控制与一次运行'),
-      `python3 bootstrap_terminal_arm64.py prepare --directory "$RUN_DIR"\npython3 bootstrap_terminal_arm64.py controls --directory "$RUN_DIR"\npython3 bootstrap_terminal_arm64.py run --directory "$RUN_DIR" --profile "$MODEL_PROFILE"\npython3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
-      t("Set RUN_DIR and MODEL_PROFILE to the paths supplied by ops. prepare sets up the environment; controls checks empty-answer and reference solutions in fresh sandboxes; run executes one model task and its grader. Use a new directory for each attempt.", "将 RUN_DIR 和 MODEL_PROFILE 设为 ops 提供的实际路径。prepare 准备环境，controls 在新沙箱检查空答案和参考解，run 执行一次模型任务与评分。每次尝试使用新目录。"));
-    appendStep(terminal, t('4. Read the score', '4. 读取评分'), null,
-      t("Read model-receipt.json: reward=1 means passed, reward=0 means failed, and null reward means unscored. Trajectories and verifier logs are in jobs/. Budget: 100 turns, 4096 output tokens per call, and 900 seconds each for Agent and verifier. Retry settings are in the guide.", "查看 model-receipt.json：reward=1 为通过，reward=0 为未通过，null reward 为未评分。轨迹和评分日志位于 jobs/。预算为 100 轮、每次输出最多 4096 tokens，Agent 与评分各 900 秒；重试设置见指南。"));
+    currentLinks.append(link(t('Complete ARM64 guide', 'ARM64 完整使用指南'), terminalBase + 'docs/TERMINAL_BENCH_ARM64.zh-CN.md'), link(t('Self-service acceptance', '新工作区验收记录'), terminalBase + 'docs/terminal-arm64-acceptance/self-service-20261031.json'), link(t('v0.18 result record', 'v0.18 结果记录'), './assets/data/terminal-arm64-acceptance-v1.json'), link(t('Ops skill', 'ops skill 运维入口'), OPS + 'SKILL.md')); result.append(currentLinks); terminal.append(result);
+    appendStep(terminal, t('1. Create a Coder workspace', '1. 创建 Coder 工作区'), null,
+      t('Select swe-bench-pro-cpu in Coder, choose at least 20 GiB of home storage, and open the terminal. This CPU template also supports the Terminal task and supplies isolated Docker and Python 3.12.',
+        '在 Coder 中选择 swe-bench-pro-cpu 模板，家目录选择至少 20 GiB，创建后打开终端。这个 CPU 模板也支持 Terminal 单题，提供独立 Docker 和 Python 3.12。'));
+    terminal.append(link(t('Open Coder', '打开 Coder'), 'https://coder.sage.org.ai:9443'));
+    const download = section('terminal-arm64-download', t('2. Download the entry script', '2. 下载入口脚本'), t('Download the pinned script and verify its SHA256.', '下载固定脚本并核对 SHA256。'), terminal);
+    download.append(code(`SHA=5b468a8a20750148c59f0a112f4bded579bd28abcd0908bea5356c2da6a21871 # pragma: allowlist secret
+BASE=https://coder.sage.org.ai:9443/swe-bench-pro-artifacts/terminal
+curl --fail --location "$BASE/$SHA/bootstrap_terminal_arm64.py" --output bootstrap_terminal_arm64.py
+echo "$SHA  bootstrap_terminal_arm64.py" | sha256sum --check`));
+    appendStep(terminal, t('3. Prepare the environment and check the grader', '3. 准备环境并检查评分器'),
+      `RUN_DIR="$HOME/terminal-first"
+BASE_IMAGE=docker.m.daocloud.io/library/python@sha256:608b27b2db85abf38d81685085cd1166a5ed7ada66549f0dfe53a75bb830cd5d # pragma: allowlist secret
+python3 bootstrap_terminal_arm64.py prepare --directory "$RUN_DIR" --base-image-ref "$BASE_IMAGE"
+python3 bootstrap_terminal_arm64.py controls --directory "$RUN_DIR"`,
+      t('The script installs Harbor and Compose, verifies the fixed inputs, and builds the ARM64 task image through a pinned registry mirror. After READY, the controls check an empty answer and the reference solution in separate sandboxes.',
+        '脚本安装 Harbor 和 Compose，校验固定输入，通过镜像源下载基础镜像并构建 ARM64 任务。出现 READY 后，正负控制会分别在新沙箱检查空答案和参考解。'));
+    appendStep(terminal, t('4. Connect your model and run once', '4. 连接模型并运行一次'),
+      `MODEL_API="https://MODEL_HOST/v1"
+MODEL_NAME="SERVED_MODEL_NAME"
+read -rsp "API key: " MODEL_API_KEY; echo
+export MODEL_API_KEY
+python3 bootstrap_terminal_arm64.py run --directory "$RUN_DIR" \\
+  --model-api "$MODEL_API" --model-name "$MODEL_NAME" --api-key-env MODEL_API_KEY
+python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
+      t('Fill in your API URL and model name. If the service needs no authentication, omit the key input and replace --api-key-env MODEL_API_KEY with --no-api-key. Each run uses a new directory and executes one Agent task followed by the original grader.',
+        '填写 API 地址和模型名。无需认证的服务可省略密钥输入，将 --api-key-env MODEL_API_KEY 换为 --no-api-key。每次使用新目录，运行一次 Agent 后自动进入原评分器。'));
+    appendStep(terminal, t('5. Read the result', '5. 查看结果'), null,
+      t('prepared.json records environment readiness. Agent trajectories are under jobs/terminal-user-model/*/agent/. Read model-receipt.json for grading: reward=1 means passed, reward=0 means failed, and null reward means unscored. Verifier logs are under jobs/terminal-user-model/*/verifier/.',
+        'prepared.json 记录环境准备状态，Agent 轨迹位于 jobs/terminal-user-model/*/agent/。评分见 model-receipt.json：reward=1 为通过，reward=0 为未通过，null reward 为未评分；评分日志位于 jobs/terminal-user-model/*/verifier/。'));
     const advanced = section('terminal-advanced', t('Batch configuration and detailed methods', '批次配置与详细方法（展开）'), t("Configure a task set and compare B0/B1 runs after completing the single-task workflow.", "完成单题流程后，可按下方方法配置任务集合和 B0/B1 对比。"), terminal);
     const e = catalog.primary_entries.find(x => x.source_id === 'TERMINAL_BENCH_2_1');
     const terminalLinks = el('p', undefined, 'entry-links');
