@@ -96,8 +96,8 @@
             zh: { title: 'TraceLoom · vLLM-HUST', 'footer-copy': 'TraceLoom · 2026 年 9 月。' },
         },
         'index.html': {
-            en: { title: 'Tests & results · vLLM-HUST', 'footer-copy': 'Tests, results and cost.' },
-            zh: { title: '测试与结果 · vLLM-HUST', 'footer-copy': '测试、结果与成本。' },
+            en: { title: 'vLLM-HUST | Inference Engine for Domestic Compute', 'footer-copy': 'Inference for domestic compute.' },
+            zh: { title: 'vLLM-HUST | 面向国产算力的推理引擎', 'footer-copy': '面向国产算力的推理服务。' },
         },
         'b0-b1.html': {
             en: { title: 'B0/B1 results · vLLM-HUST', 'footer-copy': 'Tests, results and cost.' },
@@ -263,10 +263,10 @@
 
         links.id = 'site-navigation';
         links.innerHTML = [
-            navLink('', './ecosystem-archive.html#products', 'navProducts'),
-            navLink('', './ecosystem-archive.html#projects', 'navProjects'),
+            navLink('', './index.html', 'navProducts'),
+            navLink('', './index.html#projects', 'navProjects'),
             navLink('plugins', './plugins.html', 'navPlugins'),
-            navLink('', './ecosystem-archive.html#stack', 'navEngine'),
+            navLink('', './index.html#stack', 'navEngine'),
             ...NAV_GROUPS.map((group) => `
                 <details class="nav-group" data-nav-group="${group.id}">
                     <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
@@ -349,7 +349,7 @@
                     <span id="${summaryId}">${summary}</span>
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
-                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./ecosystem-archive.html#products" data-i18n-common="navProducts">Products</a><a href="./ecosystem-archive.html#stack" data-i18n-common="navEngine">Engine</a><a href="./ecosystem-archive.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
+                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html" data-i18n-common="navProducts">Products</a><a href="./index.html#stack" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
                     <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. Designated datasets</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 results</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></div>
                     <div><strong data-i18n-common="footerPublications">Papers & news</strong><a href="./achievements.html" data-i18n-common="navAchievements">Papers & achievements</a><a href="./news.html" data-i18n-common="navNews">News</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>
