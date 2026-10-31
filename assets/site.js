@@ -101,6 +101,7 @@
             const parts = target.pathname.split('/').filter(Boolean);
             if (target.hostname !== 'github.com' || parts[0]?.toLowerCase() !== 'vllm-hust'
                 || !RESTRICTED_REPOSITORIES.has(parts[1])) return;
+            link.dataset.repositoryUrl = link.getAttribute('href');
             link.removeAttribute('href');
             link.removeAttribute('target');
             link.setAttribute('aria-disabled', 'true');
