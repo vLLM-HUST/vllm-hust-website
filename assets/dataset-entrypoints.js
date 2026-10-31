@@ -2,7 +2,7 @@
   'use strict';
   const REV = '07628b9b5b32d0de37dd3b6fa3bc48d350d8ed71'; // pragma: allowlist secret - public source revision
   const BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${REV}/`;
-  const AGENT_REV = 'a05b816b7d205a8e97c2bc0042f4bc52e60601ba'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
+  const AGENT_REV = '2e74ff7ad9847da467914863d16dd565ab06b6b6'; // pragma: allowlist secret - reviewed public source revision // pragma: allowlist secret
   const AGENT_BASE = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${AGENT_REV}/`;
   const OPS = 'https://github.com/yancanmao/npu-private-cloud-ops-skill/blob/02b8fea242d5fcf49e43344b2a6c0db4e03418d2/'; // pragma: allowlist secret - reviewed public skill revision
   let catalog;
