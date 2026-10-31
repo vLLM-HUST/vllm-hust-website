@@ -68,7 +68,7 @@
     text('entry-run-warning', "Choose the client for your task, connect your model API, and run one example using the steps below.",
       "选择对应客户端，连接模型 API，按下方步骤运行一道示例题。");
     const notes = {
-      MMLU_PRO: ['MMLU-Pro', 'Token-ID completions and local extraction; not a generic chat-only service.', '需要 token-ID completions 与本地答案提取，不适用于仅支持通用 chat 的服务。'],
+      MMLU_PRO: ['MMLU-Pro', 'Requires token-ID completions and local answer extraction.', '使用 token-ID completions 接口与本地答案提取。'],
       HLE_VERIFIED: ['HLE-Verified', 'Separate solver/judge; images require multimodal input and judging needs Structured Outputs.', '独立 Solver/Judge；图像题需多模态输入，Judge 需 Structured Outputs。'],
       FRONTIERSCIENCE: ['FrontierScience', 'Olympiad and Research rubrics require their existing judge adapter.', 'Olympiad 与 Research 评分需使用已有 Judge 适配。']
     };
@@ -259,8 +259,6 @@ python3 bootstrap_swe_bench_pro.py --source-revision "$REV" \\
       const card = el('article', undefined, 'focus-card'); card.append(el('h2', names[id]));
       card.append(link(t('Test instructions & runner →', '测试说明与执行入口 →'), '#' + id));
       card.append(link(t('Official dataset ↗', '原始数据集 ↗'), entry.official_data));
-      const scope = entry.splits ? jsonText(entry.splits) : entry.split;
-      if (scope) card.append(el('p', scope));
       card.append(el('p', t(...descriptions[id])));
       root.append(card);
     }
