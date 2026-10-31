@@ -32,7 +32,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
-        "391f237f54fed9a68e66430e72d31f5d2c000877"  # pragma: allowlist secret
+        "620eba184d06f7fb01140711218cde58215d1b40"  # pragma: allowlist secret
     )
     assert checkouts[2]["with"]["ref"] == policy_revision
     assert checkouts[2]["with"]["repository"] == "vLLM-HUST/vllm-hust-benchmark"
