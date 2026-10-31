@@ -103,7 +103,9 @@ def verify(url, output):
                     altered["projection"] = {"policy": "unknown", "revision": "a" * 40}
                 page.route(
                     "**/data/benchmark-source-manifest.json",
-                    lambda route, _request, altered=altered: route.fulfill(json=altered),
+                    lambda route, _request, altered=altered: route.fulfill(
+                        json=altered
+                    ),
                 )
             page.goto(url + "/b0-b1.html")
             expect(page.locator("#comparison")).to_contain_text(
