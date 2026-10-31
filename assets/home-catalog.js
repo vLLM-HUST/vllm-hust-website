@@ -37,7 +37,22 @@
   }
 
   function render() {
-    if (!summary || !Number.isInteger(phaseCount) || !Number.isInteger(scenarioCount)) return;
+    if (!summary || !Number.isInteger(phaseCount) || !Number.isInteger(scenarioCount)) {
+      const zh = language() === "zh";
+      const fallback = {
+        "home-kicker": zh ? "覆盖推理全流程的 MOD 工具与优化。" : "MOD tools and optimizations across the inference lifecycle.",
+        "home-primary-cta": zh ? "浏览 MOD 目录 →" : "Browse the MOD catalog →",
+        "home-fact-1-value": zh ? "MOD 目录" : "MOD catalog",
+        "home-fact-2-value": zh ? "阶段与场景" : "Phases and scenarios",
+        "atlas-title": zh ? "探索推理各阶段的 MOD。" : "Explore MODs across the inference lifecycle."
+      };
+      Object.entries(fallback).forEach(([id, value]) => {
+        const node = document.getElementById(id);
+        if (node) node.textContent = value;
+      });
+      document.querySelectorAll("[data-home-mod-count]").forEach(node => { node.textContent = "—"; });
+      return;
+    }
     const values = copy(language(), summary.total, phaseCount, scenarioCount);
     const targets = {
       "home-kicker": values.kicker,
@@ -84,4 +99,5 @@
   });
 
   window.addEventListener("vllm-hust:langchange", render);
+  render();
 })();

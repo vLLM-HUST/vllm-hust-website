@@ -646,10 +646,22 @@ def main():
                 assert payload["chart"]["x"] == "decode_p90_tps"
                 assert payload["chart"]["y"] == "output_tps_per_chip"
                 for source in point["configuration"].get("mod_sources", []):
+                    source_url = f"{source['repository']}/commit/{source['revision']}"
                     link = page.locator(
-                        f'.frontier-popup-mod-source a[href="{source["repository"]}/commit/{source["revision"]}"]'
+                        f'.frontier-popup-mod-source a[href="{source_url}"], '
+                        f'.frontier-popup-mod-source a[data-repository-url="{source_url}"]'
                     )
-                    assert link.inner_text() == source["revision"][:7]
+                    if link.get_attribute("data-repository-access") == "required":
+                        assert link.get_attribute("href") is None
+                        assert link.get_attribute("aria-disabled") == "true"
+                        assert link.inner_text().startswith(source["revision"][:7])
+                        assert (
+                            "需仓库权限"
+                            if language == "zh"
+                            else "Repository access required"
+                        ) in link.inner_text()
+                    else:
+                        assert link.inner_text() == source["revision"][:7]
                     assert (
                         payload["point"]["configuration"]["mod_sources"]
                         == point["configuration"]["mod_sources"]

@@ -86,6 +86,44 @@
         },
     };
 
+    // Public-link audit, 2026-11-01. Keep catalog entries and measurements visible.
+    const RESTRICTED_REPOSITORIES = new Set([
+        'demo-repository', 'fcs-domestic-chip-llm-recsys', 'llm-serving-workloads',
+        'quality-bounded-inference-plugin', 'request-throttling-controller',
+        'vllm-ascend-quantized-kv-cache-hust', 'vllm-hust-clm-lifecycle',
+        'vllm-hust-dla', 'vllm-hust-maintenance', 'vllm-hust-opfuse',
+    ]);
+
+    function updateRepositoryAccess() {
+        const label = getCurrentLang() === 'zh' ? '需仓库权限' : 'Repository access required';
+        document.querySelectorAll('a[href]').forEach((link) => {
+            const target = new URL(link.href, location.href);
+            const parts = target.pathname.split('/').filter(Boolean);
+            if (target.hostname !== 'github.com' || parts[0]?.toLowerCase() !== 'vllm-hust'
+                || !RESTRICTED_REPOSITORIES.has(parts[1])) return;
+            link.dataset.repositoryUrl = link.getAttribute('href');
+            link.removeAttribute('href');
+            link.removeAttribute('target');
+            link.setAttribute('aria-disabled', 'true');
+            link.dataset.repositoryAccess = 'required';
+            const note = document.createElement('span');
+            note.className = 'repository-access-note';
+            link.append(note);
+        });
+        document.querySelectorAll('[data-repository-access="required"]').forEach((link) => {
+            const note = link.querySelector('.repository-access-note');
+            const text = ` · ${label}`;
+            if (note.textContent !== text) note.textContent = text;
+            if (link.title !== label) link.title = label;
+        });
+    }
+
+    function initRepositoryAccess() {
+        updateRepositoryAccess();
+        const observer = new MutationObserver(updateRepositoryAccess);
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });
+    }
+
     const PAGE_COPY = {
         'betterscale.html': {
             en: { title: 'BetterScale · vLLM-HUST', 'footer-copy': 'BetterScale · Measurements: September 2026.' },
@@ -197,6 +235,7 @@
             node.textContent = common.brandSubtitle;
         });
         applyPageI18n(lang);
+        updateRepositoryAccess();
         document.querySelector('.site-directory-links')?.setAttribute('aria-label', common.footerNavigation);
         window.dispatchEvent(new CustomEvent('vllm-hust:langchange', { detail: { lang } }));
     }
@@ -465,6 +504,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         renderNavigation();
         renderFooter();
+        initRepositoryAccess();
         initNav();
         initCosmicBackground();
         setLang(detectDefaultLang());
