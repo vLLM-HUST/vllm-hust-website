@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SITE_JS = (ROOT / "assets" / "site.js").read_text(encoding="utf-8")
 SITE_CSS = (ROOT / "assets" / "site.css").read_text(encoding="utf-8")
-HOME = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
+HOME = (ROOT / "index.html").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
 
 
@@ -20,8 +20,15 @@ def test_labels_titles_and_footer_use_bilingual_public_copy() -> None:
         "serving-plan.html",
     ):
         assert f"'{name}':" in SITE_JS
-        assert 'class="site-footer"' in (ROOT / name).read_text()
-    for title in ("Tests & results", "B0/B1 results", "Designated dataset tests"):
+        assert any(
+            f'class="{footer}"' in (ROOT / name).read_text()
+            for footer in ("site-footer", "execution-footer")
+        )
+    for title in (
+        "Inference Engine for Domestic Compute",
+        "B0/B1 results",
+        "Designated dataset tests",
+    ):
         assert title in SITE_JS
     assert "footerNavigation: '页脚导航'" in SITE_JS
     assert "plugin availability alone is not proof" not in HOME
@@ -54,11 +61,12 @@ def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     for name in ("publications", "community", "resources"):
         assert f"id: '{name}'" in groups
     assert "id: 'engine'" not in groups
-    assert "navLink('', './ecosystem-archive.html#stack', 'navEngine')" in SITE_JS
+    assert "navLink('', './index.html#stack', 'navEngine')" in SITE_JS
     for old in ("leaderboard-runs.html", "dataset-validation.html"):
         assert old not in performance
     for section in ("products", "projects", "stack"):
-        assert f"./ecosystem-archive.html#{section}" in SITE_JS
+        href = "./index.html" if section == "products" else f"./index.html#{section}"
+        assert href in SITE_JS
         assert f'id="{section}"' in HOME
     assert "navLink('plugins', './plugins.html', 'navPlugins')" in SITE_JS
     for name in (
@@ -149,7 +157,7 @@ def test_every_public_page_has_a_cache_safe_static_ecosystem_navigation_entry() 
         text = (ROOT / name).read_text(encoding="utf-8")
         assert 'id="nav-plugins"' in text, name
         assert 'href="./plugins.html">MOD catalog</a>' in text, name
-        assert "assets/site.js?v=site-labels-20261029" in text, name
+        assert "assets/site.js?v=product-home-20261031" in text, name
     assert "page === 'plugins' ? ' nav-plugin-link'" in SITE_JS
 
 
@@ -189,7 +197,7 @@ def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:
     assert 'class="site-nav"' in versions
     assert 'class="site-footer"' in versions
     assert "assets/site.css?v=benchmarks-ia-20261003" in versions
-    assert "assets/site.js?v=site-labels-20261029" in versions
+    assert "assets/site.js?v=product-home-20261031" in versions
     assert "assets/versions.css?v=0.3.7" in versions
 
 
@@ -211,7 +219,7 @@ def test_all_public_pages_use_the_same_shared_shell_release() -> None:
     for name in pages:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "assets/site.css?v=benchmarks-ia-20261003" in text
-        assert "assets/site.js?v=site-labels-20261029" in text
+        assert "assets/site.js?v=product-home-20261031" in text
         if name not in ("ecosystem-archive.html", "versions.html"):
             assert "assets/subpages.css?v=site-structure-20260816" in text
 
