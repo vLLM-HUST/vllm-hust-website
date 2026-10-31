@@ -72,6 +72,20 @@ jobs:
           python publication-policy/scripts/build_public_site.py \
             --website website --output public-site \
             --policy-revision 391f237f54fed9a68e66430e72d31f5d2c000877
+      - name: Verify the final public comparison page
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+          python -m http.server 8771 --bind 127.0.0.1 --directory public-site > /tmp/public-comparison-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          python website/scripts/verify_public_comparison_browser.py --url http://127.0.0.1:8771 --output website/output/public-comparison
+      - name: Upload public comparison verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-comparison-verification
+          path: website/output/public-comparison/
       - name: Upload assembled site without committing generated data
         uses: actions/upload-pages-artifact@v3
         with:
