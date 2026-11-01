@@ -175,7 +175,7 @@ def main():
                                 )
                                 overview = page.locator(".comparison-overview")
                                 assert page.locator(".comparison-group").count() == 4
-                                assert page.locator(".comparison-row").count() == 8
+                                assert page.locator(".comparison-row").count() == 9
                                 assert (
                                     page.locator(".comparison-method[open]").count()
                                     == 0
@@ -187,13 +187,21 @@ def main():
                                     ).bounding_box()["y"]
                                 )
                                 current = overview.inner_text()
+                                for threshold in ("50%", "90%"):
+                                    assert (
+                                        threshold
+                                        in page.locator(
+                                            "#acceptance-stages"
+                                        ).text_content()
+                                    )
+                                assert not page.locator(
+                                    "#method-1 [data-calculation-step]"
+                                ).first.is_visible()
                                 joint = page.evaluate(
                                     "async () => (await (await fetch('./data/midterm-v103.json')).json()).full_answer_joint"
                                 )
                                 for value in (
                                     "4.5325–4.5393",
-                                    "50%",
-                                    "90%",
                                     "153 / 73",
                                     "408 / 183",
                                     "8192",
@@ -271,11 +279,13 @@ def main():
                                 method = page.locator("#method-1 > summary")
                                 method.focus()
                                 page.keyboard.press("Enter")
-                                assert (
-                                    page.locator("#method-1").get_attribute("open")
-                                    is None
+                                expect(page.locator("#method-1")).not_to_have_attribute(
+                                    "open", ""
                                 )
                                 page.keyboard.press("Enter")
+                                expect(page.locator("#method-1")).to_have_attribute(
+                                    "open", ""
+                                )
                                 assert (
                                     "recompute_full_answer_compute.py --check"
                                     in page.locator("#method-1").inner_text()

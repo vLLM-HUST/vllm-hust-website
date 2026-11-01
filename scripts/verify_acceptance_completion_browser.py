@@ -54,8 +54,6 @@ def main():
                             )
                             target = page.locator(".comparison-overview")
                             for text in (
-                                "F_matrix",
-                                "F_draft",
                                 "4.5325–4.5393",
                                 f"{a['correct']}/200",
                                 f"{b['correct']}/200",
