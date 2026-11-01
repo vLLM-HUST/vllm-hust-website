@@ -67,9 +67,9 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "完整回答批次算力结果"
+                    "已达标 · B0 参考算力"
                     if language == "zh"
-                    else "Full-answer compute result"
+                    else "Target met · B0-reference compute"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
                     "吞吐与时延达标"
@@ -92,13 +92,18 @@ def verify(url, output):
                     "remains open",
                 ):
                     expect(root).not_to_contain_text(vague)
-                expect(root.locator("#metric-1")).to_contain_text("4.5325–4.5393")
+                for value in ("3.8407", "7.1042", "184.9705%", "256"):
+                    expect(root.locator("#metric-1")).to_contain_text(value)
                 expect(root.locator("#method-1")).not_to_have_attribute("open", "")
                 expect(
                     root.locator("#method-1 [data-calculation-step]").first
                 ).not_to_be_visible()
-                expect(root.locator("#metric-1 .comparison-row")).to_have_count(1)
+                expect(root.locator("#metric-1 .comparison-row")).to_have_count(2)
                 page.locator("#metric-1 .comparison-detail-link").click()
+                expect(
+                    root.locator("#method-1 [data-calculation-step]").first
+                ).not_to_be_visible()
+                page.locator("#method-full-answer-compute > summary").click()
                 expect(
                     root.locator("#method-1 [data-calculation-step]").first
                 ).to_be_visible()
@@ -115,7 +120,7 @@ def verify(url, output):
                     "2,763,050,179",
                 ):
                     expect(root.locator("#method-1")).to_contain_text(value)
-                for old in ("3.8407", "7.1042", "37.2302", "47.5033", "out256"):
+                for old in ("37.2302", "47.5033"):
                     expect(root.locator("#metric-1")).not_to_contain_text(old)
                     expect(root.locator("#method-1")).not_to_contain_text(old)
                 expect(root.locator("#metric-4")).to_contain_text("C₁")
@@ -149,7 +154,12 @@ def verify(url, output):
                 expect(root.locator(".comparison-group")).to_have_count(4)
                 results.append({"language": language, "width": width, "sections": 4})
                 page.close()
-        failures = ["modified-data", "unavailable-data", "missing-c16-identity"]
+        failures = [
+            "modified-data",
+            "unavailable-data",
+            "missing-c16-identity",
+            "changed-reference-verdict",
+        ]
         for case in failures:
             page = context.new_page()
             page.add_init_script("localStorage.setItem('vllm-hust_lang', 'zh')")
@@ -164,7 +174,7 @@ def verify(url, output):
                         else report_raw + b" ",
                     ),
                 )
-            else:
+            elif case == "missing-c16-identity":
                 altered = copy.deepcopy(manifest)
                 missing_id = report["c16_equal_request_latency"]["arms"][1]["run_id"]
                 incomplete = copy.deepcopy(runs)
@@ -193,6 +203,32 @@ def verify(url, output):
                     lambda route, _request, altered=altered: route.fulfill(
                         json=altered
                     ),
+                )
+            else:
+                changed = context.request.get(
+                    url + "/data/b0-reference-compute-20261101.json"
+                ).json()
+                changed["arms"][1]["reference_target_met"] = False
+                changed_raw = json.dumps(changed).encode()
+                altered = copy.deepcopy(manifest)
+                entry = next(
+                    e
+                    for e in altered["files"]
+                    if e["website_path"] == "data/b0-reference-compute-20261101.json"
+                )
+                entry.update(
+                    sha256=hashlib.sha256(changed_raw).hexdigest(),
+                    bytes=len(changed_raw),
+                )
+                page.route(
+                    "**/data/b0-reference-compute-20261101.json",
+                    lambda route, body=changed_raw: route.fulfill(
+                        content_type="application/json", body=body
+                    ),
+                )
+                page.route(
+                    "**/data/benchmark-source-manifest.json",
+                    lambda route, doc=altered: route.fulfill(json=doc),
                 )
             page.goto(url + "/b0-b1.html")
             expect(page.locator("#comparison")).to_contain_text(
