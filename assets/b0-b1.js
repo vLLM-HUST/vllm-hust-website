@@ -18,7 +18,7 @@
   };
   function render() {
     document.getElementById('comparison-title').textContent=t('B0/B1 大纲对比','B0/B1 results by test outline');
-    document.getElementById('comparison-lead').textContent=t('按测试大纲 3.4.1—3.4.4 列出本轮结论、实测数值与具体缺项。','Results, measurements and specific missing tests for outline sections 3.4.1–3.4.4.');
+    document.getElementById('comparison-lead').textContent=t('以固定 B0 为基线，展示相对吞吐效率、时延与成本，以及大纲各项结果。','Measured B0-relative throughput efficiency, latency and cost, alongside the outline results.');
     if (!data) return;
     const ref=data.wholechain_reference, joint=data.full_answer_joint, [a,b]=joint.arms;
     const diagnostic=ref.model_diagnostic.graph_recomputation.find(x=>x.seed===ref.model_diagnostic.primary_seed);
@@ -36,18 +36,18 @@
     const row=(name,b0,b1,status,basis)=>`<div class="comparison-row"><h3>${escape(name)}</h3><dl>${[['B0',b0],['B1',b1],[t('本轮结论','Result'),status],[t('判定依据','Basis'),basis]].map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl></div>`;
     const group=(i,verdict,rows,note,path)=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2><p class="comparison-verdict"><strong>${escape(verdict)}</strong></p>${rows}<p class="comparison-caveat">${escape(note)}</p><a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a><p class="focus-source"><a href="${source(path)}">${t('原始证据与复算','Original evidence and recomputation')}</a></p></section>`;
     const qualityBasis=t('MMLU-Pro 固定200题；原评分器；回答上限8192 token。','MMLU-Pro fixed 200; original scorer; output cap 8192 tokens.');
-    const m01Verdict=t('未通过：η 计量条件不完整','Not accepted: incomplete η measurement conditions');
+    const m01Verdict=t('未通过：η_ref 计量条件不完整','Not accepted: incomplete η_ref measurement conditions');
     const stabilityVerdict=t('未通过：五项任务的完整稳定性检查未完成','Not accepted: five-dataset stability checks incomplete');
     const continuousVerdict=zeroFailures?t('运行通过：两臂窗口完成，零失败','Run passed: Both arms completed, no failures'):t('运行未通过：存在失败或缺少窗口','Run failed: failures or missing windows');
     const currentPath='reports/full-answer-joint-20261030/';
     const overview=group(0,m01Verdict,
       row(t('实测有效算力（out256计数工况）','Measured compute (out256 counted workload)'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,
-        t('有效算力已测得；η 验收未通过','Compute measured; η acceptance not passed'),
+        t('有效算力已测得；η_ref 验收未通过','Compute measured; η_ref acceptance not passed'),
         t('缺少 B0 路径参考及匹配的无插桩计时；同预算评分','Missing B0 path reference and matched uninstrumented timing; same-budget scores')+` B0 ${q0.correct}/${q0.total}、B1 ${q1.correct}/${q1.total}。`)+
       row(t('独立标定模型诊断','Independent calibration model diagnostic'),t('无对应参考值','No bound reference'),`${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
         `${number(diagnostic.efficiency_percent)}% · `+t('模型值低于中期50%门槛','Model value below the 50% midterm target'),
         t('以独立标定的 B1 依赖图计算参考时间，与原计数轮耗时比较。','B1 reference time from independently calibrated dependencies, compared with the counted run.')),
-      t('中期 η ≥50%，最终 η ≥90%。本轮未出具正式 η；上列效率为模型诊断值。','Midterm η ≥50%; final η ≥90%. Formal η is not issued for this run; the efficiency above is a model diagnostic.'),
+      t('中期 η_ref ≥50%，最终 η_ref ≥90%。本轮未出具正式 η_ref；上列效率为模型诊断值。','Midterm η_ref ≥50%; final η_ref ≥90%. Formal η_ref is not issued for this run; the efficiency above is a model diagnostic.'),
       'reports/acceptance-completion-20261029/reference-reassessment-20261029.json')+
       group(1,servingPass?t('本批次达标：吞吐、TTFT、TPOT及正确数比较通过','Batch targets met: throughput, TTFT, TPOT and correct-count comparison'):t('本批次未达标','Batch targets not met'),
         row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/${a.completed} · ${a.truncated}`,`${b.correct}/${b.completed} · ${b.truncated}`,qualityVerdict,qualityBasis)+
@@ -77,15 +77,51 @@
       t('既有配对属于旧冻结组合；本轮 B1 配置缺少对应任务验证。','The existing pair uses the old frozen combination; task validation for this round’s B1 configuration is missing.'),
       t('既定任务覆盖不足，缺少 B1 同题配对；已有上下文拒绝，部分原任务未评分。','Incomplete assigned-task coverage and missing matched B1 tasks; context-limit rejections and ungraded original attempts are recorded.')
     ];
+    const throughputB0=a.successful_output_tokens/a.phase_seconds, throughputB1=b.successful_output_tokens/b.phase_seconds;
+    const speed=throughputB1/throughputB0, etaB0=100*speed;
+    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/6052874d496c79a3c011ace7cb9dd2c00333f850/docs/B0_BASELINE_METRICS.md';
+    const baseline=`<section class="focus-result" id="b0-baseline" aria-labelledby="b0-baseline-title">
+      <h2 id="b0-baseline-title">${t('B0 实测基线：相对吞吐效率 η_B0','Measured B0 baseline: relative throughput efficiency η_B0')}</h2>
+      <p>${t('B0 固定为 vLLM 0.18 + vLLM-Ascend 0.18，并归一化为100%。η_B0 表示达到 B0 吞吐的百分比；超过100%表示更快。','B0 is fixed at vLLM 0.18 + vLLM-Ascend 0.18 and normalized to 100%. η_B0 expresses throughput relative to measured B0; above 100% means faster.')}</p>
+      ${table([t('指标','Metric'),'B0','B1'],[
+        [t('相对吞吐效率 η_B0','Relative throughput efficiency η_B0'),'100.0000%',number(etaB0)+'%'],
+        [t('吞吐倍率','Throughput ratio'),'1.0000×',number(speed)+'×'],
+        [t('吞吐提升率','Throughput gain'),'0.0000%',number(etaB0-100)+'%']
+      ])}
+      <p><code>η_B0 = 100 × (O₁ / T₁) / (O₀ / T₀)</code> · <code>${t('提升率','Gain')} = η_B0 − 100</code></p>
+      <p>${t('本组为同轮完整回答配对，正确数','Paired full-answer batch, correct counts')}: B0 ${a.correct}/${a.completed} · B1 ${b.correct}/${b.completed}。${t('统一任务、质量与资源约束，允许算子、批处理和调度实现不同。','Task, quality and resource constraints are shared; operators, batching and scheduling may differ.')}</p>
+      <details class="focus-note" id="method-b0"><summary>${t('计算公式、分母与复算记录','Formulas, denominators and recomputation')}</summary>
+      ${table([t('测量量','Measured quantity'),'B0','B1'],[
+        [t('成功完成请求的输出 token 数 O','Output tokens from completed requests O'),String(a.successful_output_tokens),String(b.successful_output_tokens)],
+        [t('批次完成时间 T（秒）','Batch elapsed time T (s)'),number(a.phase_seconds),number(b.phase_seconds)],
+        [t('输出吞吐 Q=O/T（token/s）','Output throughput Q=O/T (tokens/s)'),number(throughputB0),number(throughputB1)]
+      ])}
+      ${table([t('量','Quantity'),t('公式','Formula'),t('本批次','This batch')],[
+        [t('吞吐倍率 S_Q','Throughput ratio S_Q'),'Q₁/Q₀ = O₁T₀/(O₀T₁)',number(speed)+'×'],
+        [t('相对吞吐效率 η_B0','Relative throughput efficiency η_B0'),'100 × S_Q',number(etaB0)+'%'],
+        [t('吞吐提升率 G_Q','Throughput gain G_Q'),'100 × (S_Q − 1)',number(etaB0-100)+'%'],
+        [t('批次时间倍率 S_T','Batch-time ratio S_T'),'T₀/T₁',number(a.phase_seconds/b.phase_seconds)+'×'],
+        [t('批次时间降幅 R_T','Batch-time reduction R_T'),'100 × (1 − T₁/T₀)',number(100*(1-b.phase_seconds/a.phase_seconds))+'%'],
+        [t('平均 TTFT 降幅','Mean TTFT reduction'),'100 × (1 − L₁/L₀)',number(joint.latency_reduction_percent.ttft_ms)+'%'],
+        [t('平均 TPOT 降幅','Mean TPOT reduction'),'100 × (1 − L₁/L₀)',number(joint.latency_reduction_percent.tpot_ms)+'%'],
+        [t('单位 token 成本降幅','Cost-per-token reduction'),'100 × [1 − (E₁/O₁)/(E₀/O₀)]',number(joint.rental_cost_reduction_percent)+'%']
+      ])}
+      <p>${t('O 为成功完成请求的输出 token 总数，T 为完整测量窗口，L 为同统计口径的时延，E 为同窗口完整资源范围的分摊费用。平均时延按请求等权。','O is output tokens from completed requests, T is the complete measurement interval, L is latency under the same statistic, and E is allocated expense for the same interval and full resource scope. Mean latency weights requests equally.')}</p>
+      <p>${t('相同完成工作量且 O₀=O₁ 时，S_Q=S_T、η_B0=100×T₀/T₁。本组自然回答长度不同，因此时间倍率与吞吐倍率分别计算。答错与长度终止的已完成输出保留，质量同时报告。','For equal completed work and O₀=O₁, S_Q=S_T and η_B0=100×T₀/T₁. This batch has different natural-answer lengths, so time and throughput ratios are computed separately. Completed output includes incorrect and length-stopped answers, with quality reported alongside it.')}</p>
+      <p>${t('只有完整部署单位时间费用相同且计费与测量窗口一致，成本降幅才等于100×(1−1/S_Q)。固定费用按完整占用资源计入；本组采用同价租赁估算。','Only equal complete deployment rates and matching billing/measurement intervals permit cost reduction = 100×(1−1/S_Q). Fixed expenses cover all reserved resources; this batch uses a same-rate rental estimate.')}</p>
+      <p>${t('η_B0=190%表示1.9倍、提升90%；η_B0=90%表示比基线低10%。多次测量逐对计算倍率后取中位数，并保留全部重复。','η_B0=190% means 1.9× throughput and a 90% gain; η_B0=90% means 10% below baseline. For repeated measurements, aggregate within-pair ratios and retain every repetition.')}</p>
+      <p>${t('原大纲的独立标定效率记为 η_ref=T_ref/T×100%，其50%与90%阶段门槛沿用原定义。47.5033秒属于旧B1标定图，η_B0的分子使用实测B0吞吐。','The outline’s independently calibrated efficiency is labeled η_ref=T_ref/T×100%; its 50% and 90% stage targets retain their original definition. The 47.5033 s reference belongs to the old B1 graph; η_B0 uses measured B0 throughput as its baseline.')}</p>
+      <p class="focus-source"><a href="${methodSource}">${t('完整公式与只读复算命令','Full method and read-only recomputation command')}</a> · <a href="${source(currentPath+'joint-summary.json')}">${t('本批原始记录','Original paired record')}</a></p>
+      </details></section>`;
     const methods=`<details class="comparison-method focus-note"><summary>${t('版本定义、阶段门槛与报告来源','Versions, targets and sources')}</summary>
       <p>${t('B0 固定为 vLLM 0.18 + vLLM-Ascend 0.18。B1 按各项实测配置记录。页面给出本轮测试结论，第三方验收报告另行归档。','B0 is vLLM 0.18 + vLLM-Ascend 0.18. B1 is recorded per measured configuration. This page reports this test round; third-party acceptance reports are archived separately.')}</p>
-      <p id="acceptance-stages">${t('中期 η ≥50%，最终 η ≥90%；吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Midterm η ≥50%, final η ≥90%; throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
+      <p id="acceptance-stages">${t('中期 η_ref ≥50%，最终 η_ref ≥90%；吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Midterm η_ref ≥50%, final η_ref ≥90%; throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
       <p class="focus-source">${escape(data.version)} · <a href="${source(data.m01_method.outline.path)}">${t('测试大纲 V1.5 课题四','V1.5 Project 4 test outline')}</a> · <a href="${escape(data.report_url)}">${t('完整报告与原始记录','Full report and records')}</a></p></details>
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('方法与记录','Methods & records')}</summary>
       <p class="focus-status"><strong>${m01Verdict}</strong></p>
       <p>${escape(ref.model)} · ${escape(ref.dtype)} · ${escape(ref.device)} × ${ref.participating_chips} · ${escape(ref.dataset)}</p>
-      <p><code>C = F / (k × T × 10¹²)</code>；<code>η = T参 / T × 100%</code>。</p>
-      ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('正式 η','Formal η')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),t('未出具：计量条件不完整','Not issued: incomplete measurement conditions')]))}
+      <p><code>C = F / (k × T × 10¹²)</code>；<code>η_ref = T参 / T × 100%</code>。</p>
+      ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('正式 η_ref','Formal η_ref')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),t('未出具：计量条件不完整','Not issued: incomplete measurement conditions')]))}
       <p>${t('现有 F/T 记录保留计数开销，缺少匹配的无插桩时间与 B0 路径参考。同一 out256 工况的 B1 正确数下降，质量比较未通过。','The F/T record includes counting overhead and lacks matched uninstrumented timing and a B0 path reference. B1 correct count fell in the same out256 workload; its quality comparison failed.')}</p>
       <details><summary>${t('out256 同预算质量','Same-budget out256 quality')}</summary>${table([t('指标','Metric'),'B0','B1'],[[t('正确 / 题数','Correct / total'),`${q0.correct}/${q0.total}`,`${q1.correct}/${q1.total}`]])}</details>
       <p>${t('B1 独立标定模型','Independently calibrated B1 model')}: ${number(diagnostic.reference_seconds)} s · ${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')} · ${number(diagnostic.efficiency_percent)}%。${t('模型诊断低于50%门槛；三个调度种子用于敏感性分析。','The model diagnostic is below 50%; three scheduling seeds provide sensitivity analysis.')}</p>
@@ -114,13 +150,13 @@
       <p>${t('费用取值','Price basis')}: ${escape(a.cost.price_basis.provider)} · ${escape(a.cost.price_basis.sku)} · ${a.cost.price_basis.instance_monthly_price} ${t('元/月','CNY/month')} · ${a.cost.price_basis.month_days_for_analysis} ${t('天/月','days/month')}.</p>
       <p>${t('采用同类机器公开报价估算，包含CPU、主存及加速卡，云盘和公网另计。成功完成请求的全部输出计入分母，包含答错和长度终止；固定费用按实际占用双卡与时长分摊。','The analogous-machine public quote includes CPU, RAM and accelerators; disk/network are separate. All completed-response output counts, including incorrect and length-stopped answers. Fixed expense uses both reserved cards and elapsed time.')}</p>
       <p><a href="./serving-plan.html">${t('调整部署费用，计算产能与成本 →','Adjust deployment costs and estimate capacity →')}</a></p>${evidence('full-answer-joint')}${evidence('milestone-v15')}</details>`;
-    root.innerHTML=`<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('本轮测试结论','Results for this test round')}</h2><p class="comparison-context">${escape(data.version)} · ${t('B0 固定0.18/0.18；各项分别列明B1配置、判定条件和适用工况。','B0 fixed at 0.18/0.18; B1 configuration, criteria and workload are identified for each result.')}</p>${overview}</section><section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('方法、任务清单与原始记录','Methods, task inventory and source records')}</h2>${methods}</section>`;
+    root.innerHTML=`${baseline}<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('本轮测试结论','Results for this test round')}</h2><p class="comparison-context">${escape(data.version)} · ${t('B0 固定0.18/0.18；各项分别列明B1配置、判定条件和适用工况。','B0 fixed at 0.18/0.18; B1 configuration, criteria and workload are identified for each result.')}</p>${overview}</section><section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('方法、任务清单与原始记录','Methods, task inventory and source records')}</h2>${methods}</section>`;
     root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',()=>{root.querySelector(link.getAttribute('href')).open=true;}));
     openLinkedMethod();
     root.dataset.loaded=data.version;
   }
   function openLinkedMethod() {
-    if (/^#method-[1-4]$/.test(location.hash)) {
+    if (/^#method-(?:b0|[1-4])$/.test(location.hash)) {
       const details=document.querySelector(location.hash);
       if (details) details.open=true;
     }
@@ -145,6 +181,10 @@
     if(d.schema!=='midterm-publication/v1'||d.version!=='V1.03')throw Error('Invalid report');
     const joint=d.full_answer_joint;
     if(joint?.same_run_quality_and_performance!==true||joint.protocol?.max_completion_tokens!==8192||joint.arms?.length!==2||joint.arms[0].role!=='B0'||joint.arms[1].role!=='B1'||joint.arms.some(a=>a.completed!==200||a.failed!==0)||!d.packed_continuous)throw Error('Invalid full-answer pair');
+    for (const arm of joint.arms) {
+      const {successful_output_tokens:o,phase_seconds:seconds,output_tokens_per_second:q}=arm;
+      if (![o,seconds,q].every(v=>Number.isFinite(v)&&v>0)||Math.abs(o/seconds-q)>1e-9*Math.max(1,q)) throw Error('Invalid B0-relative measurement');
+    }
     if(d.acceptance_completion?.continuous?.status!=='B0_completed_B1_measured_host_allocation_failure'||d.acceptance_completion.continuous.paired_continuous_stability_pass!==false)throw Error('Invalid completion evidence');
     const ref=d.wholechain_reference;
     if(ref?.status!=='reference_under_revision'||ref.reference_qualified!==false||ref.reference_C_TFLOPS_per_chip!==null)throw Error('Invalid reference revision');

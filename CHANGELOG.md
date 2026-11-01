@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-01 — Measured B0-relative formulas
+
+- Show measured B0-normalized throughput efficiency (`η_B0`), multiplier and gain together.
+- Add elapsed-time, latency and cost formulas with the existing paired batch denominators.
+- Label independently calibrated outline efficiency `η_ref`; preserve original records and verdicts.
+
+
 ## 2026-11-01 — B0/B1 result decisions
 
 - State the outcome of each measured item and name missing measurement conditions directly.
