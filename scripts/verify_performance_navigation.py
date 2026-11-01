@@ -215,15 +215,23 @@ def main():
                                     assert withdrawn not in current
                                 assert (
                                     "修订中" if language == "zh" else "under revision"
-                                ) in current
-                                assert (
-                                    "不是本机账单"
-                                    in page.locator("#metric-4").inner_text()
+                                ) not in current
+                                for label in (
+                                    ("未通过", "本批次达标", "同价租赁估算达标")
                                     if language == "zh"
-                                    else "not this host’s bill"
-                                    in page.locator("#metric-4").inner_text()
-                                )
-                                assert "4GiB/rank" in current
+                                    else (
+                                        "Not accepted",
+                                        "Batch targets met",
+                                        "rental estimate meets",
+                                    )
+                                ):
+                                    assert label in current
+                                assert (
+                                    "公开月租" if language == "zh" else "public CTYun"
+                                ) in page.locator("#metric-4").inner_text()
+                                assert (
+                                    "4GiB/rank" if language == "zh" else "4 GiB/rank"
+                                ) in current
                                 assert (
                                     "五任务" if language == "zh" else "five-task"
                                 ) in current
@@ -262,14 +270,14 @@ def main():
                                 quality = page.locator("#method-1 details summary")
                                 quality.focus()
                                 page.keyboard.press("Enter")
-                                assert (
-                                    "151 / 200"
-                                    in page.locator("#method-1").inner_text()
+                                out256 = page.evaluate(
+                                    "async () => (await (await fetch('./data/midterm-v103.json')).json()).acceptance_completion.out256_quality.arms"
                                 )
-                                assert (
-                                    "156 / 200"
-                                    in page.locator("#method-1").inner_text()
-                                )
+                                for arm in out256:
+                                    assert (
+                                        f"{arm['correct']}/{arm['total']}"
+                                        in page.locator("#method-1").inner_text()
+                                    )
                                 page.locator(
                                     "#metric-2 .comparison-detail-link"
                                 ).click()
@@ -289,6 +297,9 @@ def main():
                                 page.locator(
                                     "#metric-3 .comparison-detail-link"
                                 ).click()
+                                task_quality = page.locator("#method-3 details summary")
+                                task_quality.focus()
+                                page.keyboard.press("Enter")
                                 stability = page.locator("#method-3").inner_text()
                                 assert (
                                     "66 / 100" in stability and "62 / 100" in stability
