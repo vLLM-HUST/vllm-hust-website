@@ -187,13 +187,21 @@ def main():
                                     ).bounding_box()["y"]
                                 )
                                 current = overview.inner_text()
+                                for threshold in ("50%", "90%"):
+                                    assert (
+                                        threshold
+                                        in page.locator(
+                                            "#acceptance-stages"
+                                        ).text_content()
+                                    )
+                                assert not page.locator(
+                                    "#method-1 [data-calculation-step]"
+                                ).first.is_visible()
                                 joint = page.evaluate(
                                     "async () => (await (await fetch('./data/midterm-v103.json')).json()).full_answer_joint"
                                 )
                                 for value in (
                                     "4.5325–4.5393",
-                                    "50%",
-                                    "90%",
                                     "153 / 73",
                                     "408 / 183",
                                     "8192",
