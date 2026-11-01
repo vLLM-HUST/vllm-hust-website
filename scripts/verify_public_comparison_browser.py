@@ -67,16 +67,16 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "未通过" if language == "zh" else "Not accepted"
+                    "验收未通过" if language == "zh" else "acceptance failed"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
-                    "本批次达标" if language == "zh" else "Batch targets met"
+                    "吞吐与时延达标" if language == "zh" else "Throughput and latency targets met"
                 )
                 expect(root.locator("#metric-3 .comparison-verdict")).to_contain_text(
-                    "未通过" if language == "zh" else "Not accepted"
+                    "验收未通过" if language == "zh" else "acceptance failed"
                 )
                 expect(root.locator("#metric-4 .comparison-verdict")).to_contain_text(
-                    "同价租赁估算达标" if language == "zh" else "rental estimate meets"
+                    "租赁成本估算与利用率达标" if language == "zh" else "Rental-cost estimate and utilization targets met"
                 )
                 for vague in (
                     "修订中",

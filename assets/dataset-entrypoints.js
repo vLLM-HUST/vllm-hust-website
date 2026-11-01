@@ -36,31 +36,31 @@
 
   function basic() {
     text('entry-install-note',
-      'Python 3.10+, Git and an isolated local environment. The shared package indexes, verifies and reads original files; it does not turn every source into a common evaluation protocol. Keep data outside the repository. Opening this page does not execute the commands; use them only for your own authorized run.',
-      '需要 Python 3.10+、Git 和独立本地环境。共用组件负责索引、校验与读取原文件，不把所有来源变成同一种评测。数据放在仓库外。打开页面不会执行这些命令；请在本人获授权的运行中使用。');
+      'Use Python 3.10+, Git and a virtual environment. The shared package indexes, verifies and reads source files; each task uses its own evaluation client. Store data outside the repository.',
+      '准备 Python 3.10+、Git 和虚拟环境。共用组件负责索引、校验与读取原文件，各任务使用对应评测客户端。数据存放在仓库外。');
     document.getElementById('entry-install').textContent = `git clone https://github.com/vLLM-HUST/vllm-hust-benchmark.git\ncd vllm-hust-benchmark\ngit checkout --detach ${REV}\npython3 -m venv .venv\n. .venv/bin/activate\npython -m pip install -e .\npython -m pip install -e "./workload-preparation[data]"\npython -m vllm_hust_benchmark.workload_data source-plan GSM8K\npython -m vllm_hust_workload_data.catalog download-plan GSM8K`;
     text('entry-install-output',
-      'Expected: source entrypoints and a pinned file/URL/SHA download plan, not downloaded data or scores. Windows: use py -3 -m venv .venv and .venv\\Scripts\\Activate.ps1; use the Python download example below instead of POSIX shell syntax.',
-      '预期输出：来源入口及固定文件、URL、SHA 下载计划，不是已下载数据或分数。Windows 使用 py -3 -m venv .venv 和 .venv\\Scripts\\Activate.ps1；下载可用下方跨平台 Python 示例。');
+      'Output: source entrypoints and a download plan with pinned files, URLs and SHA hashes. Windows: use py -3 -m venv .venv and .venv\\Scripts\\Activate.ps1; use the Python download example below instead of POSIX shell syntax.',
+      '输出：来源入口及含固定文件、URL、SHA 的下载计划。Windows 使用 py -3 -m venv .venv 和 .venv\\Scripts\\Activate.ps1；下载可用下方跨平台 Python 示例。');
     const root = document.getElementById('entry-basic'); root.replaceChildren();
     const g = section('GSM8K-quickstart', t('GSM8K: download, configure, prepare and run 3 original questions', 'GSM8K：下载、配置、准备并运行 3 道原题'),
-      t('A small supported path through the existing repository, not a universal runner or a full benchmark score. The task uses the unchanged lm-eval GSM8K prompt/scorer with five training examples; three held-out test rows, chat transport, 2,048 output tokens and thinking disabled are explicit differences.',
-        '复用现有仓库的小型完整路径，不是万能执行器或全量成绩。沿用 lm-eval 的 GSM8K 提示、评分和五个训练示例；显式区别为三道测试题、chat 传输、2048 输出 token 与关闭 thinking。'), root, true);
+      t('Run three test questions using lm-eval’s GSM8K prompt and scorer with five training examples. Settings: chat API, 2,048 output tokens, thinking disabled.',
+        '使用 lm-eval 的 GSM8K 提示、评分器和五个训练示例，运行三道测试题。配置：chat API、2048 输出 token、关闭 thinking。'), root, true);
     appendStep(g, t('Download the original fixed files', '下载固定原文件'),
       `mkdir -p ../evaluation-data/gsm8k\npython -c "from pathlib import Path; from urllib.request import urlretrieve; from vllm_hust_workload_data.catalog import download_plan; p=Path('../evaluation-data/gsm8k'); p.mkdir(parents=True,exist_ok=True); [urlretrieve(f['url'], p/Path(f['path']).name) for f in download_plan('GSM8K')['files'] if f['role']=='data']"`,
-      t('MIT metadata at the pinned publisher revision; review publisher terms. Downloads both original train and test parquet files. Omit mkdir on Windows; the Python command creates the directory.', '目录记录许可为 MIT，仍需阅读固定发布版本条款；下载原 train/test parquet 文件。Windows 可省略 mkdir，Python 命令会创建目录。'));
+      t('License recorded at the pinned revision: MIT. Downloads both original train and test parquet files. Omit mkdir on Windows; the Python command creates the directory.', '固定版本记录许可为 MIT；下载原 train/test parquet 文件。Windows 可省略 mkdir，Python 命令会创建目录。'));
     appendStep(g, t('Shared configuration: save as input.json in the repository root', '统一准备配置：在仓库根目录创建 input.json'),
       JSON.stringify({sources: [{source_id: 'GSM8K', data_root: '../evaluation-data/gsm8k', manifest: '../evaluation-data/gsm8k-binding.json', limit: 3}]}, null, 2));
     appendStep(g, t('Bind and prepare references', '校验并准备输入引用'),
       `python -m vllm_hust_workload_data.pipeline bind GSM8K --data-root ../evaluation-data/gsm8k --files test-00000-of-00001.parquet --revision 740312add88f781978c0658806c59bc2815b9866 --output ../evaluation-data/gsm8k-binding.json\npython -m vllm_hust_workload_data.pipeline plan --config input.json\npython -m vllm_hust_workload_data.pipeline run --config input.json --output ../evaluation-data/prepared-001`,
-      t('Expected: workload.sqlite and manifest.json containing input references, not model replies or scores. Use a fresh output directory. Other supported readers use the same configuration shape, but each source needs its own original files and adapter.', '预期生成 workload.sqlite 与 manifest.json，只保存输入引用，不含模型回复或分数。输出目录必须是新目录；其他已支持读取器共用此配置结构，但仍需对应原文件和适配器。'));
+      t('Output: workload.sqlite and manifest.json with input references. Use a new output directory. Other readers use the same configuration structure with their source files and adapters.', '输出：保存输入引用的 workload.sqlite 和 manifest.json。使用新的输出目录；其他读取器沿用此配置结构，并填写对应原文件和适配器。'));
     appendStep(g, t('Actual execution: the existing GSM8K runner', '实际执行：现有 GSM8K 专用执行入口'),
       `python -m pip install 'lm-eval[api]==0.4.11' datasets==3.6.0 pyarrow==19.0.1 huggingface-hub==0.31.0\npython scripts/run_gsm8k_original_samples.py --data-root ../evaluation-data/gsm8k --endpoint https://MODEL_HOST/v1/chat/completions --model SERVED_MODEL_NAME --output ../evaluation-data/gsm8k-run-001`,
-      t('Provide an authorized chat/completions endpoint and its exact model name; for authenticated lm-eval API transport use its OPENAI_API_KEY environment variable, never a key in argv. This runner reads and hashes the original parquet directly, not workload.sqlite. Expected: receipt.json and private-results.json, three evaluated sample IDs and actual metrics or a retained error. Private results contain questions, references and responses. No promised passing score.',
-        '提供获授权的 chat/completions 地址和真实模型名；lm-eval API 认证使用其 OPENAI_API_KEY 环境变量，不把密钥写进参数。此执行器直接读取并校验原 parquet，不消费 workload.sqlite。预期产物为 receipt.json、private-results.json、三个样本 ID 和真实指标或保留的错误；私有结果含题目、参考和回复，不保证通过。'));
+      t('Set your chat/completions endpoint, model name and OPENAI_API_KEY environment variable. The runner reads and verifies the original parquet. Outputs: receipt.json and private-results.json, including sample IDs, scores, questions, references, responses and any errors.',
+        '填写 chat/completions 地址、模型名及 OPENAI_API_KEY 环境变量。执行器读取并校验原 parquet，输出 receipt.json 和 private-results.json，包含样本 ID、评分、题目、参考答案、模型回复及错误记录。'));
     g.append(link(t('Original runner and scope', '原执行器及范围'), BASE + 'scripts/run_gsm8k_original_samples.py'));
-    root.append(el('p', t('The shared execution module is only for records explicitly marked request_replay with original HTTP bodies. It rejects static tasks and metadata-only traces and reports scoring=NOT_RUN. It is not the execution command for these 118 sources.',
-      '共用 execution 模块仅接收显式 request_replay 的原始 HTTP 请求体，拒绝静态题与纯元数据轨迹，输出 scoring=NOT_RUN；不能作为 118 个来源的统一评测命令。')));
+    root.append(el('p', t('HTTP replay: the shared execution module accepts request_replay records containing original request bodies and reports scoring=NOT_RUN. For task evaluation, use the source-specific clients below.',
+      'HTTP 回放：共用 execution 模块接收含原始请求体的 request_replay 记录，评分状态为 scoring=NOT_RUN。任务评测使用下方对应客户端。')));
   }
 
   function special() {
@@ -191,7 +191,7 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
         "提供平台账号、目标模型和任务范围，由 ops 准备 Docker + Compose、Python 3.12+、镜像访问、持久存储和模型 API 连接，并按任务要求配置 CPU、内存和磁盘。"));
     advanced.append(el('p', t("The batch plan uses linux/amd64 images. Use a matching backend. For additional ARM64 tasks, verify each image, its dependencies, reference solution and grader.",
       "批次方案使用 linux/amd64 镜像，请选择对应架构的后端。扩展 ARM64 任务时，逐题检查镜像、依赖、参考解和评分器。")));
-    const preparation = section('terminal-preparation', t('2. Fetch, verify and prepare (operator commands)', '2. 获取、校验与准备（运维命令）'), t('Run in a new private workspace. These commands prepare a candidate; they do not run model tasks.', '在新的私有工作目录执行。以下只准备候选方案，不执行模型任务。'), advanced);
+    const preparation = section('terminal-preparation', t('2. Fetch, verify and prepare (operator commands)', '2. 获取、校验与准备（运维命令）'), t('Prepare the task environment in a new private workspace; model execution follows in the next step.', '在新的私有工作目录准备任务环境，下一步运行模型任务。'), advanced);
     appendStep(preparation, t('Install the pinned client', '安装固定客户端'),
       `git clone https://github.com/vLLM-HUST/vllm-hust-benchmark.git\ncd vllm-hust-benchmark\ngit checkout --detach ${AGENT_REV}\npython3.12 -m venv "$HOME/terminal-client"\n. "$HOME/terminal-client/bin/activate"\npython -m pip install harbor==0.24.0\npython -m pip freeze > "$HOME/terminal-client-requirements.txt"\nharbor run --help\ndocker version\ndocker compose version`,
       t("Create a separate client environment and record its resolved dependencies and execution image.", "创建独立客户端环境，记录安装的依赖版本和执行环境镜像。"));
@@ -233,13 +233,13 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
       const sum = el('summary'); sum.append(el('strong', row.source_id), el('span', row.guide_id ? t('On-page guide', '站内指南') : row.ledger_status)); d.append(sum);
       const list = el('dl'); const field = (name, value) => { list.append(el('dt', name), el('dd', value)); };
       field(t('Classification', '分类'), `${row.classes.join(', ') || row.asset_group} / ${row.asset_group}`);
-      field(t('Provider', '数据组件'), row.provider_registered ? t('Registered; download-plan is metadata only.', '已注册；download-plan 只输出元数据。') : t('Not registered in this provider, not proof that no client exists.', '仅此 provider 未注册，不代表项目没有客户端。'));
+      field(t('Provider', '数据组件'), row.provider_registered ? t('Registered; download-plan is metadata only.', '已注册；download-plan 只输出元数据。') : t('Unregistered; check the task-specific guide.', '未注册；客户端见对应任务指南。'));
       field(t('Ledger status', '既有清单状态'), row.ledger_status + (row.guide_id ? t(' (workload batch only; use the independent guide below)', '（仅 workload 批次；独立入口见下方指南）') : ''));
       if (row.scope_limits) field(t('Validated scope', '已验证范围'), jsonText(row.scope_limits));
       if (row.native_validation) field(t('Native validation', '原生验证'), jsonText(row.native_validation));
       if (row.blocker) field(t('Recorded limitation', '已记录限制'), jsonText(row.blocker));
       field(t('Revision', '固定版本'), row.revision || t('Not recorded by this provider; see the specific guide/publisher.', '此 provider 未记录，见对应指南/发布方。'));
-      field(t('License / access', '许可与访问'), row.access ? jsonText(row.access) : t('Not established here; publisher/task terms apply.', '此处未确立，遵守发布方/任务条款。'));
+      field(t('License / access', '许可与访问'), row.access ? jsonText(row.access) : t('See publisher and task terms.', '见发布方与任务条款。'));
       d.append(list);
       const links = el('p', undefined, 'entry-links');
       if (row.publisher) links.append(link(t('Publisher', '官方来源'), row.publisher));
@@ -255,9 +255,9 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
         } d.append(files);
       }
       if (row.entrypoints.length) {
-        d.append(el('p', t('Existing source-specific entrypoints. A reader/preparer is not a task executor; indexed code is not proof of full validation.', '已有分来源入口。读取/准备不等于任务执行，索引有代码不等于全量验证。')));
+        d.append(el('p', t('Source-specific entrypoints for data reading, preparation and task execution are listed below.', '下方按数据读取、准备与任务执行列出对应入口。')));
         const entries = el('ul'); for (const e of row.entrypoints) { const item = el('li'); item.append(link(`${e.role}: ${e.path}`, e.url)); if (e.scope) item.append(el('span', ` — ${e.scope}`)); entries.append(item); } d.append(entries);
-      } else if (!row.guide_id) d.append(el('p', t('No executable entry is established by this index. Use the publisher protocol or request integration; no generic execution command is supplied.', '本索引尚未确立可执行入口。需按发布方协议或接入相应执行器，此处不提供假通用命令。')));
+      } else if (!row.guide_id) d.append(el('p', t('Execution client: not integrated. Use the publisher’s evaluation protocol.', '执行客户端：未接入。请使用发布方评测协议。')));
       if (row.evidence.length) { const evidence = el('p', undefined, 'entry-links'); for (const e of row.evidence) evidence.append(link(e.label, e.url)); d.append(evidence); }
       root.append(d);
     }
@@ -294,7 +294,7 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
       'entry-sandbox-title': ['3. Sandboxes, tools and task graders', '3. 沙箱、工具与任务评分'],
       'entry-boundary-title': ['Services and integration', "服务配置"],
       'entry-catalog-title': ['All 118 sources', '全部 118 来源'],
-      'entry-catalog-note': ['40 task classes plus 15 separately classified trace, probe, relationship and private assets. 104 provider registrations and 14 unregistered entries. Registration, reading, generation and native grading are separate states; AVAILABLE is limited to each linked receipt, not all records or versions. License metadata is a pinned snapshot, not a new legal/access check.', '40 类任务及另列的 15 项轨迹、探针、跨任务关系和私有资产；104 个 provider 注册来源、14 个未注册项。登记、读取、生成与原生评分是不同状态；AVAILABLE 只限对应回执范围，不表示全记录/版本通过。许可元数据为固定快照，不是新法律/访问审核。'],
+      'entry-catalog-note': ['40 task classes and 15 trace, probe, relationship or private assets; 104 registered providers and 14 unregistered entries. Each source lists its preparation and scoring status. AVAILABLE links to the tested scope; license information is recorded at the pinned revision.', '40 类任务及15项轨迹、探针、跨任务关系和私有资产；104个已注册来源、14个未注册项。各来源分别列出准备与评分状态，AVAILABLE 链接对应测试范围，许可信息记录于固定版本。'],
       'entry-search-label': ['Search', '搜索'], 'entry-filter-label': ['Entry status', '入口类型'],
       'entry-json': ['Versioned catalog (JSON)', '版本化机器目录（JSON）'], 'entry-old-results': ['Existing results', '已有评测结果']
     };
@@ -330,6 +330,6 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
     catalog = data; render();
   }).catch(error => {
     console.error('Public catalog could not be rendered', error);
-    text('entry-load-status', 'Catalog could not be loaded. The JSON and existing results links remain available; no execution was started.', '目录加载失败，可通过 JSON 与已有结果链接读取；未启动任何执行。');
+    text('entry-load-status', 'Catalog could not be loaded. Open the JSON catalog or existing results below.', '目录加载失败，请使用下方 JSON 目录或已有结果链接。');
   });
 }());

@@ -68,7 +68,7 @@
           <p class="hero-lede">
             从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。
           </p>
-          <p>实测吞吐、参考价格和计算假设分开记账。API 等价产值是估算，不是实际收入；综合成本采用你输入的数值。</p>
+          <p>按实测吞吐和参考 API 单价估算服务产值，结合输入成本计算差额。</p>
           <p><a href="#benchmark-source">benchmark 数据源与校验清单</a> · <a href="./data/serving-plans.json">产能方案与价格依据</a></p>
         </div>
       </section>
@@ -76,14 +76,14 @@
         <aside class="controls">
           <div class="section-no">01 / 计算条件</div>
           <fieldset id="plan-options"><legend>旗舰推理方案 · 可多选</legend><p>正在读取方案…</p></fieldset>
-          <p class="hint">按模型与方案并列展示；不是不同模型的效果排名。</p>
+          <p class="hint">选择模型与部署方案，查看各自的产能与价格。</p>
           <div class="field-head">
             <label for="utilization">有效利用率</label
             ><output id="util-label">100%</output>
           </div>
           <input id="utilization" type="range" min="0" max="100" value="100" />
           <p class="hint">
-            100% 为满载外推。利用率按等效满载时长折算，不是低负载性能预测。
+            100% 按实测满载速率外推；其他利用率折算为等效满载时长。
           </p>
           <label for="cost">综合成本 · 元 / 卡月 <small>选填</small></label
           ><input
@@ -137,7 +137,7 @@
               </div>
             </div>
             <div class="legend"><span><i></i>输出</span><span><i class="input-key"></i>新增输入</span><span><i class="cache-key"></i>缓存命中输入</span><span><i class="cost-key"></i>成本参考</span></div>
-            <p class="verdict">API 等价产值不是实际收入或利润。成本由你输入；不同模型、工作负载和价格的柱高，不能解释成优化倍数或效果等价。</p>
+            <p class="verdict">柱高为各方案按参考价格折算的服务产值；成本线采用输入的综合成本。</p>
 
           </div>
         </div>
@@ -149,10 +149,9 @@
 
         </div>
         <div>
-          <h3>这张账单回答什么？</h3>
+          <h3>计算方法</h3>
           <p>
-            等价产值是按参考 API
-            单价折算的服务价值，不是销售收入或利润。日/月数值按同一工作负载、固定实测速率线性外推；不是长期稳定性测量。真实采购还需确认业务效果、体验要求、可靠性与运维投入。
+            API 等价产值＝实测每卡吞吐×等效满载时长×参考 API 单价。输入、缓存命中和输出分别计价，再合计；日/月产能按同一工作负载与实测速率线性外推。产值与输入成本的差额用于部署预算估算，实际收入取决于业务用量与成交价。
           </p>
         </div>
       </section>
@@ -164,6 +163,6 @@
     <script src="./assets/site.js?v=public-audit-20261101"></script>
     <link rel="stylesheet" href="./assets/current-measurements.css?v=20261020" />
     <script src="./assets/benchmark-source.js?v=evidence-links-20261022"></script>
-    <script type="module" src="assets/serving-plan/app.mjs?v=public-audit-20261101"></script>
+    <script type="module" src="assets/serving-plan/app.mjs?v=concise-copy-20261101"></script>
   </body>
 </html>
