@@ -375,6 +375,11 @@ def maintainer_profile(
     client: GitHubClient, login: str, identities: dict[str, str]
 ) -> dict[str, str]:
     payload = client.user(login)
+    if payload.get("type") in {"Organization", "Bot"}:
+        raise ValueError(
+            f"{login}: MOD maintainers must identify responsible people, "
+            "not the repository organization or an automation account"
+        )
     name = payload.get("name")
     verified_name = identities.get(login.casefold())
     return {
@@ -448,7 +453,9 @@ def build_snapshot(
         if not handles:
             raise ValueError(f"{plugin_id}: no current maintainer remains")
         declared_names = declared_identity_names(item, handles)
-        plugin_identity_names = {**identity_names, **declared_names}
+        # Confirmed organization identities take precedence over stale catalog
+        # nicknames. Declared names still cover people absent from that registry.
+        plugin_identity_names = {**declared_names, **identity_names}
         advisors = declared_advisors(item)
         plugins[plugin_id] = {
             **repository_cache[slug],

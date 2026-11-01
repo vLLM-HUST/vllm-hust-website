@@ -24,11 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 3
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #572 refreshes MOD effects and preserves the joint measurement.
+    # Benchmark #590 corrects MOD ownership and preserves the joint measurement.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "c7e0ad58ec9f5793f91509a8783e26ccbe1a04fe"  # pragma: allowlist secret
+        "ed159ad2ceb04618bbd7f32fd803afd38b15a936"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
