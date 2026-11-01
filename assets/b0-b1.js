@@ -23,6 +23,7 @@
     const ref=data.wholechain_reference, joint=data.full_answer_joint, [a,b]=joint.arms;
     const diagnostic=ref.model_diagnostic.graph_recomputation.find(x=>x.seed===ref.model_diagnostic.primary_seed);
     const continuous=data.packed_continuous;
+    const [q0,q1]=data.acceptance_completion.out256_quality.arms;
     const phases=arm=>continuous[arm].phases.filter(p=>p.name.endsWith('-formal'));
     const phaseText=arm=>phases(arm).map(p=>p.requests).join(' / ')+t(' 请求，',' requests, ')+phases(arm).reduce((sum,p)=>sum+p.failures,0)+t(' 失败',' failures');
     const numeric=(value,target)=>`${number(value)}% · `+(value>=target?t('达标','Met'):t('未达标','Not met'));
@@ -42,7 +43,7 @@
     const overview=group(0,m01Verdict,
       row(t('实测有效算力（out256计数工况）','Measured compute (out256 counted workload)'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,
         t('有效算力已测得；η 验收未通过','Compute measured; η acceptance not passed'),
-        t('缺少 B0 路径参考绑定、匹配的无插桩计时和同预算质量验证。','Missing B0 path-reference binding, matched uninstrumented timing and same-budget quality validation.'))+
+        t('缺少 B0 路径参考及匹配的无插桩计时；同预算评分','Missing B0 path reference and matched uninstrumented timing; same-budget scores')+` B0 ${q0.correct}/${q0.total}、B1 ${q1.correct}/${q1.total}。`)+
       row(t('独立标定模型诊断','Independent calibration model diagnostic'),t('无对应参考值','No bound reference'),`${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
         `${number(diagnostic.efficiency_percent)}% · `+t('模型值低于中期50%门槛','Model value below the 50% midterm target'),
         t('以独立标定的 B1 依赖图计算参考时间，与原计数轮耗时比较。','B1 reference time from independently calibrated dependencies, compared with the counted run.')),
@@ -70,11 +71,11 @@
     const config=runs[1].configuration;
     const taskNames=['MMLU-Pro','HLE-Verified','SWE-bench-Pro','FrontierScience','TerminalBench 2.1'];
     const taskGaps=[
-      t('缺少既定任务全范围的服务异常关联记录。','Missing service-anomaly linkage across the specified task scope.'),
-      t('缺少完整服务异常记录；求解与裁判状态分开统计。','Missing complete service-anomaly records; solver and judge states are tracked separately.'),
-      t('既定任务覆盖不足，缺少 B1 同题配对。','Incomplete assigned-task coverage and missing matched B1 tasks.'),
-      t('受控中断已记录，完整连续稳定性核验未完成。','Controlled interruptions recorded; continuous stability check incomplete.'),
-      t('既定任务覆盖不足，缺少 B1 同题配对，部分任务未评分。','Incomplete assigned-task coverage, missing matched B1 tasks and ungraded attempts.')
+      t('任务质量轮缺少实际达到16K的连续窗口。','The task-quality run lacks a continuous window reaching 16K.'),
+      t('原父进程退出码缺失；资格测试与续跑属于分开的服务区间。','Original parent exit code is missing; qualification and continuation are separate service intervals.'),
+      t('既定任务覆盖不足，缺少 B1 同题配对；已有上下文拒绝和步数耗尽。','Incomplete assigned-task coverage and missing matched B1 tasks; context-limit and step-limit terminations are recorded.'),
+      t('既有配对属于旧冻结组合；本轮 B1 配置缺少对应任务验证。','The existing pair uses the old frozen combination; task validation for this round’s B1 configuration is missing.'),
+      t('既定任务覆盖不足，缺少 B1 同题配对；已有上下文拒绝，部分原任务未评分。','Incomplete assigned-task coverage and missing matched B1 tasks; context-limit rejections and ungraded original attempts are recorded.')
     ];
     const methods=`<details class="comparison-method focus-note"><summary>${t('版本定义、阶段门槛与报告来源','Versions, targets and sources')}</summary>
       <p>${t('B0 固定为 vLLM 0.18 + vLLM-Ascend 0.18。B1 按各项实测配置记录。页面给出本轮测试结论，第三方验收报告另行归档。','B0 is vLLM 0.18 + vLLM-Ascend 0.18. B1 is recorded per measured configuration. This page reports this test round; third-party acceptance reports are archived separately.')}</p>
@@ -85,7 +86,8 @@
       <p>${escape(ref.model)} · ${escape(ref.dtype)} · ${escape(ref.device)} × ${ref.participating_chips} · ${escape(ref.dataset)}</p>
       <p><code>C = F / (k × T × 10¹²)</code>；<code>η = T参 / T × 100%</code>。</p>
       ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('正式 η','Formal η')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),t('未出具：计量条件不完整','Not issued: incomplete measurement conditions')]))}
-      <p>${t('现有 F/T 记录保留计数开销。正式 η 缺少与算量匹配的无插桩时间、B0 路径参考及同输出预算质量验证。','The F/T record includes counting overhead. Formal η lacks matched uninstrumented timing, a bound B0 path reference and same-output-budget quality validation.')}</p>
+      <p>${t('现有 F/T 记录保留计数开销，缺少匹配的无插桩时间与 B0 路径参考。同一 out256 工况的 B1 正确数下降，质量比较未通过。','The F/T record includes counting overhead and lacks matched uninstrumented timing and a B0 path reference. B1 correct count fell in the same out256 workload; its quality comparison failed.')}</p>
+      ${table([t('out256 同预算评分','Same-budget out256 scores'),'B0','B1'],[[t('正确 / 题数','Correct / total'),`${q0.correct}/${q0.total}`,`${q1.correct}/${q1.total}`]])}
       <p>${t('B1 独立标定模型','Independently calibrated B1 model')}: ${number(diagnostic.reference_seconds)} s · ${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')} · ${number(diagnostic.efficiency_percent)}%。${t('模型诊断低于50%门槛；三个调度种子用于敏感性分析。','The model diagnostic is below 50%; three scheduling seeds provide sensitivity analysis.')}</p>
       ${evidence('m01-verdict')}${evidence('acceptance-completion')}</details>
       <details class="comparison-method focus-result" id="method-2"><summary>${titles[1]} · ${t('方法与记录','Methods & records')}</summary>
