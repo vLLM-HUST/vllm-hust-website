@@ -281,7 +281,7 @@ def test_request_controller_is_an_external_ecpa_control_plane() -> None:
     ]
     assert component["maintainers"] == ["yancanmao"]
     assert component["maintainer_profiles"] == [
-        {"login": "yancanmao", "name": "Mao Yancan"}
+        {"login": "yancanmao", "name": "毛言粲"}
     ]
     assert (
         WORKSHOP_METADATA["plugins"][component["id"]]["maintainers"][0]["login"]
@@ -1000,7 +1000,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     kvcompress = WORKSHOP_METADATA["plugins"]["kvcompress-ascend"]
     assert [
         (person["name"], person["login"]) for person in kvcompress["maintainers"]
-    ] == [("张家万", "Jiawan23")]
+    ] == [("张家万", "Jiawan23"), ("韦若皓", "kotoriqaq0"), ("刘思辰", "Seas0")]
     assert kvcompress["advisors"] == [
         {"name_zh": "万瑶", "name_en": "Yao Wan", "relationship": "internal"}
     ]
@@ -1551,7 +1551,10 @@ def test_public_plugin_evidence_never_exposes_internal_machine_ids() -> None:
 
 def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
     expected = {
-        "kvcompress-ascend": ([("张家万", "Jiawan23")], "万瑶"),
+        "kvcompress-ascend": (
+            [("张家万", "Jiawan23"), ("韦若皓", "kotoriqaq0"), ("刘思辰", "Seas0")],
+            "万瑶",
+        ),
         "split-batch-full-graph-migration": (
             [("吴天宇", "Raing5Days"), ("李上上", "ilnnfover")],
             "郑龙",

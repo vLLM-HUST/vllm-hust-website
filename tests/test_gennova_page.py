@@ -1,6 +1,5 @@
 """Public promotion is paused; experiment evidence is deliberately preserved."""
 
-import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,8 +14,5 @@ def test_gennova_is_not_a_public_page_or_navigation_target():
         assert 'id="independent-engines"' not in text, page
 
 
-def test_withdrawal_preserves_benchmark_evidence():
-    data = json.loads((ROOT / "data/gennova-validation-v1.json").read_text())
-    assert data["kind"] == "independent-engine"
-    assert data["b1_replacement_approved"] is False
-    assert data["metrics"]["output_tokens_per_second"] > 0
+def test_relocated_summary_is_not_a_public_data_endpoint():
+    assert not (ROOT / "data/gennova-validation-v1.json").exists()

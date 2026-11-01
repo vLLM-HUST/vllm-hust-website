@@ -247,6 +247,36 @@ def test_private_repository_preserves_public_identity_without_repo_api():
     }
 
 
+@pytest.mark.parametrize("account_type", ["Organization", "Bot"])
+def test_maintainer_profile_rejects_organization_and_automation(account_type):
+    class IdentityClient:
+        def user(self, login):
+            return {"login": login, "name": login, "type": account_type}
+
+    with pytest.raises(ValueError, match="responsible people"):
+        MODULE.maintainer_profile(IdentityClient(), "repository-owner", {})
+
+
+def test_confirmed_identity_overrides_stale_catalog_nickname():
+    class IdentityClient:
+        def user(self, login):
+            return {"login": login, "name": login, "type": "User"}
+
+    item = {
+        "id": "opfuse",
+        "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-opfuse",
+        "repository_visibility": "private",
+        "maintainers": ["KimmoZAG"],
+        "maintainer_profiles": [{"login": "KimmoZAG", "name": "KimmoZAG"}],
+    }
+    result = MODULE.build_snapshot(
+        {"components": [item]},
+        IdentityClient(),
+        identities={"kimmozag": "张睿诚"},
+    )
+    assert result["plugins"]["opfuse"]["maintainers"][0]["name"] == "张睿诚"
+
+
 def test_explicit_no_advisor_overrides_inferred_relationships():
     class PublicIdentityClient:
         def get_json(self, path):
