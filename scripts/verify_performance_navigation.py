@@ -217,7 +217,11 @@ def main():
                                     "修订中" if language == "zh" else "under revision"
                                 ) not in current
                                 for label in (
-                                    ("验收未通过", "吞吐与时延达标", "租赁成本估算与利用率达标")
+                                    (
+                                        "验收未通过",
+                                        "吞吐与时延达标",
+                                        "租赁成本估算与利用率达标",
+                                    )
                                     if language == "zh"
                                     else (
                                         "acceptance failed",
