@@ -20,10 +20,8 @@
     document.getElementById('comparison-title').textContent=t('B0/B1 大纲对比','B0/B1 results by test outline');
     document.getElementById('comparison-lead').textContent=t('按大纲展示有效算力、吞吐与时延、稳定性和成本；固定 B0 为比较基线。','Effective compute, throughput and latency, stability and cost by the test outline, compared with fixed B0.');
     if (!data) return;
-    const ref=data.wholechain_reference, joint=data.full_answer_joint, [a,b]=joint.arms;
-    const diagnostic=ref.model_diagnostic.graph_recomputation.find(x=>x.seed===ref.model_diagnostic.primary_seed);
+    const joint=data.full_answer_joint, [a,b]=joint.arms;
     const continuous=data.packed_continuous;
-    const [q0,q1]=data.acceptance_completion.out256_quality.arms;
     const phases=arm=>continuous[arm].phases.filter(p=>p.name.endsWith('-formal'));
     const phaseText=arm=>phases(arm).map(p=>p.requests).join(' / ')+t(' 请求，',' requests, ')+phases(arm).reduce((sum,p)=>sum+p.failures,0)+t(' 失败',' failures');
     const numeric=(value,target)=>`${number(value)}% · `+(value>=target?t('达标','Met'):t('未达标','Not met'));
@@ -36,28 +34,59 @@
     const row=(name,b0,b1,status,basis)=>`<div class="comparison-row"><h3>${escape(name)}</h3><dl>${[['B0',b0],['B1',b1],[t('结果','Result'),status],[t('计算依据','Basis'),basis]].map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl></div>`;
     const group=(i,verdict,rows,note,path)=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2><p class="comparison-verdict"><strong>${escape(verdict)}</strong></p>${rows}<p class="comparison-caveat">${escape(note)}</p><a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a><p class="focus-source"><a href="${source(path)}">${t('来源与复算','Source and calculation')}</a></p></section>`;
     const qualityBasis=t('MMLU-Pro 固定200题；原评分器；回答上限8192 token。','MMLU-Pro fixed 200; original scorer; output cap 8192 tokens.');
-    const m01Verdict=t('B1 基础算量已复算；η 需同步计时和独立参考','B1 basic work recomputed; η needs synchronized timing and an independent reference');
+    const m01Verdict=t('完整回答批次：从请求记录计算单芯片算力','Full-answer batch: deriving per-chip compute from request records');
     const stabilityVerdict=t('五任务稳定性验收未通过','Five-task stability acceptance failed');
     const continuousVerdict=zeroFailures?t('两组均零失败','Zero failures in both arms'):t('窗口失败或缺失','Failed or missing windows');
     const currentPath='reports/full-answer-joint-20261030/';
     const [c0,c1]=compute.arms;
     const extended=compute.b1_basic_work_interval;
     const computeRange=extended.client_tflops_per_chip_interval.map(number).join('–');
-    const overview=group(0,m01Verdict,
-      row(t('完整回答 B1：基础算量 / 客户端时间','Full-answer B1: basic work / client time'),t('缺逐步 MTP 记录','Detailed MTP sequence absent'),`${computeRange} TFLOPS/${t('芯片','chip')}`,
-        t('GDN 分块算量上下界','GDN partition-work bounds'),
-        t('已恢复200请求、247720步 MTP；计入必要草稿依赖、基础标量及 GDN 状态运算。区间来自实际 prefill 分块未知。','Recovered native MTP sequences for 200 requests and 247720 steps; includes necessary draft dependencies, basic scalar and GDN state arithmetic. Unknown actual prefill partitions determine the range.'))+
-      row(t('完整回答：主干矩阵小计 / 客户端时间','Full answer: target-matrix subtotal / client time'),`${number(c0.matrix_subtotal_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,`${number(c1.matrix_subtotal_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
-        t('本次复算；矩阵小计','Current recomputation; matrix subtotal'),
-        t('逐题计算投影、因果 QK/AV 和词表矩阵，除以各自客户端时间。未计入 GDN 状态运算、基础标量和必要 MTP 依赖。','Per-request projections, causal QK/AV and vocabulary matrices divided by each client interval. GDN state arithmetic, basic scalar operations and necessary MTP dependencies are not included.'))+
-      row(t('旧 out256：有效算力（含计数开销）','Prior out256: effective compute (counting overhead retained)'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,
-        t('B1 有效算力提高','Higher B1 effective compute'),
-        t('计数运行含插桩开销；out256 评分','Instrumented run; out256 scores')+` B0 ${q0.correct}/${q0.total}、B1 ${q1.correct}/${q1.total}。`)+
-      row(t('旧 out256：独立标定模型','Prior out256: independent calibration model'),t('—','—'),`${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
-        `${number(diagnostic.efficiency_percent)}% · `+t('低于中期50%目标','Below the 50% midterm target'),
-        t('以独立标定的 B1 依赖图计算参考时间，与原计数轮耗时比较。','B1 reference time from independently calibrated dependencies, compared with the counted run.')),
-      t('大纲：C=F/(k×T×10¹²)，η=100×T_ref/T；中期≥50%，最终≥90%。B0 补 MTP；两臂补 GDN 分块点值、同步计时和参考模型。','Outline: C=F/(k×T×10¹²), η=100×T_ref/T; midterm ≥50%, final ≥90%. B0 needs MTP sequences; both arms need actual GDN partitions, synchronized timing and reference models.'),
-      compute.report_path)+
+    const integer=v=>v.toLocaleString('en-US');
+    const coefficients=compute.coefficients, positions=c1.necessary_target_positions, pairs=c1.causal_pairs;
+    const parts=c1.matrix_flops_parts, deps=extended.dependencies;
+    const known=c1.matrix_flops_subtotal+extended.target_scalar_flops+extended.necessary_draft_flops;
+    const step=(n,title,body)=>`<section class="compute-step" data-calculation-step="${n}"><h3>${n}. ${escape(title)}</h3>${body}</section>`;
+    const calculation=
+      step(1,t('确定同批请求与计时','Identify the paired requests and timing'),
+        `<p>${t('Qwen3.5-35B-A3B · BF16 · 双卡910B2 · MMLU-Pro固定200题，回答上限8192 token。B1采用 BetterScale E24/R36、KV重算、FA Microflow 与 MTP2。','Qwen3.5-35B-A3B · BF16 · two 910B2 chips · MMLU-Pro fixed 200, output cap 8192 tokens. B1 uses BetterScale E24/R36, KV recomputation, FA Microflow and MTP2.')}</p>`+
+        table([t('原始量','Input'),'B0','B1'],[
+          [t('运行','Run'),c0.run,c1.run],
+          [t('请求数 R','Requests R'),integer(c0.requests),integer(c1.requests)],
+          [t('输入 token ΣI','Input tokens ΣI'),integer(c0.input_tokens),integer(c1.input_tokens)],
+          [t('输出 token ΣO','Output tokens ΣO'),integer(c0.output_tokens),integer(c1.output_tokens)],
+          [t('客户端区间 T_client（秒）','Client interval T_client (s)'),c0.client_seconds.toFixed(10),c1.client_seconds.toFixed(10)],
+          [t('参与芯片 k','Participating chips k'),c0.chips,c1.chips]
+        ]))+
+      step(2,t('按实际长度计算目标模型矩阵算量','Count target-model matrices from actual lengths'),
+        `<p>${t('以下逐步展开 B1。每题输入 Iⱼ、输出 Oⱼ；最后发出的 token 不再作为一次新输入。','The following steps expand B1. Each request has input Iⱼ and output Oⱼ; the final emitted token is not a new input.')}</p>
+        <p>N = Σ(Iⱼ + Oⱼ − 1) = ${integer(c1.input_tokens)} + ${integer(c1.output_tokens)} − ${c1.requests} = ${integer(positions)}</p>
+        <p>A = Σ[(Iⱼ + Oⱼ − 1)(Iⱼ + Oⱼ)/2] = ${integer(pairs)}</p>
+        <p>${t('A 按逐题长度求和，不对合并后的 token 总数取三角数。矩阵乘法按2MNK，MoE只计激活专家。','A sums the causal pairs of each request, rather than using the combined token count. Matrix multiplication uses 2MNK; MoE counts activated experts.')}</p>`+
+        table([t('矩阵项','Matrix term'),t('代入计算（FLOPs）','Substitution (FLOPs)')],[
+          [t('投影：全注意力 + GDN + MoE/路由','Projections: full attention + GDN + MoE/router'),`(${Object.values(coefficients.projection_per_position).map(integer).join(' + ')}) × ${integer(positions)} = ${integer(parts.target_projections)}`],
+          ['QK / AV',`${integer(coefficients.causal_qk_av_per_pair)} × ${integer(pairs)} = ${integer(parts.target_causal_qk_av)}`],
+          [t('输出词表','Output vocabulary'),`${integer(coefficients.vocabulary_per_output)} × ${integer(c1.output_tokens)} = ${integer(parts.target_vocabulary)}`],
+          ['F_matrix',`${Object.values(parts).map(integer).join(' + ')} = ${integer(c1.matrix_flops_subtotal)}`]
+        ]))+
+      step(3,t('加入基础标量与必要草稿运算','Add basic scalar and necessary draft operations'),
+        `<p>F_scalar = N × (1,627,333 + 1,683,480 + 371,520 + 1,720,320 − 160) − R × 2,949,120 + A × 480 + (ΣO − R) × 110,223,360 = ${integer(extended.target_scalar_flops)}</p>
+        <p>${t('依次对应归一化/残差/门控、位置编码与路由、GDN预处理、卷积、softmax与解码状态更新。','These terms cover normalization/residual/gating, positional encoding and routing, GDN preprocessing, convolution, softmax and decode-state updates.')}</p>
+        <p>${t('从逐步 MTP 接纳记录追踪最终输出需要的依赖：','Trace dependencies needed by retained outputs from the native MTP acceptance sequence:')} ${integer(deps.kv_rows)} KV、${integer(deps.full_query_rows)} query、${integer(deps.retained_vocab_rows)} vocab、${integer(deps.attention_pairs)} QK/AV pairs。</p>
+        <p>F_draft = 20,998,533 × ${integer(deps.kv_rows)} + 108,091,657 × ${integer(deps.full_query_rows)} + 1,017,118,720 × ${integer(deps.retained_vocab_rows)} + 16,432 × ${integer(deps.attention_pairs)} = ${integer(extended.necessary_draft_flops)}</p>
+        <p>${t('未采纳草稿、填充和重复工作不计入有效算量。','Rejected drafts, padding and redundant work are excluded.')}</p>`)+
+      step(4,t('求 GDN 预填充算量的上下界','Bound GDN prefill work'),
+        `<p>${t('对每题输入 Iⱼ，枚举每块1–64 token的合法分割。首块用零初态成本 c₀，后续块用延续状态成本 c₊；动态规划分别求所有分割的最小、最大总算量。','For each input Iⱼ, consider partitions with 1–64 tokens per chunk. Use zero-initial-state cost c₀ for the first chunk and continued-state cost c₊ thereafter; dynamic programming finds minimum and maximum total work.')}</p>
+        <p>F_GDN ∈ [Σ min_partition Σ c(chunk), Σ max_partition Σ c(chunk)] = [${extended.gdn_prefill_flops_interval.map(integer).join(', ')}]</p>
+        <p>${t('区间来自原记录未保存实际分块，表示算量边界。分块成本表和递推式见下方方法。','The original record does not retain actual chunk partitions, so this is a work bound. Chunk costs and the recurrence are linked below.')}</p>`)+
+      step(5,t('合计有效算量，再除以芯片数和时间','Sum effective work, then divide by chips and time'),
+        `<p>F = F_matrix + F_scalar + F_draft + F_GDN</p>
+        <p>= ${integer(c1.matrix_flops_subtotal)} + ${integer(extended.target_scalar_flops)} + ${integer(extended.necessary_draft_flops)} + [${extended.gdn_prefill_flops_interval.map(integer).join(', ')}]</p>
+        <p>= ${integer(known)} + [${extended.gdn_prefill_flops_interval.map(integer).join(', ')}] = [${extended.basic_work_flops_interval.map(integer).join(', ')}] FLOPs</p>
+        <p>C₁,client = F / (k × T_client × 10¹²) = [${extended.basic_work_flops_interval.map(integer).join(', ')}] / (${c1.chips} × ${c1.client_seconds.toFixed(10)} × 10¹²)</p>
+        <p><strong>= ${computeRange} TFLOPS/${t('芯片','chip')}</strong></p>
+        <p>${t('当前计算采用请求提交至响应排空的客户端区间。大纲 C₁ 使用同步墙钟 T；η₁=100×T参,₁/T₁，本批同步 T 和独立 T参 尚无记录。B0 的完整算量缺逐步 MTP 记录。','This calculation uses the client interval from submission to response drain. Outline C₁ uses synchronized wall time T; η₁=100×T_ref,₁/T₁. This batch has no synchronized T or independent T_ref record. Complete B0 work lacks the stepwise MTP sequence.')}</p>`);
+    const overview=group(0,m01Verdict,calculation,
+      t('大纲：C=F/(k×T×10¹²)，η=100×T参/T；中期≥50%，最终≥90%。','Outline: C=F/(k×T×10¹²), η=100×T_ref/T; midterm ≥50%, final ≥90%.'),compute.report_path)+
       group(1,servingPass?t('吞吐与时延达标','Throughput and latency targets met'):t('吞吐与时延未达标','Throughput or latency targets not met'),
         row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/${a.completed} · ${a.truncated}`,`${b.correct}/${b.completed} · ${b.truncated}`,qualityVerdict,qualityBasis)+
         row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(a.output_tokens_per_second),number(b.output_tokens_per_second),numeric(joint.output_throughput_change_percent,10),t('提升门槛 ≥10%。','Target: improvement ≥10%.'))+
@@ -71,9 +100,9 @@
         t('五任务待补：同题配对、服务异常记录及连续稳定性检查，详见任务清单。','Five-task checklist: matched tasks, service-anomaly records and continuous stability checks.'),currentPath+'continuous-summary.json')+
       group(3,costPass?t('租赁成本估算与利用率达标','Rental-cost estimate and utilization targets met'):t('租赁成本估算未达标','Rental-cost estimate target not met'),
         row(t('每百万输出 token 租赁估算（元）','Rental estimate per million output tokens (CNY)'),number(a.cost.cny_per_million_output_tokens),number(b.cost.cny_per_million_output_tokens),numeric(joint.rental_cost_reduction_percent,10),t('同一报价、费用范围和测量区间；降幅门槛 ≥10%。','Same price, scope and measurement interval; target reduction ≥10%.'))+
-        row(t('同请求区间 AI Core 采样均值','AI Core sample mean over the same request interval'),number(a.utilization.mean_percent)+'%',number(b.utilization.mean_percent)+'%',
+        row(t('AI Core 时间平均利用率（设备监控）','Time-averaged AI Core utilization (device monitoring)'),number(a.utilization.mean_percent)+'%',number(b.utilization.mean_percent)+'%',
           t('利用率提高','Utilization increased')+` ${number(b.utilization.mean_percent-a.utilization.mean_percent)} `+t('个百分点','percentage points'),
-          t('双卡同期采样，按采样时长加权。','Two-card samples over the same interval, duration-weighted.')),
+          t('同批请求区间内按时长加权，再对双卡取平均；用于3.4.4利用率对照，不是3.4.1的 C₁ 或 η。','Duration-weighted samples over each paired request interval, averaged across both chips; the utilization comparison for 3.4.4, not C₁ or η in 3.4.1.')),
         t('按天翼云同类双卡910B公开月租估算，费用组成见详情。','Estimated from public CTYun dual-910B monthly rental. Cost components are in the details.'),currentPath+'joint-summary.json');
     const latency=data.c16_equal_request_latency, c16=data.milestone_contract.recomputed.c16_fixed_b0;
     const runs=latency.arms.map(arm=>runEvidence.runs.find(r=>r.run_id===arm.run_id));
@@ -121,7 +150,7 @@
         [t('时间与吞吐','Time and throughput'),t('同工作量且 O₀=O₁ 时 S_Q=S_T。本组自然回答长度不同，两个倍率分别计算。','For equal work and O₀=O₁, S_Q=S_T. Natural-answer lengths differ here, so the ratios are calculated separately.')],
         [t('等租价成本','Equal-rate cost'),t('完整部署小时费用相同、计费与测量窗口一致时，降幅=100×(1−1/S_Q)。','With equal complete-deployment hourly rates and matching billing/measurement intervals, reduction=100×(1−1/S_Q).')],
         [t('百分比与重复测量','Percentages and repetitions'),t('η_B0=190%：1.9倍，提升90%。重复测量逐对计算倍率后取中位数，保留全部重复。','η_B0=190%: 1.9×, a 90% gain. For repetitions, take the median of within-pair ratios and retain all runs.')],
-        [t('独立参考 η_ref','Independent reference η_ref'),t('η_ref=100×T_ref/T；中期目标50%，最终90%。旧B1标定图的 T_ref=47.5033秒。','η_ref=100×T_ref/T; targets: 50% midterm, 90% final. The old B1 calibration graph gives T_ref=47.5033 s.')]
+        [t('独立参考 η_ref','Independent reference η_ref'),t('η_ref=100×T_ref/T；中期目标50%，最终90%。T_ref由对应工况独立标定及依赖模型推导。','η_ref=100×T_ref/T; targets: 50% midterm, 90% final. T_ref comes from independent calibration and dependencies for the matched workload.')]
       ])}
       <p class="focus-source"><a href="${methodSource}">${t('完整公式与只读复算命令','Full method and read-only recomputation command')}</a> · <a href="${source(currentPath+'joint-summary.json')}">${t('本批原始记录','Original paired record')}</a></p>
       </details></section>`;
@@ -130,16 +159,12 @@
       <p id="acceptance-stages">${t('中期 η_ref ≥50%，最终 η_ref ≥90%；吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Midterm η_ref ≥50%, final η_ref ≥90%; throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
       <p class="focus-source">${escape(data.version)} · <a href="${source(data.m01_method.outline.path)}">${t('测试大纲 V1.5 课题四','V1.5 Project 4 test outline')}</a> · <a href="${escape(data.report_url)}">${t('完整报告与原始记录','Full report and records')}</a></p></details>
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('方法与记录','Methods & records')}</summary>
-      <p class="focus-status"><strong>${m01Verdict}</strong></p>
-      <p>${escape(ref.model)} · ${escape(ref.dtype)} · ${escape(ref.device)} × ${ref.participating_chips} · ${escape(ref.dataset)}</p>
-      <p><code>C = F / (k × T × 10¹²)</code>；<code>η_ref = T参 / T × 100%</code>。</p>
-      <p>${t('本批 B1 基础算量区间','Current B1 basic-work interval')}: F ∈ [${extended.basic_work_flops_interval.map(v=>v.toExponential(9)).join(', ')}] FLOPs；T_client = ${number(c1.client_seconds)} s；F / (2 × T_client × 10¹²) = ${computeRange} TFLOPS/${t('芯片','chip')}。</p>
-      <p>${t('区间覆盖1–64 token的 GDN prefill 分块组合，首块零状态、后续延续状态。该行使用客户端计时；同步验收值和 η 需匹配计时与独立参考。','The interval covers 1–64-token GDN prefill partitions, with zero initial state and continued state thereafter. This row uses client timing; synchronized acceptance compute and η need matched timing and an independent reference.')} <a href="${source(compute.report_path)}">${t('逐项算量与复算','Operation ledger and recomputation')}</a></p>
-      ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('正式 η_ref','Formal η_ref')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),t('缺参考与无插桩计时','Missing reference and uninstrumented timing')]))}
-      <p>${t('F/T 含计数开销。out256 正确数由21降至19，质量比较未通过。','F/T includes counting overhead. Out256 correct answers fell from 21 to 19, failing the quality comparison.')}</p>
-      <details><summary>${t('out256 同预算质量','Same-budget out256 quality')}</summary>${table([t('指标','Metric'),'B0','B1'],[[t('正确 / 题数','Correct / total'),`${q0.correct}/${q0.total}`,`${q1.correct}/${q1.total}`]])}</details>
-      <p>${t('B1 独立标定模型','Independently calibrated B1 model')}: ${number(diagnostic.reference_seconds)} s · ${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')} · ${number(diagnostic.efficiency_percent)}%。${t('三个调度种子用于敏感性分析。','Three scheduling seeds provide sensitivity analysis.')}</p>
-      ${evidence('m01-verdict')}${evidence('acceptance-completion')}</details>
+      <p>${t('主表按同一完整回答批次列出输入、矩阵、标量、必要草稿、GDN分块和最终除法。原始数据与逐项系数来自同一版本的复算报告。','The main calculation follows one full-answer batch through inputs, matrices, scalar work, necessary drafts, GDN partitions and final division. Inputs and coefficients come from the same versioned calculation report.')}</p>
+      <p><a href="${source(compute.report_path)}">${t('完整推导与复算命令','Full derivation and recomputation command')}</a> · <a href="${source('reports/full-answer-compute-20261101/operation-catalog.json')}">${t('标量、草稿及分块成本系数表','Scalar, draft and chunk-cost coefficient catalog')}</a></p>
+      <p>L(0)=U(0)=0; L(n)=min₁≤ⱼ≤min(64,n) {n=j ? c₀(j) : L(n−j)+c₊(j)}; U(n)=max₁≤ⱼ≤min(64,n) {n=j ? c₀(j) : U(n−j)+c₊(j)}.</p>
+      <p>F_GDN ∈ [Σ L(Iⱼ), Σ U(Iⱼ)]</p>
+      <p><code>python scripts/recompute_full_answer_compute.py --check</code></p>
+      <p>${t('在 benchmark 仓库执行，只读取已归档记录。','Run in the benchmark repository; reads archived records only.')}</p></details>
       <details class="comparison-method focus-result" id="method-2"><summary>${titles[1]} · ${t('方法与记录','Methods & records')}</summary>
       <h3>${t('完整回答批次','Full-answer batch')}</h3>${sectionTables('full-answer-joint',[0])}
       <p>${qualityBasis} ${t('负载：同一突发到达序列。统计：已完成响应的吞吐与逐请求平均时延。交互式服务 SLO：未测。','Load: the same burst arrival sequence. Statistics: throughput and per-request mean latency of completed responses. Interactive-service SLO: untested.')}</p>
@@ -163,6 +188,11 @@
       <p><code>${escape(data.milestone_contract.cost_method.allocated_expense)}</code>；${t('单位成本 = 10⁶ × 区间分摊费用 / 成功完成请求的输出 token 数。','Unit cost = 10⁶ × allocated interval expense / output tokens from completed requests.')}</p>
       <p>${t('费用取值','Price basis')}: ${escape(a.cost.price_basis.provider)} · ${escape(a.cost.price_basis.sku)} · ${a.cost.price_basis.instance_monthly_price} ${t('元/月','CNY/month')} · ${a.cost.price_basis.month_days_for_analysis} ${t('天/月','days/month')}.</p>
       <p>${t('采用同类机器公开报价估算，包含CPU、主存及加速卡，云盘和公网另计。成功完成请求的全部输出计入分母，包含答错和长度终止；固定费用按实际占用双卡与时长分摊。','The analogous-machine public quote includes CPU, RAM and accelerators; disk/network are separate. All completed-response output counts, including incorrect and length-stopped answers. Fixed expense uses both reserved cards and elapsed time.')}</p>
+      <h3>${t('设备监控利用率如何计算','How device utilization is calculated')}</h3>
+      <p>U_card = Σ(U_sample × Δt_overlap) / T; U = (Σ U_card) / k.</p>
+      <p>${t('Δt_overlap 是采样覆盖区间与本批测量窗口的交集时长。先对每卡按时间加权，再对参与芯片求平均。','Δt_overlap is the overlap between the sample interval and this batch’s measurement window. Weight by time per card, then average over participating chips.')}</p>
+      ${table([t('每卡采样均值','Per-card mean'),'B0','B1'],Object.keys(b.utilization.per_card_percent).map(card=>[card,number(a.utilization.per_card_percent[card])+'%',number(b.utilization.per_card_percent[card])+'%']))}
+      <p>${t('该百分比描述AI Core的忙碌程度，不包含有效FLOPs计数。重复运算和未采纳草稿也会占用设备，因此不能把 U 当成 C₁ 或 η，也不能用 U 乘硬件峰值代替有效算力。','This percentage describes AI Core activity, without counting effective FLOPs. Redundant computation and rejected drafts can also occupy the device. U is neither C₁ nor η; multiplying U by hardware peak throughput does not yield effective compute.')}</p>
       <p><a href="./serving-plan.html">${t('调整部署费用，计算产能与成本 →','Adjust deployment costs and estimate capacity →')}</a></p>${evidence('full-answer-joint')}${evidence('milestone-v15')}</details>`;
     root.innerHTML=`<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('各项结果','Results by metric')}</h2><p class="comparison-context">${escape(data.version)} · ${t('B0 0.18/0.18 → B1；版本、公式与任务记录见下方详情。','B0 0.18/0.18 → B1. Versions, formulas and task records are below.')}</p>${overview}</section>${baseline}<section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('方法、任务清单与原始记录','Methods, task inventory and source records')}</h2>${methods}</section>`;
     root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',()=>{root.querySelector(link.getAttribute('href')).open=true;}));
@@ -217,6 +247,10 @@
       if(!Number.isSafeInteger(f)||f!==measured.matrix_flops_subtotal+extended.target_scalar_flops+extended.necessary_draft_flops+extended.gdn_prefill_flops_interval[i]||extended.client_tflops_per_chip_interval[i]!==f/(2*measured.client_seconds*1e12))throw Error('Extended arithmetic mismatch');
     });
     if(extended.basic_work_flops_interval[0]>extended.basic_work_flops_interval[1]||['synchronized_effective_tflops_per_chip','reference_seconds','efficiency_percent','outline_pass'].some(k=>extended[k]!==null))throw Error('Client-work interval cannot supply outline acceptance');
+    const n=measured.necessary_target_positions, p=measured.causal_pairs, o=measured.output_tokens, requests=measured.requests, dep=extended.dependencies;
+    const scalar=n*(1627333+1683480+371520+1720320-160)-requests*2949120+p*480+(o-requests)*110223360;
+    const draft=20998533*dep.kv_rows+108091657*dep.full_query_rows+1017118720*dep.retained_vocab_rows+16432*dep.attention_pairs;
+    if(scalar!==extended.target_scalar_flops||draft!==extended.necessary_draft_flops)throw Error('Displayed coefficient calculation mismatch');
     data=d;manifest=m;runEvidence=runs;compute=counts;render();
   }
   loadPublication().catch(error=>{console.error('B0/B1 publication load failed',error);root.textContent=t('结果加载失败或校验不一致，请刷新重试。','Results unavailable or publication verification failed; please retry.');});
