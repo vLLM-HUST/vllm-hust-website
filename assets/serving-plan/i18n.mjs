@@ -47,7 +47,7 @@ const copy = new Map([
   ["正在读取方案…", "Loading measured plans…"],
   ["选择模型与部署方案，查看各自的产能与价格。", "Select models and deployment plans to compare their capacity and pricing."],
   ["有效利用率", "Effective utilization"],
-  ["100% 按实测满载速率外推；其他利用率折算为等效满载时长。", "100% extrapolates the measured full-load rate; other utilization levels scale equivalent full-load time."],
+  ["100% 按实测速率外推满载产能；其他利用率折算为等效满载时长。", "100% extrapolates full-load capacity from the measured rate; other utilization levels scale equivalent full-load time."],
   ["综合成本 · 元 / 卡月", "Total cost · CNY / card-month"],
   ["选填", "Optional"],
   ["可合并卡租、主机、内存、电力与运维。不填成本，不计算差额。", "Include card rental, host, memory, electricity and operations. Leave blank to omit the cost comparison."],
