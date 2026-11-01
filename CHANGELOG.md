@@ -16,6 +16,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Avoid a delayed hash-change reopening the calculation disclosure after keyboard collapse.
+
 - Validate acceptance thresholds in the methods disclosure while keeping the result overview concise.
 
 - Keep the current compute result in one comparison row and place its full derivation in the default-collapsed methods section, matching the other outline sections.
