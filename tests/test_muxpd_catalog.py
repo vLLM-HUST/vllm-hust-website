@@ -24,7 +24,8 @@ def test_muxpd_joins_as_a_restricted_runtime_mod_with_organization_support():
     assert row["public_surface"] is True
     assert row["maturity"] == "experimental"
     assert row["evidence_level"] == "hardware_verified"
-    assert row["maintainers"] == ["vLLM-HUST"]
+    assert row["maintainers"] == ["Irisuko"]
+    assert row["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛潮云"}]
     assert row["support_url"] == row["canonical_repository"] + "/issues"
     taxonomy = load("mod-taxonomy.json")["components"]["muxpd"]
     assert taxonomy["kind"] == "runtime_mod"
@@ -34,8 +35,9 @@ def test_muxpd_joins_as_a_restricted_runtime_mod_with_organization_support():
     assert "latency_slo" in load("plugin-workload-navigation.json")["plugins"]["muxpd"]
     metadata = load("plugin-workshop-metadata.json")["plugins"]["muxpd"]
     assert metadata["repository_url"] == row["canonical_repository"]
-    assert [item["login"] for item in metadata["maintainers"]] == ["vLLM-HUST"]
-    assert metadata["advisors"] == []
+    assert [item["login"] for item in metadata["maintainers"]] == ["Irisuko"]
+    assert metadata["advisors"] == row["advisors"]
+    assert [person["name_zh"] for person in metadata["advisors"]] == ["罗瑞坤"]
 
 
 def test_muxpd_qualification_link_is_immutable_and_keeps_numerical_limits():
