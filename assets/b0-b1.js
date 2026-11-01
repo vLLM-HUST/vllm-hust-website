@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  let data, manifest, runEvidence;
+  let data, manifest, runEvidence, compute;
   const root = document.getElementById('comparison');
   const escape = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const t = (cn, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? cn : en;
@@ -18,7 +18,7 @@
   };
   function render() {
     document.getElementById('comparison-title').textContent=t('B0/B1 大纲对比','B0/B1 results by test outline');
-    document.getElementById('comparison-lead').textContent=t('以固定 B0 为基线，展示相对吞吐效率、时延与成本，以及大纲各项结果。','Measured B0-relative throughput efficiency, latency and cost, alongside the outline results.');
+    document.getElementById('comparison-lead').textContent=t('按大纲展示有效算力、吞吐与时延、稳定性和成本；固定 B0 为比较基线。','Effective compute, throughput and latency, stability and cost by the test outline, compared with fixed B0.');
     if (!data) return;
     const ref=data.wholechain_reference, joint=data.full_answer_joint, [a,b]=joint.arms;
     const diagnostic=ref.model_diagnostic.graph_recomputation.find(x=>x.seed===ref.model_diagnostic.primary_seed);
@@ -36,19 +36,28 @@
     const row=(name,b0,b1,status,basis)=>`<div class="comparison-row"><h3>${escape(name)}</h3><dl>${[['B0',b0],['B1',b1],[t('结果','Result'),status],[t('计算依据','Basis'),basis]].map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl></div>`;
     const group=(i,verdict,rows,note,path)=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2><p class="comparison-verdict"><strong>${escape(verdict)}</strong></p>${rows}<p class="comparison-caveat">${escape(note)}</p><a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a><p class="focus-source"><a href="${source(path)}">${t('来源与复算','Source and calculation')}</a></p></section>`;
     const qualityBasis=t('MMLU-Pro 固定200题；原评分器；回答上限8192 token。','MMLU-Pro fixed 200; original scorer; output cap 8192 tokens.');
-    const m01Verdict=t('η_ref 计量验收未通过','η_ref measurement acceptance failed');
+    const m01Verdict=t('B1 基础算量已复算；η 需同步计时和独立参考','B1 basic work recomputed; η needs synchronized timing and an independent reference');
     const stabilityVerdict=t('五任务稳定性验收未通过','Five-task stability acceptance failed');
     const continuousVerdict=zeroFailures?t('两组均零失败','Zero failures in both arms'):t('窗口失败或缺失','Failed or missing windows');
     const currentPath='reports/full-answer-joint-20261030/';
+    const [c0,c1]=compute.arms;
+    const extended=compute.b1_basic_work_interval;
+    const computeRange=extended.client_tflops_per_chip_interval.map(number).join('–');
     const overview=group(0,m01Verdict,
-      row(t('实测有效算力（out256计数工况）','Measured compute (out256 counted workload)'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,
+      row(t('完整回答 B1：基础算量 / 客户端时间','Full-answer B1: basic work / client time'),t('缺逐步 MTP 记录','Detailed MTP sequence absent'),`${computeRange} TFLOPS/${t('芯片','chip')}`,
+        t('GDN 分块算量上下界','GDN partition-work bounds'),
+        t('已恢复200请求、247720步 MTP；计入必要草稿依赖、基础标量及 GDN 状态运算。区间来自实际 prefill 分块未知。','Recovered native MTP sequences for 200 requests and 247720 steps; includes necessary draft dependencies, basic scalar and GDN state arithmetic. Unknown actual prefill partitions determine the range.'))+
+      row(t('完整回答：主干矩阵小计 / 客户端时间','Full answer: target-matrix subtotal / client time'),`${number(c0.matrix_subtotal_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,`${number(c1.matrix_subtotal_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
+        t('本次复算；矩阵小计','Current recomputation; matrix subtotal'),
+        t('逐题计算投影、因果 QK/AV 和词表矩阵，除以各自客户端时间。未计入 GDN 状态运算、基础标量和必要 MTP 依赖。','Per-request projections, causal QK/AV and vocabulary matrices divided by each client interval. GDN state arithmetic, basic scalar operations and necessary MTP dependencies are not included.'))+
+      row(t('旧 out256：有效算力（含计数开销）','Prior out256: effective compute (counting overhead retained)'),`${number(ref.B0.own_C)} TFLOPS/${t('芯片','chip')}`,`${number(ref.B1.own_C)} TFLOPS/${t('芯片','chip')}`,
         t('B1 有效算力提高','Higher B1 effective compute'),
         t('计数运行含插桩开销；out256 评分','Instrumented run; out256 scores')+` B0 ${q0.correct}/${q0.total}、B1 ${q1.correct}/${q1.total}。`)+
-      row(t('独立标定模型','Independent calibration model'),t('—','—'),`${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
+      row(t('旧 out256：独立标定模型','Prior out256: independent calibration model'),t('—','—'),`${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')}`,
         `${number(diagnostic.efficiency_percent)}% · `+t('低于中期50%目标','Below the 50% midterm target'),
         t('以独立标定的 B1 依赖图计算参考时间，与原计数轮耗时比较。','B1 reference time from independently calibrated dependencies, compared with the counted run.')),
-      t('η_ref 目标：中期≥50%，最终≥90%。待补：B0 路径参考、匹配的无插桩计时。','η_ref targets: midterm ≥50%, final ≥90%. Missing measurements: B0 path reference and matched uninstrumented timing.'),
-      'reports/acceptance-completion-20261029/reference-reassessment-20261029.json')+
+      t('大纲：C=F/(k×T×10¹²)，η=100×T_ref/T；中期≥50%，最终≥90%。B0 补 MTP；两臂补 GDN 分块点值、同步计时和参考模型。','Outline: C=F/(k×T×10¹²), η=100×T_ref/T; midterm ≥50%, final ≥90%. B0 needs MTP sequences; both arms need actual GDN partitions, synchronized timing and reference models.'),
+      compute.report_path)+
       group(1,servingPass?t('吞吐与时延达标','Throughput and latency targets met'):t('吞吐与时延未达标','Throughput or latency targets not met'),
         row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/${a.completed} · ${a.truncated}`,`${b.correct}/${b.completed} · ${b.truncated}`,qualityVerdict,qualityBasis)+
         row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(a.output_tokens_per_second),number(b.output_tokens_per_second),numeric(joint.output_throughput_change_percent,10),t('提升门槛 ≥10%。','Target: improvement ≥10%.'))+
@@ -79,9 +88,9 @@
     ];
     const throughputB0=a.successful_output_tokens/a.phase_seconds, throughputB1=b.successful_output_tokens/b.phase_seconds;
     const speed=throughputB1/throughputB0, etaB0=100*speed;
-    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/6052874d496c79a3c011ace7cb9dd2c00333f850/docs/B0_BASELINE_METRICS.md';
+    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/79a4b24a330cb007b341b3303d76406534976815/docs/B0_BASELINE_METRICS.md';
     const baseline=`<section class="focus-result" id="b0-baseline" aria-labelledby="b0-baseline-title">
-      <h2 id="b0-baseline-title">${t('B0 实测基线：相对吞吐效率 η_B0','Measured B0 baseline: relative throughput efficiency η_B0')}</h2>
+      <h2 id="b0-baseline-title">${t('补充比较：B0 相对吞吐 η_B0','Supplement: B0-relative throughput η_B0')}</h2>
       <p>${t('以 vLLM 0.18 + vLLM-Ascend 0.18 的实测吞吐为100%，比较 B1 的吞吐、时延与成本。','Measured vLLM 0.18 + vLLM-Ascend 0.18 throughput is the 100% baseline for comparing B1 throughput, latency and cost.')}</p>
       ${table([t('指标','Metric'),'B0','B1'],[
         [t('相对吞吐效率 η_B0','Relative throughput efficiency η_B0'),'100.0000%',number(etaB0)+'%'],
@@ -124,6 +133,8 @@
       <p class="focus-status"><strong>${m01Verdict}</strong></p>
       <p>${escape(ref.model)} · ${escape(ref.dtype)} · ${escape(ref.device)} × ${ref.participating_chips} · ${escape(ref.dataset)}</p>
       <p><code>C = F / (k × T × 10¹²)</code>；<code>η_ref = T参 / T × 100%</code>。</p>
+      <p>${t('本批 B1 基础算量区间','Current B1 basic-work interval')}: F ∈ [${extended.basic_work_flops_interval.map(v=>v.toExponential(9)).join(', ')}] FLOPs；T_client = ${number(c1.client_seconds)} s；F / (2 × T_client × 10¹²) = ${computeRange} TFLOPS/${t('芯片','chip')}。</p>
+      <p>${t('区间覆盖1–64 token的 GDN prefill 分块组合，首块零状态、后续延续状态。该行使用客户端计时；同步验收值和 η 需匹配计时与独立参考。','The interval covers 1–64-token GDN prefill partitions, with zero initial state and continued state thereafter. This row uses client timing; synchronized acceptance compute and η need matched timing and an independent reference.')} <a href="${source(compute.report_path)}">${t('逐项算量与复算','Operation ledger and recomputation')}</a></p>
       ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('正式 η_ref','Formal η_ref')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),t('缺参考与无插桩计时','Missing reference and uninstrumented timing')]))}
       <p>${t('F/T 含计数开销。out256 正确数由21降至19，质量比较未通过。','F/T includes counting overhead. Out256 correct answers fell from 21 to 19, failing the quality comparison.')}</p>
       <details><summary>${t('out256 同预算质量','Same-budget out256 quality')}</summary>${table([t('指标','Metric'),'B0','B1'],[[t('正确 / 题数','Correct / total'),`${q0.correct}/${q0.total}`,`${q1.correct}/${q1.total}`]])}</details>
@@ -153,7 +164,7 @@
       <p>${t('费用取值','Price basis')}: ${escape(a.cost.price_basis.provider)} · ${escape(a.cost.price_basis.sku)} · ${a.cost.price_basis.instance_monthly_price} ${t('元/月','CNY/month')} · ${a.cost.price_basis.month_days_for_analysis} ${t('天/月','days/month')}.</p>
       <p>${t('采用同类机器公开报价估算，包含CPU、主存及加速卡，云盘和公网另计。成功完成请求的全部输出计入分母，包含答错和长度终止；固定费用按实际占用双卡与时长分摊。','The analogous-machine public quote includes CPU, RAM and accelerators; disk/network are separate. All completed-response output counts, including incorrect and length-stopped answers. Fixed expense uses both reserved cards and elapsed time.')}</p>
       <p><a href="./serving-plan.html">${t('调整部署费用，计算产能与成本 →','Adjust deployment costs and estimate capacity →')}</a></p>${evidence('full-answer-joint')}${evidence('milestone-v15')}</details>`;
-    root.innerHTML=`${baseline}<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('各项结果','Results by metric')}</h2><p class="comparison-context">${escape(data.version)} · ${t('B0 0.18/0.18 → B1；版本、公式与任务记录见下方详情。','B0 0.18/0.18 → B1. Versions, formulas and task records are below.')}</p>${overview}</section><section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('方法、任务清单与原始记录','Methods, task inventory and source records')}</h2>${methods}</section>`;
+    root.innerHTML=`<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('各项结果','Results by metric')}</h2><p class="comparison-context">${escape(data.version)} · ${t('B0 0.18/0.18 → B1；版本、公式与任务记录见下方详情。','B0 0.18/0.18 → B1. Versions, formulas and task records are below.')}</p>${overview}</section>${baseline}<section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('方法、任务清单与原始记录','Methods, task inventory and source records')}</h2>${methods}</section>`;
     root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',()=>{root.querySelector(link.getAttribute('href')).open=true;}));
     openLinkedMethod();
     root.dataset.loaded=data.version;
@@ -180,7 +191,7 @@
       if(hash!==entry.sha256||raw.byteLength!==entry.bytes)throw Error('Publication identity mismatch');
       return JSON.parse(new TextDecoder().decode(raw));
     };
-    const [d,runs]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json'].map(fetchVerified));
+    const [d,runs,counts]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json','data/full-answer-compute-20261101.json'].map(fetchVerified));
     if(d.schema!=='midterm-publication/v1'||d.version!=='V1.03')throw Error('Invalid report');
     const joint=d.full_answer_joint;
     if(joint?.same_run_quality_and_performance!==true||joint.protocol?.max_completion_tokens!==8192||joint.arms?.length!==2||joint.arms[0].role!=='B0'||joint.arms[1].role!=='B1'||joint.arms.some(a=>a.completed!==200||a.failed!==0)||!d.packed_continuous)throw Error('Invalid full-answer pair');
@@ -194,7 +205,19 @@
     for(const arm of ['B0','B1']) if(ref[arm]?.eta_percent!==null||ref[arm]?.eta_target_met!==null||!Number.isFinite(ref[arm]?.own_C)||ref[arm].own_C!==ref[arm].ownF/(ref.participating_chips*ref[arm].own_T_seconds*1e12))throw Error('Invalid same-run measurement');
     const missingC16=d.c16_equal_request_latency.arms.some(arm=>!runs.runs.some(r=>r.run_id===arm.run_id));
     if(missingC16)throw Error('Missing C16 identity');
-    data=d;manifest=m;runEvidence=runs;render();
+    if(counts.schema!=='full-answer-compute-subtotal/v1'||counts.arms?.length!==2)throw Error('Invalid compute subtotal');
+    counts.arms.forEach((arm,i)=>{
+      const paired=joint.arms[i], parts=Object.values(arm.matrix_flops_parts);
+      if(arm.run!==paired.run||arm.role!==paired.role||arm.client_seconds!==paired.phase_seconds||arm.output_tokens!==paired.successful_output_tokens||arm.requests!==paired.completed||arm.chips!==2||parts.some(v=>!Number.isSafeInteger(v)||v<=0)||parts.reduce((a,b)=>a+b,0)!==arm.matrix_flops_subtotal||arm.matrix_subtotal_tflops_per_chip!==arm.matrix_flops_subtotal/(arm.chips*arm.client_seconds*1e12))throw Error('Compute subtotal identity mismatch');
+      if(['effective_flops_total','effective_tflops_per_chip','reference_seconds','efficiency_percent','outline_pass'].some(k=>arm[k]!==null))throw Error('Subtotal cannot supply total compute or acceptance');
+    });
+    const extended=counts.b1_basic_work_interval, measured=counts.arms[1];
+    if(extended?.run!==measured.run||extended.recovered_native_requests!==measured.requests||extended.basic_work_flops_interval?.length!==2||extended.client_tflops_per_chip_interval?.length!==2||extended.gdn_prefill_flops_interval?.length!==2)throw Error('Invalid extended arithmetic');
+    extended.basic_work_flops_interval.forEach((f,i)=>{
+      if(!Number.isSafeInteger(f)||f!==measured.matrix_flops_subtotal+extended.target_scalar_flops+extended.necessary_draft_flops+extended.gdn_prefill_flops_interval[i]||extended.client_tflops_per_chip_interval[i]!==f/(2*measured.client_seconds*1e12))throw Error('Extended arithmetic mismatch');
+    });
+    if(extended.basic_work_flops_interval[0]>extended.basic_work_flops_interval[1]||['synchronized_effective_tflops_per_chip','reference_seconds','efficiency_percent','outline_pass'].some(k=>extended[k]!==null))throw Error('Client-work interval cannot supply outline acceptance');
+    data=d;manifest=m;runEvidence=runs;compute=counts;render();
   }
   loadPublication().catch(error=>{console.error('B0/B1 publication load failed',error);root.textContent=t('结果加载失败或校验不一致，请刷新重试。','Results unavailable or publication verification failed; please retry.');});
 })();
