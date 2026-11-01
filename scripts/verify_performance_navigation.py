@@ -268,17 +268,19 @@ def main():
                                     page.locator("#method-1").get_attribute("open")
                                     is not None
                                 )
-                                quality = page.locator("#method-1 details summary")
-                                quality.focus()
+                                method = page.locator("#method-1 > summary")
+                                method.focus()
                                 page.keyboard.press("Enter")
-                                out256 = page.evaluate(
-                                    "async () => (await (await fetch('./data/midterm-v103.json')).json()).acceptance_completion.out256_quality.arms"
+                                assert (
+                                    page.locator("#method-1").get_attribute("open")
+                                    is None
                                 )
-                                for arm in out256:
-                                    assert (
-                                        f"{arm['correct']}/{arm['total']}"
-                                        in page.locator("#method-1").inner_text()
-                                    )
+                                page.keyboard.press("Enter")
+                                assert (
+                                    "recompute_full_answer_compute.py --check"
+                                    in page.locator("#method-1").inner_text()
+                                )
+                                assert "L(n)" in page.locator("#method-1").inner_text()
                                 page.locator(
                                     "#metric-2 .comparison-detail-link"
                                 ).click()
