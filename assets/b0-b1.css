@@ -28,3 +28,8 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
  body[data-page="b0-b1"] .focus-main > .benchmark-tabs { gap: 0; }
  body[data-page="b0-b1"] .focus-main > .benchmark-tabs a { padding: 6px 8px; }
 }
+
+/* Keep the B0/B1 normalized values visible together on narrow screens. */
+#b0-baseline > .focus-table table { min-width: 0; width: 100%; table-layout: fixed; }
+#b0-baseline > .focus-table th:first-child { width: 40%; }
+#b0-baseline > .focus-table th, #b0-baseline > .focus-table td { white-space: normal; overflow-wrap: anywhere; }
