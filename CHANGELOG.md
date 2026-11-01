@@ -14,6 +14,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Restore outline-first comparison order and distinguish current basic-work bounds and matrix subtotals, prior counted compute and supplementary throughput ratios.
+
+
 ### Changed
 
 - 核对全部 MOD 负责人：MuxPD 恢复毛潮云（Irisuko）与导师罗瑞坤，KVCompress 补全三位维护者，其他相关卡片统一已确认姓名；同步脚本拒绝用组织或机器人账号替代负责人。
