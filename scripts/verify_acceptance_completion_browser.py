@@ -54,7 +54,9 @@ def main():
                             )
                             target = page.locator(".comparison-overview")
                             for text in (
-                                "4.5325–4.5393",
+                                "3.8407",
+                                "7.1042",
+                                "184.9705%",
                                 f"{a['correct']}/200",
                                 f"{b['correct']}/200",
                                 "153 / 73",
