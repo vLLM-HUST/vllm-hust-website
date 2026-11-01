@@ -175,7 +175,7 @@ def main():
                                 )
                                 overview = page.locator(".comparison-overview")
                                 assert page.locator(".comparison-group").count() == 4
-                                assert page.locator(".comparison-row").count() == 12
+                                assert page.locator(".comparison-row").count() == 8
                                 assert (
                                     page.locator(".comparison-method[open]").count()
                                     == 0
@@ -191,12 +191,9 @@ def main():
                                     "async () => (await (await fetch('./data/midterm-v103.json')).json()).full_answer_joint"
                                 )
                                 for value in (
-                                    "3.8407",
-                                    "7.1042",
+                                    "4.5325–4.5393",
                                     "50%",
                                     "90%",
-                                    "19.0819",
-                                    "37.2302%",
                                     "153 / 73",
                                     "408 / 183",
                                     "8192",

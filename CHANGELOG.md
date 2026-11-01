@@ -16,6 +16,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Show the current compute derivation from request inputs through operation counts and timing; remove older compute rows from the current comparison and explain device utilization separately.
+
 - Restore outline-first comparison order and distinguish current basic-work bounds and matrix subtotals, prior counted compute and supplementary throughput ratios.
 
 
