@@ -67,7 +67,9 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "验收未通过" if language == "zh" else "acceptance failed"
+                    "总 C 与 η 需补测"
+                    if language == "zh"
+                    else "total C and η require measurement"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
                     "吞吐与时延达标"
@@ -90,6 +92,12 @@ def verify(url, output):
                     "remains open",
                 ):
                     expect(root).not_to_contain_text(vague)
+                expect(root.locator("#metric-1")).to_contain_text("2.1186")
+                expect(root.locator("#metric-1")).to_contain_text("4.0871")
+                assert (
+                    page.locator("#metric-1").bounding_box()["y"]
+                    < page.locator("#b0-baseline").bounding_box()["y"]
+                )
                 expect(root.locator("#b0-baseline")).to_contain_text("190.4811%")
                 expect(root.locator("#b0-baseline")).to_contain_text("1.9048×")
                 page.locator("#method-b0 summary").click()
