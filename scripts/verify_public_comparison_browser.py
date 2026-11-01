@@ -70,13 +70,17 @@ def verify(url, output):
                     "验收未通过" if language == "zh" else "acceptance failed"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
-                    "吞吐与时延达标" if language == "zh" else "Throughput and latency targets met"
+                    "吞吐与时延达标"
+                    if language == "zh"
+                    else "Throughput and latency targets met"
                 )
                 expect(root.locator("#metric-3 .comparison-verdict")).to_contain_text(
                     "验收未通过" if language == "zh" else "acceptance failed"
                 )
                 expect(root.locator("#metric-4 .comparison-verdict")).to_contain_text(
-                    "租赁成本估算与利用率达标" if language == "zh" else "Rental-cost estimate and utilization targets met"
+                    "租赁成本估算与利用率达标"
+                    if language == "zh"
+                    else "Rental-cost estimate and utilization targets met"
                 )
                 for vague in (
                     "修订中",

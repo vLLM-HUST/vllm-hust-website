@@ -65,9 +65,9 @@ def main():
                             ):
                                 expect(target).to_contain_text(text)
                             expect(target).to_contain_text(
-                                "两臂窗口完成"
+                                "两组均零失败"
                                 if language == "zh"
-                                else "Both arms completed"
+                                else "Zero failures in both arms"
                             )
                             expect(target).not_to_contain_text(
                                 "16K未执行" if language == "zh" else "16K not run"
