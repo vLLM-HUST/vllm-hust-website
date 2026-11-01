@@ -34,7 +34,7 @@
     const row=(name,b0,b1,status,basis)=>`<div class="comparison-row"><h3>${escape(name)}</h3><dl>${[['B0',b0],['B1',b1],[t('结果','Result'),status],[t('计算依据','Basis'),basis]].map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl></div>`;
     const group=(i,verdict,rows,note,path)=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2><p class="comparison-verdict"><strong>${escape(verdict)}</strong></p>${rows}<p class="comparison-caveat">${escape(note)}</p><a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a><p class="focus-source"><a href="${source(path)}">${t('来源与复算','Source and calculation')}</a></p></section>`;
     const qualityBasis=t('MMLU-Pro 固定200题；原评分器；回答上限8192 token。','MMLU-Pro fixed 200; original scorer; output cap 8192 tokens.');
-    const m01Verdict=t('完整回答批次：从请求记录计算单芯片算力','Full-answer batch: deriving per-chip compute from request records');
+    const m01Verdict=t('完整回答批次算力结果','Full-answer compute result');
     const stabilityVerdict=t('五任务稳定性验收未通过','Five-task stability acceptance failed');
     const continuousVerdict=zeroFailures?t('两组均零失败','Zero failures in both arms'):t('窗口失败或缺失','Failed or missing windows');
     const currentPath='reports/full-answer-joint-20261030/';
@@ -85,8 +85,11 @@
         <p>C₁,client = F / (k × T_client × 10¹²) = [${extended.basic_work_flops_interval.map(integer).join(', ')}] / (${c1.chips} × ${c1.client_seconds.toFixed(10)} × 10¹²)</p>
         <p><strong>= ${computeRange} TFLOPS/${t('芯片','chip')}</strong></p>
         <p>${t('当前计算采用请求提交至响应排空的客户端区间。大纲 C₁ 使用同步墙钟 T；η₁=100×T参,₁/T₁，本批同步 T 和独立 T参 尚无记录。B0 的完整算量缺逐步 MTP 记录。','This calculation uses the client interval from submission to response drain. Outline C₁ uses synchronized wall time T; η₁=100×T_ref,₁/T₁. This batch has no synchronized T or independent T_ref record. Complete B0 work lacks the stepwise MTP sequence.')}</p>`);
-    const overview=group(0,m01Verdict,calculation,
-      t('大纲：C=F/(k×T×10¹²)，η=100×T参/T；中期≥50%，最终≥90%。','Outline: C=F/(k×T×10¹²), η=100×T_ref/T; midterm ≥50%, final ≥90%.'),compute.report_path)+
+    const overview=group(0,m01Verdict,
+      row(t('单芯片有效算力（TFLOPS/芯片）','Effective compute (TFLOPS/chip)'),t('未计算','Not calculated'),computeRange,
+        t('B1 已复算','B1 recomputed'),
+        t('有效算量 ÷ 双卡 ÷ 同轮客户端耗时。','Effective work divided by two chips and the same-run client duration.')),
+      t('MMLU-Pro 固定200题；区间来自 GDN 预填充分块算量。完整计算过程见详情。','MMLU-Pro fixed 200; the range reflects GDN prefill partition work. Expand the details for the full calculation.'),compute.report_path)+
       group(1,servingPass?t('吞吐与时延达标','Throughput and latency targets met'):t('吞吐与时延未达标','Throughput or latency targets not met'),
         row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/${a.completed} · ${a.truncated}`,`${b.correct}/${b.completed} · ${b.truncated}`,qualityVerdict,qualityBasis)+
         row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(a.output_tokens_per_second),number(b.output_tokens_per_second),numeric(joint.output_throughput_change_percent,10),t('提升门槛 ≥10%。','Target: improvement ≥10%.'))+
@@ -158,8 +161,9 @@
       <p>${t('B0：vLLM 0.18 + vLLM-Ascend 0.18。B1 版本及配置随各项记录列出。','B0: vLLM 0.18 + vLLM-Ascend 0.18. Each result lists its B1 version and configuration.')}</p>
       <p id="acceptance-stages">${t('中期 η_ref ≥50%，最终 η_ref ≥90%；吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Midterm η_ref ≥50%, final η_ref ≥90%; throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
       <p class="focus-source">${escape(data.version)} · <a href="${source(data.m01_method.outline.path)}">${t('测试大纲 V1.5 课题四','V1.5 Project 4 test outline')}</a> · <a href="${escape(data.report_url)}">${t('完整报告与原始记录','Full report and records')}</a></p></details>
-      <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('方法与记录','Methods & records')}</summary>
-      <p>${t('主表按同一完整回答批次列出输入、矩阵、标量、必要草稿、GDN分块和最终除法。原始数据与逐项系数来自同一版本的复算报告。','The main calculation follows one full-answer batch through inputs, matrices, scalar work, necessary drafts, GDN partitions and final division. Inputs and coefficients come from the same versioned calculation report.')}</p>
+      <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('计算过程与记录','Calculation & records')}</summary>
+      ${calculation}
+      <p>${t('以上按同一完整回答批次列出输入、矩阵、标量、必要草稿、GDN分块和最终除法。原始数据与逐项系数来自同一版本的复算报告。','The calculation above follows one full-answer batch through inputs, matrices, scalar work, necessary drafts, GDN partitions and final division. Inputs and coefficients come from the same versioned calculation report.')}</p>
       <p><a href="${source(compute.report_path)}">${t('完整推导与复算命令','Full derivation and recomputation command')}</a> · <a href="${source('reports/full-answer-compute-20261101/operation-catalog.json')}">${t('标量、草稿及分块成本系数表','Scalar, draft and chunk-cost coefficient catalog')}</a></p>
       <p>L(0)=U(0)=0; L(n)=min₁≤ⱼ≤min(64,n) {n=j ? c₀(j) : L(n−j)+c₊(j)}; U(n)=max₁≤ⱼ≤min(64,n) {n=j ? c₀(j) : U(n−j)+c₊(j)}.</p>
       <p>F_GDN ∈ [Σ L(Iⱼ), Σ U(Iⱼ)]</p>
