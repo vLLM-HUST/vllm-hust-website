@@ -67,9 +67,9 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "η 需同步计时和独立参考"
+                    "从请求记录计算单芯片算力"
                     if language == "zh"
-                    else "η needs synchronized timing and an independent reference"
+                    else "deriving per-chip compute from request records"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
                     "吞吐与时延达标"
@@ -92,9 +92,23 @@ def verify(url, output):
                     "remains open",
                 ):
                     expect(root).not_to_contain_text(vague)
-                expect(root.locator("#metric-1")).to_contain_text("2.1186")
-                expect(root.locator("#metric-1")).to_contain_text("4.0871")
                 expect(root.locator("#metric-1")).to_contain_text("4.5325–4.5393")
+                expect(root.locator("#metric-1 [data-calculation-step]")).to_have_count(
+                    5
+                )
+                for value in (
+                    "F_matrix",
+                    "F_scalar",
+                    "F_draft",
+                    "F_GDN",
+                    "943,105",
+                    "2,763,050,179",
+                ):
+                    expect(root.locator("#metric-1")).to_contain_text(value)
+                for old in ("3.8407", "7.1042", "37.2302", "47.5033", "out256"):
+                    expect(root.locator("#metric-1")).not_to_contain_text(old)
+                    expect(root.locator("#method-1")).not_to_contain_text(old)
+                expect(root.locator("#metric-4")).to_contain_text("C₁")
                 assert (
                     page.locator("#metric-1").bounding_box()["y"]
                     < page.locator("#b0-baseline").bounding_box()["y"]
