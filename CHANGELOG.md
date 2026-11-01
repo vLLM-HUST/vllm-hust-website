@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-01 — B0/B1 result decisions
+
+- State the outcome of each measured item and name missing measurement conditions directly.
+- Report batch performance and same-rate rental targets with their workload and cost scope.
+- Preserve model diagnostics, C16 measurements, dataset scores and source identity checks.
+
+
 All notable changes to vllm-hust-website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
