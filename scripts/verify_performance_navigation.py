@@ -217,12 +217,16 @@ def main():
                                     "修订中" if language == "zh" else "under revision"
                                 ) not in current
                                 for label in (
-                                    ("未通过", "本批次达标", "同价租赁估算达标")
+                                    (
+                                        "验收未通过",
+                                        "吞吐与时延达标",
+                                        "租赁成本估算与利用率达标",
+                                    )
                                     if language == "zh"
                                     else (
-                                        "Not accepted",
-                                        "Batch targets met",
-                                        "rental estimate meets",
+                                        "acceptance failed",
+                                        "Throughput and latency targets met",
+                                        "Rental-cost estimate and utilization targets met",
                                     )
                                 ):
                                     assert label in current
@@ -233,7 +237,7 @@ def main():
                                     "4GiB/rank" if language == "zh" else "4 GiB/rank"
                                 ) in current
                                 assert (
-                                    "五任务" if language == "zh" else "five-task"
+                                    "五任务" if language == "zh" else "Five-task"
                                 ) in current
                                 # Every metric exposes both measurements, verdict and gaps
                                 # without opening details or horizontal scrolling on mobile.

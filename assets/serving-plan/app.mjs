@@ -1,5 +1,5 @@
 import { calculate } from "./calc.mjs?v=accounted-plans-20261009";
-import { t, translate, errorText, sourceEnglish } from "./i18n.mjs?v=clarity-20261025";
+import { t, translate, errorText, sourceEnglish, sourceChinese } from "./i18n.mjs?v=concise-copy-20261101";
 const $ = (id) => document.getElementById(id);
 const fmt = (n, d = 2) =>
   n.toLocaleString("zh-CN", { maximumFractionDigits: d });
@@ -187,7 +187,7 @@ function initialize() {
         render();
       });
     }
-    box.append(element("p", p.cacheScope, "hint", sourceEnglish(p.cacheScope)));
+    box.append(element("p", sourceChinese(p.cacheScope), "hint", sourceEnglish(p.cacheScope)));
     const original = element("details");
     original.append(element("summary", "来源条件（中文原文）", undefined, "Source conditions (original Chinese)"),
       element("p", [p.region, p.cacheScope, p.scope].filter(Boolean).join(' '), "hint"));
@@ -195,12 +195,12 @@ function initialize() {
     prices.set(id, controls);
     $("price-controls").append(box);
     if (p.userDefined) {
-      $("price-note").append(element("p", `${p.model}：售价由用户输入，不预设参考价格；未填写时仅展示实测性能，不计算产值。`, undefined, `${p.model}: enter your own prices. Without prices, only measured performance is shown; no value is calculated.`));
+      $("price-note").append(element("p", `${p.model}：填入售价后计算产值。`, undefined, `${p.model}: enter selling prices to calculate service value.`));
       continue;
     }
     const note = element(
       "p",
-      `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${p.cacheScope} ${p.scope || ''}`,
+      `${p.model}：新增输入 ¥${p.inputCnyPerMillion}，缓存命中输入 ¥${p.cachedInputCnyPerMillion}，输出 ¥${p.outputCnyPerMillion} / 百万 token。${p.region}；核对日期 ${p.checkedAt}。${sourceChinese(p.cacheScope)} ${sourceChinese(p.scope)}`,
       undefined,
       `${sourceEnglish(p.model)}: new input ¥${p.inputCnyPerMillion}, cached input ¥${p.cachedInputCnyPerMillion}, output ¥${p.outputCnyPerMillion} per million tokens. Checked ${p.checkedAt}. ${sourceEnglish(p.region)}; ${sourceEnglish(p.cacheScope)} ${sourceEnglish(p.scope)}`,
     );

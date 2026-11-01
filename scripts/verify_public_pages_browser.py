@@ -191,7 +191,7 @@ async def run(args):
                             price_copy = await page.locator("#price-note").inner_text()
                             assert "peak-period prices are twice as high" in price_copy
                             assert (
-                                "not an official quote for the same checkpoint"
+                                "V4-0731 plan uses V4.1 Flash off-peak pricing as an adjustable estimate"
                                 in price_copy
                             )
                             assert not any(
