@@ -222,13 +222,13 @@ def verify(url, output):
                 )
                 page.route(
                     "**/data/b0-reference-compute-20261101.json",
-                    lambda route, body=changed_raw: route.fulfill(
+                    lambda route, _request, body=changed_raw: route.fulfill(
                         content_type="application/json", body=body
                     ),
                 )
                 page.route(
                     "**/data/benchmark-source-manifest.json",
-                    lambda route, doc=altered: route.fulfill(json=doc),
+                    lambda route, _request, doc=altered: route.fulfill(json=doc),
                 )
             page.goto(url + "/b0-b1.html")
             expect(page.locator("#comparison")).to_contain_text(
