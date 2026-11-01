@@ -531,3 +531,32 @@ def test_full_answer_compute_subtotal_has_own_time_and_no_total_or_eta():
             "outline_pass",
         ):
             assert arm[key] is None
+
+
+def test_b1_work_interval_includes_recovered_drafts_without_imputing_eta():
+    data = json.loads((ROOT / "data/full-answer-compute-20261101.json").read_text())
+    arm, interval = data["arms"][1], data["b1_basic_work_interval"]
+    assert interval["recovered_native_requests"] == arm["requests"]
+    assert interval["run"] == arm["run"]
+    assert (
+        interval["basic_work_flops_interval"][0]
+        <= interval["basic_work_flops_interval"][1]
+    )
+    for i, work in enumerate(interval["basic_work_flops_interval"]):
+        assert (
+            work
+            == arm["matrix_flops_subtotal"]
+            + interval["target_scalar_flops"]
+            + interval["necessary_draft_flops"]
+            + interval["gdn_prefill_flops_interval"][i]
+        )
+        assert interval["client_tflops_per_chip_interval"][i] == work / (
+            2 * arm["client_seconds"] * 1e12
+        )
+    for field in (
+        "synchronized_effective_tflops_per_chip",
+        "reference_seconds",
+        "efficiency_percent",
+        "outline_pass",
+    ):
+        assert interval[field] is None
