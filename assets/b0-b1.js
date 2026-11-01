@@ -87,7 +87,7 @@
       <p><code>C = F / (k × T × 10¹²)</code>；<code>η = T参 / T × 100%</code>。</p>
       ${table([t('方案','Arm'),t('有效算力 TFLOPS/芯片','Effective TFLOPS/chip'),t('正式 η','Formal η')],['B0','B1'].map(arm=>[arm,number(ref[arm].own_C),t('未出具：计量条件不完整','Not issued: incomplete measurement conditions')]))}
       <p>${t('现有 F/T 记录保留计数开销，缺少匹配的无插桩时间与 B0 路径参考。同一 out256 工况的 B1 正确数下降，质量比较未通过。','The F/T record includes counting overhead and lacks matched uninstrumented timing and a B0 path reference. B1 correct count fell in the same out256 workload; its quality comparison failed.')}</p>
-      ${table([t('out256 同预算评分','Same-budget out256 scores'),'B0','B1'],[[t('正确 / 题数','Correct / total'),`${q0.correct}/${q0.total}`,`${q1.correct}/${q1.total}`]])}
+      <details><summary>${t('out256 同预算质量','Same-budget out256 quality')}</summary>${table([t('指标','Metric'),'B0','B1'],[[t('正确 / 题数','Correct / total'),`${q0.correct}/${q0.total}`,`${q1.correct}/${q1.total}`]])}</details>
       <p>${t('B1 独立标定模型','Independently calibrated B1 model')}: ${number(diagnostic.reference_seconds)} s · ${number(diagnostic.reference_tflops_per_chip)} TFLOPS/${t('芯片','chip')} · ${number(diagnostic.efficiency_percent)}%。${t('模型诊断低于50%门槛；三个调度种子用于敏感性分析。','The model diagnostic is below 50%; three scheduling seeds provide sensitivity analysis.')}</p>
       ${evidence('m01-verdict')}${evidence('acceptance-completion')}</details>
       <details class="comparison-method focus-result" id="method-2"><summary>${titles[1]} · ${t('方法与记录','Methods & records')}</summary>
