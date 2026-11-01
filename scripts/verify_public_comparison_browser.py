@@ -86,6 +86,14 @@ def verify(url, output):
                     "remains open",
                 ):
                     expect(root).not_to_contain_text(vague)
+                expect(root.locator("#b0-baseline")).to_contain_text("190.4811%")
+                expect(root.locator("#b0-baseline")).to_contain_text("1.9048×")
+                page.locator("#method-b0 summary").click()
+                expect(root.locator("#method-b0")).to_contain_text("706796")
+                expect(root.locator("#method-b0")).to_contain_text("661040")
+                expect(root.locator("#method-b0")).to_contain_text("2.0367×")
+                expect(root.locator("#method-b0")).to_contain_text("50.9000%")
+                page.locator("#method-b0 summary").click()
                 text = root.inner_text()
                 assert "undefined" not in text and "NaN" not in text
                 assert page.evaluate(
