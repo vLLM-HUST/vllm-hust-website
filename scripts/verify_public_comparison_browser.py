@@ -67,9 +67,9 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "总 C 与 η 需补测"
+                    "η 需同步计时和独立参考"
                     if language == "zh"
-                    else "total C and η require measurement"
+                    else "η needs synchronized timing and an independent reference"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
                     "吞吐与时延达标"
@@ -94,6 +94,7 @@ def verify(url, output):
                     expect(root).not_to_contain_text(vague)
                 expect(root.locator("#metric-1")).to_contain_text("2.1186")
                 expect(root.locator("#metric-1")).to_contain_text("4.0871")
+                expect(root.locator("#metric-1")).to_contain_text("4.5325–4.5393")
                 assert (
                     page.locator("#metric-1").bounding_box()["y"]
                     < page.locator("#b0-baseline").bounding_box()["y"]

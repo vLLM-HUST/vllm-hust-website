@@ -16,7 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Restore outline-first comparison order and distinguish current matrix subtotals, prior counted compute and supplementary throughput ratios.
+- Restore outline-first comparison order and distinguish current basic-work bounds and matrix subtotals, prior counted compute and supplementary throughput ratios.
 
 
 ### Changed

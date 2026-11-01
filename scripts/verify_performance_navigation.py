@@ -175,7 +175,7 @@ def main():
                                 )
                                 overview = page.locator(".comparison-overview")
                                 assert page.locator(".comparison-group").count() == 4
-                                assert page.locator(".comparison-row").count() == 11
+                                assert page.locator(".comparison-row").count() == 12
                                 assert (
                                     page.locator(".comparison-method[open]").count()
                                     == 0
