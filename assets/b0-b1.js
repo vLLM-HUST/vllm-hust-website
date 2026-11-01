@@ -199,7 +199,14 @@
       <p>${t('该百分比描述AI Core的忙碌程度，不包含有效FLOPs计数。重复运算和未采纳草稿也会占用设备，因此不能把 U 当成 C₁ 或 η，也不能用 U 乘硬件峰值代替有效算力。','This percentage describes AI Core activity, without counting effective FLOPs. Redundant computation and rejected drafts can also occupy the device. U is neither C₁ nor η; multiplying U by hardware peak throughput does not yield effective compute.')}</p>
       <p><a href="./serving-plan.html">${t('调整部署费用，计算产能与成本 →','Adjust deployment costs and estimate capacity →')}</a></p>${evidence('full-answer-joint')}${evidence('milestone-v15')}</details>`;
     root.innerHTML=`<section class="comparison-overview" aria-labelledby="current-results-title"><h2 id="current-results-title">${t('各项结果','Results by metric')}</h2><p class="comparison-context">${escape(data.version)} · ${t('B0 0.18/0.18 → B1；版本、公式与任务记录见下方详情。','B0 0.18/0.18 → B1. Versions, formulas and task records are below.')}</p>${overview}</section>${baseline}<section class="comparison-methods" aria-labelledby="methods-title"><h2 id="methods-title">${t('方法、任务清单与原始记录','Methods, task inventory and source records')}</h2>${methods}</section>`;
-    root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',()=>{root.querySelector(link.getAttribute('href')).open=true;}));
+    root.querySelectorAll('.comparison-detail-link').forEach(link=>link.addEventListener('click',event=>{
+      if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+      event.preventDefault();
+      const hash=link.getAttribute('href'), target=root.querySelector(hash);
+      target.open=true;
+      if(location.hash!==hash)history.pushState(null,'',hash);
+      target.scrollIntoView({block:'start'});
+    }));
     openLinkedMethod();
     root.dataset.loaded=data.version;
   }
