@@ -65,6 +65,27 @@ def verify(url, output):
                     "not currently published"
                 )
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
+                expect(root.locator(".comparison-verdict")).to_have_count(4)
+                expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
+                    "未通过" if language == "zh" else "Not accepted"
+                )
+                expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
+                    "本批次达标" if language == "zh" else "Batch targets met"
+                )
+                expect(root.locator("#metric-3 .comparison-verdict")).to_contain_text(
+                    "未通过" if language == "zh" else "Not accepted"
+                )
+                expect(root.locator("#metric-4 .comparison-verdict")).to_contain_text(
+                    "同价租赁估算达标" if language == "zh" else "rental estimate meets"
+                )
+                for vague in (
+                    "修订中",
+                    "尚不能判定",
+                    "未闭合",
+                    "under revision",
+                    "remains open",
+                ):
+                    expect(root).not_to_contain_text(vague)
                 text = root.inner_text()
                 assert "undefined" not in text and "NaN" not in text
                 assert page.evaluate(
