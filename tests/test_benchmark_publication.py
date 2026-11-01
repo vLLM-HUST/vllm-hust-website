@@ -166,7 +166,7 @@ def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
 
 
 def test_all_data_files_match_the_benchmark_publication_manifest():
-    assert "b0-b1.js?v=concise-copy-20261101" in (ROOT / "b0-b1.html").read_text()
+    assert "b0-b1.js?v=outline-compute-20261101" in (ROOT / "b0-b1.html").read_text()
     manifest_path = ROOT / "data/benchmark-source-manifest.json"
     manifest = json.loads(manifest_path.read_text())
     assert manifest["repository"] == "vLLM-HUST/vllm-hust-benchmark"
@@ -509,3 +509,25 @@ def test_circuit_null_and_byte_diagnostic_are_not_new_scores():
         "reports/terminal-break-filter-byte-diagnostic-20261027/summary.json",
     ):
         assert repr(path) in loader
+
+
+def test_full_answer_compute_subtotal_has_own_time_and_no_total_or_eta():
+    subtotal = json.loads((ROOT / "data/full-answer-compute-20261101.json").read_text())
+    pair = json.loads((ROOT / "data/midterm-v103.json").read_text())[
+        "full_answer_joint"
+    ]
+    for arm, measured in zip(subtotal["arms"], pair["arms"], strict=True):
+        assert arm["run"] == measured["run"]
+        assert arm["client_seconds"] == measured["phase_seconds"]
+        assert arm["matrix_flops_subtotal"] == sum(arm["matrix_flops_parts"].values())
+        assert arm["matrix_subtotal_tflops_per_chip"] == arm[
+            "matrix_flops_subtotal"
+        ] / (arm["chips"] * arm["client_seconds"] * 1e12)
+        for key in (
+            "effective_flops_total",
+            "effective_tflops_per_chip",
+            "reference_seconds",
+            "efficiency_percent",
+            "outline_pass",
+        ):
+            assert arm[key] is None
