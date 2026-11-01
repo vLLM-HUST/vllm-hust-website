@@ -289,10 +289,18 @@ def main():
                                     "open", ""
                                 )
                                 assert (
-                                    "recompute_full_answer_compute.py --check"
+                                    "recompute_b0_reference_compute.py --check"
                                     in page.locator("#method-1").inner_text()
                                 )
-                                assert "L(n)" in page.locator("#method-1").inner_text()
+                                archived = page.locator("#method-full-answer-compute")
+                                expect(archived).not_to_have_attribute("open", "")
+                                archived.locator(":scope > summary").click()
+                                expect(archived).to_have_attribute("open", "")
+                                assert (
+                                    "recompute_full_answer_compute.py --check"
+                                    in archived.inner_text()
+                                )
+                                assert "L(n)" in archived.inner_text()
                                 page.locator(
                                     "#metric-2 .comparison-detail-link"
                                 ).click()
