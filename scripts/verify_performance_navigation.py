@@ -270,14 +270,14 @@ def main():
                                 quality = page.locator("#method-1 details summary")
                                 quality.focus()
                                 page.keyboard.press("Enter")
-                                assert (
-                                    "151 / 200"
-                                    in page.locator("#method-1").inner_text()
+                                out256 = page.evaluate(
+                                    "async () => (await (await fetch('./data/midterm-v103.json')).json()).acceptance_completion.out256_quality.arms"
                                 )
-                                assert (
-                                    "156 / 200"
-                                    in page.locator("#method-1").inner_text()
-                                )
+                                for arm in out256:
+                                    assert (
+                                        f"{arm['correct']}/{arm['total']}"
+                                        in page.locator("#method-1").inner_text()
+                                    )
                                 page.locator(
                                     "#metric-2 .comparison-detail-link"
                                 ).click()
@@ -297,6 +297,9 @@ def main():
                                 page.locator(
                                     "#metric-3 .comparison-detail-link"
                                 ).click()
+                                task_quality = page.locator("#method-3 details summary")
+                                task_quality.focus()
+                                page.keyboard.press("Enter")
                                 stability = page.locator("#method-3").inner_text()
                                 assert (
                                     "66 / 100" in stability and "62 / 100" in stability
