@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -24,6 +25,20 @@ def main():
         report = response.json()
         assert report["version"] == "V1.03"
         a, b = report["full_answer_joint"]["arms"]
+        paired_response = request.get(
+            args.url.rstrip("/") + "/data/m01-qualified-pair-20261103.json"
+        )
+        assert paired_response.ok
+        paired = paired_response.json()
+        assert paired["evidence_qualified"] and paired["current_milestone_met"]
+        compute_values = [
+            f"{(math.ceil if i else math.floor)(float(value) * 10000) / 10000:.4f}"
+            for arm in paired["arms"]
+            for i, value in enumerate(arm["aggregate"]["C_interval"])
+        ] + [
+            f"{math.floor(float(arm['aggregate']['eta_percent_lower']) * 10000) / 10000:.4f}%"
+            for arm in paired["arms"]
+        ]
         request.dispose()
         for width in (390, 1440):
             for language in ("zh", "en"):
@@ -54,9 +69,7 @@ def main():
                             )
                             target = page.locator(".comparison-overview")
                             for text in (
-                                "3.8407",
-                                "7.1042",
-                                "184.9705%",
+                                *compute_values,
                                 f"{a['correct']}/200",
                                 f"{b['correct']}/200",
                                 "153 / 73",
