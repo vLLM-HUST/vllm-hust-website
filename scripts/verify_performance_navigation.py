@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import math
 import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -195,15 +196,30 @@ def main():
                                         ).text_content()
                                     )
                                 assert not page.locator(
-                                    "#method-1 [data-calculation-step]"
+                                    "#current-qualified-compute"
                                 ).first.is_visible()
                                 joint = page.evaluate(
                                     "async () => (await (await fetch('./data/midterm-v103.json')).json()).full_answer_joint"
                                 )
+                                paired = page.evaluate(
+                                    "async () => (await (await fetch('./data/m01-qualified-pair-20261103.json')).json())"
+                                )
+                                assert (
+                                    paired["evidence_qualified"]
+                                    and paired["current_milestone_met"]
+                                )
+                                compute_values = [
+                                    f"{(math.ceil if i else math.floor)(float(value) * 10000) / 10000:.4f}"
+                                    for arm in paired["arms"]
+                                    for i, value in enumerate(
+                                        arm["aggregate"]["C_interval"]
+                                    )
+                                ] + [
+                                    f"{math.floor(float(arm['aggregate']['eta_percent_lower']) * 10000) / 10000:.4f}%"
+                                    for arm in paired["arms"]
+                                ]
                                 for value in (
-                                    "3.8407",
-                                    "7.1042",
-                                    "184.9705%",
+                                    *compute_values,
                                     "153 / 73",
                                     "408 / 183",
                                     "8192",
@@ -289,18 +305,23 @@ def main():
                                     "open", ""
                                 )
                                 assert (
-                                    "recompute_b0_reference_compute.py --check"
+                                    "recompute_m01_qualified_pair.py --check"
                                     in page.locator("#method-1").inner_text()
                                 )
-                                archived = page.locator("#method-full-answer-compute")
-                                expect(archived).not_to_have_attribute("open", "")
-                                archived.locator(":scope > summary").click()
-                                expect(archived).to_have_attribute("open", "")
+                                for arm in paired["arms"]:
+                                    for repetition in arm["repetitions"]:
+                                        assert (
+                                            repetition["T_seconds"]
+                                            in page.locator("#method-1").inner_text()
+                                        )
+                                        assert (
+                                            repetition["Tref_lower_seconds"]
+                                            in page.locator("#method-1").inner_text()
+                                        )
                                 assert (
-                                    "recompute_full_answer_compute.py --check"
-                                    in archived.inner_text()
+                                    "finish(v)"
+                                    in page.locator("#method-1").inner_text()
                                 )
-                                assert "L(n)" in archived.inner_text()
                                 page.locator(
                                     "#metric-2 .comparison-detail-link"
                                 ).click()
