@@ -67,9 +67,9 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "已达标 · B0 参考算力"
+                    "计量验收未通过"
                     if language == "zh"
-                    else "Target met · B0-reference compute"
+                    else "Measurement acceptance failed"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
                     "吞吐与时延达标"
@@ -99,6 +99,15 @@ def verify(url, output):
                     root.locator("#method-1 [data-calculation-step]").first
                 ).not_to_be_visible()
                 expect(root.locator("#metric-1 .comparison-row")).to_have_count(2)
+                expect(root.locator("#metric-1")).to_contain_text("84.9705%")
+                for forbidden in (
+                    "已达标",
+                    "Target met",
+                    "项目目标",
+                    "Project target",
+                    "≥90%",
+                ):
+                    expect(root.locator("#metric-1")).not_to_contain_text(forbidden)
                 page.locator("#metric-1 .comparison-detail-link").click()
                 expect(
                     root.locator("#method-1 [data-calculation-step]").first
@@ -158,7 +167,8 @@ def verify(url, output):
             "modified-data",
             "unavailable-data",
             "missing-c16-identity",
-            "changed-reference-verdict",
+            "fabricated-baseline-pass",
+            "changed-compute-ratio",
         ]
         for case in failures:
             page = context.new_page()
@@ -208,7 +218,10 @@ def verify(url, output):
                 changed = context.request.get(
                     url + "/data/b0-reference-compute-20261101.json"
                 ).json()
-                changed["arms"][1]["reference_target_met"] = False
+                if case == "fabricated-baseline-pass":
+                    changed["arms"][1]["reference_target_met"] = True
+                else:
+                    changed["arms"][1]["relative_compute_percent"] += 1
                 changed_raw = json.dumps(changed).encode()
                 altered = copy.deepcopy(manifest)
                 entry = next(
