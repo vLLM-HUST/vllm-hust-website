@@ -190,15 +190,24 @@
         [t('时间与吞吐','Time and throughput'),t('同工作量且 O₀=O₁ 时 S_Q=S_T。本组自然回答长度不同，两个倍率分别计算。','For equal work and O₀=O₁, S_Q=S_T. Natural-answer lengths differ here, so the ratios are calculated separately.')],
         [t('等租价成本','Equal-rate cost'),t('完整部署小时费用相同、计费与测量窗口一致时，降幅=100×(1−1/S_Q)。','With equal complete-deployment hourly rates and matching billing/measurement intervals, reduction=100×(1−1/S_Q).')],
         [t('百分比与重复测量','Percentages and repetitions'),t('η_B0=190%：1.9倍，提升90%。重复测量逐对计算倍率后取中位数，保留全部重复。','η_B0=190%: 1.9×, a 90% gain. For repetitions, take the median of within-pair ratios and retain all runs.')],
-        [t('独立参考 η_ref','Independent reference η_ref'),t('η_ref=100×T_ref/T；中期目标50%，最终90%。T_ref由对应工况独立标定及依赖模型推导。','η_ref=100×T_ref/T; targets: 50% midterm, 90% final. T_ref comes from independent calibration and dependencies for the matched workload.')]
+        [t('同工况参考效率 η_ref','Workload-reference efficiency η_ref'),t('η_ref=100×T_ref/T；本次中期目标50%，后续目标90%。T_ref基于B0阶段标定，按必要依赖与资源重叠推导。','η_ref=100×T_ref/T; current milestone: 50%; later target: 90%. T_ref uses B0 stage calibration with necessary dependencies and resource overlap.')]
       ])}
       <p class="focus-source"><a href="${methodSource}">${t('完整公式与只读复算命令','Full method and read-only recomputation command')}</a> · <a href="${source(currentPath+'joint-summary.json')}">${t('本批原始记录','Original paired record')}</a></p>
       </details></section>`;
     const methods=`<details class="comparison-method focus-note"><summary>${t('版本定义、阶段门槛与报告来源','Versions, targets and sources')}</summary>
       <p>${t('B0：vLLM 0.18 + vLLM-Ascend 0.18。B1 版本及配置随各项记录列出。','B0: vLLM 0.18 + vLLM-Ascend 0.18. Each result lists its B1 version and configuration.')}</p>
-      <p id="acceptance-stages">${t('独立参考效率：中期 η_ref ≥50%，最终 ≥90%。吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Independent-reference efficiency: η_ref ≥50% midterm, ≥90% final. Throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
+      <p id="acceptance-stages">${t('同工况参考效率：本次中期 η_ref ≥50%（T≤2T_ref）；后续目标 ≥90%（T≤T_ref/0.9）。吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Workload-reference efficiency: current milestone η_ref ≥50% (T≤2T_ref); later target ≥90% (T≤T_ref/0.9). Throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
       <p class="focus-source">${escape(data.version)} · <a href="${source(data.m01_method.outline.path)}">${t('测试大纲 V1.5 课题四','V1.5 Project 4 test outline')}</a> · <a href="${escape(data.report_url)}">${t('完整报告与原始记录','Full report and records')}</a></p></details>
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('计算过程与记录','Calculation & records')}</summary>
+      <section id="stage-reference-method">
+      <h3>${t('参考算力：B0阶段标定与依赖计算','Reference compute: B0 stage calibration and dependencies')}</h3>
+      <p>${t('以固定版本B0标定必要计算、访存、通信和主机处理的阶段时间，记录对应精度、形状与工作量。串行且互不重叠的阶段直接累加；跨卡并行和计算/通信重叠按数据依赖及资源占用计算完成时间，得到T参。','Calibrate necessary compute, memory, communication and host-processing stages using a fixed B0 version, with matched precision, shapes and work. Sum serial nonoverlapping stages; derive T_ref from data dependencies and resource occupancy for cross-chip parallelism and compute/communication overlap.')}</p>
+      <p><code>C参,i = Fᵢ / (kᵢ × T参,i × 10¹²)</code><br><code>ηᵢ = 100 × Cᵢ/C参,i = 100 × T参,i/Tᵢ</code></p>
+      <p>${t('必要搬运、通信、同步与主机调度各计一次。阶段划分、标定统计规则及重叠关系在正式计算前确定，可消除的等待与冗余工作另列。F、T和T参对应同一测量区间及工作量；计时采用无插桩同步墙钟，两侧使用同一参考方法，按各自工作量核算。','Count necessary transfers, communication, synchronization and host scheduling once. Fix stage boundaries, calibration statistics and overlap rules before formal calculation; classify avoidable waiting and redundant work separately. F, T and T_ref cover matched work and measurement boundaries. Use uninstrumented synchronized wall time and the same reference method for both arms, applied to each arm’s workload.')}</p>
+      <p><strong>${t('本次中期：η≥50%，即T≤2T参。','Current milestone: η≥50%, equivalent to T≤2T_ref.')}</strong> ${t('后续90%目标对应T≤T参/0.9，约为参考耗时的1.111倍。','The later90% target corresponds to T≤T_ref/0.9, about1.111 times the reference duration.')}</p>
+      <p>${t('参考值描述已标定B0阶段能力和执行约束下的同工况算力。硬件MFU、设备利用率和相对B0提升分别报告；更快实现超过参考值时按实际效率报告。','The reference describes workload compute under calibrated B0 stage capabilities and execution constraints. Hardware MFU, device utilization and B0-relative gains are reported separately; implementations that exceed the reference retain their actual efficiency.')}</p>
+      <p><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/bf10e5fd7f1d6b06b7a90b7404fa92eaae240969/docs/B0_REFERENCE_COMPUTE.md">${t('完整参考计算方法','Full reference calculation method')}</a></p>
+      </section>
       ${referenceCalculation}
       <details class="focus-note" id="method-full-answer-compute"><summary>${t('完整回答批次：算量区间与计算记录','Full-answer batch: work interval and calculation')}</summary>
       ${calculation}
