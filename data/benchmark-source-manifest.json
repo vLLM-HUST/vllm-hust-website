@@ -1,7 +1,7 @@
 {
   "schema": "benchmark-website-publication/v1",
   "repository": "vLLM-HUST/vllm-hust-benchmark",
-  "commit": "62981c81f9a40951bd1557b4ffa4d8b0e86c5918",
+  "commit": "17ee3549ddb757c9198763f27666af34d50958f6",
   "status": "published-source",
   "scope": "Website data files; original experiment provenance is retained inside each artifact.",
   "files": [
@@ -46,6 +46,13 @@
       "sha256": "e76bd9824e4ef756519c10968f89111d775dc72586244eab362f53c51563c930",
       "source_sha256": "e76bd9824e4ef756519c10968f89111d775dc72586244eab362f53c51563c930",
       "bytes": 1218
+    },
+    {
+      "website_path": "data/benchmark-evidence-links.json",
+      "benchmark_path": "website-publication/data/benchmark-evidence-links.json",
+      "sha256": "03e39fdacc5110320e2ab5c3e5f4853f05f35a6638c32cb922a44a06bf9b3049",
+      "source_sha256": "03e39fdacc5110320e2ab5c3e5f4853f05f35a6638c32cb922a44a06bf9b3049",
+      "bytes": 150574
     },
     {
       "website_path": "data/betterscale-dataset-validation-20261015/report.json",
@@ -141,23 +148,23 @@
     {
       "website_path": "data/dataset-matrix-v1.json",
       "benchmark_path": "website-publication/data/dataset-matrix-v1.json",
-      "sha256": "f645903c9ae2fb122264dc25dd84093a0f6b9b73f2b48b1ebad6b77fa9b7cb11",
-      "source_sha256": "f645903c9ae2fb122264dc25dd84093a0f6b9b73f2b48b1ebad6b77fa9b7cb11",
-      "bytes": 295371
+      "sha256": "7ffae7c27f01de964d377cdf9420e02233cee1ee7a786fc8380119437e89b47c",
+      "source_sha256": "7ffae7c27f01de964d377cdf9420e02233cee1ee7a786fc8380119437e89b47c",
+      "bytes": 304490
     },
     {
       "website_path": "data/dataset_program_v1.json",
       "benchmark_path": "website-publication/data/dataset_program_v1.json",
-      "sha256": "431290969ca2ac77ece4bde4d3e307c05c79a31102b6ee1cec5416fd6aa5fcb0",
-      "source_sha256": "431290969ca2ac77ece4bde4d3e307c05c79a31102b6ee1cec5416fd6aa5fcb0",
-      "bytes": 15383
+      "sha256": "e3615ca2a185a06e45f13b3f9e8acd906af82efaf24d23faf8902229834e3e94",
+      "source_sha256": "e3615ca2a185a06e45f13b3f9e8acd906af82efaf24d23faf8902229834e3e94",
+      "bytes": 15940
     },
     {
       "website_path": "data/dataset_validation_index_v1.json",
       "benchmark_path": "website-publication/data/dataset_validation_index_v1.json",
-      "sha256": "83a2ea5523e90a7321e09427d206dc05d46b3c1f489f5d69c3e4a675380e883c",
-      "source_sha256": "83a2ea5523e90a7321e09427d206dc05d46b3c1f489f5d69c3e4a675380e883c",
-      "bytes": 3419
+      "sha256": "44a2c435ac3742aa2c3e615ae5d51fd151071ed72a99372f398a0ce18fa6d57c",
+      "source_sha256": "44a2c435ac3742aa2c3e615ae5d51fd151071ed72a99372f398a0ce18fa6d57c",
+      "bytes": 3380
     },
     {
       "website_path": "data/dataset_validation_qwen35_bidkv.json",
@@ -190,8 +197,8 @@
     {
       "website_path": "data/dataset_validation_qwen35_mmlu_school028_inf_out256.json",
       "benchmark_path": "website-publication/data/dataset_validation_qwen35_mmlu_school028_inf_out256.json",
-      "sha256": "ac4553e778ae720c020bc86c55d5f6425dadeac43db1ab3c9e237b65fdc63ceb",
-      "source_sha256": "ac4553e778ae720c020bc86c55d5f6425dadeac43db1ab3c9e237b65fdc63ceb",
+      "sha256": "3de144124ec07eba0052b9c5131e219ca9aecaef2c29ee890f6caa37c028188e",
+      "source_sha256": "3de144124ec07eba0052b9c5131e219ca9aecaef2c29ee890f6caa37c028188e",
       "bytes": 27435
     },
     {
@@ -225,9 +232,9 @@
     {
       "website_path": "data/ecosystem.json",
       "benchmark_path": "website-publication/data/ecosystem.json",
-      "sha256": "c72106e7c22cad3e8a58f594fab1ae4eb88fcd1267c2eb94367826e566930cec",
-      "source_sha256": "c72106e7c22cad3e8a58f594fab1ae4eb88fcd1267c2eb94367826e566930cec",
-      "bytes": 164652
+      "sha256": "3c949ad0e4eb22569b057e8f5122faf8698e0b684465a27fff4589cce4859a32",
+      "source_sha256": "3c949ad0e4eb22569b057e8f5122faf8698e0b684465a27fff4589cce4859a32",
+      "bytes": 173222
     },
     {
       "website_path": "data/examples/frontier-submission/README.md",
@@ -305,6 +312,13 @@
       "sha256": "d168c401d5d00219ed0d3462fd72ccf1def3a2a9732a054f68dae41bc949b1a2",
       "source_sha256": "d168c401d5d00219ed0d3462fd72ccf1def3a2a9732a054f68dae41bc949b1a2",
       "bytes": 1982
+    },
+    {
+      "website_path": "data/gennova-validation-v1.json",
+      "benchmark_path": "website-publication/data/gennova-validation-v1.json",
+      "sha256": "13c3185c7e27e0b4d46235b67fe0229bb4011ba3c406ad8432dce8abb493df72",
+      "source_sha256": "13c3185c7e27e0b4d46235b67fe0229bb4011ba3c406ad8432dce8abb493df72",
+      "bytes": 1844
     },
     {
       "website_path": "data/hle-verified-20261015/bench-manifest.json.gz",
@@ -524,6 +538,230 @@
       "bytes": 16889
     },
     {
+      "website_path": "data/midterm-v050.json",
+      "benchmark_path": "website-publication/data/midterm-v050.json",
+      "sha256": "3d1a5585715a7bf245b0ea0ae06866bc87f30dc1d50cc4b11e60601587cddc6b",
+      "source_sha256": "3d1a5585715a7bf245b0ea0ae06866bc87f30dc1d50cc4b11e60601587cddc6b",
+      "bytes": 12903
+    },
+    {
+      "website_path": "data/midterm-v052.json",
+      "benchmark_path": "website-publication/data/midterm-v052.json",
+      "sha256": "94211490977bc6f2673e1755b8e9392dbcf3815ceab0883c658b10b4b00e175b",
+      "source_sha256": "94211490977bc6f2673e1755b8e9392dbcf3815ceab0883c658b10b4b00e175b",
+      "bytes": 20526
+    },
+    {
+      "website_path": "data/midterm-v053.json",
+      "benchmark_path": "website-publication/data/midterm-v053.json",
+      "sha256": "0df265e559ce63d26fd498ab01c569bc372d8b8114f96c8cd9d6aed098eda2c1",
+      "source_sha256": "0df265e559ce63d26fd498ab01c569bc372d8b8114f96c8cd9d6aed098eda2c1",
+      "bytes": 22135
+    },
+    {
+      "website_path": "data/midterm-v054.json",
+      "benchmark_path": "website-publication/data/midterm-v054.json",
+      "sha256": "21238ebcdde271b2681554752930f04bba1ea6a21243b6cb877961bb6b923acb",
+      "source_sha256": "21238ebcdde271b2681554752930f04bba1ea6a21243b6cb877961bb6b923acb",
+      "bytes": 23923
+    },
+    {
+      "website_path": "data/midterm-v055.json",
+      "benchmark_path": "website-publication/data/midterm-v055.json",
+      "sha256": "91d025d92dcac27f61d40bb3dfcfd60099d283e63be67e6a093430eea433c232",
+      "source_sha256": "91d025d92dcac27f61d40bb3dfcfd60099d283e63be67e6a093430eea433c232",
+      "bytes": 26862
+    },
+    {
+      "website_path": "data/midterm-v056.json",
+      "benchmark_path": "website-publication/data/midterm-v056.json",
+      "sha256": "d819f0ce58f4f6bea304f9ab24f668280d87a2f151910e74e80e8828fe4ea0a2",
+      "source_sha256": "d819f0ce58f4f6bea304f9ab24f668280d87a2f151910e74e80e8828fe4ea0a2",
+      "bytes": 31639
+    },
+    {
+      "website_path": "data/midterm-v057.json",
+      "benchmark_path": "website-publication/data/midterm-v057.json",
+      "sha256": "01acf41b31591c8858bb12c3845a0c25025927296eaeec61cd7f102bfa7cda94",
+      "source_sha256": "01acf41b31591c8858bb12c3845a0c25025927296eaeec61cd7f102bfa7cda94",
+      "bytes": 33783
+    },
+    {
+      "website_path": "data/midterm-v058.json",
+      "benchmark_path": "website-publication/data/midterm-v058.json",
+      "sha256": "ac643b56830771298f2384655badb9418c21202ffd67b84611dde8ca08e491ae",
+      "source_sha256": "ac643b56830771298f2384655badb9418c21202ffd67b84611dde8ca08e491ae",
+      "bytes": 35357
+    },
+    {
+      "website_path": "data/midterm-v059.json",
+      "benchmark_path": "website-publication/data/midterm-v059.json",
+      "sha256": "613e3f8630d87c8aa1c43b48fd75f381c21a25814cc771b4fcf8cfccaf81401b",
+      "source_sha256": "613e3f8630d87c8aa1c43b48fd75f381c21a25814cc771b4fcf8cfccaf81401b",
+      "bytes": 37858
+    },
+    {
+      "website_path": "data/midterm-v060.json",
+      "benchmark_path": "website-publication/data/midterm-v060.json",
+      "sha256": "0be70d44ca4255c0e8f39534da7e6176c616e483e1684099834763bf7366576c",
+      "source_sha256": "0be70d44ca4255c0e8f39534da7e6176c616e483e1684099834763bf7366576c",
+      "bytes": 40021
+    },
+    {
+      "website_path": "data/midterm-v061.json",
+      "benchmark_path": "website-publication/data/midterm-v061.json",
+      "sha256": "3d352f2257481a2edcb2c2cf455d08a985f04bb0d55d882dd339589371dc1efc",
+      "source_sha256": "3d352f2257481a2edcb2c2cf455d08a985f04bb0d55d882dd339589371dc1efc",
+      "bytes": 41988
+    },
+    {
+      "website_path": "data/midterm-v062.json",
+      "benchmark_path": "website-publication/data/midterm-v062.json",
+      "sha256": "486b38c9b699c0094762d979808e8a99891cf3a795a0a47469bcc7c62a23843d",
+      "source_sha256": "486b38c9b699c0094762d979808e8a99891cf3a795a0a47469bcc7c62a23843d",
+      "bytes": 44087
+    },
+    {
+      "website_path": "data/midterm-v063.json",
+      "benchmark_path": "website-publication/data/midterm-v063.json",
+      "sha256": "d2d7e25b0973c497e93a0b0d0799bd4b61b93cf182c47d6593630fef8be55731",
+      "source_sha256": "d2d7e25b0973c497e93a0b0d0799bd4b61b93cf182c47d6593630fef8be55731",
+      "bytes": 46046
+    },
+    {
+      "website_path": "data/midterm-v064.json",
+      "benchmark_path": "website-publication/data/midterm-v064.json",
+      "sha256": "0028a7767541ec8588adf9297305b603b2c07870499dc4b48cbb960b44fa4cc1",
+      "source_sha256": "0028a7767541ec8588adf9297305b603b2c07870499dc4b48cbb960b44fa4cc1",
+      "bytes": 47891
+    },
+    {
+      "website_path": "data/midterm-v065.json",
+      "benchmark_path": "website-publication/data/midterm-v065.json",
+      "sha256": "e8fbbd9fae44e11b3eeadc6df49d58be761431cbacf89db255f4e5885f02dcb4",
+      "source_sha256": "e8fbbd9fae44e11b3eeadc6df49d58be761431cbacf89db255f4e5885f02dcb4",
+      "bytes": 48373
+    },
+    {
+      "website_path": "data/midterm-v066.json",
+      "benchmark_path": "website-publication/data/midterm-v066.json",
+      "sha256": "bab0341a98df61d1a30d0856783371f49796f5687ae86c527785e0ca60770c93",
+      "source_sha256": "bab0341a98df61d1a30d0856783371f49796f5687ae86c527785e0ca60770c93",
+      "bytes": 50426
+    },
+    {
+      "website_path": "data/midterm-v067.json",
+      "benchmark_path": "website-publication/data/midterm-v067.json",
+      "sha256": "387cd284a632705c639ff1ef0ac87168bac60408419e052d7af69e0bfbae3f6c",
+      "source_sha256": "387cd284a632705c639ff1ef0ac87168bac60408419e052d7af69e0bfbae3f6c",
+      "bytes": 52106
+    },
+    {
+      "website_path": "data/midterm-v068.json",
+      "benchmark_path": "website-publication/data/midterm-v068.json",
+      "sha256": "8a936577fda190b9110d649c7b473670b9bd46300b7696d89184cd326762abe9",
+      "source_sha256": "8a936577fda190b9110d649c7b473670b9bd46300b7696d89184cd326762abe9",
+      "bytes": 56187
+    },
+    {
+      "website_path": "data/midterm-v069.json",
+      "benchmark_path": "website-publication/data/midterm-v069.json",
+      "sha256": "5711330763790e1be56279ae1cf2922299ace5823224c4bfa9d9d86a7d4e475b",
+      "source_sha256": "5711330763790e1be56279ae1cf2922299ace5823224c4bfa9d9d86a7d4e475b",
+      "bytes": 57184
+    },
+    {
+      "website_path": "data/midterm-v070.json",
+      "benchmark_path": "website-publication/data/midterm-v070.json",
+      "sha256": "b8dc7cf1aa18a9665d0cd1612c4bfa94ecbeefb8dcf390f9a4c71f9c2fa15ebf",
+      "source_sha256": "b8dc7cf1aa18a9665d0cd1612c4bfa94ecbeefb8dcf390f9a4c71f9c2fa15ebf",
+      "bytes": 58410
+    },
+    {
+      "website_path": "data/midterm-v071.json",
+      "benchmark_path": "website-publication/data/midterm-v071.json",
+      "sha256": "d57584141b6bcf73e3e2e4b23def53971581beaa60adff6d78984ce8f4b38d5a",
+      "source_sha256": "d57584141b6bcf73e3e2e4b23def53971581beaa60adff6d78984ce8f4b38d5a",
+      "bytes": 64278
+    },
+    {
+      "website_path": "data/midterm-v072.json",
+      "benchmark_path": "website-publication/data/midterm-v072.json",
+      "sha256": "ea1f7a4d25fc8305e01b9a6600ecd5a3fc9f7ef59a5b6ce343be5deb4e5e3f11",
+      "source_sha256": "ea1f7a4d25fc8305e01b9a6600ecd5a3fc9f7ef59a5b6ce343be5deb4e5e3f11",
+      "bytes": 72285
+    },
+    {
+      "website_path": "data/midterm-v074.json",
+      "benchmark_path": "website-publication/data/midterm-v074.json",
+      "sha256": "9dee82f05569ed2bc46534e70d028ab6a0aa1537e67ed5bdbcd69e6539916a47",
+      "source_sha256": "9dee82f05569ed2bc46534e70d028ab6a0aa1537e67ed5bdbcd69e6539916a47",
+      "bytes": 90253
+    },
+    {
+      "website_path": "data/midterm-v075.json",
+      "benchmark_path": "website-publication/data/midterm-v075.json",
+      "sha256": "2f72a6133dabfe2160a0c765b9b8e7178839f5c0b4ce98e48197909ce2e1b269",
+      "source_sha256": "2f72a6133dabfe2160a0c765b9b8e7178839f5c0b4ce98e48197909ce2e1b269",
+      "bytes": 101162
+    },
+    {
+      "website_path": "data/midterm-v076.json",
+      "benchmark_path": "website-publication/data/midterm-v076.json",
+      "sha256": "c46fb18a8ed18cd4db8d59ee2acf964fa871e71d22a04c2b67cb07d3fa112f09",
+      "source_sha256": "c46fb18a8ed18cd4db8d59ee2acf964fa871e71d22a04c2b67cb07d3fa112f09",
+      "bytes": 102783
+    },
+    {
+      "website_path": "data/midterm-v077.json",
+      "benchmark_path": "website-publication/data/midterm-v077.json",
+      "sha256": "dbaccf1bd754476e1a134579a3bf03d3f5869d30d86f4436fe38edd610af0bb8",
+      "source_sha256": "dbaccf1bd754476e1a134579a3bf03d3f5869d30d86f4436fe38edd610af0bb8",
+      "bytes": 106237
+    },
+    {
+      "website_path": "data/midterm-v078.json",
+      "benchmark_path": "website-publication/data/midterm-v078.json",
+      "sha256": "dd04ab9a5601f301d6684ca4ad0f4f84c161717f413a24fcaa39d5bce9edfc4e",
+      "source_sha256": "dd04ab9a5601f301d6684ca4ad0f4f84c161717f413a24fcaa39d5bce9edfc4e",
+      "bytes": 153383
+    },
+    {
+      "website_path": "data/midterm-v079.json",
+      "benchmark_path": "website-publication/data/midterm-v079.json",
+      "sha256": "3e3f80ac614b04724866a55ca439b011b9a26b4fee268b15282ccafbf0ae9284",
+      "source_sha256": "3e3f80ac614b04724866a55ca439b011b9a26b4fee268b15282ccafbf0ae9284",
+      "bytes": 185692
+    },
+    {
+      "website_path": "data/midterm-v080.json",
+      "benchmark_path": "website-publication/data/midterm-v080.json",
+      "sha256": "cd24ca67c93efe9c7701905ac5d4dfc6f61e482f47630d1f376c34b488864f25",
+      "source_sha256": "cd24ca67c93efe9c7701905ac5d4dfc6f61e482f47630d1f376c34b488864f25",
+      "bytes": 193776
+    },
+    {
+      "website_path": "data/midterm-v081.json",
+      "benchmark_path": "website-publication/data/midterm-v081.json",
+      "sha256": "c2d9f1ec47fc3d170d0a3a344de0d9f139c9fb391f8654a33db77da1e7259519",
+      "source_sha256": "c2d9f1ec47fc3d170d0a3a344de0d9f139c9fb391f8654a33db77da1e7259519",
+      "bytes": 247007
+    },
+    {
+      "website_path": "data/midterm-v082.json",
+      "benchmark_path": "website-publication/data/midterm-v082.json",
+      "sha256": "e2336cbbdf4d9b99ac9ba4b6b7eb623bbd0c39d6b4e063277ecbd0895fc85362",
+      "source_sha256": "e2336cbbdf4d9b99ac9ba4b6b7eb623bbd0c39d6b4e063277ecbd0895fc85362",
+      "bytes": 253050
+    },
+    {
+      "website_path": "data/midterm-v083.json",
+      "benchmark_path": "website-publication/data/midterm-v083.json",
+      "sha256": "a4f815c3e3b9f60bae7ac09b2b6a200d022d64ade70408ae4b58dc2bcd12ad5c",
+      "source_sha256": "a4f815c3e3b9f60bae7ac09b2b6a200d022d64ade70408ae4b58dc2bcd12ad5c",
+      "bytes": 298468
+    },
+    {
       "website_path": "data/mmlu-pro-20261012/accuracy.json",
       "benchmark_path": "website-publication/data/mmlu-pro-20261012/accuracy.json",
       "sha256": "41be6f71ae5b20920bc54149afbdaddff088ee4eab44ad6af3bc20b918ababd0",
@@ -561,9 +799,9 @@
     {
       "website_path": "data/mod-taxonomy.json",
       "benchmark_path": "website-publication/data/mod-taxonomy.json",
-      "sha256": "1d8e6e31dee948f15d017afedbe2b7f9cba5cecf93ceede39c0b814a4224255d",
-      "source_sha256": "1d8e6e31dee948f15d017afedbe2b7f9cba5cecf93ceede39c0b814a4224255d",
-      "bytes": 9130
+      "sha256": "57390f30bfa793205088afd4e405d3ec0e325d5aba749c6beeadc9d6901622fc",
+      "source_sha256": "57390f30bfa793205088afd4e405d3ec0e325d5aba749c6beeadc9d6901622fc",
+      "bytes": 9378
     },
     {
       "website_path": "data/news.json",
@@ -589,23 +827,23 @@
     {
       "website_path": "data/plugin-performance.json",
       "benchmark_path": "website-publication/data/plugin-performance.json",
-      "sha256": "7b69bfef9730c61ef9a104188cc69bc115c5938cc7c72dbe635e6951f1c65895",
-      "source_sha256": "7b69bfef9730c61ef9a104188cc69bc115c5938cc7c72dbe635e6951f1c65895",
-      "bytes": 18324
+      "sha256": "2f1e3a9036adf8fc937e257e129870cabac013018b6f25abed6ddf1fa4314bbd",
+      "source_sha256": "2f1e3a9036adf8fc937e257e129870cabac013018b6f25abed6ddf1fa4314bbd",
+      "bytes": 20258
     },
     {
       "website_path": "data/plugin-workload-navigation.json",
       "benchmark_path": "website-publication/data/plugin-workload-navigation.json",
-      "sha256": "011ee939b40797ad35d0f16c99debe998ed6c9d9495352050d0186421ce0f334",
-      "source_sha256": "011ee939b40797ad35d0f16c99debe998ed6c9d9495352050d0186421ce0f334",
-      "bytes": 7918
+      "sha256": "269d387b9ae9581e2debd914dbd535b4096c85f523715bfa1a80557b9889eaed",
+      "source_sha256": "269d387b9ae9581e2debd914dbd535b4096c85f523715bfa1a80557b9889eaed",
+      "bytes": 8040
     },
     {
       "website_path": "data/plugin-workshop-metadata.json",
       "benchmark_path": "website-publication/data/plugin-workshop-metadata.json",
-      "sha256": "436328040670417fee9ba64f2e93880447475a6586ab47f42453f81586571b4f",
-      "source_sha256": "436328040670417fee9ba64f2e93880447475a6586ab47f42453f81586571b4f",
-      "bytes": 31034
+      "sha256": "a5f9897fa674f7c006ee29316a51319c55508b7c4968a8a179adbc8be1952c49",
+      "source_sha256": "a5f9897fa674f7c006ee29316a51319c55508b7c4968a8a179adbc8be1952c49",
+      "bytes": 31692
     },
     {
       "website_path": "data/repository-portfolio.json",
@@ -725,6 +963,13 @@
       "sha256": "3d891e5921db1441539a56cc713d9ffb7d5b609cf6001ffa401226b623f0069b",
       "source_sha256": "3d891e5921db1441539a56cc713d9ffb7d5b609cf6001ffa401226b623f0069b",
       "bytes": 24145
+    },
+    {
+      "website_path": "data/swe-bench-pro-real-agent-threeway-20261022/report.json",
+      "benchmark_path": "website-publication/data/swe-bench-pro-real-agent-threeway-20261022/report.json",
+      "sha256": "7457b63321dd45b42187a121915ca1274a39e3f3c60618ceca8e7cd0dfd6293c",
+      "source_sha256": "7457b63321dd45b42187a121915ca1274a39e3f3c60618ceca8e7cd0dfd6293c",
+      "bytes": 15617
     },
     {
       "website_path": "data/traceloom-capture.json",
