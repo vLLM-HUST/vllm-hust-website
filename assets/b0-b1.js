@@ -35,8 +35,7 @@
     const group=(i,verdict,rows,note,path)=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2><p class="comparison-verdict"><strong>${escape(verdict)}</strong></p>${rows}<p class="comparison-caveat">${escape(note)}</p><a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a><p class="focus-source"><a href="${source(path)}">${t('来源与复算','Source and calculation')}</a></p></section>`;
     const qualityBasis=t('MMLU-Pro 固定200题；原评分器；回答上限8192 token。','MMLU-Pro fixed 200; original scorer; output cap 8192 tokens.');
     const [r0,r1]=referenceCompute.arms;
-    const referencePass=referenceCompute.arms.every(arm=>arm.reference_target_met);
-    const m01Verdict=referencePass?t('已达标 · B0 参考算力','Target met · B0-reference compute'):t('未达标 · B0 参考算力','Target not met · B0-reference compute');
+    const m01Verdict=t('计量验收未通过','Measurement acceptance failed');
     const stabilityVerdict=t('五任务稳定性验收未通过','Five-task stability acceptance failed');
     const continuousVerdict=zeroFailures?t('两组均零失败','Zero failures in both arms'):t('窗口失败或缺失','Failed or missing windows');
     const currentPath='reports/full-answer-joint-20261030/';
@@ -101,7 +100,7 @@
       necessary_draft:t('必要草稿运算','Necessary draft work')
     }[name]||name);
     const referenceCalculation=
-      `<p>${t('参考方法：官方 B0 的同工况实测有效算力作为共同参考；项目目标为达到该参考的90%。','Reference method: measured official B0 effective compute for the same workload is the common reference; the project target is 90% of it.')}</p>
+      `<p>${t('比较方法：分别计算B0、B1同工况有效算力，再报告相对B0的算力比值和提升率。','Comparison method: calculate each arm’s effective compute, then report the B0-relative ratio and gain.')}</p>
       <p>${t('Qwen3.5-35B-A3B · BF16 · TP2 · 双卡910B2 · MMLU-Pro固定200请求 · 每题上限256 token。两组输入均282265 token、输出均51200 token。','Qwen3.5-35B-A3B · BF16 · TP2 · two 910B2 chips · MMLU-Pro fixed 200 requests · cap 256 tokens per request. Each arm has 282265 input and 51200 output tokens.')}</p>
       <h3>1. ${t('分别合计两组必要算量','Sum necessary work for each arm')}</h3>`+
       table([t('B0 运算族','B0 operation family'),t('基础运算数','Basic operations')],Object.entries(referenceCompute.B0_family_totals).map(([name,value])=>[workLabel(name),integer(value)]))+
@@ -111,24 +110,23 @@
       <h3>2. ${t('除以参与芯片数与同轮同步耗时','Divide by participating chips and same-run synchronized time')}</h3>
       <p>C₀ = ${integer(r0.F)} / (${r0.chips} × ${r0.T_seconds.toFixed(10)} × 10¹²) = <strong>${number(r0.C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</strong></p>
       <p>C₁ = ${integer(r1.F)} / (${r1.chips} × ${r1.T_seconds.toFixed(10)} × 10¹²) = <strong>${number(r1.C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</strong></p>
-      <h3>3. ${t('用共同参考计算达成率','Calculate attainment against the common reference')}</h3>
-      <p>C_ref = C₀ = ${number(referenceCompute.reference_C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</p>
-      <p>η_compute,B0,₀ = 100 × C₀/C_ref = ${number(r0.eta_compute_b0_percent)}%</p>
-      <p>η_compute,B0,₁ = 100 × C₁/C_ref = 100 × ${number(r1.C_TFLOPS_per_chip)}/${number(r0.C_TFLOPS_per_chip)} = ${number(r1.eta_compute_b0_percent)}%</p>
-      <p>${t('目标','Target')}: η_compute,B0 ≥${referenceCompute.target_percent}%；${t('对应有效算力','equivalent effective compute')} ≥${number(referenceCompute.target_C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}。</p>
-      <p><strong>${m01Verdict}</strong> · ${t('B1有效算力提升','B1 effective-compute gain')} ${number(referenceCompute.C_gain_percent)}%。</p>
-      <p>${t('B0的100%为归一化值；本方法是相对官方基线的项目参考目标，允许超过100%。原大纲独立标定参考的阶段目标及历史结论保留，不将本结果称为硬件理想上限的达成率。','B0’s 100% is a normalization identity. This project target is relative to the official baseline and may exceed 100%. The original independently calibrated outline targets and historical outcomes remain separate; this is not attainment against a physical ideal.')}</p>
+      <h3>3. ${t('计算相对B0的比值与提升','Calculate the B0-relative ratio and gain')}</h3>
+      <p>C₀ = ${number(referenceCompute.baseline_C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</p>
+      <p>R_C,0 = 100 × C₀/C₀ = ${number(r0.relative_compute_percent)}%</p>
+      <p>R_C,1 = 100 × C₁/C₀ = 100 × ${number(r1.C_TFLOPS_per_chip)}/${number(r0.C_TFLOPS_per_chip)} = ${number(r1.relative_compute_percent)}%</p>
+      <p>${t('B1有效算力提升','B1 effective-compute gain')} ${number(referenceCompute.C_gain_percent)}%。</p>
+      <p>${t('B0的100%是归一化身份。算力比值只作性能比较，不作验收效率。3.4.1要求η=100×T_ref/T：T_ref由独立标定与实际依赖推导，T使用对应无插桩同步计时；本组尚缺两侧完整的同口径验收记录，计量验收未通过。','B0’s 100% is a normalization identity. This ratio describes performance, not acceptance efficiency. Section 3.4.1 requires η=100×T_ref/T, independently calibrated resources and actual dependencies for T_ref, and matched uninstrumented synchronized timing for T. This pair lacks complete matched acceptance records for both arms; measurement acceptance failed.')}</p>
       <p>${t('本算力工况每题上限256 token，正确数B0 21/200、B1 19/200。完整回答成绩使用下方独立批次。统计开销保留在同步时间内。','This compute workload caps each answer at 256 tokens: B0 scores 21/200 and B1 19/200. Full-answer results use the separate batch below. Accounting overhead remains in synchronized elapsed time.')}</p>
       <p><code>python scripts/recompute_b0_reference_compute.py --check</code></p>
-      <p><a href="${source(referenceCompute.method)}">${t('参考方法与判定范围','Reference method and target scope')}</a> · <a href="${source(referenceCompute.report_path)}">${t('计算报告、分项与原始审计','Calculation, components and source audits')}</a></p>`;
+      <p><a href="${source(referenceCompute.method)}">${t('算力比较与验收方法','Compute comparison and acceptance method')}</a> · <a href="${source(referenceCompute.report_path)}">${t('计算报告、分项与原始审计','Calculation, components and source audits')}</a></p>`;
     const overview=group(0,m01Verdict,
       row(t('单芯片有效算力（TFLOPS/芯片）','Effective compute (TFLOPS/chip)'),number(r0.C_TFLOPS_per_chip),number(r1.C_TFLOPS_per_chip),
-        referencePass?t('已达标','Target met'):t('未达标','Target not met'),
+        t('提升 ','Gain ')+number(referenceCompute.C_gain_percent)+'%',
         t('各自必要算量 ÷ 参与芯片数 ÷ 同轮同步耗时。','Own necessary work divided by all participating chips and same-run synchronized duration.'))+
-      row(t('B0 参考达成率','B0-reference attainment'),number(r0.eta_compute_b0_percent)+'%',number(r1.eta_compute_b0_percent)+'%',
-        t('项目目标 ≥90%','Project target ≥90%'),
-        t('共同参考 C_ref=C₀；η=100×C/C_ref。','Common reference C_ref=C₀; η=100×C/C_ref.')),
-      t('200请求、每题上限256 token的算力工况；参考方法和逐项计算见详情。','Compute workload: 200 requests, cap 256 tokens per request. Reference method and full calculation are in the details.'),referenceCompute.report_path)+
+      row(t('相对B0算力比值','B0-relative compute ratio'),number(r0.relative_compute_percent)+'%',number(r1.relative_compute_percent)+'%',
+        t('比较值','Descriptive comparison'),
+        t('R_C=100×C/C₀；不作验收效率。','R_C=100×C/C₀; not acceptance efficiency.')),
+      t('200请求、每题上限256 token的算力工况；逐项计算与验收依据见详情。','Compute workload: 200 requests, cap 256 tokens per request. Full calculation and acceptance requirements are in the details.'),referenceCompute.report_path)+
       group(1,servingPass?t('吞吐与时延达标','Throughput and latency targets met'):t('吞吐与时延未达标','Throughput or latency targets not met'),
         row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/${a.completed} · ${a.truncated}`,`${b.correct}/${b.completed} · ${b.truncated}`,qualityVerdict,qualityBasis)+
         row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(a.output_tokens_per_second),number(b.output_tokens_per_second),numeric(joint.output_throughput_change_percent,10),t('提升门槛 ≥10%。','Target: improvement ≥10%.'))+
@@ -159,7 +157,7 @@
     ];
     const throughputB0=a.successful_output_tokens/a.phase_seconds, throughputB1=b.successful_output_tokens/b.phase_seconds;
     const speed=throughputB1/throughputB0, etaB0=100*speed;
-    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/085f4917ad4a1b2cec850aa469ce33bf4147c55c/docs/B0_BASELINE_METRICS.md';
+    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/8b8e5f2f448371913615cbe25d5127b04642fd88/docs/B0_BASELINE_METRICS.md';
     const baseline=`<section class="focus-result" id="b0-baseline" aria-labelledby="b0-baseline-title">
       <h2 id="b0-baseline-title">${t('补充比较：B0 相对吞吐 η_B0','Supplement: B0-relative throughput η_B0')}</h2>
       <p>${t('以 vLLM 0.18 + vLLM-Ascend 0.18 的实测吞吐为100%，比较 B1 的吞吐、时延与成本。','Measured vLLM 0.18 + vLLM-Ascend 0.18 throughput is the 100% baseline for comparing B1 throughput, latency and cost.')}</p>
@@ -198,7 +196,7 @@
       </details></section>`;
     const methods=`<details class="comparison-method focus-note"><summary>${t('版本定义、阶段门槛与报告来源','Versions, targets and sources')}</summary>
       <p>${t('B0：vLLM 0.18 + vLLM-Ascend 0.18。B1 版本及配置随各项记录列出。','B0: vLLM 0.18 + vLLM-Ascend 0.18. Each result lists its B1 version and configuration.')}</p>
-      <p id="acceptance-stages">${t('原独立参考：中期 η_ref ≥50%，最终 ≥90%；本次项目 B0 参考算力目标 ≥90%。吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Original independent reference: η_ref ≥50% midterm, ≥90% final. Current project B0-reference compute target: ≥90%. Throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
+      <p id="acceptance-stages">${t('独立参考效率：中期 η_ref ≥50%，最终 ≥90%。吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Independent-reference efficiency: η_ref ≥50% midterm, ≥90% final. Throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
       <p class="focus-source">${escape(data.version)} · <a href="${source(data.m01_method.outline.path)}">${t('测试大纲 V1.5 课题四','V1.5 Project 4 test outline')}</a> · <a href="${escape(data.report_url)}">${t('完整报告与原始记录','Full report and records')}</a></p></details>
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('计算过程与记录','Calculation & records')}</summary>
       ${referenceCalculation}
@@ -303,16 +301,17 @@
     const scalar=n*(1627333+1683480+371520+1720320-160)-requests*2949120+p*480+(o-requests)*110223360;
     const draft=20998533*dep.kv_rows+108091657*dep.full_query_rows+1017118720*dep.retained_vocab_rows+16432*dep.attention_pairs;
     if(scalar!==extended.target_scalar_flops||draft!==extended.necessary_draft_flops)throw Error('Displayed coefficient calculation mismatch');
-    if(reference.schema!=='project-b0-reference-compute/v1'||reference.arms?.length!==2||reference.target_percent!==90||reference.target_scope!=='project_B0_reference_compute_target'||reference.independent_outline_eta_ref_pass!==null||reference.original_independent_reference_reclassified!==false)throw Error('Invalid project reference method');
+    if(reference.schema!=='b0-effective-compute-comparison/v2'||reference.arms?.length!==2||reference.acceptance_scope!=='descriptive_comparison_only'||reference.independent_outline_eta_ref_pass!==null||reference.original_independent_reference_reclassified!==false)throw Error('Invalid compute comparison scope');
+    if([reference,...reference.arms].some(record=>Object.keys(record).some(key=>key.includes('target')||key.includes('margin'))))throw Error('Baseline comparison cannot supply an acceptance target');
     const base=reference.arms[0];
-    if(base.role!=='B0'||reference.arms[1].role!=='B1'||reference.reference_C_TFLOPS_per_chip!==base.C_TFLOPS_per_chip)throw Error('Invalid common B0 reference');
+    if(base.role!=='B0'||reference.arms[1].role!=='B1'||reference.baseline_C_TFLOPS_per_chip!==base.C_TFLOPS_per_chip)throw Error('Invalid B0 comparison baseline');
     for(const arm of reference.arms){
       const terms=Object.values(reference.component_totals[arm.role]);
       const original=ref[arm.role];
-      const eta=100*arm.C_TFLOPS_per_chip/base.C_TFLOPS_per_chip;
-      if(terms.some(v=>!Number.isSafeInteger(v)||v<0)||terms.reduce((a,b)=>a+b,0)!==arm.F||arm.F!==original.ownF||arm.T_seconds!==original.own_T_seconds||arm.chips!==ref.participating_chips||arm.C_TFLOPS_per_chip!==arm.F/(arm.chips*arm.T_seconds*1e12)||Math.abs(arm.eta_compute_b0_percent-eta)>1e-10||arm.reference_target_met!==(eta>=reference.target_percent))throw Error('B0-reference arithmetic mismatch');
+      const ratio=100*arm.C_TFLOPS_per_chip/base.C_TFLOPS_per_chip;
+      if(terms.some(v=>!Number.isSafeInteger(v)||v<0)||terms.reduce((a,b)=>a+b,0)!==arm.F||arm.F!==original.ownF||arm.T_seconds!==original.own_T_seconds||arm.chips!==ref.participating_chips||arm.C_TFLOPS_per_chip!==arm.F/(arm.chips*arm.T_seconds*1e12)||Math.abs(arm.relative_compute_percent-ratio)>1e-10)throw Error('B0 comparison arithmetic mismatch');
     }
-    if(Object.values(reference.B0_family_totals).reduce((a,b)=>a+b,0)!==base.F||reference.target_C_TFLOPS_per_chip!==base.C_TFLOPS_per_chip*reference.target_percent/100)throw Error('B0-reference component mismatch');
+    if(Object.values(reference.B0_family_totals).reduce((a,b)=>a+b,0)!==base.F||Math.abs(reference.C_gain_percent-(reference.arms[1].relative_compute_percent-100))>1e-10)throw Error('B0 comparison component or gain mismatch');
     data=d;manifest=m;runEvidence=runs;compute=counts;referenceCompute=reference;render();
   }
   loadPublication().catch(error=>{console.error('B0/B1 publication load failed',error);root.textContent=t('结果加载失败或校验不一致，请刷新重试。','Results unavailable or publication verification failed; please retry.');});
