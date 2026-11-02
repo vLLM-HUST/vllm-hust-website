@@ -4,6 +4,7 @@ import argparse
 import copy
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 
@@ -39,6 +40,10 @@ def verify(url, output):
         assert {
             arm["run_id"] for arm in report["c16_equal_request_latency"]["arms"]
         } <= set(manifest["projection"]["public_run_ids"])
+        qualified = context.request.get(
+            url + "/data/m01-qualified-pair-20261103.json"
+        ).json()
+        assert qualified["evidence_qualified"] and qualified["current_milestone_met"]
         results = []
         for language in ("zh", "en"):
             for width in (390, 1440):
@@ -67,9 +72,9 @@ def verify(url, output):
                 expect(root.locator("#method-2")).not_to_contain_text("当前未公开")
                 expect(root.locator(".comparison-verdict")).to_have_count(4)
                 expect(root.locator("#metric-1 .comparison-verdict")).to_contain_text(
-                    "计量验收未通过"
+                    "已达标 · 本次里程碑"
                     if language == "zh"
-                    else "Measurement acceptance failed"
+                    else "Current milestone met"
                 )
                 expect(root.locator("#metric-2 .comparison-verdict")).to_contain_text(
                     "吞吐与时延达标"
@@ -92,43 +97,32 @@ def verify(url, output):
                     "remains open",
                 ):
                     expect(root).not_to_contain_text(vague)
-                for value in ("3.8407", "7.1042", "184.9705%", "256"):
-                    expect(root.locator("#metric-1")).to_contain_text(value)
+                for arm in qualified["arms"]:
+                    for i, value in enumerate(arm["aggregate"]["C_interval"]):
+                        expect(root.locator("#metric-1")).to_contain_text(
+                            f"{(math.ceil if i else math.floor)(float(value) * 10000) / 10000:.4f}"
+                        )
+                    expect(root.locator("#metric-1")).to_contain_text(
+                        f"{math.floor(float(arm['aggregate']['eta_percent_lower']) * 10000) / 10000:.4f}%"
+                    )
+                expect(root.locator("#metric-1")).to_contain_text("50%")
+                expect(root.locator("#metric-1")).not_to_contain_text("90%")
                 expect(root.locator("#method-1")).not_to_have_attribute("open", "")
-                expect(
-                    root.locator("#method-1 [data-calculation-step]").first
-                ).not_to_be_visible()
+                expect(root.locator("#current-qualified-compute")).not_to_be_visible()
                 expect(root.locator("#metric-1 .comparison-row")).to_have_count(2)
-                expect(root.locator("#metric-1")).to_contain_text("84.9705%")
-                for forbidden in (
-                    "已达标",
-                    "Target met",
-                    "项目目标",
-                    "Project target",
-                    "≥90%",
-                ):
-                    expect(root.locator("#metric-1")).not_to_contain_text(forbidden)
                 page.locator("#metric-1 .comparison-detail-link").click()
-                expect(
-                    root.locator("#method-1 [data-calculation-step]").first
-                ).not_to_be_visible()
-                page.locator("#method-full-answer-compute > summary").click()
-                expect(
-                    root.locator("#method-1 [data-calculation-step]").first
-                ).to_be_visible()
+                expect(root.locator("#current-qualified-compute")).to_be_visible()
+                for arm in qualified["arms"]:
+                    for repetition in arm["repetitions"]:
+                        expect(root.locator("#method-1")).to_contain_text(
+                            repetition["T_seconds"]
+                        )
+                        expect(root.locator("#method-1")).to_contain_text(
+                            repetition["Tref_lower_seconds"]
+                        )
+                for expression in ("ΣF", "ΣT", "finish(v)", "90%"):
+                    expect(root.locator("#method-1")).to_contain_text(expression)
                 page.locator("#method-1 > summary").click()
-                expect(root.locator("#method-1 [data-calculation-step]")).to_have_count(
-                    5
-                )
-                for value in (
-                    "F_matrix",
-                    "F_scalar",
-                    "F_draft",
-                    "F_GDN",
-                    "943,105",
-                    "2,763,050,179",
-                ):
-                    expect(root.locator("#method-1")).to_contain_text(value)
                 for old in ("37.2302", "47.5033"):
                     expect(root.locator("#metric-1")).not_to_contain_text(old)
                     expect(root.locator("#method-1")).not_to_contain_text(old)
@@ -169,6 +163,9 @@ def verify(url, output):
             "missing-c16-identity",
             "fabricated-baseline-pass",
             "changed-compute-ratio",
+            "changed-qualified-work",
+            "changed-qualified-threshold",
+            "missing-qualified-repetition",
         ]
         for case in failures:
             page = context.new_page()
@@ -213,6 +210,39 @@ def verify(url, output):
                     lambda route, _request, altered=altered: route.fulfill(
                         json=altered
                     ),
+                )
+            elif case in (
+                "changed-qualified-work",
+                "changed-qualified-threshold",
+                "missing-qualified-repetition",
+            ):
+                changed = copy.deepcopy(qualified)
+                if case == "changed-qualified-work":
+                    changed["arms"][1]["repetitions"][0]["F_interval"][0] += 1000000
+                elif case == "changed-qualified-threshold":
+                    changed["milestone_percent"] = 49
+                else:
+                    changed["arms"][0]["repetitions"].pop()
+                changed_raw = json.dumps(changed).encode()
+                altered = copy.deepcopy(manifest)
+                entry = next(
+                    e
+                    for e in altered["files"]
+                    if e["website_path"] == "data/m01-qualified-pair-20261103.json"
+                )
+                entry.update(
+                    sha256=hashlib.sha256(changed_raw).hexdigest(),
+                    bytes=len(changed_raw),
+                )
+                page.route(
+                    "**/data/m01-qualified-pair-20261103.json",
+                    lambda route, _request, body=changed_raw: route.fulfill(
+                        content_type="application/json", body=body
+                    ),
+                )
+                page.route(
+                    "**/data/benchmark-source-manifest.json",
+                    lambda route, _request, doc=altered: route.fulfill(json=doc),
                 )
             else:
                 changed = context.request.get(

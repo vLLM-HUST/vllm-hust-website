@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  let data, manifest, runEvidence, compute, referenceCompute;
+  let data, manifest, runEvidence, qualifiedPair;
   const root = document.getElementById('comparison');
   const escape = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const t = (cn, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? cn : en;
@@ -16,6 +16,99 @@
     const tables = window.vllmHustSite.getCurrentLang()==='zh' ? s.tables : (s.tables_en || s.tables);
     return indices.map(i=>table(tables[i].headers,tables[i].rows)).join('');
   };
+
+  function validateQualifiedPair(pair) {
+    const fail = () => { throw Error('Qualified pair evidence or arithmetic mismatch'); };
+    const close = (a, b) => Math.abs(Number(a) - Number(b)) <= 1e-10 * Math.max(1, Math.abs(Number(b)));
+    if (pair.schema !== 'm01-qualified-pair/v1' || pair.chips !== 2 || pair.milestone_percent !== 50 ||
+        pair.final_target_percent !== 90 || pair.evidence_qualified !== true ||
+        pair.reference_kind !== 'certified_lower_bound_of_fixed_full_reference' || pair.arms?.length !== 2) fail();
+    const interval = a => Array.isArray(a) && a.length === 2 && a.every(v => Number.isSafeInteger(v) && v > 0) && a[0] <= a[1];
+    pair.arms.forEach((arm, i) => {
+      if (arm.role !== ['B0', 'B1'][i] || arm.repetitions?.length !== 3 ||
+          !arm.reference_certificate_path || !arm.work_components?.length ||
+          arm.F_correspondence_qualified !== true || arm.reference_lower_qualified !== true) fail();
+      const names = new Set();
+      arm.repetitions.forEach(r => {
+        names.add(r.name);
+        if (!interval(r.F_interval) || ![r.T_seconds, r.Tref_lower_seconds].every(v => Number.isFinite(Number(v)) && Number(v) > 0) ||
+            r.requests !== 200 || r.input_tokens !== 282265 || r.output_tokens !== 51200 ||
+            r.uninstrumented !== true || r.synchronized_ranks !== 2 ||
+            !/^[a-f0-9]{64}$/.test(r.source_sha256)) fail();
+      });
+      if (names.size !== 3 || !['uninstrumented-1','uninstrumented-2','uninstrumented-3'].every(n => names.has(n))) fail();
+      const sumT = arm.repetitions.reduce((s, r) => s + Number(r.T_seconds), 0);
+      const sumRef = arm.repetitions.reduce((s, r) => s + Number(r.Tref_lower_seconds), 0);
+      const sums = [0, 1].map(j => arm.repetitions.reduce((s, r) => s + r.F_interval[j], 0));
+      if (arm.work_components.some(c => !interval(c.F_interval))) fail();
+      [0, 1].forEach(j => {
+        if (arm.work_components.reduce((s, c) => s + c.F_interval[j], 0) !== sums[j] ||
+            !close(arm.aggregate.C_interval[j], sums[j] / (pair.chips * sumT * 1e12))) fail();
+      });
+      if (!close(arm.aggregate.sum_T_seconds, sumT) || !close(arm.aggregate.sum_Tref_lower_seconds, sumRef) ||
+          !close(arm.aggregate.eta_percent_lower, 100 * sumRef / sumT)) fail();
+    });
+    const passed = Number(pair.arms[1].aggregate.eta_percent_lower) >= pair.milestone_percent;
+    if (pair.current_milestone_met !== passed) fail();
+  }
+
+  function qualifiedComputeView(paired) {
+    const bound = (v, upper = false, digits = 4) => ((upper ? Math.ceil : Math.floor)(Number(v) * 10 ** digits) / 10 ** digits).toFixed(digits);
+    const interval = (v, digits = 4) => v.map((x, i) => bound(x, i === 1, digits)).join('–');
+    const whole = v => Number(v).toLocaleString('en-US');
+    const rawRange = v => '[' + v.map(whole).join(', ') + ']';
+    const values = paired.arms.map(arm => {
+      const repetitions = arm.repetitions;
+      const sumT = repetitions.reduce((s, r) => s + Number(r.T_seconds), 0);
+      const sumF = [0, 1].map(i => repetitions.reduce((s, r) => s + r.F_interval[i], 0));
+      const sumRef = repetitions.reduce((s, r) => s + Number(r.Tref_lower_seconds), 0);
+      return {arm, sumT, sumF, sumRef, C: sumF.map(f => f / (paired.chips * sumT * 1e12)), etaLower: 100 * sumRef / sumT};
+    });
+    const [b0, b1] = values;
+    const gain = [100 * (b1.C[0] / b0.C[1] - 1), 100 * (b1.C[1] / b0.C[0] - 1)];
+    const met = paired.evidence_qualified === true && b1.etaLower >= paired.milestone_percent;
+    const verdict = met ? t('已达标 · 本次里程碑', 'Current milestone met') : t('本次里程碑未达标', 'Current milestone not met');
+    const line = (label, a, b, result, basis) => '<div class="comparison-row"><h3>' + escape(label) + '</h3><dl>' +
+      [['B0', a], ['B1', b], [t('结果', 'Result'), result], [t('计算依据', 'Basis'), basis]].map(([k, v]) => '<div><dt>' + escape(k) + '</dt><dd>' + escape(v) + '</dd></div>').join('') + '</dl></div>';
+    const report = source(paired.report_path);
+    const overview = '<section class="comparison-group" id="metric-1"><h2>' + t('3.4.1 单芯片有效算力', '3.4.1 Effective compute per chip') + '</h2><p class="comparison-verdict"><strong>' + verdict + '</strong></p>' +
+      line(t('有效算力（TFLOPS/芯片）', 'Effective compute (TFLOPS/chip)'), interval(b0.C), interval(b1.C),
+        t('提升 ', 'Gain ') + interval(gain) + '%', 'C = ΣF / (k × ΣT × 10¹²)') +
+      line(t('同工况参考效率', 'Workload reference efficiency'), '≥' + bound(b0.etaLower) + '%', '≥' + bound(b1.etaLower) + '%',
+        t('本次要求 ≥50%', 'Current target ≥50%'), 'η ≥ 100 × ΣT参,下界 / ΣT') +
+      '<p class="comparison-caveat">' + t('固定200请求、每题上限256 token；两组各3轮，无插桩同步计时，全部计入。', 'Fixed 200 requests, cap 256 tokens; three uninstrumented, synchronized repetitions per arm, all included.') +
+      '</p><a class="comparison-detail-link" href="#method-1">' + t('展开计算与记录', 'Expand calculations & records') + ' →</a><p class="focus-source"><a href="' + report + '">' + t('来源与复算', 'Source and calculation') + '</a></p></section>';
+    let calculation = '<section id="current-qualified-compute"><h3>' + t('本次计算：有效F、同步T与独立参考T参', 'Current calculation: effective F, synchronized T and independent T_ref') + '</h3><p>' +
+      t('Qwen3.5-35B-A3B · BF16 · TP2 · 双卡910B2 · MMLU-Pro固定200请求。每轮输入282265 token、输出51200 token。', 'Qwen3.5-35B-A3B · BF16 · TP2 · two 910B2 chips · MMLU-Pro fixed 200 requests. Each repetition has 282265 input and 51200 output tokens.') +
+      '</p><p>' + t('计时从请求提交前的双卡同步开始，到完成请求后的双卡同步结束；包含区间内搬运、通信与同步。HTTP和分词在两侧均不计入。路径核查另行采集，三轮正式计时均无逐步观察器。', 'Timing spans synchronization on both chips before request submission through synchronization after completion, including transfers, communication and synchronization in the interval. HTTP and tokenization are outside both arms. Path auditing is separate; all three timed repetitions omit stepwise observers.') + '</p>';
+    calculation += '<h3>1. ' + t('合计必要算量', 'Sum necessary work') + '</h3><p>' +
+      t('从保留输出追溯必要依赖，按矩阵、注意力、GDN与基础标量运算计数。未确定的末次截断和共享状态分支分别计算保证成立的下界与上界。', 'Trace dependencies of retained outputs and count matrix, attention, GDN and basic scalar operations. Unresolved terminal clipping and shared-state branches receive certified lower and upper work bounds.') + '</p>';
+    for (const {arm} of values) {
+      calculation += '<h4>' + arm.role + '</h4>' + table([t('运算项', 'Operation term'), t('三轮基本运算数合计', 'Basic operations across all three repetitions')],
+        arm.work_components.map(x => [t(x.label_zh, x.label_en), rawRange(x.F_interval)]));
+      calculation += '<p>ΣF' + (arm.role === 'B0' ? '₀' : '₁') + ' = ' + arm.work_components.map(x => rawRange(x.F_interval)).join(' + ') + '</p>';
+    }
+    calculation += '<h3>2. ' + t('列出每一轮F、T和参考时间', 'List F, T and reference time for every repetition') + '</h3>' +
+      table([t('运行', 'Run'), 'F (FLOPs)', 'T (s)', t('T参下界 (s)', 'T_ref lower bound (s)')],
+        values.flatMap(({arm}) => arm.repetitions.map(r => [arm.role + ' / ' + r.name, rawRange(r.F_interval), r.T_seconds, '≥' + r.Tref_lower_seconds])));
+    calculation += '<h3>3. ' + t('由独立标定构造参考时间', 'Construct reference time from independent calibration') + '</h3><p>' +
+      t('沿预先固定的组件与资源依赖图，将独立标定得到的组件耗时d(v)代入；同一资源的顺序约束和双卡通信依赖均作为边。', 'Use the component and resource dependency graph fixed in advance, with independently calibrated component duration d(v). Edges include resource order and communication dependencies on both chips.') +
+      '</p><p>finish(v) = d(v) + max{finish(u) : u → v}; T参 = max finish(v).</p><p>' +
+      t('对所有与运行记录相容的分支，保留算量、形状和依赖均确定的节点，计算完整参考时间的下界。该下界用于保守验收；完整参考方法与组件标定值保持不变。', 'Across every branch compatible with the records, retain nodes with invariant work, shapes and dependencies to certify a lower bound on the full reference time. Acceptance uses this conservative bound; the full reference method and component calibration values remain unchanged.') + '</p>';
+    calculation += '<h3>4. ' + t('分别代入计算', 'Calculate each arm') + '</h3>';
+    for (const v of values) {
+      calculation += '<h4>' + v.arm.role + '</h4><p>ΣT = ' + v.arm.repetitions.map(r => r.T_seconds).join(' + ') + ' = ' + v.sumT.toFixed(9) + ' s</p>' +
+        '<p>C = ' + rawRange(v.sumF) + ' / (' + paired.chips + ' × ' + v.sumT.toFixed(9) + ' × 10¹²) = <strong>' + interval(v.C) + ' TFLOPS/' + t('芯片', 'chip') + '</strong></p>' +
+        '<p>η ≥ 100 × (' + v.arm.repetitions.map(r => r.Tref_lower_seconds).join(' + ') + ') / ' + v.sumT.toFixed(9) + ' = <strong>' + bound(v.etaLower) + '%</strong></p>' +
+        '<p><a href="' + source(v.arm.reference_certificate_path) + '">' + t('查看参考时间证明与组件记录', 'Reference-time certificate and component records') + '</a></p>';
+    }
+    calculation += '<h3>5. ' + t('按本次50%要求判定', 'Apply the current 50% criterion') + '</h3><p><strong>' + verdict + '：B1 η ≥ ' + bound(b1.etaLower) + (met ? '% ≥ ' : '%；本次要求 ') + paired.milestone_percent + '%。</strong></p><p>' +
+      t('90%为后续目标。η表示同工况独立参考效率；B1相对B0的有效算力提升另按C₁/C₀−1计算。', '90% is a later target. η measures efficiency against the independent workload reference; B1 compute improvement over B0 is calculated separately as C₁/C₀−1.') +
+      '</p><p>' + t('本批输出均达到256-token长度上限，反映固定输出预算的服务工况。完整回答质量与吞吐结果见3.4.2。当前B1组合与源码版本见来源记录；Request Throttling接入由独立任务跟进，其收益未计入本批。', 'All outputs reach the 256-token cap, defining a fixed-budget serving workload. Full-answer quality and throughput appear in section 3.4.2. The source record identifies the B1 combination and revisions; Request Throttling integration is tracked separately and contributes no claimed gain here.') +
+      '</p><p><code>python scripts/recompute_m01_qualified_pair.py --check</code></p><p><a href="' + report + '">' + t('完整公式、证据索引与复算说明', 'Full formulas, evidence index and recomputation instructions') + '</a></p></section>';
+    return {overview, calculation};
+  }
+
   function render() {
     document.getElementById('comparison-title').textContent=t('B0/B1 大纲对比','B0/B1 results by test outline');
     document.getElementById('comparison-lead').textContent=t('按大纲展示有效算力、吞吐与时延、稳定性和成本；固定 B0 为比较基线。','Effective compute, throughput and latency, stability and cost by the test outline, compared with fixed B0.');
@@ -34,99 +127,11 @@
     const row=(name,b0,b1,status,basis)=>`<div class="comparison-row"><h3>${escape(name)}</h3><dl>${[['B0',b0],['B1',b1],[t('结果','Result'),status],[t('计算依据','Basis'),basis]].map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl></div>`;
     const group=(i,verdict,rows,note,path)=>`<section class="comparison-group" id="metric-${i+1}"><h2>${titles[i]}</h2><p class="comparison-verdict"><strong>${escape(verdict)}</strong></p>${rows}<p class="comparison-caveat">${escape(note)}</p><a class="comparison-detail-link" href="#method-${i+1}">${t('展开方法与记录','Expand methods & records')} →</a><p class="focus-source"><a href="${source(path)}">${t('来源与复算','Source and calculation')}</a></p></section>`;
     const qualityBasis=t('MMLU-Pro 固定200题；原评分器；回答上限8192 token。','MMLU-Pro fixed 200; original scorer; output cap 8192 tokens.');
-    const [r0,r1]=referenceCompute.arms;
-    const m01Verdict=t('计量验收未通过','Measurement acceptance failed');
     const stabilityVerdict=t('五任务稳定性验收未通过','Five-task stability acceptance failed');
     const continuousVerdict=zeroFailures?t('两组均零失败','Zero failures in both arms'):t('窗口失败或缺失','Failed or missing windows');
     const currentPath='reports/full-answer-joint-20261030/';
-    const [c0,c1]=compute.arms;
-    const extended=compute.b1_basic_work_interval;
-    const computeRange=extended.client_tflops_per_chip_interval.map(number).join('–');
-    const integer=v=>v.toLocaleString('en-US');
-    const coefficients=compute.coefficients, positions=c1.necessary_target_positions, pairs=c1.causal_pairs;
-    const parts=c1.matrix_flops_parts, deps=extended.dependencies;
-    const known=c1.matrix_flops_subtotal+extended.target_scalar_flops+extended.necessary_draft_flops;
-    const step=(n,title,body)=>`<section class="compute-step" data-calculation-step="${n}"><h3>${n}. ${escape(title)}</h3>${body}</section>`;
-    const calculation=
-      step(1,t('确定同批请求与计时','Identify the paired requests and timing'),
-        `<p>${t('Qwen3.5-35B-A3B · BF16 · 双卡910B2 · MMLU-Pro固定200题，回答上限8192 token。B1采用 BetterScale E24/R36、KV重算、FA Microflow 与 MTP2。','Qwen3.5-35B-A3B · BF16 · two 910B2 chips · MMLU-Pro fixed 200, output cap 8192 tokens. B1 uses BetterScale E24/R36, KV recomputation, FA Microflow and MTP2.')}</p>`+
-        table([t('原始量','Input'),'B0','B1'],[
-          [t('运行','Run'),c0.run,c1.run],
-          [t('请求数 R','Requests R'),integer(c0.requests),integer(c1.requests)],
-          [t('输入 token ΣI','Input tokens ΣI'),integer(c0.input_tokens),integer(c1.input_tokens)],
-          [t('输出 token ΣO','Output tokens ΣO'),integer(c0.output_tokens),integer(c1.output_tokens)],
-          [t('客户端区间 T_client（秒）','Client interval T_client (s)'),c0.client_seconds.toFixed(10),c1.client_seconds.toFixed(10)],
-          [t('参与芯片 k','Participating chips k'),c0.chips,c1.chips]
-        ]))+
-      step(2,t('按实际长度计算目标模型矩阵算量','Count target-model matrices from actual lengths'),
-        `<p>${t('以下逐步展开 B1。每题输入 Iⱼ、输出 Oⱼ；最后发出的 token 不再作为一次新输入。','The following steps expand B1. Each request has input Iⱼ and output Oⱼ; the final emitted token is not a new input.')}</p>
-        <p>N = Σ(Iⱼ + Oⱼ − 1) = ${integer(c1.input_tokens)} + ${integer(c1.output_tokens)} − ${c1.requests} = ${integer(positions)}</p>
-        <p>A = Σ[(Iⱼ + Oⱼ − 1)(Iⱼ + Oⱼ)/2] = ${integer(pairs)}</p>
-        <p>${t('A 按逐题长度求和，不对合并后的 token 总数取三角数。矩阵乘法按2MNK，MoE只计激活专家。','A sums the causal pairs of each request, rather than using the combined token count. Matrix multiplication uses 2MNK; MoE counts activated experts.')}</p>`+
-        table([t('矩阵项','Matrix term'),t('代入计算（FLOPs）','Substitution (FLOPs)')],[
-          [t('投影：全注意力 + GDN + MoE/路由','Projections: full attention + GDN + MoE/router'),`(${Object.values(coefficients.projection_per_position).map(integer).join(' + ')}) × ${integer(positions)} = ${integer(parts.target_projections)}`],
-          ['QK / AV',`${integer(coefficients.causal_qk_av_per_pair)} × ${integer(pairs)} = ${integer(parts.target_causal_qk_av)}`],
-          [t('输出词表','Output vocabulary'),`${integer(coefficients.vocabulary_per_output)} × ${integer(c1.output_tokens)} = ${integer(parts.target_vocabulary)}`],
-          ['F_matrix',`${Object.values(parts).map(integer).join(' + ')} = ${integer(c1.matrix_flops_subtotal)}`]
-        ]))+
-      step(3,t('加入基础标量与必要草稿运算','Add basic scalar and necessary draft operations'),
-        `<p>F_scalar = N × (1,627,333 + 1,683,480 + 371,520 + 1,720,320 − 160) − R × 2,949,120 + A × 480 + (ΣO − R) × 110,223,360 = ${integer(extended.target_scalar_flops)}</p>
-        <p>${t('依次对应归一化/残差/门控、位置编码与路由、GDN预处理、卷积、softmax与解码状态更新。','These terms cover normalization/residual/gating, positional encoding and routing, GDN preprocessing, convolution, softmax and decode-state updates.')}</p>
-        <p>${t('从逐步 MTP 接纳记录追踪最终输出需要的依赖：','Trace dependencies needed by retained outputs from the native MTP acceptance sequence:')} ${integer(deps.kv_rows)} KV、${integer(deps.full_query_rows)} query、${integer(deps.retained_vocab_rows)} vocab、${integer(deps.attention_pairs)} QK/AV pairs。</p>
-        <p>F_draft = 20,998,533 × ${integer(deps.kv_rows)} + 108,091,657 × ${integer(deps.full_query_rows)} + 1,017,118,720 × ${integer(deps.retained_vocab_rows)} + 16,432 × ${integer(deps.attention_pairs)} = ${integer(extended.necessary_draft_flops)}</p>
-        <p>${t('未采纳草稿、填充和重复工作不计入有效算量。','Rejected drafts, padding and redundant work are excluded.')}</p>`)+
-      step(4,t('求 GDN 预填充算量的上下界','Bound GDN prefill work'),
-        `<p>${t('对每题输入 Iⱼ，枚举每块1–64 token的合法分割。首块用零初态成本 c₀，后续块用延续状态成本 c₊；动态规划分别求所有分割的最小、最大总算量。','For each input Iⱼ, consider partitions with 1–64 tokens per chunk. Use zero-initial-state cost c₀ for the first chunk and continued-state cost c₊ thereafter; dynamic programming finds minimum and maximum total work.')}</p>
-        <p>F_GDN ∈ [Σ min_partition Σ c(chunk), Σ max_partition Σ c(chunk)] = [${extended.gdn_prefill_flops_interval.map(integer).join(', ')}]</p>
-        <p>${t('区间来自原记录未保存实际分块，表示算量边界。分块成本表和递推式见下方方法。','The original record does not retain actual chunk partitions, so this is a work bound. Chunk costs and the recurrence are linked below.')}</p>`)+
-      step(5,t('合计有效算量，再除以芯片数和时间','Sum effective work, then divide by chips and time'),
-        `<p>F = F_matrix + F_scalar + F_draft + F_GDN</p>
-        <p>= ${integer(c1.matrix_flops_subtotal)} + ${integer(extended.target_scalar_flops)} + ${integer(extended.necessary_draft_flops)} + [${extended.gdn_prefill_flops_interval.map(integer).join(', ')}]</p>
-        <p>= ${integer(known)} + [${extended.gdn_prefill_flops_interval.map(integer).join(', ')}] = [${extended.basic_work_flops_interval.map(integer).join(', ')}] FLOPs</p>
-        <p>C₁,client = F / (k × T_client × 10¹²) = [${extended.basic_work_flops_interval.map(integer).join(', ')}] / (${c1.chips} × ${c1.client_seconds.toFixed(10)} × 10¹²)</p>
-        <p><strong>= ${computeRange} TFLOPS/${t('芯片','chip')}</strong></p>
-        <p>${t('当前计算采用请求提交至响应排空的客户端区间。大纲 C₁ 使用同步墙钟 T；η₁=100×T参,₁/T₁，本批同步 T 和独立 T参 尚无记录。B0 的完整算量缺逐步 MTP 记录。','This calculation uses the client interval from submission to response drain. Outline C₁ uses synchronized wall time T; η₁=100×T_ref,₁/T₁. This batch has no synchronized T or independent T_ref record. Complete B0 work lacks the stepwise MTP sequence.')}</p>`);
-    const workLabel=name=>({
-      'target:linear_attention:prefill':t('目标模型：GDN 预填充','Target: GDN prefill'),
-      'target:full_attention:':t('目标模型：全注意力层','Target: full-attention layers'),
-      'target_final:final_norm:':t('目标模型：最终归一化与词表','Target: final normalization and vocabulary'),
-      'draft:full_attention:':t('必要草稿依赖','Necessary draft dependencies'),
-      'target:linear_attention:spec':t('目标模型：GDN 解码/验证','Target: GDN decode/verification'),
-      target_projection:t('目标模型投影','Target projections'),
-      target_qk_av:'QK / AV',
-      target_vocabulary:t('目标模型输出词表','Target vocabulary'),
-      target_scalar:t('目标模型基础标量','Target basic scalar work'),
-      target_prefill:t('GDN 预填充','GDN prefill'),
-      necessary_draft:t('必要草稿运算','Necessary draft work')
-    }[name]||name);
-    const referenceCalculation=
-      `<p>${t('比较方法：分别计算B0、B1同工况有效算力，再报告相对B0的算力比值和提升率。','Comparison method: calculate each arm’s effective compute, then report the B0-relative ratio and gain.')}</p>
-      <p>${t('Qwen3.5-35B-A3B · BF16 · TP2 · 双卡910B2 · MMLU-Pro固定200请求 · 每题上限256 token。两组输入均282265 token、输出均51200 token。','Qwen3.5-35B-A3B · BF16 · TP2 · two 910B2 chips · MMLU-Pro fixed 200 requests · cap 256 tokens per request. Each arm has 282265 input and 51200 output tokens.')}</p>
-      <h3>1. ${t('分别合计两组必要算量','Sum necessary work for each arm')}</h3>`+
-      table([t('B0 运算族','B0 operation family'),t('基础运算数','Basic operations')],Object.entries(referenceCompute.B0_family_totals).map(([name,value])=>[workLabel(name),integer(value)]))+
-      `<p>F₀ = ${Object.values(referenceCompute.B0_family_totals).map(integer).join(' + ')} = ${integer(r0.F)}</p>`+
-      table([t('B1 运算分项','B1 operation term'),t('基础运算数','Basic operations')],Object.entries(referenceCompute.component_totals.B1).map(([name,value])=>[workLabel(name),integer(value)]))+
-      `<p>F₁ = ${Object.values(referenceCompute.component_totals.B1).map(integer).join(' + ')} = ${integer(r1.F)}</p>
-      <h3>2. ${t('除以参与芯片数与同轮同步耗时','Divide by participating chips and same-run synchronized time')}</h3>
-      <p>C₀ = ${integer(r0.F)} / (${r0.chips} × ${r0.T_seconds.toFixed(10)} × 10¹²) = <strong>${number(r0.C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</strong></p>
-      <p>C₁ = ${integer(r1.F)} / (${r1.chips} × ${r1.T_seconds.toFixed(10)} × 10¹²) = <strong>${number(r1.C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</strong></p>
-      <h3>3. ${t('计算相对B0的比值与提升','Calculate the B0-relative ratio and gain')}</h3>
-      <p>C₀ = ${number(referenceCompute.baseline_C_TFLOPS_per_chip)} TFLOPS/${t('芯片','chip')}</p>
-      <p>R_C,0 = 100 × C₀/C₀ = ${number(r0.relative_compute_percent)}%</p>
-      <p>R_C,1 = 100 × C₁/C₀ = 100 × ${number(r1.C_TFLOPS_per_chip)}/${number(r0.C_TFLOPS_per_chip)} = ${number(r1.relative_compute_percent)}%</p>
-      <p>${t('B1有效算力提升','B1 effective-compute gain')} ${number(referenceCompute.C_gain_percent)}%。</p>
-      <p>${t('B0的100%是归一化身份。算力比值只作性能比较，不作验收效率。3.4.1要求η=100×T_ref/T：T_ref由独立标定与实际依赖推导，T使用对应无插桩同步计时；本组尚缺两侧完整的同口径验收记录，计量验收未通过。','B0’s 100% is a normalization identity. This ratio describes performance, not acceptance efficiency. Section 3.4.1 requires η=100×T_ref/T, independently calibrated resources and actual dependencies for T_ref, and matched uninstrumented synchronized timing for T. This pair lacks complete matched acceptance records for both arms; measurement acceptance failed.')}</p>
-      <p>${t('本算力工况每题上限256 token，正确数B0 21/200、B1 19/200。完整回答成绩使用下方独立批次。统计开销保留在同步时间内。','This compute workload caps each answer at 256 tokens: B0 scores 21/200 and B1 19/200. Full-answer results use the separate batch below. Accounting overhead remains in synchronized elapsed time.')}</p>
-      <p><code>python scripts/recompute_b0_reference_compute.py --check</code></p>
-      <p><a href="${source(referenceCompute.method)}">${t('算力比较与验收方法','Compute comparison and acceptance method')}</a> · <a href="${source(referenceCompute.report_path)}">${t('计算报告、分项与原始审计','Calculation, components and source audits')}</a></p>`;
-    const overview=group(0,m01Verdict,
-      row(t('单芯片有效算力（TFLOPS/芯片）','Effective compute (TFLOPS/chip)'),number(r0.C_TFLOPS_per_chip),number(r1.C_TFLOPS_per_chip),
-        t('提升 ','Gain ')+number(referenceCompute.C_gain_percent)+'%',
-        t('各自必要算量 ÷ 参与芯片数 ÷ 同轮同步耗时。','Own necessary work divided by all participating chips and same-run synchronized duration.'))+
-      row(t('相对B0算力比值','B0-relative compute ratio'),number(r0.relative_compute_percent)+'%',number(r1.relative_compute_percent)+'%',
-        t('比较值','Descriptive comparison'),
-        t('R_C=100×C/C₀；不作验收效率。','R_C=100×C/C₀; not acceptance efficiency.')),
-      t('200请求、每题上限256 token的算力工况；逐项计算与验收依据见详情。','Compute workload: 200 requests, cap 256 tokens per request. Full calculation and acceptance requirements are in the details.'),referenceCompute.report_path)+
+    const currentCompute = qualifiedComputeView(qualifiedPair);
+    const overview=currentCompute.overview+
       group(1,servingPass?t('吞吐与时延达标','Throughput and latency targets met'):t('吞吐与时延未达标','Throughput or latency targets not met'),
         row(t('同轮质量 / 长度终止','Same-run quality / length stops'),`${a.correct}/${a.completed} · ${a.truncated}`,`${b.correct}/${b.completed} · ${b.truncated}`,qualityVerdict,qualityBasis)+
         row(t('输出吞吐（token/s）','Output throughput (tokens/s)'),number(a.output_tokens_per_second),number(b.output_tokens_per_second),numeric(joint.output_throughput_change_percent,10),t('提升门槛 ≥10%。','Target: improvement ≥10%.'))+
@@ -199,24 +204,7 @@
       <p id="acceptance-stages">${t('同工况参考效率：本次中期 η_ref ≥50%（T≤2T_ref）；后续目标 ≥90%（T≤T_ref/0.9）。吞吐提升 ≥10%；平均 TTFT、TPOT 分别改善 ≥5%；单位 token 成本降低 ≥10%。','Workload-reference efficiency: current milestone η_ref ≥50% (T≤2T_ref); later target ≥90% (T≤T_ref/0.9). Throughput +10%; mean TTFT and TPOT each −5%; cost per token −10%.')}</p>
       <p class="focus-source">${escape(data.version)} · <a href="${source(data.m01_method.outline.path)}">${t('测试大纲 V1.5 课题四','V1.5 Project 4 test outline')}</a> · <a href="${escape(data.report_url)}">${t('完整报告与原始记录','Full report and records')}</a></p></details>
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('计算过程与记录','Calculation & records')}</summary>
-      <section id="stage-reference-method">
-      <h3>${t('参考算力：B0阶段标定与依赖计算','Reference compute: B0 stage calibration and dependencies')}</h3>
-      <p>${t('以固定版本B0标定必要计算、访存、通信和主机处理的阶段时间，记录对应精度、形状与工作量。串行且互不重叠的阶段直接累加；跨卡并行和计算/通信重叠按数据依赖及资源占用计算完成时间，得到T参。','Calibrate necessary compute, memory, communication and host-processing stages using a fixed B0 version, with matched precision, shapes and work. Sum serial nonoverlapping stages; derive T_ref from data dependencies and resource occupancy for cross-chip parallelism and compute/communication overlap.')}</p>
-      <p><code>C参,i = Fᵢ / (kᵢ × T参,i × 10¹²)</code><br><code>ηᵢ = 100 × Cᵢ/C参,i = 100 × T参,i/Tᵢ</code></p>
-      <p>${t('必要搬运、通信、同步与主机调度各计一次。阶段划分、标定统计规则及重叠关系在正式计算前确定，可消除的等待与冗余工作另列。F、T和T参对应同一测量区间及工作量；计时采用无插桩同步墙钟，两侧使用同一参考方法，按各自工作量核算。','Count necessary transfers, communication, synchronization and host scheduling once. Fix stage boundaries, calibration statistics and overlap rules before formal calculation; classify avoidable waiting and redundant work separately. F, T and T_ref cover matched work and measurement boundaries. Use uninstrumented synchronized wall time and the same reference method for both arms, applied to each arm’s workload.')}</p>
-      <p><strong>${t('本次中期：η≥50%，即T≤2T参。','Current milestone: η≥50%, equivalent to T≤2T_ref.')}</strong> ${t('后续90%目标对应T≤T参/0.9，约为参考耗时的1.111倍。','The later90% target corresponds to T≤T_ref/0.9, about1.111 times the reference duration.')}</p>
-      <p>${t('参考值描述已标定B0阶段能力和执行约束下的同工况算力。硬件MFU、设备利用率和相对B0提升分别报告；更快实现超过参考值时按实际效率报告。','The reference describes workload compute under calibrated B0 stage capabilities and execution constraints. Hardware MFU, device utilization and B0-relative gains are reported separately; implementations that exceed the reference retain their actual efficiency.')}</p>
-      <p><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/bf10e5fd7f1d6b06b7a90b7404fa92eaae240969/docs/B0_REFERENCE_COMPUTE.md">${t('完整参考计算方法','Full reference calculation method')}</a></p>
-      </section>
-      ${referenceCalculation}
-      <details class="focus-note" id="method-full-answer-compute"><summary>${t('完整回答批次：算量区间与计算记录','Full-answer batch: work interval and calculation')}</summary>
-      ${calculation}
-      <p>${t('以上按同一完整回答批次列出输入、矩阵、标量、必要草稿、GDN分块和最终除法。原始数据与逐项系数来自同一版本的复算报告。','The calculation above follows one full-answer batch through inputs, matrices, scalar work, necessary drafts, GDN partitions and final division. Inputs and coefficients come from the same versioned calculation report.')}</p>
-      <p><a href="${source(compute.report_path)}">${t('完整推导与复算命令','Full derivation and recomputation command')}</a> · <a href="${source('reports/full-answer-compute-20261101/operation-catalog.json')}">${t('标量、草稿及分块成本系数表','Scalar, draft and chunk-cost coefficient catalog')}</a></p>
-      <p>L(0)=U(0)=0; L(n)=min₁≤ⱼ≤min(64,n) {n=j ? c₀(j) : L(n−j)+c₊(j)}; U(n)=max₁≤ⱼ≤min(64,n) {n=j ? c₀(j) : U(n−j)+c₊(j)}.</p>
-      <p>F_GDN ∈ [Σ L(Iⱼ), Σ U(Iⱼ)]</p>
-      <p><code>python scripts/recompute_full_answer_compute.py --check</code></p>
-      <p>${t('在 benchmark 仓库执行，只读取已归档记录。','Run in the benchmark repository; reads archived records only.')}</p></details></details>
+      ${currentCompute.calculation}</details>
       <details class="comparison-method focus-result" id="method-2"><summary>${titles[1]} · ${t('方法与记录','Methods & records')}</summary>
       <h3>${t('完整回答批次','Full-answer batch')}</h3>${sectionTables('full-answer-joint',[0])}
       <p>${qualityBasis} ${t('负载：同一突发到达序列。统计：已完成响应的吞吐与逐请求平均时延。交互式服务 SLO：未测。','Load: the same burst arrival sequence. Statistics: throughput and per-request mean latency of completed responses. Interactive-service SLO: untested.')}</p>
@@ -280,7 +268,7 @@
       if(hash!==entry.sha256||raw.byteLength!==entry.bytes)throw Error('Publication identity mismatch');
       return JSON.parse(new TextDecoder().decode(raw));
     };
-    const [d,runs,counts,reference]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json','data/full-answer-compute-20261101.json','data/b0-reference-compute-20261101.json'].map(fetchVerified));
+    const [d,runs,counts,reference,paired]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json','data/full-answer-compute-20261101.json','data/b0-reference-compute-20261101.json','data/m01-qualified-pair-20261103.json'].map(fetchVerified));
     if(d.schema!=='midterm-publication/v1'||d.version!=='V1.03')throw Error('Invalid report');
     const joint=d.full_answer_joint;
     if(joint?.same_run_quality_and_performance!==true||joint.protocol?.max_completion_tokens!==8192||joint.arms?.length!==2||joint.arms[0].role!=='B0'||joint.arms[1].role!=='B1'||joint.arms.some(a=>a.completed!==200||a.failed!==0)||!d.packed_continuous)throw Error('Invalid full-answer pair');
@@ -321,7 +309,8 @@
       if(terms.some(v=>!Number.isSafeInteger(v)||v<0)||terms.reduce((a,b)=>a+b,0)!==arm.F||arm.F!==original.ownF||arm.T_seconds!==original.own_T_seconds||arm.chips!==ref.participating_chips||arm.C_TFLOPS_per_chip!==arm.F/(arm.chips*arm.T_seconds*1e12)||Math.abs(arm.relative_compute_percent-ratio)>1e-10)throw Error('B0 comparison arithmetic mismatch');
     }
     if(Object.values(reference.B0_family_totals).reduce((a,b)=>a+b,0)!==base.F||Math.abs(reference.C_gain_percent-(reference.arms[1].relative_compute_percent-100))>1e-10)throw Error('B0 comparison component or gain mismatch');
-    data=d;manifest=m;runEvidence=runs;compute=counts;referenceCompute=reference;render();
+    validateQualifiedPair(paired);
+    data=d;manifest=m;runEvidence=runs;qualifiedPair=paired;render();
   }
   loadPublication().catch(error=>{console.error('B0/B1 publication load failed',error);root.textContent=t('结果加载失败或校验不一致，请刷新重试。','Results unavailable or publication verification failed; please retry.');});
 })();
