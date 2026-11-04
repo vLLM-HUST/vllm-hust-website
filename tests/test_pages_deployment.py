@@ -24,11 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 3
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #609 verifies publication source manifests; data bytes are unchanged.
+    # MOD catalog and Workshop statistics use the reviewed canonical snapshot.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "4421300dd69ef033453205b874e71d1540cce4d7"  # pragma: allowlist secret
+        "39651bca5910994e67fc823cc253e050567d7940"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
@@ -40,6 +40,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     assert checkouts[2]["with"]["path"] == "publication-policy"
     for filename in (
         "ci.yml",
+        "leaderboard-runs.yml",
         "midterm-browser.yml",
         "sync-plugin-workshop-metadata.yml",
         "plugin-effects-browser.yml",

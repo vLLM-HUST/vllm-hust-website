@@ -207,7 +207,7 @@ def test_simllm_keeps_history_but_surfaces_failed_answer_diagnostic() -> None:
     assert component["public_effect_status"] == "not-beneficial-in-tested-cell"
     canonical = re.fullmatch(
         r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
-        r"reports/simllm-issue3-targeted-20261030/README\.md",
+        r"reports/simllm-issue3-ttft-admission-20261102/README\.md",
         component["public_effect_url"],
     )
     assert canonical

@@ -38,7 +38,7 @@
 </p>
 <p class="tl-lede"><span lang="en">Turn profiler events into queryable, comparable execution structure. See model layers with explicit hints; connect recorded scheduler steps to exact graph replay members. Standalone analysis, with an optional vLLM runtime plugin.</span><span lang="zh">把 profiler 事件组织成可查询、可比较的执行结构。借助显式提示看清模型层次，用运行时证据关联 scheduler step 与 graph replay 内部成员。既能独立分析，也能作为可选的 vLLM 运行时插件。</span>
 </p>
-<div class="tl-actions"><a class="tl-button" href="#integration"><span lang="en">Start with your trace →</span><span lang="zh">从你的 trace 开始 →</span></a><a href="#deepseek"><span lang="en">Walk through real evidence ↓</span><span lang="zh">从真实案例开始讲 ↓</span></a><a href="https://github.com/vLLM-HUST/vllm-hust-perf-analyzer">GitHub ↗</a>
+<div class="tl-actions"><a class="tl-button" href="#integration"><span lang="en">Start with your trace →</span><span lang="zh">从你的 trace 开始 →</span></a><a href="#deepseek"><span lang="en">Walk through real evidence ↓</span><span lang="zh">从真实案例开始讲 ↓</span></a><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/releases/tag/evidence-traceloom-tp2-20261027-v1"><span lang="en">Public evidence ↗</span><span lang="zh">公开证据 ↗</span></a>
 </div>
 <p class="tl-stamp"><span lang="en">Native C++17 analyzer · Python runtime observer · MIT · Experimental</span><span lang="zh">原生 C++17 分析器 · Python 运行时观测插件 · MIT · 实验性</span>
 </p>
@@ -171,6 +171,13 @@ ORDER BY occurrence_count DESC;</code>
 <p><span lang="en">Decode macro N103 reuses the same definition across steps, but every instance and inner repeat body stays separate. The scheduler row is an associated-device envelope, not a host scheduling duration or a claim of complete step membership.</span><span lang="zh">Decode 宏 N103 在不同 step 复用同一个定义，但每次实例及其内部 repeat body 独立显示。Scheduler 行展示关联设备事件的外包络，不是 host 调度耗时，也不代表完整的 step 成员集合。</span>
 </p>
 </section>
+<section id="tp2-evidence" class="tl-section">
+<p class="tl-kicker">TP2 / RETAINED STRUCTURAL STUDY</p>
+<h2><span lang="en">Four processes, eight worker profiles.</span><span lang="zh">四个进程，八份 worker profile。</span></h2>
+<p><span lang="en">The 2026-10-27 Qwen3-0.6B FP16 study on two Ascend 910B2 devices ran HOST → AIV → AIV → HOST. All four processes produced identical output tokens. Independent raw-event checks agree on 496 replays, 14,384 graph launch coordinates and 273,544 member occurrences, including every per-replay cost vector.</span><span lang="zh">2026-10-27 的 Qwen3-0.6B FP16 研究在两张 Ascend 910B2 上按 HOST → AIV → AIV → HOST 运行，四个进程输出 token 完全一致。独立原始事件检查核对了 496 次 replay、14,384 个 graph launch 坐标、273,544 次成员出现及每次 replay 的全部 cost 向量。</span></p>
+<aside class="tl-boundary"><span lang="en">Paired profiled span differences change sign between repetitions. This is a bounded native-profile structural comparison, not request-linked production tracing or an unprofiled backend speedup. The two ranks share an engine process; replay instances are not independent trials. Repository access is private; the archived report and release evidence below remain public.</span><span lang="zh">配对的 profile span 差异在两轮间正负翻转。这是有界原生 profile 结构对照，不是生产请求关联追踪或未开启 profiler 的后端加速证明。同一进程的两个 rank 及嵌套 replay 不是独立实验。源码仓库现为私有；下方归档报告与 Release 证据仍公开。</span></aside>
+<p><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/4421300dd69ef033453205b874e71d1540cce4d7/reports/traceloom-tp2-20261027/README.md"><span lang="en">Pinned report and reproduction steps ↗</span><span lang="zh">固定版本报告与复现步骤 ↗</span></a> · <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/releases/tag/evidence-traceloom-tp2-20261027-v1"><span lang="en">Public raw profiles and checksums ↗</span><span lang="zh">公开原始 profile 与校验和 ↗</span></a></p>
+</section>
 <section id="evidence" class="tl-section">
 <p class="tl-kicker">ADDITIONAL / BOUNDED VALIDATION</p>
 <h2><span lang="en">Evidence with its boundaries intact.</span><span lang="zh">保留证据，也保留边界。</span>
@@ -184,7 +191,7 @@ ORDER BY occurrence_count DESC;</code>
 </div>
 </div>
 <p><span lang="en">Two requests, 16 generated tokens each; two empty scheduling decisions retained. All 11,684 non-control structural anchors were linked in this capture. Unassociated controls and out-of-scope events remain visible rather than assigned to the nearest step.</span><span lang="zh">两个请求，每个生成 16 个 token；保留两个空调度决策。此采集中全部 11,684 个非控制结构锚点建立关联。未关联的控制事件和范围外事件仍然可见，不强行归到最近的 step。</span>
-</p><aside class="tl-boundary"><span lang="en">Scope: Qwen3-0.6B · TP1 · eager · in-process V1 · vLLM <code>0fc695fc</code> / Ascend <code>f4a08bdd</code>. The profiler warned about potentially incomplete parsing on stop. Results describe captured evidence only, not universal coverage, critical paths, acceleration, or measured instrumentation overhead. Graph capture has separate bounded acceptance above; distributed capture remains unqualified.</span><span lang="zh">范围：Qwen3-0.6B · TP1 · eager · 进程内 V1 · vLLM <code>0fc695fc</code> / Ascend <code>f4a08bdd</code>。Profiler 停止时提示可能存在解析不完整。结果只描述采集到的证据，不承诺普适覆盖、关键路径识别、加速或已测记录开销。Graph 采集已有上述独立的限定验收；分布式采集仍待验收。</span></aside>
+</p><aside class="tl-boundary"><span lang="en">Scope: Qwen3-0.6B · TP1 · eager · in-process V1 · vLLM <code>0fc695fc</code> / Ascend <code>f4a08bdd</code>. The profiler warned about potentially incomplete parsing on stop. Results describe captured evidence only, not universal coverage, critical paths, acceleration, or measured instrumentation overhead. TP1 graph and TP2 native profiles have separate bounded validation; universal distributed coverage remains unqualified.</span><span lang="zh">范围：Qwen3-0.6B · TP1 · eager · 进程内 V1 · vLLM <code>0fc695fc</code> / Ascend <code>f4a08bdd</code>。Profiler 停止时提示可能存在解析不完整。结果只描述采集到的证据，不承诺普适覆盖、关键路径识别、加速或已测记录开销。TP1 graph 与 TP2 原生 profile 分别有独立限定验证；普适分布式覆盖仍未验收。</span></aside>
 <p><a href="https://github.com/vLLM-HUST/vllm-hust-perf-analyzer/blob/215f4ec/docs/runtime-context.md"><span lang="en">Versioned capture conditions & audit record ↗</span><span lang="zh">版本固定的采集条件与审计记录 ↗</span></a> · <a href="./data/traceloom-capture.json"><span lang="en">Download the displayed intervals ↗</span><span lang="zh">下载图中展示的区间数据 ↗</span></a>
 </p>
 </section>
