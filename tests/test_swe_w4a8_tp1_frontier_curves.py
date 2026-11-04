@@ -227,7 +227,7 @@ def test_w4a8_tp1_runtime_evidence_is_this_cohorts_own():
     runs = {
         r["run_id"]: r
         for r in swe_evidence()["runs"]
-        if r.get("point_id", "").startswith("qwen35-sweprefix-w4a8")
+        if r.get("point_id") in {point["id"] for point in points}
     }
     assert len(runs) == len(LEVELS)
     for point in points:
