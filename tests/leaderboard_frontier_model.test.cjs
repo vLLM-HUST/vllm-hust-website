@@ -686,6 +686,13 @@ test('SWE observations keep their fixed-window protocol and real MTP separate fr
             assert.ok([1,2,4,8,16].includes(p.load.concurrency));
             assert.equal(p.configuration.hardware.accelerator_count,1);
             assert.equal(byId.get(p.cohort_id).precision.id,'w4a8-expert-int4-linearattn-w8a8-weights-compute-bf16-kv');
+        } else if(p.evidence.benchmark_protocol.campaign==='qwen35-w4a8-gdnw8a8-tp2-swe-curves-20261030'){
+            assert.equal(p.cohort_id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp2-2x910b3-full-decode-only-sweprefix-900s-v1');
+            assert.ok([1,2,4,8,16].includes(p.load.concurrency));
+            assert.equal(p.configuration.hardware.accelerator_count,2);
+            assert.equal(byId.get(p.cohort_id).precision.id,'w4a8-expert-int4-linearattn-5proj-w8a8-weights-compute-bf16-kv');
+            assert.equal(run.client.chips,2);
+            assert.ok(run.limitations.some(text=>text.includes('cannot be independently recomputed')));
         } else assert.equal(p.evidence.benchmark_protocol.campaign,'repaired-mtp2-separated-experts-c64');
         assert.equal(run.client.endpoint,undefined);
         assert.equal(run.client.server_metadata,undefined);
@@ -1170,7 +1177,7 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     const data=require('../data/leaderboard_frontier.json');
     const visible=model.visibleData(data);
     const allQwen35=visible.cohorts.filter(c=>c.model.label==='Qwen3.5-35B-A3B');
-    assert.ok([8,9].includes(allQwen35.length));
+    assert.ok([9,10].includes(allQwen35.length));
     const cohorts=allQwen35.filter(c=>c.precision.id==='bf16-weights-compute-kv');
     assert.equal(cohorts.length,4);
     assert.equal(cohorts.filter(c=>c.workload.contract.presentation==='configuration-study').length,3);
@@ -1204,7 +1211,10 @@ test('Qwen35 unified campaign remains on its series page without losing checkpoi
     assert.doesNotMatch(w4a8[0].workload.label,/smoke|historical/i);
     const w4a8gdnw8a8=allQwen35.filter(c=>c.precision.id==='w4a8-expert-int4-linearattn-w8a8-weights-compute-bf16-kv');
     assert.ok([0,1].includes(w4a8gdnw8a8.length));
-    assert.equal(allQwen35.length,8+w4a8gdnw8a8.length);
+    const w4a8gdnw8a8tp2=allQwen35.filter(c=>c.precision.id==='w4a8-expert-int4-linearattn-5proj-w8a8-weights-compute-bf16-kv');
+    assert.equal(w4a8gdnw8a8tp2.length,1);
+    assert.equal(w4a8gdnw8a8tp2[0].id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp2-2x910b3-full-decode-only-sweprefix-900s-v1'); // pragma: allowlist secret (public cohort id)
+    assert.equal(allQwen35.length,8+w4a8gdnw8a8.length+w4a8gdnw8a8tp2.length);
     if(w4a8gdnw8a8.length===1){
         assert.equal(w4a8gdnw8a8[0].id,'qwen35-35b-a3b-w4a8-gdnw8a8-tp1-1x910b3-full-decode-only-sweprefix-900s-v1'); // pragma: allowlist secret (public cohort id)
         assert.equal(w4a8gdnw8a8[0].workload.id,'sweprefix-qwen35-w4a8-gdnw8a8-tp1-900s-v1'); // pragma: allowlist secret (public workload id)
