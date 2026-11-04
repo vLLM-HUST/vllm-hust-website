@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  let data, manifest, runEvidence, qualifiedPair;
+  let data, manifest, runEvidence, qualifiedPair, controllerDiscovery;
   const root = document.getElementById('comparison');
   const escape = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const t = (cn, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? cn : en;
@@ -16,6 +16,20 @@
     const tables = window.vllmHustSite.getCurrentLang()==='zh' ? s.tables : (s.tables_en || s.tables);
     return indices.map(i=>table(tables[i].headers,tables[i].rows)).join('');
   };
+
+  function controllerDiscoverySection() {
+    const d=controllerDiscovery, a=d.arms;
+    const decrease=(base,next)=>(100*(1-next/base)).toFixed(2);
+    const labels=t(['A 旧B1重算参考（不是B0）','B 跨轮缓存B1，无Controller','C 与B相同，加原版Controller','D C＋延迟感知候选（不采用）'],['A Previous B1 recomputation reference (not B0)','B Cross-turn-cache B1, no Controller','C Same as B, with original Controller','D C + latency-aware candidate (rejected)']);
+    return `<h3>${t('Controller：多轮回放的阶段性结果','Controller: preliminary multi-turn replay results')}</h3>
+      <p class="focus-status">${t('单次发现，尚未重复验证；不是上方200题完整回答成绩，也没有匹配B0。','Single-run discovery, not yet replicated; separate from the 200 full-answer tasks above, with no matched B0.')}</p>
+      <p>${escape(t(`${d.programs_per_arm}个program，每个${d.rounds_per_program}轮；每组${a.B.successful_business_requests}个成功请求、${a.B.actual_generated_tokens}个实际输出token。真实输出继承历史及记录的工具等待；初始提示按长度构造，非完整代码Agent任务。`,`${d.programs_per_arm} programs, ${d.rounds_per_program} turns each; ${a.B.successful_business_requests} successful requests and ${a.B.actual_generated_tokens} generated tokens per arm. Actual outputs feed later turns with recorded tool waits; length-constructed initial prompts, not complete coding-agent tasks.`))}</p>
+      ${table(t(['配置','整批耗时（秒）','请求P95（秒）','缓存输入占比（%）'],['Configuration','Batch time (s)','Request P95 (s)','Cached input (%)']),['A','B','C','D'].map((k,i)=>[labels[i],number(a[k].makespan_seconds),number(a[k].request_p95_seconds),number(a[k].cached_input_fraction_percent)]))}
+      <p>${escape(t(`旧B1→缓存B1：耗时减少${decrease(a.A.makespan_seconds,a.B.makespan_seconds)}%（包含缓存及驻留配置变化）；缓存B1→加入Controller：再减少${decrease(a.B.makespan_seconds,a.C.makespan_seconds)}%；旧B1→缓存＋Controller：合计减少${decrease(a.A.makespan_seconds,a.C.makespan_seconds)}%。各百分比的分母不同，不能相加。`,`Previous B1 → cached B1: ${decrease(a.A.makespan_seconds,a.B.makespan_seconds)}% less time (cache and residency configuration changes); cached B1 → Controller: ${decrease(a.B.makespan_seconds,a.C.makespan_seconds)}% less time; previous B1 → cache + Controller: ${decrease(a.A.makespan_seconds,a.C.makespan_seconds)}% less time overall. Different denominators: do not add these percentages.`))}</p>
+      <p>${t('同一模型BF16/TP2、双卡910B2；B/C共享引擎配置。原版指保留原调度算法，另有共同HTTP token-ID、容量及无业务超时适配，不是完全未修改的上游程序。','Same BF16/TP2 model and two 910B2 devices; B/C share engine settings. Original refers to the scheduling algorithm, with disclosed common token-ID HTTP, capacity and no-business-timeout adaptations, not an unmodified upstream binary.')}</p>
+      <p class="comparison-caveat">${t('必须澄清：顺序B→C→D→A，每组仅一次，无独立留出；D比C更慢，候选不采用。缓存/冷路径逐token诊断仍失败（64个仅15个相同），原因未解决，性能数据不证明数值等价或任务质量。非流式回放未测首字延迟及每token延迟；业务无错误不代表SDK收尾无告警。','Clarifications: order B→C→D→A, one run per arm, no independent holdout. D is slower than C and is rejected. Cached/cold token comparison remains unresolved (15 of 64 match); timing does not establish numerical equivalence or task quality. Non-streaming replay did not measure TTFT or TPOT. Error-free business requests do not imply warning-free SDK shutdown.')}</p>
+      <p class="focus-source"><a href="${escape(source(d.report_path))}">${t('配置、负结果与证据边界','Configuration, negative result and evidence limits')}</a> · <a href="${escape(source('website-publication/data/controller-b1-discovery-20261104.json'))}">${t('机器可读数据与来源SHA','Machine-readable results and source hashes')}</a></p>`;
+  }
 
   function validateQualifiedPair(pair) {
     const fail = () => { throw Error('Qualified pair evidence or arithmetic mismatch'); };
@@ -206,6 +220,7 @@
       <details class="comparison-method focus-result" id="method-1"><summary>${titles[0]} · ${t('计算过程与记录','Calculation & records')}</summary>
       ${currentCompute.calculation}</details>
       <details class="comparison-method focus-result" id="method-2"><summary>${titles[1]} · ${t('方法与记录','Methods & records')}</summary>
+      ${controllerDiscoverySection()}
       <h3>${t('完整回答批次','Full-answer batch')}</h3>${sectionTables('full-answer-joint',[0])}
       <p>${qualityBasis} ${t('负载：同一突发到达序列。统计：已完成响应的吞吐与逐请求平均时延。交互式服务 SLO：未测。','Load: the same burst arrival sequence. Statistics: throughput and per-request mean latency of completed responses. Interactive-service SLO: untested.')}</p>
       <p>${t('B1 主机 State 预算','B1 host State budget')}: ${continuous.b1_host_state_budget_bytes_per_rank/(1024**3)} GiB/rank · ${escape(b.runtime.vllm_version)} / ${escape(b.runtime.ascend_version)}.</p>${evidence('full-answer-joint')}
@@ -268,7 +283,7 @@
       if(hash!==entry.sha256||raw.byteLength!==entry.bytes)throw Error('Publication identity mismatch');
       return JSON.parse(new TextDecoder().decode(raw));
     };
-    const [d,runs,counts,reference,paired]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json','data/full-answer-compute-20261101.json','data/b0-reference-compute-20261101.json','data/m01-qualified-pair-20261103.json'].map(fetchVerified));
+    const [d,runs,counts,reference,paired,discovery]=await Promise.all(['data/midterm-v103.json','data/leaderboard_frontier_swe_evidence.json','data/full-answer-compute-20261101.json','data/b0-reference-compute-20261101.json','data/m01-qualified-pair-20261103.json','data/controller-b1-discovery-20261104.json'].map(fetchVerified));
     if(d.schema!=='midterm-publication/v1'||d.version!=='V1.03')throw Error('Invalid report');
     const joint=d.full_answer_joint;
     if(joint?.same_run_quality_and_performance!==true||joint.protocol?.max_completion_tokens!==8192||joint.arms?.length!==2||joint.arms[0].role!=='B0'||joint.arms[1].role!=='B1'||joint.arms.some(a=>a.completed!==200||a.failed!==0)||!d.packed_continuous)throw Error('Invalid full-answer pair');
@@ -309,6 +324,13 @@
       if(terms.some(v=>!Number.isSafeInteger(v)||v<0)||terms.reduce((a,b)=>a+b,0)!==arm.F||arm.F!==original.ownF||arm.T_seconds!==original.own_T_seconds||arm.chips!==ref.participating_chips||arm.C_TFLOPS_per_chip!==arm.F/(arm.chips*arm.T_seconds*1e12)||Math.abs(arm.relative_compute_percent-ratio)>1e-10)throw Error('B0 comparison arithmetic mismatch');
     }
     if(Object.values(reference.B0_family_totals).reduce((a,b)=>a+b,0)!==base.F||Math.abs(reference.C_gain_percent-(reference.arms[1].relative_compute_percent-100))>1e-10)throw Error('B0 comparison component or gain mismatch');
+    if(discovery.schema!=='controller-b1-discovery/v1'||discovery.matched_B0!==null||discovery.validated_win!==false||discovery.repetitions_per_arm!==1||discovery.task_quality_evaluated!==false)throw Error('Invalid Controller discovery scope');
+    for(const arm of Object.values(discovery.arms)) {
+      if(arm.successful_business_requests!==discovery.programs_per_arm*discovery.rounds_per_program||![arm.makespan_seconds,arm.request_p95_seconds].every(v=>Number.isFinite(v)&&v>0))throw Error('Incomplete Controller batch');
+    }
+    const gain=100*(1-discovery.arms.C.makespan_seconds/discovery.arms.B.makespan_seconds);
+    if(Math.abs(gain-discovery.C_over_B_percent)>1e-9)throw Error('Controller comparator mismatch');
+    controllerDiscovery=discovery;
     validateQualifiedPair(paired);
     data=d;manifest=m;runEvidence=runs;qualifiedPair=paired;render();
   }
