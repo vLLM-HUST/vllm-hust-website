@@ -39,7 +39,8 @@ does not claim that every historical measurement has completed methodological or
 1. Commit and merge the benchmark publication source and sync tool.
 1. Trigger `Deploy Pages From Benchmark` (`deploy-benchmark-pages.yml`) on website `main`, or send a
    `benchmark-publication` repository dispatch. Website code merges also trigger this workflow.
-1. The workflow checks out benchmark `main`, resolves its exact commit, and runs
+1. The workflow checks out the reviewed, merged benchmark commit pinned in
+   `deploy-benchmark-pages.yml` and the presentation CI workflows, and runs
    `publish --revision <full-merged-commit>` into a temporary website checkout. It verifies the
    manifest and runs publication and presentation tests before uploading the Pages artifact.
 1. Deploy that artifact with GitHub Pages Actions, without committing generated `data/` files or
@@ -54,3 +55,19 @@ released through the deployment workflow above after merging the benchmark PR.
 Tests for this migration verify navigation, preserved sections, unique DOM IDs, calculation behavior
 and publication bytes. They do not substitute for a methodological audit of every historical
 measurement or a fresh price quote.
+
+## Catalog migration and rollback
+
+`ecosystem.json` and the Workshop metadata live in benchmark's `website-publication/data/`. The
+former claim that `vllm-hust-docs` owns a machine-readable registry is obsolete. The source manifest
+records the immutable data revision; presentation code is versioned separately. Classification and
+public visibility are preserved by the one-way publication and the separately pinned public-site
+policy. Installation, activation, runtime effectiveness, recovery, and performance qualification do
+not follow from catalog publication.
+
+To roll back a publication, select a previously merged and verified benchmark revision, update the
+same source pin in deployment and every presentation CI workflow, and rerun their checks before
+merging the website change. Redeploy the assembled artifact and verify its source manifest and
+public-file hashes. Preserve the public policy pin and original evidence; do not overwrite source
+reports, restore withdrawn entries, or copy generated data into website Git. The retained
+pre-rollout manifest identifies the prior data revision without relying on the moving `main` branch.
