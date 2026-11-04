@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" role="img" aria-labelledby="title desc">
+<title id="title">Qwen3.5-35B-A3B W4A8 (experts int4, GDN W8A8) two-chip SWE concurrency speed-throughput tradeoff</title>
+<desc id="desc">Client concurrency varies in sequential runs sharing server history; order effects are not controlled. Every point is one 900s closed-loop observation on two Ascend 910B3 chips at max-num-seqs 16.</desc>
+<rect width="1000" height="580" fill="#fff"/>
+<g font-family="system-ui,sans-serif" fill="#172033">
+<text x="60" y="40" font-size="23" font-weight="700">Qwen3.5-35B-A3B W4A8 · two-chip SWE prefix reuse</text>
+<text x="60" y="68" font-size="15">TP2 · 2×910B3 · FULL_DECODE_ONLY · MNS16 · real MTP2 · int4 experts + GDN W8A8 · 900s/point</text>
+<path d="M90.00 120V440 M90 440.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="90.00" y="464" text-anchor="middle" font-size="13">0</text>
+<text x="78" y="444.00" text-anchor="end" font-size="13">0</text>
+<path d="M252.00 120V440 M90 376.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="252.00" y="464" text-anchor="middle" font-size="13">20</text>
+<text x="78" y="380.00" text-anchor="end" font-size="13">48</text>
+<path d="M414.00 120V440 M90 312.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="414.00" y="464" text-anchor="middle" font-size="13">40</text>
+<text x="78" y="316.00" text-anchor="end" font-size="13">96</text>
+<path d="M576.00 120V440 M90 248.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="576.00" y="464" text-anchor="middle" font-size="13">60</text>
+<text x="78" y="252.00" text-anchor="end" font-size="13">144</text>
+<path d="M738.00 120V440 M90 184.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="738.00" y="464" text-anchor="middle" font-size="13">80</text>
+<text x="78" y="188.00" text-anchor="end" font-size="13">192</text>
+<path d="M900.00 120V440 M90 120.00H900" stroke="#e2e8f0" fill="none"/>
+<text x="900.00" y="464" text-anchor="middle" font-size="13">100</text>
+<text x="78" y="124.00" text-anchor="end" font-size="13">240</text>
+<polyline points="857.12,383.83 742.82,353.59 655.87,303.76 574.22,237.47 401.05,171.73" fill="none" stroke="#0f766e" stroke-width="2.5"/>
+<circle data-point="qwen35-sweprefix-w4a8-gdnw8a8-ascend-tp2-mtp2-c1-20261030" cx="857.12" cy="383.83" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C1: P90 94.71 tokens/s; 42.13 tokens/s/chip</title></circle>
+<text x="866.12" y="371.83" fill="#0f766e" font-size="14">C1</text>
+<circle data-point="qwen35-sweprefix-w4a8-gdnw8a8-ascend-tp2-mtp2-c2-20261030" cx="742.82" cy="353.59" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C2: P90 80.59 tokens/s; 64.81 tokens/s/chip</title></circle>
+<text x="751.82" y="341.59" fill="#0f766e" font-size="14">C2</text>
+<circle data-point="qwen35-sweprefix-w4a8-gdnw8a8-ascend-tp2-mtp2-c4-20261030" cx="655.87" cy="303.76" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C4: P90 69.86 tokens/s; 102.18 tokens/s/chip</title></circle>
+<text x="664.87" y="291.76" fill="#0f766e" font-size="14">C4</text>
+<circle data-point="qwen35-sweprefix-w4a8-gdnw8a8-ascend-tp2-mtp2-c8-20261030" cx="574.22" cy="237.47" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C8: P90 59.78 tokens/s; 151.90 tokens/s/chip</title></circle>
+<text x="583.22" y="225.47" fill="#0f766e" font-size="14">C8</text>
+<circle data-point="qwen35-sweprefix-w4a8-gdnw8a8-ascend-tp2-mtp2-c16-20261030" cx="401.05" cy="171.73" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C16: P90 38.40 tokens/s; 201.20 tokens/s/chip</title></circle>
+<text x="410.05" y="159.73" fill="#0f766e" font-size="14">C16</text>
+<text x="90" y="99" fill="#0f766e" font-size="15">W4A8 (GDN W8A8) + real MTP2 · int4 experts / int8 rest · bf16 KV</text>
+<text x="495" y="496" text-anchor="middle" font-size="16">P90 request decode speed · output tokens/s</text>
+<text transform="translate(25 280) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
+<text x="60" y="532" font-size="13">The line connects all five measured client C levels (C1/C2/C4/C8/C16); it is not a fitted curve or a cross-setting Pareto envelope.</text>
+<text x="60" y="554" font-size="13">Sequential runs share server history. Public summaries only; no task-quality or cross-recipe speedup claim.</text>
+</g></svg>
