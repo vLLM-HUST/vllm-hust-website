@@ -36,12 +36,31 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout canonical benchmark publication
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: 4421300dd69ef033453205b874e71d1540cce4d7 # pragma: allowlist secret
+          path: .benchmark-source
+          persist-credentials: false
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Assemble and verify canonical benchmark data
+        run: |
+          python .benchmark-source/scripts/sync_website_publication.py publish \
+            --revision 4421300dd69ef033453205b874e71d1540cce4d7 --website .
+          python .benchmark-source/scripts/sync_website_publication.py check \
+            --revision 4421300dd69ef033453205b874e71d1540cce4d7 --website .
       - run: node --test tests/leaderboard_runs_model.test.cjs tests/leaderboard_frontier_model.test.cjs
       - name: Install review dependencies and run Python tests
         timeout-minutes: 15
