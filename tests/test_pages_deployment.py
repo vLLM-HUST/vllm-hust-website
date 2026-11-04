@@ -24,11 +24,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     ]
     assert len(checkouts) == 3
     assert checkouts[0]["with"]["ref"] == "main"
-    # Benchmark #607 adds conditional Controller discovery; prior results remain.
+    # Benchmark #609 verifies publication source manifests; data bytes are unchanged.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "e03423a77010b2ec4f1cb29f63ab3ed038afb37d"  # pragma: allowlist secret
+        "91ff1c2910ad9b917033095f5666b80a07a2df0e"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
