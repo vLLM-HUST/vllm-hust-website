@@ -142,7 +142,7 @@ def render(snapshot):
             f'<text x="{px + 9:.2f}" y="{py - 12:.2f}" fill="{color}" font-size="14">C{p["load"]["concurrency"]}</text>'
         )
     svg.append(
-        f'<text x="90" y="99" fill="{color}" font-size="15">{label} · int4 experts / int8 rest · bf16 KV</text>'
+        f'<text x="90" y="99" fill="{color}" font-size="15">{label} · int4 experts / int8 GDN · bf16 KV</text>'
     )
     svg.extend(
         [
