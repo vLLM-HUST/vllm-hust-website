@@ -58,16 +58,16 @@ measurement or a fresh price quote.
 
 ## Catalog migration and rollback
 
-`ecosystem.json` and the Workshop metadata live in benchmark's `website-publication/data/`.
-The former claim that `vllm-hust-docs` owns a machine-readable registry is obsolete.
-The source manifest records the immutable data revision; presentation code is versioned separately.
-Classification and public visibility are preserved by the one-way publication and the separately
-pinned public-site policy. Installation, activation, runtime effectiveness, recovery, and performance
-qualification do not follow from catalog publication.
+`ecosystem.json` and the Workshop metadata live in benchmark's `website-publication/data/`. The
+former claim that `vllm-hust-docs` owns a machine-readable registry is obsolete. The source manifest
+records the immutable data revision; presentation code is versioned separately. Classification and
+public visibility are preserved by the one-way publication and the separately pinned public-site
+policy. Installation, activation, runtime effectiveness, recovery, and performance qualification do
+not follow from catalog publication.
 
 To roll back a publication, select a previously merged and verified benchmark revision, update the
 same source pin in deployment and every presentation CI workflow, and rerun their checks before
 merging the website change. Redeploy the assembled artifact and verify its source manifest and
 public-file hashes. Preserve the public policy pin and original evidence; do not overwrite source
-reports, restore withdrawn entries, or copy generated data into website Git. The retained pre-rollout
-manifest identifies the prior data revision without relying on the moving `main` branch.
+reports, restore withdrawn entries, or copy generated data into website Git. The retained
+pre-rollout manifest identifies the prior data revision without relying on the moving `main` branch.
