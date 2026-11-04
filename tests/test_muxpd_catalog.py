@@ -42,15 +42,22 @@ def test_muxpd_joins_as_a_restricted_runtime_mod_with_organization_support():
 
 def test_muxpd_qualification_link_is_immutable_and_keeps_numerical_limits():
     row = component()
-    assert row["qualification_report"] == row["public_effect_url"]
+    assert row["qualification_report"] != row["public_effect_url"]
     assert re.fullmatch(
         r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
         r"reports/muxpd-ecpa-20261025/RELEASE-QUALIFICATION\.md",
-        row["public_effect_url"],
+        row["qualification_report"],
     )
     assert "6/8" in row["public_effect_en"] and "6/8" in row["public_effect_zh"]
-    assert "equivalence is not established" in row["public_effect_en"]
-    assert "No current-package performance gain" in row["public_effect_en"]
+    assert "do not establish exact output equivalence" in row["public_effect_en"]
+    assert "current-package performance gain is established" in row["public_effect_en"]
+    assert "5/8" in row["public_effect_en"] and "5/8" in row["public_effect_zh"]
+    assert row["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert re.fullmatch(
+        r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
+        r"reports/muxpd-batch14-quota-control-20261030/README\.md",
+        row["public_effect_url"],
+    )
     assert row["compatibility"]["followup_url"].endswith("/issues/23")
     assert row["historical_evidence_scope"].startswith("Historical scoped TP4")
     assert "muxpd" not in {
