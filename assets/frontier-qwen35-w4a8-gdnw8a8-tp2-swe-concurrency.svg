@@ -34,7 +34,7 @@
 <text x="583.22" y="225.47" fill="#0f766e" font-size="14">C8</text>
 <circle data-point="qwen35-sweprefix-w4a8-gdnw8a8-ascend-tp2-mtp2-c16-20261030" cx="401.05" cy="171.73" r="5" fill="#0f766e"><title>W4A8 (GDN W8A8) + real MTP2 C16: P90 38.40 tokens/s; 201.20 tokens/s/chip</title></circle>
 <text x="410.05" y="159.73" fill="#0f766e" font-size="14">C16</text>
-<text x="90" y="99" fill="#0f766e" font-size="15">W4A8 (GDN W8A8) + real MTP2 · int4 experts / int8 rest · bf16 KV</text>
+<text x="90" y="99" fill="#0f766e" font-size="15">W4A8 (GDN W8A8) + real MTP2 · int4 experts / int8 GDN · bf16 KV</text>
 <text x="495" y="496" text-anchor="middle" font-size="16">P90 request decode speed · output tokens/s</text>
 <text transform="translate(25 280) rotate(-90)" text-anchor="middle" font-size="16">Output tokens/s/chip</text>
 <text x="60" y="532" font-size="13">The line connects all five measured client C levels (C1/C2/C4/C8/C16); it is not a fitted curve or a cross-setting Pareto envelope.</text>
