@@ -325,6 +325,7 @@
   };
 
   const isWorkshopMod = (item) => {
+    if (window.EcosystemCatalog.isWithdrawn(item)) return false;
     const kind = taxonomyProfile(item).kind;
     return Boolean(kind) && (item.public_surface !== false || kind === "retired");
   };
