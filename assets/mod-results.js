@@ -123,7 +123,9 @@
       document.querySelectorAll("[data-summary]").forEach((value) => {
         value.textContent = report.summary[value.dataset.summary];
       });
-      document.querySelector("[data-report-source]").href = report.source.report_url;
+      if (report.source?.report_url) {
+        document.querySelector("[data-report-source]").href = report.source.report_url;
+      }
       render();
     })
     .catch((error) => {
