@@ -42,6 +42,8 @@ async def run(args):
                         timeout=60000,
                     )
                     assert response.status == 200
+                    visible_text = await page.locator("body").inner_text()
+                    assert "stateaxis" not in visible_text.lower(), filename
                     # Every public shell has translated metadata and a shared footer.
                     title = await page.title()
                     assert title.strip(), filename

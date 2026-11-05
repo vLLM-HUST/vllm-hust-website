@@ -8,16 +8,6 @@
     "control_plane"
   ]);
 
-  const WITHDRAWN_MOD_IDS = new Set([
-    "stateaxis-automatic-prefix-cache",
-    "stateaxis-async-kv-transfer",
-    "stateaxis-pipelined-weight-loading"
-  ]);
-
-  function isWithdrawn(item) {
-    return WITHDRAWN_MOD_IDS.has(item?.id);
-  }
-
   function taxonomyComponents(taxonomy) {
     if (taxonomy?.schema_version !== "mod-taxonomy/v2" || !taxonomy.components) {
       throw new Error("unsupported MOD taxonomy");
@@ -26,7 +16,7 @@
   }
 
   function isWorkshopMod(item, taxonomy) {
-    if (!item || isWithdrawn(item) || item.public_surface === false) return false;
+    if (!item || item.public_surface === false) return false;
     const profile = taxonomyComponents(taxonomy)[item.id];
     return Boolean(profile && ACTIVE_MOD_KINDS.has(profile.kind));
   }
@@ -54,5 +44,5 @@
     };
   }
 
-  global.EcosystemCatalog = Object.freeze({ isWithdrawn, isWorkshopMod, summarize });
+  global.EcosystemCatalog = Object.freeze({ isWorkshopMod, summarize });
 })(window);
