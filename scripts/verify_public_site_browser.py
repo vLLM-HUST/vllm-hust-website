@@ -122,8 +122,11 @@ async def verify(args):
         await page.route("**/data/ecosystem.json*", lambda route: route.abort())
         await page.goto(f"{args.url.rstrip('/')}/", wait_until="networkidle")
         for _ in range(2):
-            assert "37" in await page.locator("#home-kicker").inner_text()
-            assert "37" in await page.locator("#home-primary-cta").inner_text()
+            kicker = await page.locator("#home-kicker").inner_text()
+            cta = await page.locator("#home-primary-cta").inner_text()
+            assert "MOD" in kicker and "MOD" in cta
+            assert "40" not in kicker and "40" not in cta
+            assert "stateaxis" not in f"{kicker} {cta}".lower()
             await page.locator("#langToggle").click()
         await browser.close()
     (args.output / "receipt.json").write_text(
