@@ -28,6 +28,8 @@ def test_mod_report_page_is_visible_and_preserves_boundaries():
     assert "does not add the source project to the vLLM-HUST MOD catalog" in page
     assert "GenNova" not in page
     assert "StateAxis" not in page
+    assert 'id="footer-copy">Bounded evidence, reproducible provenance.' in page
+    assert '"title":"MOD 测试报告 | vLLM-HUST"' in page
     assert 'href="./mod-results.html"' in plugins
     assert 'payload.schema_version !== "mod-test-evidence/v1"' in script
     assert ".replace(/gennova[a-z0-9-]*/gi" in script
