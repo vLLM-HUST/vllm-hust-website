@@ -34,6 +34,9 @@ def test_mod_report_page_is_visible_and_preserves_boundaries():
     assert 'href="./mod-results.html"' in plugins
     assert 'payload.schema_version !== "mod-test-evidence/v1"' in script
     assert "if (report.source?.report_url)" in script
+    assert "integration_records: report.integration_records.length" in script
+    assert "combination_effects: report.combination_effects.length" in script
+    assert "bounded_negative_results: report.negative_results.length" in script
     assert ".replace(/gennova[a-z0-9-]*/gi" in script
     assert ".replace(/stateaxis[a-z0-9-]*/gi" in script
     assert "do_not_repeat" in script and "reopen_requires" in script
