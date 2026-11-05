@@ -638,19 +638,19 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
         "vllm-ascend runtime patch surface",
     ]
     assert diffspec["execution_planes"] == ["scheduler", "worker", "native", "device"]
-    assert "DiffSpec 9986978" in diffspec["summary_en"]
+    assert "DiffSpec 48b1828" in diffspec["summary_en"]
     assert "Ascend 4e57439e" in diffspec["summary_en"]
-    assert "Eagle3 draft" in diffspec["summary_en"]
+    assert "Specforge Eagle3" in diffspec["summary_en"]
     assert (
-        "Qwen3.8-27B — verified functional, performance degraded"
+        "Qwen/Qwen3.5-35B-A3B@59d61f3c — qualification pending"
         in diffspec["compatibility"]["models"]
     )
     assert (
-        "VirVen/Qwen3.5-27B-EAGLE3-v2 — required draft"
+        "jiapingW/Qwen3.5-35B-A3B-Eagle3-Specforge@d07a277e — required draft"
         in diffspec["compatibility"]["models"]
     )
-    assert "19.29%" in diffspec["public_effect_en"]
-    assert diffspec["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert "no benchmark-custodied" in diffspec["public_effect_en"]
+    assert diffspec["public_effect_status"] == "pending"
     assert vspec["integration_contracts"] == [
         "vllm_hust.extension_manifest.v0.3-experimental"
     ]
@@ -754,11 +754,11 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
             ],
         ),
         "diffspec": (
-            "verified",
+            "experimental",
             "vLLM Ascend",
             [
-                "Core 762f85b3 + Ascend 4e57439e + DiffSpec 9986978",
-                "Manifest 0.3 @ 9d9ddc9",
+                "Core 762f85b3 + Ascend 4e57439e + DiffSpec 48b1828",
+                "Manifest 0.3 experimental",
             ],
         ),
         "latchmoe": (
@@ -1052,6 +1052,7 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
             "measured",
             "validated",
             "preview",
+            "pending",
             "inconclusive",
             "not-beneficial-in-tested-cell",
             "beneficial",
@@ -1758,7 +1759,6 @@ def test_performance_evidence_cannot_override_the_publication_gate():
         "bidkv",
         "dla",
         "kv-tiering-migration",
-        "diffspec",
         "latchmoe",
         "vspec",
     }
