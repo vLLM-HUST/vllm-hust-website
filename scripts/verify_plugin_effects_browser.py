@@ -108,6 +108,12 @@ def main():
                     components = {
                         c["id"]: c for c in payloads["ecosystem.json"]["components"]
                     }
+                    for component_id in (
+                        "stateaxis-automatic-prefix-cache",
+                        "stateaxis-async-kv-transfer",
+                        "stateaxis-pipelined-weight-loading",
+                    ):
+                        expect(page.locator(f"#{component_id}")).to_have_count(0)
                     checked = []
                     people_checked = check_people(
                         page,
