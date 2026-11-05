@@ -336,3 +336,15 @@ test('quantized KV card is derived from archived pairs and preserves acceptance 
   assert.match(component.public_effect_en, /Latency thresholds failed/);
   assert.match(component.public_effect_zh, /答案质量未评估/);
 });
+
+
+test('separate GSM8K subset does not qualify A3 long-context quality', () => {
+  const quality = JSON.parse(fs.readFileSync('data/quantized-kv-gsm8k-200-20261105.json'));
+  const rows = quality.summary.paired['strict-match'].rows;
+  assert.equal(new Set(rows.map(r => r.id)).size, 200);
+  assert.equal(rows.filter(r => r.bf16_correct).length, 194);
+  assert.equal(rows.filter(r => r.int8_correct).length, 195);
+  assert.equal(quality.a3_long_context_quality_evaluated, false);
+  assert.equal(quality.formal_noninferiority_established, false);
+  assert.equal(quality.client_concurrency, 8);
+});
