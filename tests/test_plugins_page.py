@@ -295,7 +295,7 @@ def test_request_controller_is_an_external_ecpa_control_plane() -> None:
 
 def test_registry_is_canonical_and_multidimensional() -> None:
     assert REGISTRY["schema_version"] == "1.0"
-    assert REGISTRY["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
+    assert REGISTRY["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
     assert len(REGISTRY["components"]) >= 15
 
     ids = [item["id"] for item in REGISTRY["components"]]
@@ -821,7 +821,7 @@ def test_workshop_supports_phase_first_scenario_discovery() -> None:
     traits = WORKLOAD_NAVIGATION["traits"]
     mappings = WORKLOAD_NAVIGATION["plugins"]
     assert traits["service_cold_start"]["label_zh"] == "服务冷启动"
-    assert mappings["stateaxis-pipelined-weight-loading"] == ["service_cold_start"]
+    assert "stateaxis-pipelined-weight-loading" not in mappings
     organization_mods = {
         item["id"]
         for item in REGISTRY["components"]
@@ -1089,57 +1089,28 @@ def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None
     assert "Qixin-Gaoke" not in json.dumps(codec)
 
 
-def test_public_stateaxis_mod_repositories_are_visible_with_scoped_evidence() -> None:
-    experimental_ids = {
+def test_withdrawn_stateaxis_mods_are_retained_only_as_non_public_history() -> None:
+    withdrawn_ids = {
         "stateaxis-automatic-prefix-cache",
         "stateaxis-async-kv-transfer",
         "stateaxis-pipelined-weight-loading",
     }
-    visible_ids = experimental_ids | {"gdn-state-codec"}
     portfolio_by_name = {item["name"]: item for item in PORTFOLIO["repositories"]}
 
-    for component_id in visible_ids:
+    for component_id in withdrawn_ids:
         component = by_id(component_id)
-        assert component.get("public_surface", True) is not False
+        assert component["public_surface"] is False
         assert component["canonical_repository"] == (
-            f"https://github.com/vLLM-HUST/{component_id}"
+            f"https://github.com/Qixin-Gaoke/{component_id}"
         )
+        assert component["ownership"] == "original_contributor_maintained"
+        assert component["repository_relationship"] == "external_reference"
         assert component["advisors"] == []
         assert component_id in MOD_TAXONOMY["components"]
-        assert component_id in WORKSHOP_METADATA["plugins"]
-        assert component_id in WORKLOAD_NAVIGATION["plugins"]
-        assert portfolio_by_name[component_id]["component_ids"] == [component_id]
-        assert "Qixin-Gaoke" not in json.dumps(component)
-
-    for component_id in experimental_ids:
-        component = by_id(component_id)
-        assert component["compatibility"]["status"] == "experimental"
-    assert by_id("stateaxis-automatic-prefix-cache")["public_effect_status"] == (
-        "preview"
-    )
-    assert by_id("stateaxis-async-kv-transfer")["public_effect_status"] == "measured"
-    assert by_id("stateaxis-pipelined-weight-loading")["public_effect_status"] == (
-        "preview"
-    )
-
-    assert by_id("stateaxis-automatic-prefix-cache")["evidence_level"] == (
-        "runtime_activation_verified_performance_unqualified"
-    )
-    assert by_id("stateaxis-async-kv-transfer")["evidence_level"] == (
-        "runtime_activation_verified_historical_performance_only"
-    )
-    assert (
-        "does not qualify an online gain"
-        in by_id("stateaxis-automatic-prefix-cache")["public_effect_en"]
-    )
-    assert (
-        "does not qualify active version 0.2.0"
-        in by_id("stateaxis-async-kv-transfer")["public_effect_en"]
-    )
-    loader = by_id("stateaxis-pipelined-weight-loading")
-    assert loader["evidence_level"] == "hardware_startup_diagnostic"
-    assert "10.68%" in loader["public_effect_en"]
-    assert "not a steady-state throughput claim" in loader["public_effect_en"]
+        assert component_id not in WORKSHOP_METADATA["plugins"]
+        assert component_id not in WORKLOAD_NAVIGATION["plugins"]
+        assert component_id not in portfolio_by_name
+        assert "2026-11-05" in component["summary_en"]
 
 
 def test_visible_ecpa_mods_publish_manifest03_and_scoped_effects() -> None:
@@ -1222,7 +1193,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=effects-20261030" in PAGE
-    assert "plugins-page.js?v=stateaxis-withdrawal-20261105" in PAGE
+    assert "plugins-page.js?v=catalog-audit-20261105" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1271,7 +1242,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     assert "mutating action contracts remain release gates" in PAGE
 
 
-def test_page_consumes_the_docs_owned_registry() -> None:
+def test_page_consumes_the_benchmark_owned_registry() -> None:
     assert 'data-source="./data/ecosystem.json?v=effects-20261030"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
@@ -1283,7 +1254,10 @@ def test_page_consumes_the_docs_owned_registry() -> None:
         'data-source="./data/plugin-workload-navigation.json?'
         'v=taxonomy-v2-20261012"' in PAGE
     )
-    assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' in SCRIPT
+    assert (
+        SCRIPT.count('payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark"') == 2
+    )
+    assert 'payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"' not in SCRIPT
 
 
 def test_browser_catalog_count_follows_the_canonical_mod_taxonomy() -> None:
@@ -1348,8 +1322,8 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
-    assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
-    assert len(PORTFOLIO["repositories"]) == 60
+    assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
+    assert len(PORTFOLIO["repositories"]) == 57
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "extension-manager",
@@ -1743,7 +1717,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 41
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 38
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
