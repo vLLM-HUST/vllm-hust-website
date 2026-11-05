@@ -325,7 +325,6 @@
   };
 
   const isWorkshopMod = (item) => {
-    if (window.EcosystemCatalog.isWithdrawn(item)) return false;
     const kind = taxonomyProfile(item).kind;
     return Boolean(kind) && (item.public_surface !== false || kind === "retired");
   };
@@ -1562,7 +1561,7 @@ vllm-hust-ext extension check ${extensionId}`
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
     .then(([payload, metadata, navigation, taxonomy, performance]) => {
-      if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs" || !Array.isArray(payload.components)) {
+      if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
       if (metadata.schema_version !== "plugin-workshop-metadata/v1" || !metadata.plugins) {
@@ -1631,7 +1630,7 @@ vllm-hust-ext extension check ${extensionId}`
       .then((payload) => {
         if (
           payload.schema_version !== "1.0"
-          || payload.canonical_owner !== "vLLM-HUST/vllm-hust-docs"
+          || payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark"
           || !Array.isArray(payload.repositories)
         ) {
           throw new Error("unsupported repository portfolio");
