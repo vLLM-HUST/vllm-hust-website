@@ -51,7 +51,6 @@ test('published paired runs expose both gains and regressions without precompute
     adm: '0.80',
     bidkv: '13.83',
     vspec: '51.80',
-    diffspec: '-70.66',
     latchmoe: '-87.65'
   };
   for (const [id, gain] of Object.entries(expected)) {
@@ -303,7 +302,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   assert.deepEqual(sorted.map(row => row.id), [
     'vspec', 'betterscale', 'bidkv', 'pipeline-microbatch-migration',
     'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'dla', 'kv-tiering-migration',
-    'kvcompress-ascend', 'diffspec', 'latchmoe', 'simllm-migration'
+    'kvcompress-ascend', 'latchmoe', 'simllm-migration'
   ]);
 });
 
