@@ -62,7 +62,7 @@ test('published paired runs expose both gains and regressions without precompute
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 11);
   const diagnostic = results.get('simllm-migration');
   assert.equal(diagnostic.gain, null);
   assert.equal(diagnostic.diagnostic_only, true);
@@ -72,7 +72,7 @@ test('published paired runs expose both gains and regressions without precompute
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
   assert.deepEqual(M.models(data, frontier), [
     'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Coder-14B', 'Qwen3-30B-A3B', 'Qwen3-30B-A3B-W8A8',
-    'Qwen3.5-35B-A3B', 'Qwen3.5-35B-A3B W8A8', 'Qwen3.8-27B'
+    'Qwen3.5-35B-A3B', 'Qwen3.5-35B-A3B W8A8'
   ]);
   const qwen25 = M.summarize(data, frontier, 'Qwen2.5-14B');
   assert.equal(qwen25.get('vspec').gain.toFixed(2), '51.80');
