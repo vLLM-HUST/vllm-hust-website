@@ -15,7 +15,10 @@
     if (text) value.textContent = text;
     return value;
   };
-  const text = (value) => Array.isArray(value) ? value.join(" ") : String(value || "");
+  const deidentify = (value) => String(value || "")
+    .replace(/gennova[a-z0-9-]*/gi, "source-project")
+    .replace(/stateaxis[a-z0-9-]*/gi, "withdrawn-project");
+  const text = (value) => deidentify(Array.isArray(value) ? value.join(" ") : value);
   const searchable = (value) => Object.values(value).map(text).join(" ").toLowerCase();
   const copy = () => language() === "zh" ? {
     integrations: "单项 MOD", combinations: "组合", negative: "负结果",
