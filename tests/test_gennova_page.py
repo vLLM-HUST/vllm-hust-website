@@ -18,7 +18,6 @@ def test_relocated_summary_is_not_a_public_data_endpoint():
     assert not (ROOT / "data/gennova-validation-v1.json").exists()
 
 
-def test_gennova_source_link_uses_the_current_repository_owner():
-    script = (ROOT / "assets/gennova.js").read_text(encoding="utf-8")
-    assert "https://github.com/GenNova-HUST/GenNova/commit/" in script
-    assert "https://github.com/vLLM-HUST/GenNova/commit/" not in script
+def test_gennova_has_no_dormant_presentation_assets():
+    assert not (ROOT / "assets/gennova.js").exists()
+    assert not (ROOT / "assets/gennova.css").exists()
