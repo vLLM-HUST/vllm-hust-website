@@ -34,7 +34,7 @@
         document.getElementById('gn-throughput').textContent = m.output_tokens_per_second.toFixed(2);
         document.getElementById('gn-tokens').textContent = m.total_output_tokens.toLocaleString('en-US');
         document.getElementById('gn-seconds').textContent = m.seconds.toFixed(3);
-        document.getElementById('gn-source').href = `https://github.com/vLLM-HUST/GenNova/commit/${data.source_commit}`;
+        document.getElementById('gn-source').href = `https://github.com/GenNova-HUST/GenNova/commit/${data.source_commit}`;
         document.querySelector('#gn-source code').textContent = data.source_commit;
         document.getElementById('gn-metrics').hidden = false;
         const labels = zh ? ['中文验证报告', 'SHA256 清单', '原始运行证据', '协议与执行脚本'] : ['Validation report (Chinese)', 'SHA256 manifest', 'Raw run evidence', 'Protocol and scripts'];

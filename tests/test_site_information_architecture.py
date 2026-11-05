@@ -179,10 +179,10 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "40 public MODs across 8 lifecycle phases" in HOME
+    assert "37 public MODs across 8 lifecycle phases" in HOME
     assert "Explore by phase, scenario, platform, and readiness" in HOME
     assert "activation and performance evidence stay separate" in HOME
-    assert "40 个公开 MOD，覆盖 8 个推理生命周期阶段" in HOME
+    assert "37 个公开 MOD，覆盖 8 个推理生命周期阶段" in HOME
     assert "按阶段、场景、平台和成熟度探索" in HOME
     assert "启用证据与性能证据分开呈现" in HOME
 
@@ -275,13 +275,13 @@ def test_plugin_standard_has_provider_owned_lifecycle_semantics() -> None:
         assert forbidden not in standard
 
 
-def test_ecosystem_registry_has_docs_as_its_canonical_owner() -> None:
+def test_ecosystem_registry_has_benchmark_as_its_canonical_owner() -> None:
     registry = json.loads(
         (ROOT / "data" / "ecosystem.json").read_text(encoding="utf-8")
     )
 
     assert registry["schema_version"] == "1.0"
-    assert registry["canonical_owner"] == "vLLM-HUST/vllm-hust-docs"
+    assert registry["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
     assert not (ROOT / "data" / "plugins.legacy.json").exists()
     standard = (ROOT / "docs" / "PLUGIN_STANDARD.md").read_text(encoding="utf-8")
     assert "Manifest `0.3`" in standard
