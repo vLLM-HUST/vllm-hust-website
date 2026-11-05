@@ -251,6 +251,7 @@ body[data-page="plugins"] .plugin-card h3 { margin: 26px 0 10px; color: #0c1112;
 .repository-card { min-height: 210px; padding: 20px; border-right: 1px solid #d3dcd9; border-bottom: 1px solid #d3dcd9; }
 .repository-name { display: block; margin: 32px 0 18px; color: #0c1112; font: 800 18px "Sora",sans-serif; overflow-wrap: anywhere; text-decoration: none; }
 .repository-name:hover { color: #176f72; text-decoration: underline; }
+.repository-summary { margin: -8px 0 16px; color: #52615f; font-size: 12px; line-height: 1.55; }
 .adjacent-section { margin-top: 42px !important; }
 .adjacent-head { display: grid; grid-template-columns: minmax(0,1fr) minmax(280px,.9fr); gap: 40px; align-items: end; }
 .adjacent-head h2 { margin: 12px 0 0; font-size: clamp(30px,4vw,50px); line-height: 1; }
@@ -277,7 +278,6 @@ body[data-page="plugins"] .plugin-standard,
 body[data-page="plugins"] .plugin-legend,
 body[data-page="plugins"] .upstream-fork-notice,
 body[data-page="plugins"] .mod-catalog-guide,
-body[data-page="plugins"] .repository-portfolio,
 body[data-page="plugins"] main > .adjacent-section { display: none; }
 body[data-page="plugins"] .plugin-hero .content-panel { min-height: 160px; padding-top: 30px; padding-bottom: 26px; }
 body[data-page="plugins"] .plugin-hero h1 { max-width: 760px; font-size: clamp(42px,6vw,68px); }

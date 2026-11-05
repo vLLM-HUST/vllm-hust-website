@@ -811,7 +811,8 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert '"plugins-title": zh ? "MOD 目录" : "MOD catalog"' in SCRIPT
     assert 'body[data-page="plugins"] .technical-highlights' in STYLES
     assert 'body[data-page="plugins"] .plugin-standard' in STYLES
-    assert 'body[data-page="plugins"] .repository-portfolio' in STYLES
+    assert ".repository-portfolio {" in STYLES
+    assert 'body[data-page="plugins"] .repository-portfolio' not in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
     assert "visible.filter((project) => project.kind === kind)" in SCRIPT
 
@@ -1323,23 +1324,42 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
-    assert len(PORTFOLIO["repositories"]) == 57
+    assert PORTFOLIO["scope"] == "active_public_repositories"
+    assert PORTFOLIO["inventory_as_of"] == "2026-11-05"
+    assert len(PORTFOLIO["repositories"]) == 61
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
+        "agentx-bench",
         "extension-manager",
+        "extension-template",
+        "hust-agentperf",
+        "hust-eval-client-frontierscience",
+        "hust-eval-client-hle-verified",
+        "hust-eval-client-mmlu-pro",
+        "LMCache-Ascend",
+        "patch-plugin-template",
+        "ride",
+        "ride-controller-demo",
+        "swe-prefix-reuse",
         "vllm-hust",
         "pegaflow-hust",
-        "vllm-hust-dla",
+        "vllm-ascend-mapped-kv-offload-hust",
+        "vllm-ascend-MuxPD-hust",
+        "vllm-hust-cuda-mtp",
+        "vllm-hust-opset",
+        "vllm-hust-prefill-microflow",
         "vllm-hust-vSpec",
     } <= names
     assert "vllm-ascend" not in names
+    assert not any("stateaxis" in name.lower() for name in names)
+    assert not any("gennova" in name.lower() for name in names)
+    assert all(item["public_surface"] is True for item in PORTFOLIO["repositories"])
     assert {
         "vllm-hust-prefix-router",
         "vllm-hust-kv-tiering",
         "vllm-hust-knorm",
         "vllm-ascend-pyramidkv-hust",
         "vllm-hust-slicegpt",
-        "vllm-ascend-adaptive-quantized-kv-hust",
     } <= names
     upstream_forks = {
         item["name"]
@@ -1365,29 +1385,24 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "pegaflow",
         "pegaflow-vllm-connectors",
     ]
-    dla = next(
-        item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-dla"
-    )
-    assert dla["url"] == "https://github.com/vLLM-HUST/vllm-hust-dla"
-    assert dla["component_ids"] == ["dla"]
-    assert dla["public_surface"] is False
     vspec = next(
         item for item in PORTFOLIO["repositories"] if item["name"] == "vllm-hust-vSpec"
     )
     assert vspec["url"] == "https://github.com/vLLM-HUST/vllm-hust-vSpec"
     assert vspec["component_ids"] == ["vspec"]
     assert vspec["public_surface"] is True
-    assert "Repositories are governance boundaries, not runtime types." in PAGE
+    assert "Every active public repository, in one place." in PAGE
+    assert "即使尚未封装为 MOD" in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v13-clm"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v14-active-public"'
         in PAGE
     )
+    assert 'element("p", "repository-summary"' in SCRIPT
     assert "repository portfolio request failed" in SCRIPT
 
 
 def test_new_migration_repositories_replace_legacy_page_links() -> None:
     expected = {
-        "vllm-ascend-quantized-kv-cache-hust": "quantized-kv-cache-migration",
         "vllm-ascend-simllm-hust": "simllm-migration",
         "vllm-hust-unified-comm": "unified-communication-migration",
         "vllm-ascend-split-batch-hust": "split-batch-full-graph-migration",
@@ -1415,7 +1430,7 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         assert component["maturity"] in {"incubating", "experimental"}
 
     scheduler_lab = repositories["vllm-hust-scheduler-policy-lab"]
-    assert scheduler_lab["public_surface"] is False
+    assert scheduler_lab["public_surface"] is True
     assert scheduler_lab["repository_role"] == "research_workspace"
     assert scheduler_lab["component_ids"] == []
 

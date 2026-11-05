@@ -1342,7 +1342,10 @@ vllm-hust-ext extension check ${extensionId}`
   function renderPortfolio() {
     if (!portfolio || !repositoryCatalog || !repositoryStatus) return;
     const query = search.value.trim().toLowerCase();
-    const visible = portfolio.repositories.filter((repository) => [
+    const publicRepositories = portfolio.repositories.filter(
+      (repository) => repository.public_surface === true
+    );
+    const visible = publicRepositories.filter((repository) => [
       repository.name,
       repository.portfolio_domain,
       repository.repository_role,
@@ -1354,7 +1357,7 @@ vllm-hust-ext extension check ${extensionId}`
 
     repositoryCatalog.replaceChildren();
     const domains = [...new Set(
-      portfolio.repositories.map((item) => item.portfolio_domain)
+      publicRepositories.map((item) => item.portfolio_domain)
     )];
     domains.forEach((domain) => {
       const repositories = visible.filter(
@@ -1371,7 +1374,7 @@ vllm-hust-ext extension check ${extensionId}`
       repositories.forEach((repository) => {
         const card = element("article", "repository-card");
         const top = element("div", "plugin-card-top");
-        top.append(element("span", "plugin-code", repository.repository_role));
+        top.append(element("span", "plugin-code", valueLabel(repository.repository_role)));
         const badges = element("div", "plugin-badges");
         badges.append(
           badge(valueLabel(repository.lifecycle), `status-${repository.lifecycle}`)
@@ -1391,7 +1394,8 @@ vllm-hust-ext extension check ${extensionId}`
           row.append(element("dt", "", label), element("dd", "", value));
           facts.append(row);
         });
-        card.append(top, name, facts);
+        const summary = element("p", "repository-summary", repository.canonical_artifacts[0]);
+        card.append(top, name, summary, facts);
 
         if (repository.component_ids.length) {
           const components = element("div", "plugin-contracts");
