@@ -1325,9 +1325,9 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
-    assert PORTFOLIO["scope"] == "active_public_repositories"
+    assert PORTFOLIO["scope"] == "active_public_repositories_and_completed_archives"
     assert PORTFOLIO["inventory_as_of"] == "2026-11-05"
-    assert len(PORTFOLIO["repositories"]) == 61
+    assert len(PORTFOLIO["repositories"]) == 62
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "agentx-bench",
@@ -1346,6 +1346,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "pegaflow-hust",
         "vllm-ascend-mapped-kv-offload-hust",
         "vllm-ascend-MuxPD-hust",
+        "vllm-ascend-hust-bidkv",
         "vllm-hust-cuda-mtp",
         "vllm-hust-opset",
         "vllm-hust-prefill-microflow",
@@ -1392,12 +1393,31 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert vspec["url"] == "https://github.com/vLLM-HUST/vllm-hust-vSpec"
     assert vspec["component_ids"] == ["vspec"]
     assert vspec["public_surface"] is True
-    assert "Every active public repository, in one place." in PAGE
+    archived_bidkv = next(
+        item
+        for item in PORTFOLIO["repositories"]
+        if item["name"] == "vllm-ascend-hust-bidkv"
+    )
+    assert archived_bidkv["repository_role"] == "completed_archive"
+    assert archived_bidkv["lifecycle"] == "completed_archived"
+    assert archived_bidkv["archive_classification"] == "completed_and_migrated"
+    assert archived_bidkv["successor"] == "vLLM-HUST/vllm-hust-bidkv"
+    assert archived_bidkv["completion_evidence"]["source_commit_short"] == "5ee80256"
+    assert archived_bidkv["completion_evidence"]["release_published"] is False
+    assert "Active repositories and completed archives, in one place." in PAGE
+    assert "已完成归档" in PAGE
     assert "即使尚未封装为 MOD" in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v14-active-public"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v15-completed-archives"'
         in PAGE
     )
+    assert (
+        'completed_archived: { en: "Completed · archived", zh: "已完成 · 已归档" }'
+        in SCRIPT
+    )
+    assert ".plugin-badge.status-completed_archived" in STYLES
+    assert '"repository-card completed-archive-card"' in SCRIPT
+    assert ".completed-archive-card" in STYLES
     assert 'element("p", "repository-summary"' in SCRIPT
     assert "repository portfolio request failed" in SCRIPT
 
