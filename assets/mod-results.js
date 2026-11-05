@@ -120,8 +120,14 @@
     .then((payload) => {
       if (payload.schema_version !== "mod-test-evidence/v1") throw new Error("unsupported report schema");
       report = payload;
+      const visibleSummary = {
+        ...report.summary,
+        integration_records: report.integration_records.length,
+        combination_effects: report.combination_effects.length,
+        bounded_negative_results: report.negative_results.length
+      };
       document.querySelectorAll("[data-summary]").forEach((value) => {
-        value.textContent = report.summary[value.dataset.summary];
+        value.textContent = visibleSummary[value.dataset.summary];
       });
       if (report.source?.report_url) {
         document.querySelector("[data-report-source]").href = report.source.report_url;
