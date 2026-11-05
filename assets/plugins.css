@@ -160,6 +160,8 @@ html[lang="zh"] .lang-zh { display: inline; }
 .plugin-badge.publication { color: #fff; background: #176f72; }
 .plugin-badge.status-concept { color: #4e5d5b; background: #e3e9e7; }
 .plugin-badge.status-incubating,.plugin-badge.status-planned { color: #694a05; background: #f4e1ae; }
+.plugin-badge.status-completed_archived { color: #1f4f37; background: #d8eadb; }
+.completed-archive-card { box-shadow: inset 0 4px #2f7b53; }
 .plugin-badge.kind-runtime_mod { color: #fff; background: #176f72; }
 .plugin-badge.kind-connector_mod { color: #fff; background: #6744a5; }
 .plugin-badge.kind-tool_mod { color: #123b3d; background: #dcefed; }

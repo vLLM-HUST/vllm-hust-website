@@ -105,6 +105,7 @@
     repositoryEmpty: "没有符合当前搜索条件的仓库。",
     artifacts: "规范制品",
     relation: "与运行时关系",
+    successor: "后继维护仓",
     repositoryRelationship: "仓库关系",
     upstream: "官方上游",
     upstreamOwner: "上游原项目",
@@ -179,6 +180,7 @@
     repositoryEmpty: "No repositories match the current search.",
     artifacts: "Canonical artifacts",
     relation: "Runtime relation",
+    successor: "Maintained successor",
     repositoryRelationship: "Repository relationship",
     upstream: "Official upstream",
     upstreamOwner: "Upstream project",
@@ -322,6 +324,14 @@
     evidence_analysis: { en: "Evidence and analysis", zh: "评测与分析" },
     documentation_product: { en: "Documentation and product", zh: "文档与产品" },
     applications_research: { en: "Applications and research", zh: "应用与研究" }
+  };
+  const repositoryValueLabels = {
+    completed_archive: { en: "Completed archive", zh: "已完成归档" },
+    completed_archived: { en: "Completed · archived", zh: "已完成 · 已归档" },
+    superseded_by_successor: {
+      en: "Migrated to maintained successor",
+      zh: "已迁移至后继维护仓"
+    }
   };
 
   const isWorkshopMod = (item) => {
@@ -674,6 +684,9 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
   };
 
   const valueLabel = (value) => String(value).replaceAll("_", " ");
+  const repositoryValueLabel = (value) => (
+    repositoryValueLabels[value]?.[language()] || valueLabel(value)
+  );
   const typeTitle = (type) => (typeLabels[type] || { en: valueLabel(type), zh: valueLabel(type) })[language()];
   const domainTitle = (domain) => (
     domainLabels[domain] || { en: valueLabel(domain), zh: valueLabel(domain) }
@@ -1351,6 +1364,7 @@ vllm-hust-ext extension check ${extensionId}`
       repository.repository_role,
       repository.relation_to_runtime,
       repository.lifecycle,
+      repository.successor || "",
       repository.canonical_artifacts.join(" "),
       repository.component_ids.join(" ")
     ].join(" ").toLowerCase().includes(query));
@@ -1372,12 +1386,17 @@ vllm-hust-ext extension check ${extensionId}`
       );
       const grid = element("div", "repository-grid");
       repositories.forEach((repository) => {
-        const card = element("article", "repository-card");
+        const card = element(
+          "article",
+          repository.archive_classification === "completed_and_migrated"
+            ? "repository-card completed-archive-card"
+            : "repository-card"
+        );
         const top = element("div", "plugin-card-top");
-        top.append(element("span", "plugin-code", valueLabel(repository.repository_role)));
+        top.append(element("span", "plugin-code", repositoryValueLabel(repository.repository_role)));
         const badges = element("div", "plugin-badges");
         badges.append(
-          badge(valueLabel(repository.lifecycle), `status-${repository.lifecycle}`)
+          badge(repositoryValueLabel(repository.lifecycle), `status-${repository.lifecycle}`)
         );
         top.append(badges);
 
@@ -1387,13 +1406,22 @@ vllm-hust-ext extension check ${extensionId}`
         name.rel = "noopener noreferrer";
         const facts = element("dl", "plugin-component-facts");
         [
-          [copy().relation, valueLabel(repository.relation_to_runtime)],
+          [copy().relation, repositoryValueLabel(repository.relation_to_runtime)],
           [copy().artifacts, repository.canonical_artifacts.join(" · ")]
         ].forEach(([label, value]) => {
           const row = element("div");
           row.append(element("dt", "", label), element("dd", "", value));
           facts.append(row);
         });
+        if (repository.successor) {
+          const row = element("div");
+          const successor = element("a", "repository-successor", repository.successor);
+          successor.href = `https://github.com/${repository.successor}`;
+          successor.target = "_blank";
+          successor.rel = "noopener noreferrer";
+          row.append(element("dt", "", copy().successor), element("dd", "", successor));
+          facts.append(row);
+        }
         const summary = element("p", "repository-summary", repository.canonical_artifacts[0]);
         card.append(top, name, summary, facts);
 
