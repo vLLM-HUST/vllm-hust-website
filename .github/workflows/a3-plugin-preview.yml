@@ -1,0 +1,57 @@
+name: A3 quantized KV branch preview
+
+on:
+  push:
+    branches: [hustcui/a3-int8-kv-results-20261104]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: website
+      - uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: 4ac8113cf570794373bff3100cfbba726e42e164 # pragma: allowlist secret
+          path: benchmark
+          persist-credentials: false
+          sparse-checkout: |
+            website-publication
+            scripts/sync_website_publication.py
+            scripts/build_public_site.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assemble immutable branch data
+        run: |
+          python benchmark/scripts/sync_website_publication.py publish --revision 4ac8113cf570794373bff3100cfbba726e42e164 --website website
+          python benchmark/scripts/sync_website_publication.py check --revision 4ac8113cf570794373bff3100cfbba726e42e164 --website website
+          cd website
+          node --test tests/plugin_performance.test.cjs
+      - name: Render public projection and verify eight display modes
+        run: |
+          python benchmark/scripts/build_public_site.py --website website --output public-site --policy-revision 8c2cfc3d2a78f334e113d38e5dd3c5f0272e373e
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+          python -m http.server 8797 --bind 127.0.0.1 --directory public-site > /tmp/a3-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          python website/scripts/verify_plugin_effects_browser.py --url http://127.0.0.1:8797 --output output/a3-plugin-preview
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: a3-plugin-preview-and-browser-receipts
+          path: |
+            public-site/
+            output/a3-plugin-preview/

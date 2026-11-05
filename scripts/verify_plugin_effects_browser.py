@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -77,6 +78,11 @@ def main():
                     errors = []
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.goto(f"{args.url}/plugins.html", wait_until="networkidle")
+                    # The catalog keeps its own palette; verify OS color preference,
+                    # not a site theme toggle that this page does not implement.
+                    assert page.evaluate(
+                        "matchMedia('(prefers-color-scheme: dark)').matches"
+                    ) == (theme == "dark")
                     expect(
                         page.locator("#simllm-migration .plugin-public-effect")
                     ).to_be_visible()
@@ -168,6 +174,44 @@ def main():
                         expect(
                             page.locator(f"#{component_id} .plugin-performance")
                         ).to_contain_text(value)
+                    # Verify the quantized-KV card against the same published source.
+                    quantized = page.locator("#quantized-kv-cache-migration")
+                    entry = next(
+                        e
+                        for e in payloads["plugin-performance.json"]["entries"]
+                        if e["id"] == "quantized-kv-cache-migration"
+                    )
+                    observation = next(
+                        o
+                        for o in entry["observations"]
+                        if o["id"] == entry["default_observation_id"]
+                    )
+                    gain = (
+                        math.prod(
+                            r["candidate"] / r["baseline"]
+                            for r in observation["comparisons"]
+                        )
+                        ** (1 / len(observation["comparisons"]))
+                        - 1
+                    ) * 100
+                    expect(quantized.locator(".plugin-performance")).to_contain_text(
+                        f"{gain:+.2f}%"
+                    )
+                    expect(quantized.locator(".plugin-public-effect")).to_contain_text(
+                        "延迟门槛未通过"
+                        if lang == "zh"
+                        else "Latency thresholds failed"
+                    )
+                    expect(quantized.locator(".plugin-public-effect")).to_contain_text(
+                        "答案质量未评估"
+                        if lang == "zh"
+                        else "answer quality was not evaluated"
+                    )
+                    quantized.screenshot(
+                        path=str(
+                            args.output / f"quantized-kv-{width}-{lang}-{theme}.png"
+                        )
+                    )
                     assert (
                         "No data"
                         not in page.locator("[data-plugin-catalog]").inner_text()

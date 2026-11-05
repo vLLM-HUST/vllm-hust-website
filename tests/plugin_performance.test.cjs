@@ -63,7 +63,7 @@ test('published paired runs expose both gains and regressions without precompute
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 13);
   const diagnostic = results.get('simllm-migration');
   assert.equal(diagnostic.gain, null);
   assert.equal(diagnostic.diagnostic_only, true);
@@ -302,7 +302,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
     'vspec', 'betterscale', 'bidkv', 'pipeline-microbatch-migration',
-    'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'dla', 'kv-tiering-migration',
+    'quantized-kv-cache-migration', 'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'dla', 'kv-tiering-migration',
     'kvcompress-ascend', 'diffspec', 'latchmoe', 'simllm-migration'
   ]);
 });
@@ -317,4 +317,22 @@ test('ECPA evidence is preserved in metadata without becoming a performance clai
   assert.equal(result.get('kvcompress-ascend').ecpa.launch_acceptance, 'manager-verified');
   assert.equal(result.get('pegaflow-vllm-connectors').ecpa.launch_acceptance, 'manager-verified');
   assert.equal(data.ecpa_experiment_boundary.process_release, 'known-defect');
+});
+
+
+test('quantized KV card is derived from archived pairs and preserves acceptance limits', () => {
+  const observation = JSON.parse(fs.readFileSync('data/a3-int8-kv-20261104.json'));
+  const card = M.summarize(data, frontier).get(observation.plugin_id);
+  const candidate = observation.breakpoint.results.find(r => r.concurrency === observation.verdict.candidate);
+  assert.equal(candidate.confirmed_four_pairs, true);
+  assert.deepEqual(card.published_comparisons.map(r => [r.baseline, r.candidate]),
+    candidate.pairs.map(r => [r.bf16_tps, r.int8_tps]));
+  assert.equal(card.count, candidate.pairs.length);
+  assert.equal(observation.formal_acceptance, false);
+  assert.equal(observation.latency_acceptance, 'failed');
+  assert.equal(observation.quality_evaluation, 'not-evaluated');
+  const component = JSON.parse(fs.readFileSync('data/ecosystem.json')).components.find(r => r.id === observation.plugin_id);
+  assert.deepEqual(component.maintainers, ['hustcui', 'SuccinctPaul']);
+  assert.match(component.public_effect_en, /Latency thresholds failed/);
+  assert.match(component.public_effect_zh, /答案质量未评估/);
 });

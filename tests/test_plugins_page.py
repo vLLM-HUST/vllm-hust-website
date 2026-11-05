@@ -1686,7 +1686,9 @@ def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
     assert quantized["compatibility"]["status"] == "experimental"
     assert quantized["evidence_level"] == "hardware_verified"
     assert quantized["public_effect_status"] == "validated"
-    assert "No matched performance comparison" in quantized["public_effect_en"]
+    assert "At C64 all four full" in quantized["public_effect_en"]
+    assert "Latency thresholds failed" in quantized["public_effect_en"]
+    assert "answer quality was not evaluated" in quantized["public_effect_en"]
 
     pipeline = by_id("pipeline-microbatch-migration")
     assert pipeline["compatibility"]["status"] == "verified"
