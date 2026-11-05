@@ -1,0 +1,49 @@
+.mod-report-page { padding-bottom: 72px; }
+.mod-report-hero .content-panel { padding: 64px 56px; color: #fff; background: #101818; }
+.mod-report-hero h1 { margin: 12px 0 18px; color: #fff; font-size: clamp(44px,7vw,84px); line-height: .95; }
+.mod-report-hero p { max-width: 780px; margin: 0; color: #b7c3c1; font-size: 18px; }
+.mod-report-boundary { margin-top: 24px; padding: 28px 32px; display: grid; grid-template-columns: 180px minmax(0,1fr) auto; gap: 24px; align-items: center; border-left: 5px solid #f0b341; }
+.mod-report-boundary p { margin: 0; color: #52615f; }
+.mod-report-boundary a { color: #176f72; font-size: 12px; font-weight: 800; }
+.mod-report-summary { margin: 24px 0; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border: 1px solid #bfcac6; background: #fff; }
+.mod-report-summary article { min-height: 132px; padding: 24px; display: grid; align-content: center; border-right: 1px solid #d3dcd9; }
+.mod-report-summary article:last-child { border-right: 0; }
+.mod-report-summary strong { color: #105456; font: 800 40px "Sora",sans-serif; }
+.mod-report-summary span { color: #61706f; font-size: 11px; text-transform: uppercase; }
+.mod-report-controls { position: sticky; top: 72px; z-index: 8; padding: 18px; display: grid; grid-template-columns: minmax(260px,1fr) auto; gap: 18px; align-items: end; background: rgba(242,245,243,.96); backdrop-filter: blur(12px); }
+.mod-report-controls label { display: grid; gap: 6px; color: #61706f; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.mod-report-controls input { min-height: 44px; padding: 9px 12px; border: 1px solid #aebbb7; background: #fff; }
+.mod-report-controls [data-report-tabs] { display: flex; gap: 6px; flex-wrap: wrap; }
+.mod-report-controls button { min-height: 40px; padding: 8px 12px; border: 1px solid #bfcac6; background: #fff; cursor: pointer; }
+.mod-report-controls button:hover,.mod-report-controls button.active { color: #fff; border-color: #176f72; background: #176f72; }
+.mod-report-status { margin: 20px 0 10px; color: #61706f; font: 11px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
+.mod-report-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.mod-result-card { min-width: 0; padding: 24px; border: 1px solid #bfcac6; background: #fff; box-shadow: inset 0 4px #39c6ca; }
+.mod-result-card.negative-record { box-shadow: inset 0 4px #c07a5a; }
+.mod-result-card.combination-record { box-shadow: inset 0 4px #6744a5; }
+.mod-result-card header { display: flex; justify-content: space-between; gap: 12px; }
+.mod-result-card header code { color: #61706f; font-size: 9px; overflow-wrap: anywhere; }
+.mod-result-kind { color: #176f72; font: 800 9px ui-monospace,SFMono-Regular,Menlo,monospace; text-transform: uppercase; }
+.mod-result-card h2 { margin: 22px 0 12px; font-size: 22px; overflow-wrap: anywhere; }
+.mod-result-tags { margin-bottom: 16px; display: flex; gap: 6px; flex-wrap: wrap; }
+.mod-result-tags span { padding: 4px 7px; color: #105456; background: #dcefed; font: 8px ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap: anywhere; }
+.mod-result-tags .warning { color: #654200; background: #f4d88c; }
+.mod-result-fact { padding: 12px 0; border-top: 1px solid #d3dcd9; }
+.mod-result-fact strong { color: #52615f; font-size: 9px; text-transform: uppercase; }
+.mod-result-fact p { margin: 6px 0 0; color: #273432; font-size: 12px; line-height: 1.55; }
+.mod-result-fact.positive { border-left: 3px solid #74a832; padding-left: 12px; }
+.mod-result-fact.negative { border-left: 3px solid #c07a5a; padding-left: 12px; }
+.mod-result-fact.boundary { border-left: 3px solid #f0b341; padding-left: 12px; background: #fffaf0; }
+@media (max-width: 860px) {
+  .mod-report-boundary { grid-template-columns: 1fr; }
+  .mod-report-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .mod-report-summary article:nth-child(2) { border-right: 0; }
+  .mod-report-summary article:nth-child(-n+2) { border-bottom: 1px solid #d3dcd9; }
+  .mod-report-controls { position: static; grid-template-columns: 1fr; }
+  .mod-report-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .mod-report-hero .content-panel { padding: 44px 24px; }
+  .mod-report-summary { grid-template-columns: 1fr; }
+  .mod-report-summary article { border-right: 0; border-bottom: 1px solid #d3dcd9; }
+}
