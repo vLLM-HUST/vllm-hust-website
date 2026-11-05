@@ -33,6 +33,7 @@ def test_mod_report_page_is_visible_and_preserves_boundaries():
     assert '"title":"MOD 测试报告 | vLLM-HUST"' in page
     assert 'href="./mod-results.html"' in plugins
     assert 'payload.schema_version !== "mod-test-evidence/v1"' in script
+    assert "if (report.source?.report_url)" in script
     assert ".replace(/gennova[a-z0-9-]*/gi" in script
     assert ".replace(/stateaxis[a-z0-9-]*/gi" in script
     assert "do_not_repeat" in script and "reopen_requires" in script
