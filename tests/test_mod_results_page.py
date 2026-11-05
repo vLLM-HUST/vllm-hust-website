@@ -25,7 +25,11 @@ def test_mod_report_page_is_visible_and_preserves_boundaries():
     script = (ROOT / "assets/mod-results.js").read_text()
     plugins = (ROOT / "plugins.html").read_text()
     assert 'data-source="./data/mod-test-evidence.json?v=mod-report-20261105"' in page
-    assert "It does not list GenNova as a vLLM-HUST MOD" in page
+    assert "does not add the source project to the vLLM-HUST MOD catalog" in page
+    assert "GenNova" not in page
+    assert "StateAxis" not in page
     assert 'href="./mod-results.html"' in plugins
     assert 'payload.schema_version !== "mod-test-evidence/v1"' in script
+    assert ".replace(/gennova[a-z0-9-]*/gi" in script
+    assert ".replace(/stateaxis[a-z0-9-]*/gi" in script
     assert "do_not_repeat" in script and "reopen_requires" in script
