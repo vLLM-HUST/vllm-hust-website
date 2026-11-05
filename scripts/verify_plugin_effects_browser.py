@@ -205,7 +205,7 @@ def main():
                     expect(quantized.locator(".plugin-public-effect")).to_contain_text(
                         "答案质量未评估"
                         if lang == "zh"
-                        else "answer quality was not evaluated"
+                        else "long-context answer quality was not evaluated"
                     )
                     quantized.screenshot(
                         path=str(
