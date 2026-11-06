@@ -317,6 +317,7 @@
     }
   };
   const domainLabels = {
+    foundation_repositories: { en: "Foundation repositories", zh: "基座仓库" },
     runtime_platform: { en: "Runtime and platform", zh: "运行时与平台" },
     kv_state_data_path: { en: "KV state and data path", zh: "KV 状态与数据路径" },
     compiler_runtime: { en: "Compiler and runtime substrate", zh: "编译器与运行时底座" },
@@ -1360,7 +1361,11 @@ vllm-hust-ext extension check ${extensionId}`
     repositoryCatalog.replaceChildren();
     const domains = [...new Set(
       publicRepositories.map((item) => item.portfolio_domain)
-    )];
+    )].sort((left, right) => {
+      if (left === "foundation_repositories") return -1;
+      if (right === "foundation_repositories") return 1;
+      return 0;
+    });
     domains.forEach((domain) => {
       const repositories = visible.filter(
         (item) => item.portfolio_domain === domain
