@@ -21,13 +21,13 @@
   const text = (value) => deidentify(Array.isArray(value) ? value.join(" ") : value);
   const searchable = (value) => Object.values(value).map(text).join(" ").toLowerCase();
   const copy = () => language() === "zh" ? {
-    integrations: "单项 MOD", combinations: "组合", negative: "负结果",
+    integrations: "单项 MOD", combinations: "组合", negative: "兼容性 / 负结果",
     positive: "正向观察", negativeLabel: "负向观察", boundary: "适用边界",
     baseline: "对照", effect: "效果", quality: "质量", qualification: "结论边界",
     result: "结果", stop: "不要重复", reopen: "重开条件", empty: "没有匹配记录",
     records: "条记录", evidence: "份证据引用", defaultOff: "默认关闭"
   } : {
-    integrations: "Single MOD", combinations: "Combination", negative: "Negative result",
+    integrations: "Single MOD", combinations: "Combination", negative: "Compatibility / negative",
     positive: "Positive observation", negativeLabel: "Negative observation", boundary: "Boundary",
     baseline: "Baseline", effect: "Effect", quality: "Quality", qualification: "Qualification",
     result: "Result", stop: "Do not repeat", reopen: "Reopen requires", empty: "No matching records",
