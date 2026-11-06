@@ -157,7 +157,7 @@ def main():
                             ).to_contain_text("36")
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("41")
+                            ).to_contain_text("40")
                             expect(
                                 page.locator('[data-scenario="service_suspend_resume"]')
                             ).to_be_disabled()
