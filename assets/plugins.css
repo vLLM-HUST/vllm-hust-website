@@ -452,6 +452,20 @@ body[data-page="plugins"] #muxpd:has(.plugin-launcher:is(.open,:hover,:focus-wit
 .plugin-performance > .performance-negative { color: #a43e29; }
 .plugin-performance-runtime { color: #61706f; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; }
 .plugin-performance p { margin: 0; line-height: 1.6; }
+.plugin-mod-results-summary { display: grid; gap: 8px; margin: 12px 0; padding: 12px; border: 1px solid rgba(22,103,73,.22); background: rgba(22,103,73,.055); }
+.plugin-mod-results-title { color: #166749; font-size: 13px; }
+.plugin-mod-results-counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.plugin-mod-results-count { display: inline-flex; align-items: baseline; gap: 5px; padding: 4px 8px; border: 1px solid rgba(22,103,73,.2); background: #fff; font-size: 11px; }
+.plugin-mod-results-count strong { color: #166749; font-size: 16px; }
+.plugin-mod-results-details { display: grid; gap: 16px; padding: 16px 0; border-top: 1px solid rgba(30,47,45,.15); }
+.plugin-mod-results-details > h3 { margin: 0; font-size: 18px; }
+.plugin-mod-result-group { display: grid; gap: 8px; }
+.plugin-mod-result-group > h4 { margin: 0; color: #166749; font-size: 13px; }
+.plugin-mod-result-record { border: 1px solid rgba(30,47,45,.15); background: rgba(255,255,255,.7); }
+.plugin-mod-result-record > summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; cursor: pointer; }
+.plugin-mod-result-record > summary strong { font-size: 12px; }
+.plugin-mod-result-record > summary code { color: #61706f; font-size: 9px; overflow-wrap: anywhere; }
+.plugin-mod-result-fact { margin: 0; padding: 0 10px 9px; color: #465553; font-size: 11px; line-height: 1.55; }
 
 /* Explicit surface colors: generic panel rules must not dim the dark hero. */
 body[data-page="plugins"] .plugin-hero .content-panel > p { color: #c7d4d1; }

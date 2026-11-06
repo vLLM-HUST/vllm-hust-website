@@ -43,7 +43,8 @@ def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
     for repo in ("vllm-hust", "vllm-ascend-hust"):
         assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
     assert 'href="./plugins.html"' in section
-    assert 'href="./mod-results.html"' in section
+    assert 'href="./mod-results.html"' not in section
+    assert "SINGLE · COMBINATION · COMPATIBILITY" not in section
     assert "https://github.com/vLLM-HUST/vllm-hust-benchmark" in HOME
     assert "gennova" not in HOME.lower()
     assert "Independent inference engine" not in HOME
