@@ -46,13 +46,13 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "36 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
+        "37 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
         "Explore by phase, scenario, platform, and readiness",
         "activation and performance evidence stay separate",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "36 个公开 MOD，覆盖 8 个推理生命周期阶段，范围与证据边界明确。",
+        "37 个公开 MOD，覆盖 8 个推理生命周期阶段，范围与证据边界明确。",
         "启用证据与性能证据分开呈现",
         "从推理运维到智能体应用。",
     ):
@@ -87,7 +87,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
     mod_count = len(mod_projects)
-    assert mod_count == 36
+    assert mod_count == 37
     scenario_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
