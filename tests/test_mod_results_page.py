@@ -55,7 +55,7 @@ def test_results_are_rendered_inside_corresponding_mod_cards():
 
 def test_old_result_url_redirects_to_catalog():
     redirect = (ROOT / "mod-results.html").read_text()
-    assert 'url=./plugins.html#plugin-catalog' in redirect
+    assert "url=./plugins.html#plugin-catalog" in redirect
     assert 'window.location.replace("./plugins.html#plugin-catalog")' in redirect
     assert "data-mod-report" not in redirect
 
@@ -70,4 +70,6 @@ def test_new_mod_homes_have_requested_owner_and_no_advisor():
         component = components[component_id]
         assert component["maintainers"] == ["ShuhaoZhangTony"]
         assert component["advisors"] == []
-        assert component["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        assert component["canonical_repository"].startswith(
+            "https://github.com/vLLM-HUST/"
+        )
