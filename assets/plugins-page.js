@@ -411,18 +411,6 @@ vllm-hust-ext extension disable org.vllm-hust.muxpd
 vllm-hust-ext extension status org.vllm-hust.muxpd
 # Use your native vLLM launch command in a fresh process after disable.`
     },
-    "state-scheduler": {
-      title_en: "Inspect the archived research tools",
-      title_zh: "复查已归档研究工具",
-      action_en: "public wheel and status",
-      action_zh: "公开 wheel 与状态检查",
-      note_en: "Performance positioning is withdrawn and current action sets are stopped. Use only for historical inspection in a dedicated environment; do not enable a serving component. The unchanged 0.2.0 package has no qualified speedup and does not contain the later P2 prototype. See the archive note for negative results; original package checksums remain on the release page.",
-      note_zh: "已撤下性能定位，当前动作集停止。仅在专用环境复查历史工具，不启用 serving 组件。原 0.2.0 制品保持不变，无已验收提速，也不含后续 P2 原型。负结果见归档说明，原制品校验和仍在发布页。",
-      command: `python -m pip install --no-deps https://github.com/vLLM-HUST/vllm-hust-website/releases/download/state-scheduler-v0.2.0/vllm_state_scheduler_plugin-0.2.0-py3-none-any.whl
-vllm-state-scheduler-mod status
-vllm-state-scheduler-trace-audit --help
-vllm-state-scheduler-correctness-probe --help`
-    },
     "vllm-hust-opset": {
       title_en: "Install and check OPset",
       title_zh: "安装并检查 OPset",

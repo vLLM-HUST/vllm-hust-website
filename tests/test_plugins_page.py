@@ -66,54 +66,14 @@ def by_id(component_id: str) -> dict:
     return next(item for item in REGISTRY["components"] if item["id"] == component_id)
 
 
-def test_state_scheduler_public_m0_release_does_not_claim_runtime_benefit() -> None:
-    component = by_id("state-scheduler")
-    assert component["canonical_repository"] == (
-        "https://github.com/Qixin-Gaoke/state-scheduler-plugin"
-    )
-    assert component["repository_visibility"] == "private"
-    assert component["compatibility"]["status"] == "inspect_only"
-    assert (
-        "execution_selector_available=false"
-        in (component["compatibility"]["requirements_en"])
-    )
-    assert "Compilation Control" in component["summary_en"]
-    assert component["evidence_level"] == "cpu_smoke"
-    assert MOD_TAXONOMY["components"]["state-scheduler"]["kind"] == "tool_mod"
-    assert component["public_effect_url"].endswith(
-        "/state-scheduler-v0.2.0"
-    ) or re.fullmatch(
-        r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
-        r"archive/mod-git-20261022/state-scheduler-website-source/snapshot/"
-        r"docs/STATE_SCHEDULER_ARCHIVE\.md",
-        component["public_effect_url"],
-    )
-    assert "releases/download/state-scheduler-v0.2.0/" in SCRIPT
-    assert "vllm-state-scheduler-mod status" in SCRIPT
+def test_state_scheduler_is_absent_from_live_catalog_surfaces() -> None:
     assert "state-scheduler" not in {
-        item["id"] for item in PLUGIN_PERFORMANCE["entries"]
+        component["id"] for component in REGISTRY["components"]
     }
-
-
-def test_state_scheduler_is_archived_not_a_performance_mod() -> None:
-    component = by_id("state-scheduler")
-    taxonomy = MOD_TAXONOMY["components"]["state-scheduler"]
-    assert taxonomy["kind"] == "tool_mod"
-    assert taxonomy["capability"] == "observability_evaluation"
-    assert taxonomy["lifecycle"] == "retired"
-    assert taxonomy["evidence"] == "no_performance_claim"
-    assert component["public_effect_status"] == "inconclusive"
-    assert "Performance MOD positioning withdrawn" in component["summary_en"]
-    assert "当前动作集停止" in component["summary_zh"]
-    assert "AB/BA was not run" in component["public_effect_en"]
-    assert "native/native" in component["public_effect_en"]
-    assert "原生/原生" in component["public_effect_zh"]
-    note_path = component["documentation_url"].removeprefix("./")
-    note = (ROOT / note_path).read_text(encoding="utf-8")
-    assert "没有已验证的推理提速" in note
-    assert "不包含后续 P2 原型" in note
-    assert "do not enable a serving component" in SCRIPT
-    assert "Performance positioning is withdrawn" in SCRIPT
+    assert "state-scheduler" not in MOD_TAXONOMY["components"]
+    assert "state-scheduler" not in WORKSHOP_METADATA["plugins"]
+    assert "state-scheduler" not in WORKLOAD_NAVIGATION["plugins"]
+    assert "state-scheduler" not in SCRIPT
 
 
 def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
@@ -1250,7 +1210,7 @@ def test_page_consumes_the_benchmark_owned_registry() -> None:
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
         'data-metadata="./data/plugin-workshop-metadata.json?'
-        'v=state-scheduler-archive-20261018"' in PAGE
+        'v=catalog-delist-20261106"' in PAGE
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
@@ -1753,7 +1713,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 38
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 37
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1851,7 +1811,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
     assert "tool-mods-20260929" not in PAGE
     assert "workshop-metadata-v17-clm" not in PAGE
     assert (
-        'data-metadata="./data/plugin-workshop-metadata.json?v=state-scheduler-archive-20261018"'
+        'data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106"'
         in PAGE
     )
     assert "taxonomy-v2-20261012" in PAGE
