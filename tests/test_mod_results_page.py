@@ -32,7 +32,7 @@ def test_mod_report_page_is_visible_and_explains_measurement_scope():
     assert "StateAxis" not in page
     assert 'id="footer-copy">Measured results, traceable configurations.' in page
     assert '"title":"MOD 实测结果 | vLLM-HUST"' in page
-    assert 'mod-results.js?v=mod-report-20261106-display' in page
+    assert "mod-results.js?v=mod-report-20261106-display" in page
     assert 'href="./mod-results.html"' in plugins
     assert "SINGLE · COMBINATION · COMPATIBILITY" in plugins
     home = (ROOT / "index.html").read_text()
