@@ -1403,6 +1403,7 @@ def test_new_migration_repositories_replace_legacy_page_links() -> None:
         promoted_statuses = {
             "quantized-kv-cache-migration": "experimental",
             "simllm-migration": "experimental",
+            "unified-communication-migration": "experimental",
             "kv-transfer-observability-migration": "experimental",
             "pipeline-microbatch-migration": "verified",
         }
@@ -1630,7 +1631,6 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
 
 def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> None:
     inspectable = {
-        "unified-communication-migration",
         "split-batch-full-graph-migration",
         "layered-prefill-migration",
         "activation-sparsity-migration",
@@ -1649,6 +1649,38 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
     assert "vllm-hust-ext extension inspect ${extensionId}" in SCRIPT
     assert "vllm-hust-ext extension check ${extensionId}" in SCRIPT
     assert "function installationStatus(item)" in SCRIPT
+
+
+def test_unified_communication_is_host_integrated_and_hardware_restricted() -> None:
+    component = by_id("unified-communication-migration")
+    assert component["ownership"] == "organization_maintained"
+    assert component["maintainers"] == ["ShuhaoZhangTony"]
+    assert component["maturity"] == "experimental"
+    assert component["compatibility"]["status"] == "experimental"
+    assert "vllm-hust merge 8ec6ac0" in component["compatibility"]["versions"]
+    assert component["public_effect_url"].endswith("/vllm-hust/pull/74")
+    assert "multi-device" in component["compatibility"]["requirements_en"]
+
+    taxonomy = MOD_TAXONOMY["components"]["unified-communication-migration"]
+    assert taxonomy == {
+        "kind": "runtime_mod",
+        "capability": "parallel_communication",
+        "phases": ["prefill", "decode"],
+        "lifecycle": "implemented_restricted",
+        "evidence": "host_integrated_hardware_validation_pending",
+    }
+
+    repository = next(
+        item
+        for item in PORTFOLIO["repositories"]
+        if item["name"] == "vllm-hust-unified-comm"
+    )
+    assert repository["relation_to_runtime"] == "provides_communication_host_provider"
+    assert repository["lifecycle"] == "implemented_restricted"
+    maintainers = WORKSHOP_METADATA["plugins"]["unified-communication-migration"][
+        "maintainers"
+    ]
+    assert [person["login"] for person in maintainers] == ["ShuhaoZhangTony"]
 
 
 def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
