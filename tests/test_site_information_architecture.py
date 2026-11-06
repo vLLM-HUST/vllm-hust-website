@@ -40,9 +40,11 @@ def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
     assert "Our focus is optimization through MOD plugins." in HOME
     assert "Some MODs also need changes to vLLM or its Ascend backend" in HOME
     section = HOME.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
-    for repo in ("vllm-hust", "vllm-ascend-hust", "vllm-hust-benchmark"):
+    for repo in ("vllm-hust", "vllm-ascend-hust"):
         assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
     assert 'href="./plugins.html"' in section
+    assert 'href="./mod-results.html"' in section
+    assert "https://github.com/vLLM-HUST/vllm-hust-benchmark" in HOME
     assert "gennova" not in HOME.lower()
     assert "Independent inference engine" not in HOME
     assert "独立的推理引擎" not in HOME

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOD test report | vLLM-HUST</title>
-  <meta name="description" content="Historical single-MOD, combination, and bounded negative test evidence published by vLLM-HUST.">
+  <title>MOD results | vLLM-HUST</title>
+  <meta name="description" content="Measured single-MOD, combination, performance, and compatibility results on vLLM-HUST-based stacks.">
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/mod-results.html">
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029">
@@ -26,37 +26,37 @@
   <main class="site-shell mod-report-page" data-mod-report data-source="./data/mod-test-evidence.json?v=mod-report-20261105">
     <section class="page-hero mod-report-hero">
       <div class="content-panel">
-        <span class="eyebrow"><span class="lang-en">Historical evidence, current boundaries</span><span class="lang-zh">历史证据，当前边界</span></span>
-        <h1><span class="lang-en">MOD test evidence report</span><span class="lang-zh">MOD 测试证据报告</span></h1>
-        <p><span class="lang-en">Search single-MOD records, measured combinations, and sealed negative results without turning bounded observations into leaderboard claims.</span><span class="lang-zh">统一检索单项 MOD、实测组合与封存负结果，同时避免把有限观察误写成榜单结论。</span></p>
+        <span class="eyebrow"><span class="lang-en">Measured on vLLM-HUST-based stacks</span><span class="lang-zh">基于 vLLM-HUST 底座实测</span></span>
+        <h1><span class="lang-en">MOD performance &amp; compatibility results</span><span class="lang-zh">MOD 性能与兼容性实测</span></h1>
+        <p><span class="lang-en">Explore measured single MODs, combined configurations, and compatibility findings in one searchable result set.</span><span class="lang-zh">在一个可搜索的结果集中查看单 MOD、组合配置及兼容性实测。</span></p>
       </div>
     </section>
     <section class="mod-report-boundary content-panel">
-      <strong><span class="lang-en">Publication boundary</span><span class="lang-zh">发布边界</span></strong>
-      <p><span class="lang-en">This page publishes de-identified historical test evidence from a transferred project. It does not add the source project to the vLLM-HUST MOD catalog, add new measurements, or grant official leaderboard qualification.</span><span class="lang-zh">本页发布来自已转移项目、已去标识化的历史测试证据，不把来源项目加入 vLLM-HUST MOD 目录，不新增测量，也不授予正式榜单资格。</span></p>
-      <a data-report-source href="./data/mod-test-evidence.json" target="_blank" rel="noopener noreferrer"><span class="lang-en">Pinned benchmark report ↗</span><span class="lang-zh">固定版本基准报告 ↗</span></a>
+      <strong><span class="lang-en">How to read the results</span><span class="lang-zh">结果口径</span></strong>
+      <p><span class="lang-en">These measurements use vLLM-HUST-based runtimes. Each card retains its baseline, quality check, and applicability; use the official leaderboard when a uniform cross-MOD ranking is required.</span><span class="lang-zh">这些结果均基于 vLLM-HUST 底座运行；每张卡片保留对照、质量检查和适用范围。需要统一口径的跨 MOD 排名时，请以正式排行榜为准。</span></p>
+      <a data-report-source href="./data/mod-test-evidence.json" target="_blank" rel="noopener noreferrer"><span class="lang-en">Benchmark evidence source ↗</span><span class="lang-zh">查看 Benchmark 证据源 ↗</span></a>
     </section>
     <section class="mod-report-summary" aria-label="Report summary">
-      <article><strong data-summary="catalog_entries">—</strong><span><span class="lang-en">catalog entries</span><span class="lang-zh">结果入口</span></span></article>
-      <article><strong data-summary="integration_records">—</strong><span><span class="lang-en">single-MOD records</span><span class="lang-zh">单项记录</span></span></article>
-      <article><strong data-summary="combination_effects">—</strong><span><span class="lang-en">combination effects</span><span class="lang-zh">组合影响</span></span></article>
-      <article><strong data-summary="bounded_negative_results">—</strong><span><span class="lang-en">bounded negative results</span><span class="lang-zh">有边界负结果</span></span></article>
+      <article><strong data-summary="catalog_entries">—</strong><span><span class="lang-en">result catalog entries</span><span class="lang-zh">结果目录条目</span></span></article>
+      <article><strong data-summary="integration_records">—</strong><span><span class="lang-en">single-MOD results</span><span class="lang-zh">单 MOD 实测</span></span></article>
+      <article><strong data-summary="combination_effects">—</strong><span><span class="lang-en">combination results</span><span class="lang-zh">组合实测</span></span></article>
+      <article><strong data-summary="bounded_negative_results">—</strong><span><span class="lang-en">compatibility findings</span><span class="lang-zh">兼容性结论</span></span></article>
     </section>
     <section class="mod-report-controls content-panel">
       <label><span class="lang-en">Search</span><span class="lang-zh">搜索</span><input type="search" data-report-search placeholder="Search MOD, combination, boundary, or result"></label>
       <div data-report-tabs role="group" aria-label="Evidence type">
         <button type="button" class="active" data-report-tab="integrations"><span class="lang-en">Single MODs</span><span class="lang-zh">单项 MOD</span></button>
         <button type="button" data-report-tab="combinations"><span class="lang-en">Combinations</span><span class="lang-zh">组合</span></button>
-        <button type="button" data-report-tab="negative"><span class="lang-en">Negative results</span><span class="lang-zh">负结果</span></button>
+        <button type="button" data-report-tab="negative"><span class="lang-en">Compatibility / negative</span><span class="lang-zh">兼容性 / 负结果</span></button>
       </div>
     </section>
     <p class="mod-report-status" data-report-status aria-live="polite">Loading MOD test evidence…</p>
     <section class="mod-report-grid" data-report-grid></section>
     <noscript><section class="content-panel"><p>JavaScript is required. Open <a href="./data/mod-test-evidence.json">the machine-readable report</a>.</p></section></noscript>
   </main>
-  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="footer-copy">Bounded evidence, reproducible provenance.</span></footer>
-  <script>window.vllmHustPageDict={"en":{"title":"MOD test report | vLLM-HUST","footer-copy":"Bounded evidence, reproducible provenance."},"zh":{"title":"MOD 测试报告 | vLLM-HUST","footer-copy":"边界清楚，来源可复核。"}};</script>
+  <footer class="site-footer"><strong>vLLM-HUST</strong> · <span id="footer-copy">Measured results, traceable configurations.</span></footer>
+  <script>window.vllmHustPageDict={"en":{"title":"MOD results | vLLM-HUST","footer-copy":"Measured results, traceable configurations."},"zh":{"title":"MOD 实测结果 | vLLM-HUST","footer-copy":"实测结果，配置可追溯。"}};</script>
   <script src="./assets/site.js?v=public-audit-20261101"></script>
-  <script src="./assets/mod-results.js?v=mod-report-20261105-shell"></script>
+  <script src="./assets/mod-results.js?v=mod-report-20261106-display"></script>
 </body>
 </html>
