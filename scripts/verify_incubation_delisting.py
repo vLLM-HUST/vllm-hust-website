@@ -70,13 +70,19 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     assert (
                         unified.locator(
                             "xpath=ancestor::*[contains(@class, "
-                            "'plugin-category-retired')]"
+                            "'plugin-category-runtime_mod')]"
                         ).count()
                         == 1
                     )
-                    assert "#42" in unified.inner_text()
-                    expected_status = "已退役" if language == "zh" else "retired"
-                    assert expected_status in unified.inner_text().lower()
+                    unified_text = unified.inner_text()
+                    assert "#74" in unified_text
+                    assert "#71" in unified_text
+                    expected_status = (
+                        "已实现 · 条件受限"
+                        if language == "zh"
+                        else "implemented · restricted"
+                    )
+                    assert expected_status in unified_text.lower()
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= window.innerWidth + 1"
                     )
