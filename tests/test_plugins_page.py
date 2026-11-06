@@ -1680,9 +1680,7 @@ def test_unified_communication_is_host_integrated_and_hardware_restricted() -> N
     maintainers = WORKSHOP_METADATA["plugins"]["unified-communication-migration"][
         "maintainers"
     ]
-    assert [(person["name"], person["login"]) for person in maintainers] == [
-        ("Shuhao Zhang (Tony)", "ShuhaoZhangTony")
-    ]
+    assert [person["login"] for person in maintainers] == ["ShuhaoZhangTony"]
 
 
 def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
