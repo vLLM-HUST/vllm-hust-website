@@ -46,13 +46,13 @@ def test_high_impact_home_copy_stays_concise_in_both_languages() -> None:
 
 def test_leadership_value_is_explicit_and_product_outcomes_are_distinct() -> None:
     for phrase in (
-        "42 public MODs across 8 lifecycle phases, with scope and evidence explicit.",
+        "Public MODs across the inference lifecycle, with scope and evidence explicit.",
         "Explore by phase, scenario, platform, and readiness",
         "activation and performance evidence stay separate",
         "From inference operations to agent applications.",
         "One workspace to serve models, observe performance, and operate the Ascend inference stack.",
         "A cited AI twin built with SAGE that calls vLLM-HUST for model execution.",
-        "42 个公开 MOD，覆盖 8 个推理生命周期阶段，范围与证据边界明确。",
+        "覆盖推理全生命周期的公开 MOD，范围与证据边界明确。",
         "启用证据与性能证据分开呈现",
         "从推理运维到智能体应用。",
     ):
@@ -106,13 +106,13 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     )
     assert scenario_count == 16
     assert phase_count == 8
-    assert f"Explore all {mod_count} MODs" in INDEX
-    assert f"查看全部 {mod_count} 个 MOD" in INDEX
-    assert f"{mod_count} public MODs" in INDEX
-    assert f"{mod_count} 个公开 MOD" in INDEX
+    assert "Explore the MOD catalog" in INDEX
+    assert "查看 MOD 目录" in INDEX
+    assert "Public MOD catalog" in INDEX
+    assert "公开 MOD 目录" in INDEX
     assert f"{phase_count} phases · {scenario_count} scenarios" in INDEX
     assert f"{phase_count} 个阶段 · {scenario_count} 类场景" in INDEX
-    assert f">{mod_count}</span>" in INDEX
+    assert 'data-home-mod-count aria-hidden="true">—</span>' in INDEX
     assert 'href="./plugins.html#plugin-catalog"' in INDEX
     assert "EcosystemCatalog.summarize(registry, taxonomy)" in HOME_CATALOG_SCRIPT
     assert "stateaxis-topic-mods.json" not in HOME_CATALOG_SCRIPT
