@@ -476,7 +476,9 @@ def test_upstream_synchronized_hust_forks_are_a_separate_system_class() -> None:
     assert by_id("vllm-ascend-hust")["name"] == "vLLM Ascend HUST"
     assert "it is not a HUST plugin" in by_id("vllm-ascend-hust")["summary_en"]
 
-    assert "One place for upstream forks that carry required base-layer changes." in PAGE
+    assert (
+        "One place for upstream forks that carry required base-layer changes." in PAGE
+    )
     assert "必须落在基座层的改动，统一由上游 fork 快速承载。" in PAGE
     assert "upstream_sync_fork" in SCRIPT
     assert 'let selectedType = "extensions"' in SCRIPT
