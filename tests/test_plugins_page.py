@@ -1156,8 +1156,8 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=mod-results-20261106" in PAGE
-    assert "plugins-page.js?v=mod-results-20261106" in PAGE
+    assert "plugins.css?v=retest-20261107" in PAGE
+    assert "plugins-page.js?v=retest-20261107" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
