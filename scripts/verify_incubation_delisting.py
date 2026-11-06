@@ -65,7 +65,7 @@ def verify(url: str, output: Path, executable: str | None = None) -> None:
                     unified.wait_for(state="visible")
                     details = unified.locator(".plugin-technical-details")
                     if not details.evaluate("e => e.open"):
-                        details.locator("summary").click()
+                        details.locator(":scope > summary").click()
                     assert unified.count() == 1
                     assert (
                         unified.locator(

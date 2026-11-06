@@ -76,6 +76,8 @@
     forks: "Forks",
     publicEffect: "公开效果",
     measuredResults: "实测结果",
+    retestPending: "重组后待复测",
+    retestPendingCopy: "旧记录仅作来源参考；当前仓库版本须按 vllm-hust-benchmark 规范重新验收。",
     singleResults: "单 MOD",
     combinationResults: "组合",
     compatibilityResults: "兼容性 / 负结果",
@@ -165,6 +167,8 @@
     forks: "Forks",
     publicEffect: "Public result",
     measuredResults: "Measured results",
+    retestPending: "Fresh qualification pending",
+    retestPendingCopy: "Previous records remain source references only; the current repository version must be requalified under the vllm-hust-benchmark protocol.",
     singleResults: "Single MOD",
     combinationResults: "Combinations",
     compatibilityResults: "Compatibility / negative findings",
@@ -1176,6 +1180,14 @@ vllm-hust-ext extension check ${extensionId}`
   function modEvidenceSummary(item) {
     const results = modResultsByComponent.get(item.id);
     if (!results) return null;
+    if (item.evidence_level === "retest_pending") {
+      const panel = element("section", "plugin-mod-results-summary");
+      panel.append(
+        element("strong", "plugin-mod-results-title", copy().retestPending),
+        element("span", "plugin-mod-results-pending", copy().retestPendingCopy)
+      );
+      return panel;
+    }
     const total = results.integration.length + results.combinations.length + results.negative.length;
     if (!total) return null;
     const panel = element("section", "plugin-mod-results-summary");
@@ -1230,6 +1242,20 @@ vllm-hust-ext extension check ${extensionId}`
     const results = modResultsByComponent.get(item.id);
     if (!results) return null;
     const panel = element("section", "plugin-mod-results-details");
+    if (item.evidence_level === "retest_pending") {
+      panel.append(
+        element("h3", "", copy().retestPending),
+        element("p", "plugin-mod-result-fact", copy().retestPendingCopy)
+      );
+      if (item.public_effect_url) {
+        const source = element("a", "plugin-public-effect-link", `${copy().resultSource} ↗`);
+        source.href = item.public_effect_url;
+        source.target = "_blank";
+        source.rel = "noopener noreferrer";
+        panel.append(source);
+      }
+      return panel;
+    }
     panel.append(element("h3", "", copy().measuredResults));
     const single = resultGroup(copy().singleResults, results.integration, row => resultRecord(
       row.name, row.id, [
