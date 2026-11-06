@@ -19,6 +19,9 @@
   let performanceResults = new Map();
   let performanceData;
   let frontierData;
+  let modEvidence;
+  let modResultBindings;
+  let modResultsByComponent = new Map();
   let selectedModel = "";
   let portfolio;
   let workshopMetadata = {};
@@ -72,6 +75,20 @@
     pullRequests: "开放 PR",
     forks: "Forks",
     publicEffect: "公开效果",
+    measuredResults: "实测结果",
+    singleResults: "单 MOD",
+    combinationResults: "组合",
+    compatibilityResults: "兼容性 / 负结果",
+    resultSource: "完整结果来源",
+    baseline: "基线",
+    quality: "质量检查",
+    qualification: "适用边界",
+    positive: "正向观察",
+    negative: "负向观察",
+    scope: "范围",
+    result: "结果",
+    doNotRepeat: "无需重复",
+    reopenRequires: "重新开启条件",
     identity: "组件身份",
     capability: "能力域",
     phases: "作用阶段",
@@ -147,6 +164,20 @@
     pullRequests: "Open PRs",
     forks: "Forks",
     publicEffect: "Public result",
+    measuredResults: "Measured results",
+    singleResults: "Single MOD",
+    combinationResults: "Combinations",
+    compatibilityResults: "Compatibility / negative findings",
+    resultSource: "Full result source",
+    baseline: "Baseline",
+    quality: "Quality check",
+    qualification: "Qualification boundary",
+    positive: "Positive observation",
+    negative: "Negative observation",
+    scope: "Scope",
+    result: "Result",
+    doNotRepeat: "Do not repeat",
+    reopenRequires: "Reopen requirements",
     identity: "Component identity",
     capability: "Capability area",
     phases: "Execution phases",
@@ -1116,6 +1147,124 @@ vllm-hust-ext extension check ${extensionId}`
     return "graphite";
   }
 
+  function indexModResults() {
+    modResultsByComponent = new Map();
+    const ensure = componentId => {
+      if (!modResultsByComponent.has(componentId)) {
+        modResultsByComponent.set(componentId, { integration: [], combinations: [], negative: [] });
+      }
+      return modResultsByComponent.get(componentId);
+    };
+    const records = {
+      integration_records: new Map(modEvidence.integration_records.map(row => [row.id, row])),
+      combination_effects: new Map(modEvidence.combination_effects.map(row => [row.id, row])),
+      negative_results: new Map(modEvidence.negative_results.map(row => [row.id, row]))
+    };
+    [
+      ["integration_records", "integration"],
+      ["combination_effects", "combinations"],
+      ["negative_results", "negative"]
+    ].forEach(([bindingKey, targetKey]) => {
+      Object.entries(modResultBindings[bindingKey]).forEach(([recordId, componentIds]) => {
+        const record = records[bindingKey].get(recordId);
+        if (!record) return;
+        componentIds.forEach(componentId => ensure(componentId)[targetKey].push(record));
+      });
+    });
+  }
+
+  function modEvidenceSummary(item) {
+    const results = modResultsByComponent.get(item.id);
+    if (!results) return null;
+    const total = results.integration.length + results.combinations.length + results.negative.length;
+    if (!total) return null;
+    const panel = element("section", "plugin-mod-results-summary");
+    panel.append(element("strong", "plugin-mod-results-title", copy().measuredResults));
+    const counts = element("div", "plugin-mod-results-counts");
+    [
+      [copy().singleResults, results.integration.length],
+      [copy().combinationResults, results.combinations.length],
+      [copy().compatibilityResults, results.negative.length]
+    ].filter(([, count]) => count).forEach(([label, count]) => {
+      const counter = element("span", "plugin-mod-results-count");
+      counter.append(element("strong", "", String(count)), document.createTextNode(label));
+      counts.append(counter);
+    });
+    panel.append(counts);
+    return panel;
+  }
+
+  function appendResultFact(container, label, value) {
+    if (!value || (Array.isArray(value) && !value.length)) return;
+    const publishableText = input => String(input)
+      .replace(/gennova(?:-hust)?[a-z0-9-]*/gi, language() === "zh" ? "vLLM-HUST 测试批次" : "vLLM-HUST test batch")
+      .replace(/stateaxis[a-z0-9-]*/gi, language() === "zh" ? "旧宿主路径" : "legacy host path");
+    const row = element("p", "plugin-mod-result-fact");
+    row.append(element("strong", "", `${label}: `), document.createTextNode(
+      Array.isArray(value) ? value.map(publishableText).join(" · ") : publishableText(value)
+    ));
+    container.append(row);
+  }
+
+  function resultRecord(title, id, facts) {
+    const publishableLabel = value => String(value)
+      .replace(/gennova(?:-hust)?[a-z0-9-]*/gi, language() === "zh" ? "vLLM-HUST 测试批次" : "vLLM-HUST test batch")
+      .replace(/stateaxis[a-z0-9-]*/gi, language() === "zh" ? "旧宿主路径" : "legacy host path");
+    const record = element("details", "plugin-mod-result-record");
+    const summary = element("summary");
+    summary.append(element("strong", "", publishableLabel(title || id)), element("code", "", publishableLabel(id)));
+    record.append(summary);
+    facts.forEach(([label, value]) => appendResultFact(record, label, value));
+    return record;
+  }
+
+  function resultGroup(title, rows, render) {
+    if (!rows.length) return null;
+    const group = element("section", "plugin-mod-result-group");
+    group.append(element("h4", "", `${title} · ${rows.length}`));
+    rows.forEach(row => group.append(render(row)));
+    return group;
+  }
+
+  function modEvidenceDetails(item) {
+    const results = modResultsByComponent.get(item.id);
+    if (!results) return null;
+    const panel = element("section", "plugin-mod-results-details");
+    panel.append(element("h3", "", copy().measuredResults));
+    const single = resultGroup(copy().singleResults, results.integration, row => resultRecord(
+      row.name, row.id, [
+        [copy().positive, row.positive],
+        [copy().negative, row.negative],
+        [copy().qualification, row.boundary]
+      ]
+    ));
+    const combinations = resultGroup(copy().combinationResults, results.combinations, row => resultRecord(
+      row.combination, row.id, [
+        [copy().baseline, row.baseline],
+        [copy().result, row.effect],
+        [copy().quality, row.quality],
+        [copy().qualification, row.qualification]
+      ]
+    ));
+    const negative = resultGroup(copy().compatibilityResults, results.negative, row => resultRecord(
+      row.name, row.id, [
+        [copy().scope, row.scope],
+        [copy().result, row.result],
+        [copy().doNotRepeat, row.do_not_repeat],
+        [copy().reopenRequires, row.reopen_requires]
+      ]
+    ));
+    [single, combinations, negative].filter(Boolean).forEach(group => panel.append(group));
+    if (modEvidence.source?.report_url) {
+      const source = element("a", "plugin-public-effect-link", `${copy().resultSource} ↗`);
+      source.href = "./data/mod-test-evidence.json";
+      source.target = "_blank";
+      source.rel = "noopener noreferrer";
+      panel.append(source);
+    }
+    return panel.children.length > 1 ? panel : null;
+  }
+
   function performancePanel(result) {
     const panel = element("div", "plugin-performance");
     const zh = language() === "zh";
@@ -1233,6 +1382,8 @@ vllm-hust-ext extension check ${extensionId}`
     if (isPerformanceCandidate(item) && Number.isFinite(performance?.gain)) {
       card.append(performancePanel(performance));
     }
+    const measuredResults = modEvidenceSummary(item);
+    if (measuredResults) card.append(measuredResults);
     const publicEffect = publicEffectPanel(item);
     if (publicEffect) card.append(publicEffect);
     const compatibility = compatibilityPanel(item);
@@ -1246,6 +1397,8 @@ vllm-hust-ext extension check ${extensionId}`
     if (projectComponents) detailBody.append(projectComponents);
     if (repositoryMetrics) detailBody.append(repositoryMetrics);
     if (compatibility) detailBody.append(compatibility);
+    const measuredResultDetails = modEvidenceDetails(item);
+    if (measuredResultDetails) detailBody.append(measuredResultDetails);
     if (performance?.diagnostic_only && performance.url) {
       const diagnostic = element("a", "plugin-public-effect-link", language() === "zh"
         ? "历史吞吐诊断原件 ↗" : "Historical throughput diagnostic ↗");
@@ -1581,11 +1734,15 @@ vllm-hust-ext extension check ${extensionId}`
     }),
     fetchModTaxonomy(catalog.dataset.taxonomy),
     Promise.all([
+      fetch("./data/mod-test-evidence.json?v=mod-catalog-20261106", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("MOD evidence unavailable"); return response.json(); }),
+      fetch("./data/mod-result-bindings.json?v=mod-catalog-20261106", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("MOD result bindings unavailable"); return response.json(); })
+    ]).then(([evidence, bindings]) => ({ evidence, bindings })),
+    Promise.all([
       fetch("./data/plugin-performance.json?v=effects-20261030", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Performance metadata unavailable"); return response.json(); }),
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
-    .then(([payload, metadata, navigation, taxonomy, performance]) => {
+    .then(([payload, metadata, navigation, taxonomy, resultPublication, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
@@ -1600,8 +1757,15 @@ vllm-hust-ext extension check ${extensionId}`
           ? "MOD 分类数据版本暂不匹配，请刷新页面后重试。"
           : "The MOD classification data is temporarily out of date. Refresh the page and try again.");
       }
+      if (resultPublication.evidence.schema_version !== "mod-test-evidence/v1"
+        || resultPublication.bindings.schema_version !== "mod-result-bindings/v1") {
+        throw new Error("unsupported MOD result publication");
+      }
       registry = payload;
       modTaxonomy = taxonomy.components;
+      modEvidence = resultPublication.evidence;
+      modResultBindings = resultPublication.bindings;
+      indexModResults();
       performanceData = performance?.data;
       frontierData = performance?.frontier;
       if (performance && window.PluginPerformance) {
