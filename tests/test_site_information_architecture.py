@@ -43,7 +43,8 @@ def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
     for repo in ("vllm-hust", "vllm-ascend-hust"):
         assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
     assert 'href="./plugins.html"' in section
-    assert 'href="./mod-results.html"' in section
+    assert 'href="./mod-results.html"' not in section
+    assert "SINGLE · COMBINATION · COMPATIBILITY" not in section
     assert "https://github.com/vLLM-HUST/vllm-hust-benchmark" in HOME
     assert "gennova" not in HOME.lower()
     assert "Independent inference engine" not in HOME
@@ -181,10 +182,10 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "37 public MODs across 8 lifecycle phases" in HOME
+    assert "42 public MODs across 8 lifecycle phases" in HOME
     assert "Explore by phase, scenario, platform, and readiness" in HOME
     assert "activation and performance evidence stay separate" in HOME
-    assert "37 个公开 MOD，覆盖 8 个推理生命周期阶段" in HOME
+    assert "42 个公开 MOD，覆盖 8 个推理生命周期阶段" in HOME
     assert "按阶段、场景、平台和成熟度探索" in HOME
     assert "启用证据与性能证据分开呈现" in HOME
 

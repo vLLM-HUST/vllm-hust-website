@@ -1156,8 +1156,8 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=effects-20261030" in PAGE
-    assert "plugins-page.js?v=catalog-audit-20261105" in PAGE
+    assert "plugins.css?v=mod-results-20261106" in PAGE
+    assert "plugins-page.js?v=mod-results-20261106" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1289,7 +1289,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
     assert PORTFOLIO["scope"] == "active_public_repositories_and_completed_archives"
     assert PORTFOLIO["inventory_as_of"] == "2026-11-06"
-    assert len(PORTFOLIO["repositories"]) == 62
+    assert len(PORTFOLIO["repositories"]) == 65
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "agentx-bench",
@@ -1312,6 +1312,9 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "vllm-hust-cuda-mtp",
         "vllm-hust-opset",
         "vllm-hust-prefill-microflow",
+        "vllm-hust-gdn-optimizations",
+        "vllm-hust-runtime-micro-optimizations",
+        "vllm-ascend-attention-optimizations",
         "vllm-hust-vSpec",
     } <= names
     assert "vllm-ascend" not in names
@@ -1759,7 +1762,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 37
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 39
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
