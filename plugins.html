@@ -889,27 +889,27 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 <div class="adjacent-head">
 <div>
 <span class="eyebrow">
-<span class="lang-en">Repository relationship</span>
-<span class="lang-zh">仓库与上游关系</span>
+<span class="lang-en">Foundation repositories</span>
+<span class="lang-zh">基座仓库</span>
 </span>
 <h2 id="upstream-sync-forks-title">
-<span class="lang-en">Upstream-synchronized HUST forks are systems, not plugins.</span>
-<span class="lang-zh">上游同步 HUST fork 是系统分支，不是插件。</span>
+<span class="lang-en">One place for upstream forks that carry required base-layer changes.</span>
+<span class="lang-zh">必须落在基座层的改动，统一由上游 fork 快速承载。</span>
 </h2>
 </div>
 <p>
-<span class="lang-en">They track an official project and carry only narrowly required HUST deltas. Runtime role and delivery type remain visible, but these repositories are grouped separately from installable extensions.</span>
-<span class="lang-zh">它们跟随官方项目演进，只承载 HUST 必需的窄幅差异。页面仍展示其运行时角色和交付方式，但会与可安装扩展分区呈现。</span>
+<span class="lang-en">These repositories track their official upstreams and provide a fast landing zone for narrowly required engine, backend, compiler, data-path, or deployment changes that cannot be delivered through an independent MOD. They remain systems rather than plugins and should keep their HUST delta small and upstreamable.</span>
+<span class="lang-zh">这些仓库持续跟随官方上游，用于快速承载无法通过独立 MOD 交付、但必须修改引擎、后端、编译器、数据路径或部署栈的必要改动。它们属于系统基座而非插件，HUST 差异应保持精简并尽可能回馈上游。</span>
 </p>
 </div>
 <div class="adjacent-grid upstream-fork-links">
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>vLLM-HUST</h3><p>fork of vllm-project/vllm</p></a>
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>vLLM Ascend HUST</h3><p>fork of vllm-project/vllm-ascend</p></a>
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>vLLM Metal HUST</h3><p>fork of vllm-project/vllm-metal</p></a>
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Triton Ascend HUST</h3><p>fork of triton-lang/triton-ascend</p></a>
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/sglang-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>SGLang HUST</h3><p>fork of sgl-project/sglang</p></a>
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/mooncake-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Mooncake HUST</h3><p>fork of kvcache-ai/Mooncake</p></a>
-<a class="adjacent-card" href="https://github.com/vLLM-HUST/production-stack-hust"><span class="plugin-code">UPSTREAM SYNC</span><h3>Production Stack HUST</h3><p>fork of vllm-project/production-stack</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>vLLM-HUST</h3><p>fork of vllm-project/vllm</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-ascend-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>vLLM Ascend HUST</h3><p>fork of vllm-project/vllm-ascend</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/vllm-metal-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>vLLM Metal HUST</h3><p>fork of vllm-project/vllm-metal</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/triton-ascend-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>Triton Ascend HUST</h3><p>fork of triton-lang/triton-ascend</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/sglang-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>SGLang HUST</h3><p>fork of sgl-project/sglang</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/mooncake-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>Mooncake HUST</h3><p>fork of kvcache-ai/Mooncake</p></a>
+<a class="adjacent-card" href="https://github.com/vLLM-HUST/production-stack-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>Production Stack HUST</h3><p>fork of vllm-project/production-stack</p></a>
 </div>
 </section>
     <section class="plugin-controls" aria-label="Ecosystem filters">
@@ -988,7 +988,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </p>
 </header>
       <p class="plugin-status" data-repository-status aria-live="polite">Loading repository portfolio…</p>
-      <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v15-completed-archives">
+      <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v16-foundation-repositories">
 </div>
     </section>
     <section class="content-panel adjacent-section">
