@@ -182,10 +182,10 @@ def test_homepage_section_index_links_to_existing_primary_sections() -> None:
 
 
 def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "42 public MODs across 8 lifecycle phases" in HOME
+    assert "Public MODs across the inference lifecycle" in HOME
     assert "Explore by phase, scenario, platform, and readiness" in HOME
     assert "activation and performance evidence stay separate" in HOME
-    assert "42 个公开 MOD，覆盖 8 个推理生命周期阶段" in HOME
+    assert "覆盖推理全生命周期的公开 MOD" in HOME
     assert "按阶段、场景、平台和成熟度探索" in HOME
     assert "启用证据与性能证据分开呈现" in HOME
 
