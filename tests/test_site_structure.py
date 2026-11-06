@@ -1271,8 +1271,8 @@ def test_homepage_presents_a_verified_serving_ecosystem() -> None:
     forks_group = catalog.split('id="upstream-forks-title"', 1)[1].split(
         'id="mechanism-control-title"', 1
     )[0]
-    assert "They are not plugins." in catalog
-    assert "它们不是插件。" in html_text
+    assert "They are systems, not plugins." in catalog
+    assert "它们属于系统而非插件。" in html_text
     for fork in (
         "vllm-hust",
         "vllm-ascend-hust",
