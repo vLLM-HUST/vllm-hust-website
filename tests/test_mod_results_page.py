@@ -44,6 +44,9 @@ def test_results_are_rendered_inside_corresponding_mod_cards():
     assert 'fetch("./data/mod-result-bindings.json?v=mod-catalog-20261106"' in script
     assert "function modEvidenceSummary(item)" in script
     assert "function modEvidenceDetails(item)" in script
+    assert 'item.evidence_level === "retest_pending"' in script
+    assert "Previous records remain source references only" in script
+    assert "旧记录仅作来源参考" in script
     assert "indexModResults();" in script
     assert "row.do_not_repeat" in script and "row.reopen_requires" in script
     assert ".replace(/gennova(?:-hust)?[a-z0-9-]*/gi" in script
