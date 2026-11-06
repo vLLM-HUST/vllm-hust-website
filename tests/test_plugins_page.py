@@ -476,8 +476,8 @@ def test_upstream_synchronized_hust_forks_are_a_separate_system_class() -> None:
     assert by_id("vllm-ascend-hust")["name"] == "vLLM Ascend HUST"
     assert "it is not a HUST plugin" in by_id("vllm-ascend-hust")["summary_en"]
 
-    assert "Upstream-synchronized HUST forks are systems, not plugins." in PAGE
-    assert "上游同步 HUST fork 是系统分支，不是插件。" in PAGE
+    assert "One place for upstream forks that carry required base-layer changes." in PAGE
+    assert "必须落在基座层的改动，统一由上游 fork 快速承载。" in PAGE
     assert "upstream_sync_fork" in SCRIPT
     assert 'let selectedType = "extensions"' in SCRIPT
     assert 'badge(copy().forkBadge, "upstream-fork")' in SCRIPT
@@ -1286,7 +1286,7 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
     assert PORTFOLIO["scope"] == "active_public_repositories_and_completed_archives"
-    assert PORTFOLIO["inventory_as_of"] == "2026-11-05"
+    assert PORTFOLIO["inventory_as_of"] == "2026-11-06"
     assert len(PORTFOLIO["repositories"]) == 62
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
@@ -1337,6 +1337,18 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
         "mooncake-hust",
         "production-stack-hust",
     }
+    assert {
+        item["portfolio_domain"]
+        for item in PORTFOLIO["repositories"]
+        if item["repository_role"] == "upstream_sync_fork"
+    } == {"foundation_repositories"}
+    assert (
+        'foundation_repositories: { en: "Foundation repositories", zh: "基座仓库" }'
+        in SCRIPT
+    )
+    assert 'left === "foundation_repositories"' in SCRIPT
+    assert "必须落在基座层的改动，统一由上游 fork 快速承载" in PAGE
+    assert "无法通过独立 MOD 交付" in PAGE
 
     pegaflow = next(
         item for item in PORTFOLIO["repositories"] if item["name"] == "pegaflow-hust"
@@ -1368,7 +1380,7 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert "已完成归档" in PAGE
     assert "即使尚未封装为 MOD" in PAGE
     assert (
-        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v15-completed-archives"'
+        'data-source="./data/repository-portfolio.json?v=repository-portfolio-v16-foundation-repositories"'
         in PAGE
     )
     assert (
