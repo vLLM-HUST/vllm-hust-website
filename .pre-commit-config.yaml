@@ -65,6 +65,9 @@ repos:
   rev: v1.5.0
   hooks:
   - id: detect-secrets
+    args:
+    - --exclude-files
+    - ^(presentation/leadership-performance/story\.json|output/leadership-performance/leadership_performance\.provenance\.json)$
     # Evidence snapshots carry public Git IDs and verified model/workload/script/request SHA256 values.
     # FrontierScience, MMLU-Pro and HLE-Verified JSON contain audited public revision/file hashes.
     # Dataset matrix is a generated projection of the same public reports and SHA256 bindings.
