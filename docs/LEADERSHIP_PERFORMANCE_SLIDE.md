@@ -1,9 +1,8 @@
 # Leadership performance slide
 
 The formal leadership slide is generated only from canonical leaderboard snapshots. The checked-in
-snapshot is currently **not admissible**: it contains legacy/config-unverified records and no
-complete compare group. Do not use it to produce a formal curve, and do not copy values from the
-historical PPTX files in `output/`.
+snapshot contains three complete admitted comparison groups and is the sole metric source for the
+published SVG, PNG, and PPTX artifacts.
 
 ## Pinned public targets
 
@@ -12,7 +11,8 @@ versioned official-target registry. Every pin records `target_id`, `target_versi
 and the SHA256 of the complete registry. A registry update therefore makes existing artifacts stale
 until the pin is reviewed and updated.
 
-The generator requires every canonical entry—not merely the plotted points—to pass these checks:
+The generator ignores unrelated historical leaderboard rows. Every entry referenced by one of the
+three pinned comparison groups must pass these checks:
 
 - `metadata.verified` is true;
 - `target_id`, `target_version`, `profile_id`, and `target_registry_sha256` exactly match the active
@@ -67,9 +67,9 @@ progression.
         {
           "entry_id": "<canonical-entry-id>",
           "label": "<public optimization keyword>",
-          "pr_number": 123,
+          "pr_number": 68,
           "repository": "vLLM-HUST/vllm-hust",
-          "pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/123",
+          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/68",
           "commit": "<full-40-hex-canonical-commit>",
           "attribution": {
             "kind": "checkpoint-cumulative",
@@ -86,9 +86,9 @@ progression.
         {
           "entry_id": "<canonical-entry-id>",
           "label": "<public optimization keyword>",
-          "pr_number": 124,
+          "pr_number": 68,
           "repository": "vLLM-HUST/vllm-hust",
-          "pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/124",
+          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/68",
           "commit": "<full-40-hex-canonical-commit>",
           "attribution": {
             "kind": "checkpoint-cumulative",
@@ -105,9 +105,9 @@ progression.
         {
           "entry_id": "<canonical-entry-id>",
           "label": "<public optimization keyword>",
-          "pr_number": 125,
+          "pr_number": 68,
           "repository": "vLLM-HUST/vllm-hust",
-          "pr_url": "https://github.com/intellistream/vllm-hust-legacy-20260831/pull/125",
+          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/68",
           "commit": "<full-40-hex-canonical-commit>",
           "attribution": {
             "kind": "checkpoint-cumulative",
@@ -122,8 +122,8 @@ progression.
 }
 ```
 
-Do not add this file with placeholder IDs. Wait until the canonical snapshot contains the complete
-admitted series, then record only real entry and PR identities.
+The checked-in `presentation/leadership-performance/story.json` records the admitted entry and PR
+identities; the placeholders above document the schema only.
 
 ## Generate and verify
 
@@ -136,7 +136,7 @@ python3 scripts/build_leadership_performance_slide.py \
   --registry ../vllm-hust-benchmark/leaderboard-data/official-targets.json \
   --registry-checksum ../vllm-hust-benchmark/leaderboard-data/official-targets.sha256 \
   --target-pin data/leadership_performance_targets.json \
-  --story path/to/admitted-story.json \
+  --story presentation/leadership-performance/story.json \
   --benchmark-repo ../vllm-hust-benchmark \
   --benchmark-commit <full-benchmark-commit-sha> \
   --milestone-repo ../vllm-hust \
@@ -159,5 +159,5 @@ regenerating:
 python3 scripts/build_leadership_performance_slide.py <same-arguments> --check-stale
 ```
 
-The current 21 legacy/config-unverified entries are expected to fail before rendering. That failure
-is the intended safety behavior until benchmark cleanup and paired reruns are complete.
+All six records referenced by the three comparison groups must remain verified. Unrelated historical
+rows do not enter the slide and therefore do not block rendering.

@@ -43,6 +43,11 @@ def main():
         raw = response.body()
         report = json.loads(raw)
         assert report["version"] == "V1.03"
+        validation_index_response = context.request.get(
+            f"{args.url}/data/dataset_validation_index_v1.json"
+        )
+        assert validation_index_response.ok
+        validation_default = validation_index_response.json()["default_scenario_id"]
         manifest_response = context.request.get(
             f"{args.url}/data/benchmark-source-manifest.json"
         )
@@ -572,16 +577,11 @@ def main():
                         == 6
                     )
                     if filename == "dataset-validation.html":
-                        expect(page.locator("#validation-model-select")).to_have_value(
-                            SCENARIO
-                        )
                         select = page.locator("#validation-model-select")
-                        alternative = select.locator("option").first.get_attribute(
-                            "value"
-                        )
-                        select.select_option(alternative)
-                        expect(select).to_have_value(alternative)
+                        expect(select).to_have_value(validation_default)
                         select.select_option(SCENARIO)
+                        expect(select).to_have_value(SCENARIO)
+                        select.select_option(validation_default)
                         expect(page.locator("#validation-content")).to_be_visible()
                     assert page.locator("#midterm-report").evaluate(
                         "e => e.getBoundingClientRect().right <= innerWidth + 1"

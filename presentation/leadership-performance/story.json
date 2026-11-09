@@ -1,0 +1,62 @@
+{
+  "schema_version": "leadership-performance-story/v1",
+  "series": [
+    {
+      "workload": "agent-research-online",
+      "milestones": [
+        {
+          "entry_id": "1337b3ca-cd8e-4e66-b6e6-02de9ab6d083",
+          "label": "Mega-AOT cache integrity",
+          "pr_number": 68,
+          "repository": "vLLM-HUST/vllm-hust",
+          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/68",
+          "commit": "bad323ac8c667c8f107ac02f143a5b0441e6155c",
+          "attribution": {
+            "kind": "checkpoint-cumulative",
+            "boundary_id": "pr68-agent-serving",
+            "checkpoint_entry_id": "1337b3ca-cd8e-4e66-b6e6-02de9ab6d083",
+            "checkpoint_commit": "bad323ac8c667c8f107ac02f143a5b0441e6155c"
+          }
+        }
+      ]
+    },
+    {
+      "workload": "sharegpt-online",
+      "milestones": [
+        {
+          "entry_id": "713b3f5b-b388-4696-8f6d-fca8e5596e6c",
+          "label": "Mega-AOT cache integrity",
+          "pr_number": 68,
+          "repository": "vLLM-HUST/vllm-hust",
+          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/68",
+          "commit": "bad323ac8c667c8f107ac02f143a5b0441e6155c",
+          "attribution": {
+            "kind": "checkpoint-cumulative",
+            "boundary_id": "pr68-sharegpt-serving",
+            "checkpoint_entry_id": "713b3f5b-b388-4696-8f6d-fca8e5596e6c",
+            "checkpoint_commit": "bad323ac8c667c8f107ac02f143a5b0441e6155c"
+          }
+        }
+      ]
+    },
+    {
+      "workload": "random-online",
+      "milestones": [
+        {
+          "entry_id": "83727313-2e8d-4139-a0b1-b2cabb6f5b5d",
+          "label": "Mega-AOT cache integrity",
+          "pr_number": 68,
+          "repository": "vLLM-HUST/vllm-hust",
+          "pr_url": "https://github.com/vLLM-HUST/vllm-hust/pull/68",
+          "commit": "75663d82ef651150e975cccac2c45e60901991fd",
+          "attribution": {
+            "kind": "checkpoint-cumulative",
+            "boundary_id": "pr68-random-serving",
+            "checkpoint_entry_id": "83727313-2e8d-4139-a0b1-b2cabb6f5b5d",
+            "checkpoint_commit": "75663d82ef651150e975cccac2c45e60901991fd"
+          }
+        }
+      ]
+    }
+  ]
+}

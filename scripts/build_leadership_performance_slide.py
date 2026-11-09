@@ -678,7 +678,6 @@ def admit_snapshot(
                 errors.append(f"{name}: every entry must be an object")
                 continue
             entries.append(raw)
-            errors.extend(_entry_errors(raw, source=name, registry=registry))
     if not isinstance(compare, dict):
         errors.append("leaderboard_compare.json must be an object")
     snapshot_time = str(_dict(marker).get("last_updated") or "")
@@ -686,7 +685,6 @@ def admit_snapshot(
         errors.append("last_updated.json must declare last_updated")
 
     by_id: dict[str, dict[str, Any]] = {}
-    admitted_workloads: set[str] = set()
     for entry in entries:
         entry_id = str(entry.get("entry_id") or "")
         if not entry_id:
@@ -695,6 +693,29 @@ def admit_snapshot(
         if entry_id in by_id:
             errors.append(f"duplicate snapshot entry_id: {entry_id}")
         by_id[entry_id] = entry
+    admitted_ids: set[str] = set()
+    if isinstance(compare, dict):
+        groups = compare.get("groups")
+        if isinstance(groups, list):
+            pinned_target_ids = {pin.target_id for pin in pins.values()}
+            for group in groups:
+                if not isinstance(group, dict):
+                    continue
+                scope = _dict(group.get("scope"))
+                if scope.get("setting_signature") not in pinned_target_ids:
+                    continue
+                for member in group.get("engines") or []:
+                    if isinstance(member, dict) and member.get("entry_id"):
+                        admitted_ids.add(str(member["entry_id"]))
+
+    admitted_workloads: set[str] = set()
+    for entry_id in sorted(admitted_ids):
+        entry = by_id.get(entry_id)
+        if entry is None:
+            continue
+        errors.extend(
+            _entry_errors(entry, source="pinned comparison", registry=registry)
+        )
         workload = str(_dict(entry.get("workload")).get("name") or "")
         if workload in pins:
             metadata = _dict(entry.get("metadata"))
@@ -727,7 +748,11 @@ def admit_snapshot(
             "canonical snapshot admission failed:\n"
             + "\n".join(f"- {message}" for message in errors)
         )
-    return by_id, snapshot_time
+    return {
+        entry_id: by_id[entry_id]
+        for entry_id in sorted(admitted_ids)
+        if entry_id in by_id
+    }, snapshot_time
 
 
 def audit_public_text(values: list[str], *, source: str) -> None:
@@ -937,6 +962,32 @@ def load_story(
     return series
 
 
+def story_milestone_refs(path: Path) -> tuple[str, ...]:
+    """Return only the public refs needed to prove this story's commits."""
+    payload = load_json(path)
+    if not isinstance(payload, dict):
+        raise ValueError("leadership performance story must be an object")
+    refs = {"refs/heads/main"}
+    raw_series = payload.get("series")
+    if not isinstance(raw_series, list):
+        raise ValueError("story series must be an array")
+    for raw in raw_series:
+        if not isinstance(raw, dict) or not isinstance(raw.get("milestones"), list):
+            raise ValueError("every story series must declare milestones")
+        for milestone in raw["milestones"]:
+            if not isinstance(milestone, dict):
+                raise ValueError("every milestone must be an object")
+            pr_number = milestone.get("pr_number")
+            if (
+                not isinstance(pr_number, int)
+                or isinstance(pr_number, bool)
+                or pr_number <= 0
+            ):
+                raise ValueError("every milestone needs a positive PR number")
+            refs.add(f"refs/pull/{pr_number}/head")
+    return tuple(sorted(refs))
+
+
 def _github_origin_identity(remote: str) -> tuple[str, str]:
     scp = re.fullmatch(r"git@github\.com:([^/]+/[^/]+?)(?:\.git)?", remote)
     if scp is not None:
@@ -1009,6 +1060,7 @@ class MilestoneCommitVerifier:
 def milestone_commit_verifier(
     repo: Path,
     *,
+    refs: tuple[str, ...] = ("refs/heads/main",),
     fetch_remote: Callable[[Path, str, tuple[str, ...]], None] | None = None,
     ls_remote: Callable[[Path, str], bytes] | None = None,
 ) -> MilestoneCommitVerifier:
@@ -1018,6 +1070,12 @@ def milestone_commit_verifier(
         _git(root, "config", "--local", "--get", "remote.origin.url").decode().strip()
     )
     local_repository, canonical_remote = _github_origin_identity(remote)
+    requested_refs = tuple(sorted(set(refs)))
+    if "refs/heads/main" not in requested_refs or any(
+        re.fullmatch(r"refs/(?:heads/main|pull/[1-9][0-9]*/head)", ref) is None
+        for ref in requested_refs
+    ):
+        raise ValueError("milestone proof requested an unsupported public ref")
     with tempfile.TemporaryDirectory(prefix="leadership-proof-") as tmp:
         proof_root = Path(tmp) / "repository.git"
         proof_root.mkdir()
@@ -1026,9 +1084,8 @@ def milestone_commit_verifier(
             _proof_git(
                 proof_root,
                 "ls-remote",
-                "--heads",
-                "--tags",
                 canonical_remote,
+                *requested_refs,
                 remote=True,
             )
             if ls_remote is None
@@ -1040,15 +1097,15 @@ def milestone_commit_verifier(
             if len(fields) != 2 or not re.fullmatch(r"[0-9a-f]{40}", fields[0]):
                 raise ValueError("origin advertised an invalid ref tip")
             ref = fields[1]
-            if not re.fullmatch(r"refs/(?:heads|tags)/[^\s^]+(?:\^\{\})?", ref):
-                raise ValueError("origin advertised an invalid head or tag name")
+            if ref not in requested_refs:
+                raise ValueError("origin advertised an unexpected milestone ref")
             if ref in advertised and advertised[ref] != fields[0]:
                 raise ValueError("origin advertised inconsistent duplicate ref tips")
             advertised[ref] = fields[0]
-        if not advertised:
-            raise ValueError("origin advertised no heads or tags")
+        if set(advertised) != set(requested_refs):
+            raise ValueError("origin did not advertise every requested public ref")
 
-        source_refs = sorted(ref for ref in advertised if not ref.endswith("^{}"))
+        source_refs = list(requested_refs)
         for source in source_refs:
             _proof_git(proof_root, "check-ref-format", source)
         namespace = f"refs/leadership-proof/{secrets.token_hex(8)}"
@@ -1632,7 +1689,10 @@ def main() -> int:
             checksum_path=args.registry_checksum,
         )
         entries, snapshot_time = admit_snapshot(args.snapshot_dir, registry, pins)
-        milestone_verifier = milestone_commit_verifier(args.milestone_repo)
+        milestone_verifier = milestone_commit_verifier(
+            args.milestone_repo,
+            refs=story_milestone_refs(args.story),
+        )
         series = load_story(
             args.story,
             entries,

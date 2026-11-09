@@ -259,6 +259,25 @@ def test_registry_pin_and_snapshot_are_admitted(tmp_path: Path) -> None:
     assert snapshot_time == "2026-08-01T00:00:00Z"
 
 
+def test_unrelated_unverified_history_does_not_block_admission(
+    tmp_path: Path,
+) -> None:
+    registry, pins, _, snapshot_dir, _ = fixtures(tmp_path)
+    snapshot_path = snapshot_dir / "leaderboard_single.json"
+    payload = json.loads(snapshot_path.read_text())
+    unrelated = copy.deepcopy(payload[0])
+    unrelated["entry_id"] = "unrelated-unverified-history"
+    unrelated["metadata"]["verified"] = False
+    unrelated["metadata"]["profile_id"] = "unrelated-profile"
+    payload.append(unrelated)
+    dump(snapshot_path, payload)
+
+    entries, _ = MODULE.admit_snapshot(snapshot_dir, registry, pins)
+
+    assert len(entries) == 6
+    assert unrelated["entry_id"] not in entries
+
+
 def test_same_spec_comparator_matches_benchmark_contract() -> None:
     registry_path = (
         ROOT.parent
@@ -444,6 +463,12 @@ def test_compare_group_requires_admitted_members_and_exact_scope(
 def test_story_uses_only_canonical_metric_and_matching_pr(tmp_path: Path) -> None:
     registry, pins, _, snapshot_dir, story_path = fixtures(tmp_path)
     entries, _ = MODULE.admit_snapshot(snapshot_dir, registry, pins)
+    assert MODULE.story_milestone_refs(story_path) == (
+        "refs/heads/main",
+        "refs/pull/1/head",
+        "refs/pull/2/head",
+        "refs/pull/3/head",
+    )
     series = MODULE.load_story(story_path, entries)
     assert series["agent-research-online"][0].throughput_tps == 101.0
 
@@ -753,6 +778,16 @@ def test_milestone_commit_verifier_requires_origin_and_strict_ancestry(
             ),
             ls_remote=lambda _root, _remote: (
                 f"{local_only}\trefs/heads/main\n".encode()
+            ),
+        )
+
+    with pytest.raises(ValueError, match="unexpected milestone ref"):
+        MODULE.milestone_commit_verifier(
+            repo,
+            fetch_remote=fetch_advertised,
+            ls_remote=lambda _root, _remote: (
+                remote_listing
+                + f"{commits[-1]}\trefs/heads/unrelated-private-history\n".encode()
             ),
         )
 
@@ -1327,7 +1362,7 @@ def test_dependency_free_render_harness_writes_auditable_complete_set(
     MODULE.check_stale(staged / "leadership_performance.provenance.json", current)
 
 
-def test_checked_in_snapshot_is_not_formally_admitted() -> None:
+def test_checked_in_snapshot_is_formally_admitted() -> None:
     benchmark = ROOT.parent / "vllm-hust-benchmark" / "leaderboard-data"
     if not benchmark.is_dir():
         pytest.skip("benchmark checkout is unavailable")
@@ -1342,11 +1377,7 @@ def test_checked_in_snapshot_is_not_formally_admitted() -> None:
         if "target pin is stale" in str(exc):
             pytest.skip(f"checked-in target pin is stale: {exc}")
         raise
-    with pytest.raises(
-        ValueError, match="canonical snapshot admission failed"
-    ) as caught:
-        MODULE.admit_snapshot(ROOT / "data", registry, pins)
-    assert "metadata.verified must be true" in str(caught.value)
-    assert "canonical compare snapshot requires exactly one admitted group" in str(
-        caught.value
-    )
+    entries, snapshot_time = MODULE.admit_snapshot(ROOT / "data", registry, pins)
+    assert len(entries) == 6
+    assert snapshot_time
+    assert all(entry["metadata"]["verified"] is True for entry in entries.values())
