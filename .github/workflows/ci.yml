@@ -18,6 +18,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
+      - name: Run pre-commit on committed website files
+        run: pre-commit run --all-files
+        env:
+          SKIP: ${{ github.ref == 'refs/heads/main' && 'no-commit-to-branch' || '' }}
       - name: Checkout pinned benchmark data for this presentation
         uses: actions/checkout@v4
         with:
@@ -35,10 +39,6 @@ jobs:
             --revision c3802d55c127f7887896edb9ed16dfac093366f1 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
             --revision c3802d55c127f7887896edb9ed16dfac093366f1 --website .
-      - name: Run pre-commit
-        run: pre-commit run --all-files
-        env:
-          SKIP: ${{ github.ref == 'refs/heads/main' && 'no-commit-to-branch' || '' }}
       - name: Assemble pinned benchmark navigation
         env:
           GH_TOKEN: ${{ github.token }}
