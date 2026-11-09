@@ -1,8 +1,16 @@
 {
   "schema_version": "plugin-workshop-metadata/v1",
-  "generated_at": "2026-11-04T13:21:55+00:00",
+  "generated_at": "2026-10-10T05:11:01+00:00",
   "source": "GitHub API + canonical ownership and organization identity data",
   "plugins": {
+    "state-scheduler": {
+      "repository": "Qixin-Gaoke/state-scheduler-plugin",
+      "repository_url": "https://github.com/Qixin-Gaoke/state-scheduler-plugin",
+      "metrics": {"stars": null, "forks": null, "open_pull_requests": null},
+      "maintainers": [{"login": "ShuhaoZhangTony", "name": "张书豪", "profile_url": "https://github.com/ShuhaoZhangTony", "avatar_url": "https://github.com/ShuhaoZhangTony.png"}],
+      "advisors": [],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "pegaflow": {
       "repository": "vLLM-HUST/pegaflow-hust",
       "repository_url": "https://github.com/vLLM-HUST/pegaflow-hust",
@@ -12,6 +20,12 @@
         "open_pull_requests": 0
       },
       "maintainers": [
+        {
+          "login": "mynameisczj",
+          "name": "陈子嘉",
+          "profile_url": "https://github.com/mynameisczj",
+          "avatar_url": "https://github.com/mynameisczj.png"
+        },
         {
           "login": "cybber695",
           "name": "陈彦博",
@@ -44,6 +58,12 @@
       },
       "maintainers": [
         {
+          "login": "mynameisczj",
+          "name": "陈子嘉",
+          "profile_url": "https://github.com/mynameisczj",
+          "avatar_url": "https://github.com/mynameisczj.png"
+        },
+        {
           "login": "cybber695",
           "name": "陈彦博",
           "profile_url": "https://github.com/cybber695",
@@ -71,7 +91,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 2
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -213,7 +233,7 @@
       "maintainers": [
         {
           "login": "KimmoZAG",
-          "name": "张睿诚",
+          "name": "KimmoZAG",
           "profile_url": "https://github.com/KimmoZAG",
           "avatar_url": "https://avatars.githubusercontent.com/u/95903923?v=4"
         }
@@ -233,7 +253,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -256,9 +276,9 @@
       "repository": "vLLM-HUST/vllm-ascend-kvcompress-hust",
       "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-kvcompress-hust",
       "metrics": {
-        "stars": 1,
+        "stars": 0,
         "forks": 0,
-        "open_pull_requests": 2
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -266,18 +286,6 @@
           "name": "张家万",
           "profile_url": "https://github.com/Jiawan23",
           "avatar_url": "https://avatars.githubusercontent.com/u/113904488?v=4"
-        },
-        {
-          "login": "kotoriqaq0",
-          "name": "韦若皓",
-          "profile_url": "https://github.com/kotoriqaq0",
-          "avatar_url": "https://avatars.githubusercontent.com/u/204298045?v=4"
-        },
-        {
-          "login": "Seas0",
-          "name": "刘思辰",
-          "profile_url": "https://github.com/Seas0",
-          "avatar_url": "https://avatars.githubusercontent.com/u/30485844?v=4"
         }
       ],
       "advisors": [
@@ -295,7 +303,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -423,7 +431,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 2
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -446,9 +454,9 @@
       "repository": "vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
       "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-quantized-kv-cache-hust",
       "metrics": {
-        "stars": null,
-        "forks": null,
-        "open_pull_requests": null
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -484,7 +492,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 1
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -513,10 +521,10 @@
       },
       "maintainers": [
         {
-          "login": "ShuhaoZhangTony",
-          "name": "Shuhao Zhang (Tony)",
-          "profile_url": "https://github.com/ShuhaoZhangTony",
-          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
+          "login": "machuanhu",
+          "name": "马川湖",
+          "profile_url": "https://github.com/machuanhu",
+          "avatar_url": "https://avatars.githubusercontent.com/u/52109545?v=4"
         }
       ],
       "advisors": [
@@ -532,7 +540,7 @@
       "repository": "vLLM-HUST/vllm-ascend-split-batch-hust",
       "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-split-batch-hust",
       "metrics": {
-        "stars": 1,
+        "stars": 0,
         "forks": 0,
         "open_pull_requests": 0
       },
@@ -565,7 +573,7 @@
       "metrics": {
         "stars": 0,
         "forks": 0,
-        "open_pull_requests": 3
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -678,7 +686,7 @@
       "maintainers": [
         {
           "login": "Tkhkrnx",
-          "name": "彭浩然",
+          "name": "Pharos Peng",
           "profile_url": "https://github.com/Tkhkrnx",
           "avatar_url": "https://avatars.githubusercontent.com/u/138972185?v=4"
         }
@@ -811,6 +819,63 @@
       ],
       "maintainer_source": "ecosystem.json#component.maintainers"
     },
+    "stateaxis-automatic-prefix-cache": {
+      "repository": "vLLM-HUST/stateaxis-automatic-prefix-cache",
+      "repository_url": "https://github.com/vLLM-HUST/stateaxis-automatic-prefix-cache",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)",
+          "profile_url": "https://github.com/ShuhaoZhangTony",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
+        }
+      ],
+      "advisors": [],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "stateaxis-async-kv-transfer": {
+      "repository": "vLLM-HUST/stateaxis-async-kv-transfer",
+      "repository_url": "https://github.com/vLLM-HUST/stateaxis-async-kv-transfer",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)",
+          "profile_url": "https://github.com/ShuhaoZhangTony",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
+        }
+      ],
+      "advisors": [],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
+    "stateaxis-pipelined-weight-loading": {
+      "repository": "vLLM-HUST/stateaxis-pipelined-weight-loading",
+      "repository_url": "https://github.com/vLLM-HUST/stateaxis-pipelined-weight-loading",
+      "metrics": {
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
+      },
+      "maintainers": [
+        {
+          "login": "ShuhaoZhangTony",
+          "name": "Shuhao Zhang (Tony)",
+          "profile_url": "https://github.com/ShuhaoZhangTony",
+          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
+        }
+      ],
+      "advisors": [],
+      "maintainer_source": "ecosystem.json#component.maintainers"
+    },
     "gdn-state-codec": {
       "repository": "vLLM-HUST/gdn-state-codec",
       "repository_url": "https://github.com/vLLM-HUST/gdn-state-codec",
@@ -822,7 +887,7 @@
       "maintainers": [
         {
           "login": "ShuhaoZhangTony",
-          "name": "张书豪",
+          "name": "Shuhao Zhang (Tony)",
           "profile_url": "https://github.com/ShuhaoZhangTony",
           "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
         }
@@ -859,9 +924,9 @@
       "repository": "vLLM-HUST/vllm-hust-perf-analyzer",
       "repository_url": "https://github.com/vLLM-HUST/vllm-hust-perf-analyzer",
       "metrics": {
-        "stars": null,
-        "forks": null,
-        "open_pull_requests": null
+        "stars": 3,
+        "forks": 1,
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
@@ -884,14 +949,14 @@
       "repository": "vLLM-HUST/request-throttling-controller",
       "repository_url": "https://github.com/vLLM-HUST/request-throttling-controller",
       "metrics": {
-        "stars": null,
-        "forks": null,
-        "open_pull_requests": null
+        "stars": 0,
+        "forks": 0,
+        "open_pull_requests": 0
       },
       "maintainers": [
         {
           "login": "yancanmao",
-          "name": "毛言粲",
+          "name": "Mao Yancan",
           "profile_url": "https://github.com/yancanmao",
           "avatar_url": "https://avatars.githubusercontent.com/u/24371733?v=4"
         }
@@ -922,126 +987,6 @@
           "relationship": "internal"
         }
       ],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
-    "muxpd": {
-      "repository": "vLLM-HUST/vllm-ascend-MuxPD-hust",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-MuxPD-hust",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 1
-      },
-      "maintainers": [
-        {
-          "login": "Irisuko",
-          "name": "毛潮云",
-          "profile_url": "https://github.com/Irisuko",
-          "avatar_url": "https://avatars.githubusercontent.com/u/247319942?v=4"
-        }
-      ],
-      "advisors": [
-        {
-          "name_zh": "罗瑞坤",
-          "name_en": "Ruikun Luo",
-          "relationship": "internal"
-        }
-      ],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
-    "gdn-optimizations": {
-      "repository": "vLLM-HUST/vllm-hust-gdn-optimizations",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-gdn-optimizations",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
-      },
-      "maintainers": [
-        {
-          "login": "ShuhaoZhangTony",
-          "name": "Shuhao Zhang (Tony)",
-          "profile_url": "https://github.com/ShuhaoZhangTony",
-          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
-        }
-      ],
-      "advisors": [],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
-    "runtime-micro-optimizations": {
-      "repository": "vLLM-HUST/vllm-hust-runtime-micro-optimizations",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-runtime-micro-optimizations",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
-      },
-      "maintainers": [
-        {
-          "login": "ShuhaoZhangTony",
-          "name": "Shuhao Zhang (Tony)",
-          "profile_url": "https://github.com/ShuhaoZhangTony",
-          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
-        }
-      ],
-      "advisors": [],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
-    "ascend-attention-optimizations": {
-      "repository": "vLLM-HUST/vllm-ascend-attention-optimizations",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-ascend-attention-optimizations",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
-      },
-      "maintainers": [
-        {
-          "login": "ShuhaoZhangTony",
-          "name": "Shuhao Zhang (Tony)",
-          "profile_url": "https://github.com/ShuhaoZhangTony",
-          "avatar_url": "https://avatars.githubusercontent.com/u/5267690?v=4"
-        }
-      ],
-      "advisors": [],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
-    "hybrid-spec": {
-      "repository": "vLLM-HUST/vllm-hust-hybrid-spec",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-hybrid-spec",
-      "metrics": {
-        "stars": null,
-        "forks": null,
-        "open_pull_requests": null
-      },
-      "maintainers": [
-        {
-          "login": "Li-changwu",
-          "name": "Changwu Li",
-          "profile_url": "https://github.com/Li-changwu",
-          "avatar_url": "https://avatars.githubusercontent.com/u/215941469?v=4"
-        }
-      ],
-      "advisors": [],
-      "maintainer_source": "ecosystem.json#component.maintainers"
-    },
-    "prefill-microflow": {
-      "repository": "vLLM-HUST/vllm-hust-prefill-microflow",
-      "repository_url": "https://github.com/vLLM-HUST/vllm-hust-prefill-microflow",
-      "metrics": {
-        "stars": 0,
-        "forks": 0,
-        "open_pull_requests": 0
-      },
-      "maintainers": [
-        {
-          "login": "CubeLander",
-          "name": "Jingyuan Tian",
-          "profile_url": "https://github.com/CubeLander",
-          "avatar_url": "https://avatars.githubusercontent.com/u/49518565?v=4"
-        }
-      ],
-      "advisors": [],
       "maintainer_source": "ecosystem.json#component.maintainers"
     }
   }

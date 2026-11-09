@@ -122,7 +122,7 @@ progression.
 }
 ```
 
-The checked-in `reports/leadership-performance/story.json` records the admitted entry and PR
+The checked-in `presentation/leadership-performance/story.json` records the admitted entry and PR
 identities; the placeholders above document the schema only.
 
 ## Generate and verify
@@ -136,7 +136,7 @@ python3 scripts/build_leadership_performance_slide.py \
   --registry ../vllm-hust-benchmark/leaderboard-data/official-targets.json \
   --registry-checksum ../vllm-hust-benchmark/leaderboard-data/official-targets.sha256 \
   --target-pin data/leadership_performance_targets.json \
-  --story reports/leadership-performance/story.json \
+  --story presentation/leadership-performance/story.json \
   --benchmark-repo ../vllm-hust-benchmark \
   --benchmark-commit <full-benchmark-commit-sha> \
   --milestone-repo ../vllm-hust \
