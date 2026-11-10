@@ -105,6 +105,29 @@
         })) : [];
         const published = observation.kind === 'published-comparisons' ? observation.comparisons : null;
         const evidenceUrl = observation.url || entry.url;
+        const referencePoint = compatible ? candidate[0] : null;
+        const review = referencePoint ? {
+          source_kind: 'normalized-frontier',
+          normalized: true,
+          metric: data.metric,
+          aggregation: data.aggregation,
+          concurrencies: [...data.concurrencies],
+          configuration: referencePoint.configuration,
+          load: referencePoint.load,
+          benchmark_protocol: referencePoint.evidence.benchmark_protocol,
+          measurement_seconds: referencePoint.evidence.measurement_seconds,
+          sampling_date_utc: referencePoint.evidence.sampling_date_utc,
+          evidence_aggregation: referencePoint.evidence.aggregation,
+          evidence_url: referencePoint.evidence.source_evidence_url
+            || referencePoint.evidence.url || evidenceUrl
+        } : published ? {
+          source_kind: 'published-comparison',
+          normalized: false,
+          metric: data.metric,
+          model_label: published[0]?.model_label || null,
+          scopes: [...new Set(published.map(row => row.scope))],
+          evidence_url: evidenceUrl
+        } : null;
         if (Boolean(observation.setting_label_en) !== Boolean(observation.setting_label_zh)) {
           throw new Error('Performance observations require bilingual setting labels');
         }
@@ -130,6 +153,7 @@
           published_comparisons: published || [], baseline_series_id: baselineSeriesId || null,
           modelLabel, cohortId: baseline?.[0].cohort_id || null,
           runtimeBase: baseline?.[0].configuration.parameters.runtime_base_commits || null,
+          review,
           source: Number.isFinite(gain)
             ? (comparisons.length ? 'frontier' : published ? 'published-comparison' : null)
             : null };
@@ -155,7 +179,8 @@
       const selected = matches.find(row => row.id === derived.entry.default_observation_id)
         || matches[0];
       const empty = { gain: null, count: 0, comparisons: [], published_comparisons: [],
-        baseline_series_id: null, modelLabel: null, cohortId: null, runtimeBase: null, source: null };
+        baseline_series_id: null, modelLabel: null, cohortId: null, runtimeBase: null,
+        review: null, source: null };
       return [id, { ...derived.entry, observations: derived.observations, ...(selected || empty), id }];
     }));
   }

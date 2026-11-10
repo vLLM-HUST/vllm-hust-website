@@ -69,6 +69,26 @@ test('published paired runs expose both gains and regressions without precompute
   assert.equal(diagnostic.published_comparisons.length, 2);
 });
 
+test('review metadata exposes normalized settings and identifies legacy summaries', () => {
+  const results = M.summarize(data, frontier);
+  const normalized = results.get('betterscale').review;
+  assert.equal(normalized.source_kind, 'normalized-frontier');
+  assert.equal(normalized.normalized, true);
+  assert.equal(normalized.metric, 'output_tps');
+  assert.deepEqual(normalized.concurrencies, [1, 2, 4, 8, 16]);
+  assert.equal(normalized.configuration.hardware.label, 'Ascend 910B2');
+  assert.ok(normalized.configuration.parameters.runtime_base_commits.vllm);
+  assert.match(normalized.benchmark_protocol.prepared_workload_sha256, /^[0-9a-f]{64}$/);
+  assert.ok(normalized.measurement_seconds > 0);
+
+  const legacy = results.get('vspec').review;
+  assert.equal(legacy.source_kind, 'published-comparison');
+  assert.equal(legacy.normalized, false);
+  assert.equal(legacy.model_label, 'Qwen2.5-14B');
+  assert.match(legacy.scopes[0], /GSM8K B128/);
+  assert.match(legacy.evidence_url, /^https:\/\/github\.com\/vLLM-HUST\//);
+});
+
 test('model-scoped summaries expose and rank only measurements from the selected model', () => {
   assert.deepEqual(M.models(data, frontier), [
     'Qwen2.5-14B', 'Qwen2.5-7B-Instruct', 'Qwen2.5-Coder-14B', 'Qwen3-30B-A3B', 'Qwen3-30B-A3B-W8A8',
