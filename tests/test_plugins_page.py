@@ -410,6 +410,30 @@ def test_measured_cards_link_to_their_exact_benchmark_setting() -> None:
     assert '"Frontier ↗"' not in SCRIPT
 
 
+def test_mod_authors_can_review_the_full_test_contract_from_the_catalog() -> None:
+    assert 'id="mod-test-protocol"' in PAGE
+    assert "不同 token 与计时口径不得混比" in PAGE
+    assert "State whether output is fixed-length" in PAGE
+    assert "actual generated tokens are not a fixed token budget" in PAGE
+    assert (
+        "126eb1929a775051927e9de27a070b6018e39e58/reports/"
+        "reproductions/native-mtp4-gamma4-20261027"
+    ) in PAGE
+    assert "function modTestReview(item, result)" in SCRIPT
+    assert (
+        "source_kind: 'normalized-frontier'"
+        in (ROOT / "assets" / "plugin-performance.js").read_text()
+    )
+    assert "prepared_workload_sha256" in SCRIPT
+    assert "tokenizer_fingerprint" in SCRIPT
+    assert "runtime_base_commits" in SCRIPT
+    assert "launch_command_redacted" in SCRIPT
+    assert "旧式发布记录尚未归一化完整配置" in SCRIPT
+    assert 'item.id === "vspec"' in SCRIPT
+    assert ".mod-test-protocol-grid" in STYLES
+    assert ".plugin-test-review" in STYLES
+
+
 def test_system_role_is_independent_from_delivery_model() -> None:
     bidkv = by_id("bidkv")
     assert bidkv["system_role"] == "scheduler_policy"
@@ -1156,8 +1180,8 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=retest-20261107" in PAGE
-    assert "plugins-page.js?v=retest-20261107" in PAGE
+    assert "plugins.css?v=mod-review-20261110" in PAGE
+    assert "plugins-page.js?v=mod-review-20261110" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1852,7 +1876,7 @@ def test_performance_defaults_match_catalog_models_and_evidence_sources() -> Non
 
 
 def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -> None:
-    assert "plugin-performance.js?v=effects-20261030" in PAGE
+    assert "plugin-performance.js?v=mod-review-20261110" in PAGE
     assert "plugin-performance.json?v=effects-20261030" in SCRIPT
     assert "leaderboard_frontier.json?v=ecpa-final-20261009" in SCRIPT
     assert '{ cache: "no-cache" }' in SCRIPT
