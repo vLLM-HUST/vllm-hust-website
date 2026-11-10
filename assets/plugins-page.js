@@ -105,6 +105,23 @@
     requirements: "前置条件",
     followup: "负责人跟进 Issue",
     details: "兼容性与技术详情",
+    testReview: "测试配置与复查",
+    normalizedReview: "已按统一字段发布，可逐项核对基线与候选配置。",
+    legacyReviewWarning: "旧式发布记录尚未归一化完整配置；只能按下列范围与原始证据复查，不得与其他 token、计时或并发口径直接比较。",
+    noReviewCell: "当前没有规范化性能测试单元；提出性能结论前请按统一协议登记配置并提交证据。",
+    reviewProtocol: "统一复查协议",
+    testModel: "模型",
+    testEngine: "引擎",
+    testHardware: "硬件",
+    testTopology: "并行拓扑",
+    testLimits: "容量与批处理",
+    testGraph: "图模式",
+    testRuntime: "运行时版本",
+    testWorkload: "工作负载",
+    testTiming: "计时窗口",
+    testMetric: "指标口径",
+    launchCommand: "启动命令",
+    mtp4Example: "原生 MTP4 完整复现样例",
     allPhases: "全部阶段",
     allScenarios: "全部场景 / 用例",
     phaseAxis: "生命周期阶段",
@@ -196,6 +213,23 @@
     requirements: "Requirements",
     followup: "Owner follow-up issue",
     details: "Compatibility & technical details",
+    testReview: "Test configuration & review",
+    normalizedReview: "Published with normalized fields for a line-by-line baseline/candidate review.",
+    legacyReviewWarning: "This legacy publication does not normalize the full configuration. Review only the stated scope and raw evidence; do not compare it directly with a different token, timing, or concurrency contract.",
+    noReviewCell: "No normalized performance cell is published. Register the full configuration and evidence under the common protocol before making a performance claim.",
+    reviewProtocol: "Common review protocol",
+    testModel: "Model",
+    testEngine: "Engine",
+    testHardware: "Hardware",
+    testTopology: "Parallel topology",
+    testLimits: "Capacity and batching",
+    testGraph: "Graph mode",
+    testRuntime: "Runtime revisions",
+    testWorkload: "Workload",
+    testTiming: "Timing window",
+    testMetric: "Metric contract",
+    launchCommand: "Launch command",
+    mtp4Example: "Complete native MTP4 reproduction example",
     allPhases: "All phases",
     allScenarios: "All scenarios / use cases",
     phaseAxis: "Lifecycle phase",
@@ -1334,6 +1368,128 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
+  function formatReviewValue(value) {
+    if (value === undefined || value === null || value === "") return null;
+    if (Array.isArray(value)) return value.join(", ");
+    if (typeof value === "object") {
+      return Object.entries(value).map(([key, item]) => `${key}=${formatReviewValue(item)}`).join(" · ");
+    }
+    return String(value);
+  }
+
+  function modTestReview(item, result) {
+    const panel = element("section", "plugin-test-review");
+    panel.append(element("h3", "plugin-test-review-title", copy().testReview));
+    const review = result?.review;
+    const notice = element("p", review?.normalized
+      ? "plugin-test-review-status normalized"
+      : "plugin-test-review-status incomplete",
+    review?.normalized ? copy().normalizedReview : (review ? copy().legacyReviewWarning : copy().noReviewCell));
+    panel.append(notice);
+
+    const facts = element("dl", "plugin-component-facts plugin-test-review-facts");
+    const appendFact = (label, value) => {
+      const formatted = formatReviewValue(value);
+      if (!formatted) return;
+      const row = element("div");
+      row.append(element("dt", "", label), element("dd", "", formatted));
+      facts.append(row);
+    };
+
+    if (review?.normalized) {
+      const configuration = review.configuration || {};
+      const parameters = configuration.parameters || {};
+      const hardware = configuration.hardware || {};
+      const protocol = review.benchmark_protocol || {};
+      appendFact(copy().testModel, result.modelLabel);
+      appendFact(copy().testEngine, [configuration.engine, configuration.engine_version].filter(Boolean).join(" · "));
+      appendFact(copy().testHardware, hardware.label
+        ? `${hardware.label} × ${hardware.accelerator_count || 1}` : null);
+      appendFact(copy().testTopology, [
+        `TP${parameters.tensor_parallel_size}`,
+        `PP${parameters.pipeline_parallel_size}`,
+        `DP${parameters.data_parallel_size}`,
+        parameters.expert_parallel ? "EP" : null
+      ].filter(value => value && !value.endsWith("undefined")).join(" · "));
+      appendFact(copy().testLimits, [
+        parameters.dtype,
+        parameters.max_model_len != null ? `max_model_len=${parameters.max_model_len}` : null,
+        parameters.max_num_seqs != null ? `max_num_seqs=${parameters.max_num_seqs}` : null,
+        parameters.max_num_batched_tokens != null ? `max_num_batched_tokens=${parameters.max_num_batched_tokens}` : null,
+        parameters.gpu_memory_utilization != null ? `memory_utilization=${parameters.gpu_memory_utilization}` : null,
+        parameters.block_size != null ? `block_size=${parameters.block_size}` : null
+      ].filter(Boolean).join(" · "));
+      appendFact(copy().testGraph, [
+        parameters.graph_mode,
+        parameters.graph_capture_sizes?.length
+          ? `capture=${parameters.graph_capture_sizes.join(",")}` : null,
+        parameters.mtp_draft_tokens != null ? `MTP=${parameters.mtp_draft_tokens}` : null,
+        parameters.async_scheduling != null ? `async=${parameters.async_scheduling}` : null,
+        parameters.prefix_caching != null ? `prefix_cache=${parameters.prefix_caching}` : null,
+        parameters.enable_chunked_prefill != null ? `chunked_prefill=${parameters.enable_chunked_prefill}` : null
+      ].filter(Boolean).join(" · "));
+      appendFact(copy().testRuntime, parameters.runtime_base_commits);
+      appendFact(copy().testWorkload, [
+        protocol.protocol_id,
+        protocol.prepared_workload_sha256
+          ? `sha256=${protocol.prepared_workload_sha256}` : null,
+        protocol.tokenizer_fingerprint
+          ? `tokenizer=${protocol.tokenizer_fingerprint}` : null
+      ].filter(Boolean).join(" · "));
+      appendFact(copy().testTiming, [
+        review.measurement_seconds != null ? `${review.measurement_seconds}s` : null,
+        parameters.warmup_policy,
+        review.sampling_date_utc
+      ].filter(Boolean).join(" · "));
+      appendFact(copy().testMetric, [
+        review.metric,
+        review.aggregation,
+        review.concurrencies?.length ? `C=${review.concurrencies.join("/")}` : null,
+        review.evidence_aggregation
+      ].filter(Boolean).join(" · "));
+      if (parameters.launch_command_redacted) {
+        const command = element("details", "plugin-test-command");
+        const pre = element("pre");
+        pre.append(element("code", "", parameters.launch_command_redacted));
+        command.append(element("summary", "", copy().launchCommand), pre);
+        panel.append(facts, command);
+      } else {
+        panel.append(facts);
+      }
+    } else if (review) {
+      appendFact(copy().testModel, review.model_label || result.modelLabel);
+      appendFact(copy().testMetric, review.metric);
+      appendFact(copy().scope, review.scopes);
+      panel.append(facts);
+    }
+
+    const links = element("div", "plugin-test-review-links");
+    const protocolLink = element("a", "plugin-public-effect-link", `${copy().reviewProtocol} →`);
+    protocolLink.href = "#mod-test-protocol";
+    links.append(protocolLink);
+    if (review?.normalized && result.cohortId) {
+      const setting = element("a", "plugin-public-effect-link", language() === "zh" ? "精确设定 →" : "Exact setting →");
+      setting.href = `./leaderboard-runs.html?setting=${encodeURIComponent(result.cohortId)}#settings`;
+      links.append(setting);
+    }
+    if (review?.evidence_url) {
+      const evidence = element("a", "plugin-public-effect-link", `${copy().effectSource} ↗`);
+      evidence.href = review.evidence_url;
+      evidence.target = "_blank";
+      evidence.rel = "noopener noreferrer";
+      links.append(evidence);
+    }
+    if (item.id === "vspec") {
+      const example = element("a", "plugin-public-effect-link", `${copy().mtp4Example} ↗`);
+      example.href = "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/126eb1929a775051927e9de27a070b6018e39e58/reports/reproductions/native-mtp4-gamma4-20261027";
+      example.target = "_blank";
+      example.rel = "noopener noreferrer";
+      links.append(example);
+    }
+    panel.append(links);
+    return panel;
+  }
+
   function publicEffectPanel(item) {
     const result = local(item, "public_effect");
     if (!result || !item.public_effect_status || !item.public_effect_url) return null;
@@ -1425,6 +1581,7 @@ vllm-hust-ext extension check ${extensionId}`
     if (compatibility) detailBody.append(compatibility);
     const measuredResultDetails = modEvidenceDetails(item);
     if (measuredResultDetails) detailBody.append(measuredResultDetails);
+    detailBody.append(modTestReview(item, performance));
     if (performance?.diagnostic_only && performance.url) {
       const diagnostic = element("a", "plugin-public-effect-link", language() === "zh"
         ? "历史吞吐诊断原件 ↗" : "Historical throughput diagnostic ↗");
