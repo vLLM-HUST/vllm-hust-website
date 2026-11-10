@@ -11,7 +11,7 @@ body[data-page="plugins"] .plugin-hero h1 { max-width: none; font-size: clamp(58
 .lang-zh { display: none; }
 html[lang="zh"] .lang-en { display: none; }
 html[lang="zh"] .lang-zh { display: inline; }
-.plugin-section-nav { margin: 28px 0; display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); border: 1px solid #bfcac6; background: #fff; }
+.plugin-section-nav { margin: 28px 0; display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); border: 1px solid #bfcac6; background: #fff; }
 .plugin-section-nav a { min-height: 96px; padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between; color: #0c1112; text-decoration: none; border-right: 1px solid #bfcac6; }
 .plugin-section-nav a:last-child { border-right: 0; }
 .plugin-section-nav a:hover { color: #fff; background: #101818; box-shadow: inset 0 4px #39c6ca; }
@@ -452,6 +452,29 @@ body[data-page="plugins"] #muxpd:has(.plugin-launcher:is(.open,:hover,:focus-wit
 .plugin-performance > .performance-negative { color: #a43e29; }
 .plugin-performance-runtime { color: #61706f; font: 9px ui-monospace,SFMono-Regular,Menlo,monospace; }
 .plugin-performance p { margin: 0; line-height: 1.6; }
+.mod-test-protocol { display: grid; gap: 24px; margin: 24px 0; padding: 30px; }
+.mod-test-protocol-head { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(280px,.85fr); gap: 32px; align-items: end; }
+.mod-test-protocol-head h2 { margin: 8px 0 0; max-width: 760px; }
+.mod-test-protocol-head p { margin: 0; color: #465754; line-height: 1.7; }
+.mod-test-protocol-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); border: 1px solid #cbd4d1; }
+.mod-test-protocol-grid article { min-height: 210px; padding: 18px; border-right: 1px solid #cbd4d1; background: rgba(255,255,255,.72); }
+.mod-test-protocol-grid article:last-child { border-right: 0; }
+.mod-test-protocol-grid article > strong { color: #166749; font: 10px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: .08em; }
+.mod-test-protocol-grid h3 { margin: 28px 0 10px; font-size: 17px; line-height: 1.25; }
+.mod-test-protocol-grid p { margin: 0; color: #465754; font-size: 12px; line-height: 1.65; }
+.mod-test-protocol-grid .mod-test-protocol-warning { background: #fff3d7; box-shadow: inset 0 4px #c77619; }
+.mod-test-protocol-grid .mod-test-protocol-warning > strong { color: #9c5210; }
+.mod-test-protocol-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.plugin-test-review { display: grid; gap: 10px; padding: 16px; border: 1px solid rgba(16,84,86,.25); background: rgba(16,84,86,.045); }
+.plugin-test-review-title { margin: 0; font-size: 16px; }
+.plugin-test-review-status { margin: 0; padding-left: 10px; border-left: 3px solid #166749; color: #465754; font-size: 12px; line-height: 1.6; }
+.plugin-test-review-status.incomplete { border-left-color: #c77619; color: #75430f; }
+.plugin-test-review-facts { margin: 0; }
+.plugin-test-review-facts dd { overflow-wrap: anywhere; }
+.plugin-test-command { border-top: 1px solid rgba(16,84,86,.18); padding-top: 8px; }
+.plugin-test-command > summary { cursor: pointer; color: #105456; font-weight: 700; font-size: 12px; }
+.plugin-test-command pre { max-height: 280px; margin: 10px 0 0; padding: 12px; overflow: auto; background: #172321; color: #e7f1ef; white-space: pre-wrap; word-break: break-word; }
+.plugin-test-review-links { display: flex; flex-wrap: wrap; gap: 10px; }
 .plugin-mod-results-summary { display: grid; gap: 8px; margin: 12px 0; padding: 12px; border: 1px solid rgba(22,103,73,.22); background: rgba(22,103,73,.055); }
 .plugin-mod-results-title { color: #166749; font-size: 13px; }
 .plugin-mod-results-pending { color: var(--muted); font-size: 13px; line-height: 1.55; }
@@ -477,4 +500,7 @@ body[data-page="plugins"] #independent-engines a { color: #105456; }
 @media (max-width: 760px) {
   /* A tall sticky search/filter panel otherwise hides most of the catalog. */
   body[data-page="plugins"] .plugin-controls { position: static; }
+  .mod-test-protocol-head,.mod-test-protocol-grid { grid-template-columns: 1fr; }
+  .mod-test-protocol-grid article { min-height: 0; border-right: 0; border-bottom: 1px solid #cbd4d1; }
+  .mod-test-protocol-grid article:last-child { border-bottom: 0; }
 }

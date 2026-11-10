@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901-public-pages-20261024">
-<link rel="stylesheet" href="./assets/plugins.css?v=retest-20261107">
+<link rel="stylesheet" href="./assets/plugins.css?v=mod-review-20261110">
 </head>
 <body data-page="plugins">
   <nav class="site-nav">
@@ -79,6 +79,11 @@
 <span class="lang-en">Architecture Contract</span>
 <span class="lang-zh">架构契约</span>
 <small>ROLE · CONTRACT · DELIVERY</small>
+</a>
+<a href="#mod-test-protocol">
+<span class="lang-en">Test & Review</span>
+<span class="lang-zh">测试与复查</span>
+<small>CONFIG · WORKLOAD · METRIC</small>
 </a>
 <a href="#plugin-catalog">
 <span class="lang-en">Ecosystem Catalog</span>
@@ -856,6 +861,27 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       </div>
     </section>
 
+    <section id="mod-test-protocol" class="content-panel mod-test-protocol" aria-labelledby="mod-test-protocol-title">
+      <header class="mod-test-protocol-head">
+        <div>
+          <span class="eyebrow"><span class="lang-en">Author review contract</span><span class="lang-zh">作者复查契约</span></span>
+          <h2 id="mod-test-protocol-title"><span class="lang-en">A performance number is reviewable only with its full test contract.</span><span class="lang-zh">性能数字必须带完整测试契约，才能复查和交付。</span></h2>
+        </div>
+        <p><span class="lang-en">Every MOD result must pin the code, model, hardware, engine settings, workload bytes, output-length rule, timing boundary, metric formula, repetitions, and quality gate. Each measured card exposes the normalized fields it has; legacy records are marked when that contract is incomplete.</span><span class="lang-zh">每条 MOD 结果都必须固定代码、模型、硬件、引擎参数、工作负载字节、输出长度规则、计时边界、指标公式、重复轮次和质量门槛。每张实测卡片会展开已规范化字段；契约不完整的旧记录会明确标记。</span></p>
+      </header>
+      <div class="mod-test-protocol-grid">
+        <article><strong>01 · IDENTITY</strong><h3><span class="lang-en">Pin every executable input</span><span class="lang-zh">固定所有可执行输入</span></h3><p><span class="lang-en">MOD, vLLM, backend and benchmark commits; model revision; package, driver and CANN versions.</span><span class="lang-zh">记录 MOD、vLLM、后端与 benchmark commit，模型 revision，以及包、驱动和 CANN 版本。</span></p></article>
+        <article><strong>02 · ENGINE</strong><h3><span class="lang-en">Publish the complete serving cell</span><span class="lang-zh">公开完整服务单元</span></h3><p><span class="lang-en">TP/PP/DP/EP, dtype, graph mode and capture sizes, memory budget, sequence and token batching, cache and async switches.</span><span class="lang-zh">公开 TP/PP/DP/EP、dtype、图模式与 capture sizes、内存预算、序列与 token 批处理、缓存和异步开关。</span></p></article>
+        <article><strong>03 · WORKLOAD</strong><h3><span class="lang-en">Freeze bytes and output rules</span><span class="lang-zh">冻结输入字节与输出规则</span></h3><p><span class="lang-en">Record workload and tokenizer hashes, prompt counts, concurrency and arrival pattern. State whether output is fixed-length or uses a maximum with early stopping.</span><span class="lang-zh">记录 workload 与 tokenizer 哈希、请求数、并发和到达模式；明确输出是固定长度，还是允许提前停止的最大长度。</span></p></article>
+        <article class="mod-test-protocol-warning"><strong>04 · TIMING & METRIC</strong><h3><span class="lang-en">Never mix token or timing contracts</span><span class="lang-zh">不同 token 与计时口径不得混比</span></h3><p><span class="lang-en">Separate load, compile, graph capture and warmup from the measured window. Define the throughput numerator explicitly: actual generated tokens are not a fixed token budget.</span><span class="lang-zh">加载、编译、图捕获和预热必须与正式计时分离；吞吐分子必须明确定义，实际生成 token 数不等于固定 token 预算。</span></p></article>
+        <article><strong>05 · COMPARISON</strong><h3><span class="lang-en">Use matched, alternating repeats</span><span class="lang-zh">同规格交替重复</span></h3><p><span class="lang-en">Run Native and candidate on the same cell, alternate order, retain all repeats, activation receipts, raw outputs, quality checks and checksums.</span><span class="lang-zh">Native 与候选使用同一测试单元并交替顺序，保留全部重复、启用收据、原始输出、质量检查与校验和。</span></p></article>
+      </div>
+      <div class="mod-test-protocol-actions">
+        <a class="action-button" href="https://github.com/vLLM-HUST/vllm-hust-benchmark" target="_blank" rel="noopener noreferrer"><span class="lang-en">Benchmark source of truth ↗</span><span class="lang-zh">Benchmark 规范与证据源 ↗</span></a>
+        <a class="action-button secondary" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/126eb1929a775051927e9de27a070b6018e39e58/reports/reproductions/native-mtp4-gamma4-20261027" target="_blank" rel="noopener noreferrer"><span class="lang-en">Native MTP4 complete example ↗</span><span class="lang-zh">原生 MTP4 完整样例 ↗</span></a>
+      </div>
+    </section>
+
     <section id="plugin-catalog" class="content-panel plugin-legend" aria-labelledby="plugins-legend-title">
 <div>
 <span id="plugins-legend-kicker" class="eyebrow">Canonical classification</span>
@@ -1066,9 +1092,9 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
   </script>
   <script src="./assets/site.js?v=public-audit-20261101">
 </script>
-<script src="./assets/plugin-performance.js?v=effects-20261030"></script>
+<script src="./assets/plugin-performance.js?v=mod-review-20261110"></script>
 <script src="./assets/ecosystem-catalog.js?v=catalog-audit-20261105"></script>
-<script src="./assets/plugins-page.js?v=retest-20261107">
+<script src="./assets/plugins-page.js?v=mod-review-20261110">
 </script>
 </body>
 </html>
