@@ -1472,7 +1472,11 @@ vllm-hust-ext extension check ${extensionId}`
       setting.href = `./leaderboard-runs.html?setting=${encodeURIComponent(result.cohortId)}#settings`;
       links.append(setting);
     }
-    if (review?.evidence_url) {
+    // Legacy publications already expose their only raw source in the existing
+    // performance/diagnostic panel.  Repeating it here makes one observation
+    // appear to have two independent evidence entries.  A normalized cell has
+    // a separate review contract, so its exact evidence remains useful here.
+    if (review?.normalized && review.evidence_url) {
       const evidence = element("a", "plugin-public-effect-link", `${copy().effectSource} ↗`);
       evidence.href = review.evidence_url;
       evidence.target = "_blank";
