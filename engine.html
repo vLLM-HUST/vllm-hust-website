@@ -11,16 +11,26 @@
   <link rel="stylesheet" href="./assets/engine.css" />
 </head>
 <body data-page="engine">
-  <header class="engine-header">
-    <div class="engine-shell engine-header-inner">
-      <a class="engine-brand" href="./index.html#stack"><img src="./assets/brand/vllm-hust-icon.png" width="28" height="28" alt="" /> vLLM-HUST</a>
-      <nav aria-label="Engine">
-        <a id="engine-nav-stack" href="#composition">Composition</a>
-        <a id="engine-nav-release" href="#release">Release</a>
-      </nav>
-      <button id="langToggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html">
+        <span class="brand-mark">V</span>
+        <span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span>
+      </a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">MOD catalog</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
+      </div>
     </div>
-  </header>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
 
   <main>
     <section class="engine-hero" aria-labelledby="engine-title">
@@ -94,7 +104,7 @@
   </main>
 
   <footer class="engine-footer">
-    <div class="engine-shell engine-header-inner">
+    <div class="engine-shell engine-footer-inner">
       <a id="engine-footer-home" href="./index.html#stack">← vLLM-HUST runtime stack</a>
       <a id="engine-footer-repo" href="https://github.com/vLLM-HUST/vllm-hust-engine">Private repository ↗</a>
     </div>
@@ -103,8 +113,6 @@
   <script>
     window.vllmHustPageDict = {
       en: {
-        'engine-nav-stack': 'Composition',
-        'engine-nav-release': 'Release',
         'engine-kicker': 'Ascend serving stack',
         'engine-lede': 'A versioned inference stack for Ascend. Each release pins the vLLM and Ascend bases, MODs, worker and serving configuration to a measured run.',
         'engine-hero-benchmark': 'Read the public benchmark ↗',
@@ -136,8 +144,6 @@
         'engine-footer-repo': 'Private repository ↗'
       },
       zh: {
-        'engine-nav-stack': '组合',
-        'engine-nav-release': '发布',
         'engine-kicker': 'Ascend 推理服务栈',
         'engine-lede': '面向 Ascend 的版本化推理引擎。每个版本固定 vLLM 和 Ascend 基座、MOD、Worker 和实际服务参数，并关联对应的实测记录。',
         'engine-hero-benchmark': '查看公开实测报告 ↗',
