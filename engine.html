@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="vLLM-HUST Engine versions for Ascend. Explore the B1 r4 serving stack, its public benchmark evidence, and the archived release." />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/engine.html" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <title>vLLM-HUST Engine | B1 r4</title>
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
+  <link rel="stylesheet" href="./assets/engine.css" />
+</head>
+<body data-page="engine">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html">
+        <span class="brand-mark">V</span>
+        <span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span>
+      </a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">MOD catalog</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
+      </div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+
+  <main>
+    <section class="engine-hero" aria-labelledby="engine-title">
+      <div class="engine-shell engine-hero-grid">
+        <div>
+          <p class="engine-kicker" id="engine-kicker">Ascend serving stack</p>
+          <h1 id="engine-title">vLLM-HUST Engine</h1>
+          <p class="engine-lede" id="engine-lede">A versioned inference stack for Ascend. Each release pins the vLLM and Ascend bases, MODs, worker and serving configuration to a measured run.</p>
+          <div class="engine-actions">
+            <a class="engine-button engine-button-primary" id="engine-hero-benchmark" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/3218d7c85475fc7466785cbc9819c6ec9f25a90f/reports/full-answer-joint-20261030/README.md">Read the public benchmark ↗</a>
+            <a class="engine-button" id="engine-hero-release" href="#release">Explore B1 r4</a>
+          </div>
+        </div>
+
+        <aside class="engine-profile" aria-label="B1 r4">
+          <div class="engine-profile-top">
+            <strong>B1 r4</strong>
+            <time datetime="2026-10-30">2026-10-30</time>
+          </div>
+          <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
+          <div class="engine-layer"><span id="engine-runtime-label">Runtime</span><strong>vLLM-HUST + vLLM-Ascend-HUST</strong></div>
+          <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="engine-shell">
+      <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
+        <p class="engine-kicker">B1 r4</p>
+        <h2 id="engine-stack-title">Pinned composition</h2>
+        <div class="engine-cards">
+          <article>
+            <h3 id="engine-base-title">Runtime bases</h3>
+            <p id="engine-base-copy">vLLM-HUST provides the serving core. vLLM-Ascend-HUST supplies the Ascend backend, running with CANN.</p>
+          </article>
+          <article>
+            <h3 id="engine-mod-title">Serving optimizations</h3>
+            <p id="engine-mod-copy">Microflow, request-scoped KV recomputation, MTP2 and FULL graph mode run alongside the scheduling configuration.</p>
+          </article>
+          <article>
+            <h3 id="engine-worker-title">Worker and host state</h3>
+            <p id="engine-worker-copy">The frozen archive includes CorrectedWorker and the host-state implementation that groups pinned allocations by dtype within each state object.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="engine-section engine-release" id="release" aria-labelledby="engine-release-title">
+        <div>
+          <p class="engine-kicker" id="engine-release-kicker">First release</p>
+          <h2 id="engine-release-title">B1 r4 archive</h2>
+          <p id="engine-release-copy">The release contains the original frozen archive, the configuration from the measured run, recovered runtime and MOD snapshots, and a SHA256 manifest.</p>
+          <div class="engine-actions">
+            <a class="engine-button engine-button-primary" id="engine-release-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261030-r4">Open private Release ↗</a>
+            <a class="engine-button" id="engine-profile-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/engines/b1-r4.json">Pinned manifest ↗</a>
+          </div>
+          <p class="engine-note" id="engine-access">Both GitHub links require access to the private Engine repository.</p>
+        </div>
+        <div class="engine-status">
+          <h3 id="engine-status-title">Qualification status</h3>
+          <dl>
+            <dt id="engine-status-run">Original benchmark</dt>
+            <dd id="engine-status-run-value">MMLU-Pro fixed 200-question run on two Ascend 910B2 cards</dd>
+            <dt id="engine-status-hash">Release attachments</dt>
+            <dd id="engine-status-hash-value">All four SHA256 checks matched after download</dd>
+            <dt id="engine-status-startup">Independent deployment and NPU startup</dt>
+            <dd id="engine-status-startup-value">Pending qualification</dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="engine-footer">
+    <div class="engine-shell engine-footer-inner">
+      <a id="engine-footer-home" href="./index.html#stack">← vLLM-HUST runtime stack</a>
+      <a id="engine-footer-repo" href="https://github.com/vLLM-HUST/vllm-hust-engine">Private repository ↗</a>
+    </div>
+  </footer>
+
+  <script>
+    window.vllmHustPageDict = {
+      en: {
+        'engine-kicker': 'Ascend serving stack',
+        'engine-lede': 'A versioned inference stack for Ascend. Each release pins the vLLM and Ascend bases, MODs, worker and serving configuration to a measured run.',
+        'engine-hero-benchmark': 'Read the public benchmark ↗',
+        'engine-hero-release': 'Explore B1 r4',
+        'engine-model-label': 'Model',
+        'engine-runtime-label': 'Runtime',
+        'engine-hardware-label': 'Hardware',
+        'engine-stack-title': 'Pinned composition',
+        'engine-base-title': 'Runtime bases',
+        'engine-base-copy': 'vLLM-HUST provides the serving core. vLLM-Ascend-HUST supplies the Ascend backend, running with CANN.',
+        'engine-mod-title': 'Serving optimizations',
+        'engine-mod-copy': 'Microflow, request-scoped KV recomputation, MTP2 and FULL graph mode run alongside the scheduling configuration.',
+        'engine-worker-title': 'Worker and host state',
+        'engine-worker-copy': 'The frozen archive includes CorrectedWorker and the host-state implementation that groups pinned allocations by dtype within each state object.',
+        'engine-release-kicker': 'First release',
+        'engine-release-title': 'B1 r4 archive',
+        'engine-release-copy': 'The release contains the original frozen archive, the configuration from the measured run, recovered runtime and MOD snapshots, and a SHA256 manifest.',
+        'engine-release-link': 'Open private Release ↗',
+        'engine-profile-link': 'Pinned manifest ↗',
+        'engine-access': 'Both GitHub links require access to the private Engine repository.',
+        'engine-status-title': 'Qualification status',
+        'engine-status-run': 'Original benchmark',
+        'engine-status-run-value': 'MMLU-Pro fixed 200-question run on two Ascend 910B2 cards',
+        'engine-status-hash': 'Release attachments',
+        'engine-status-hash-value': 'All four SHA256 checks matched after download',
+        'engine-status-startup': 'Independent deployment and NPU startup',
+        'engine-status-startup-value': 'Pending qualification',
+        'engine-footer-home': '← vLLM-HUST runtime stack',
+        'engine-footer-repo': 'Private repository ↗'
+      },
+      zh: {
+        'engine-kicker': 'Ascend 推理服务栈',
+        'engine-lede': '面向 Ascend 的版本化推理引擎。每个版本固定 vLLM 和 Ascend 基座、MOD、Worker 和实际服务参数，并关联对应的实测记录。',
+        'engine-hero-benchmark': '查看公开实测报告 ↗',
+        'engine-hero-release': '查看 B1 r4',
+        'engine-model-label': '模型',
+        'engine-runtime-label': '运行时',
+        'engine-hardware-label': '硬件',
+        'engine-stack-title': '固定组合',
+        'engine-base-title': '运行时基座',
+        'engine-base-copy': 'vLLM-HUST 提供推理服务核心，vLLM-Ascend-HUST 提供 Ascend 后端，通过 CANN 运行。',
+        'engine-mod-title': '服务优化',
+        'engine-mod-copy': '实测组合将调度配置与 Microflow、逐请求 KV 重算、MTP2 和 FULL 图模式一起启用。',
+        'engine-worker-title': 'Worker 与主机状态',
+        'engine-worker-copy': '冻结原包包含 CorrectedWorker 和 packed-host 实现。锁页分配在同一状态对象内按 dtype 合并。',
+        'engine-release-kicker': '首个版本',
+        'engine-release-title': 'B1 r4 归档',
+        'engine-release-copy': 'Release 保存冻结原包、同轮实际运行配置、恢复的运行时及 MOD 快照，以及 SHA256 校验清单。',
+        'engine-release-link': '打开私有 Release ↗',
+        'engine-profile-link': '固定组合清单 ↗',
+        'engine-access': '两个 GitHub 入口均需私有 Engine 仓库访问权限。',
+        'engine-status-title': '验收状态',
+        'engine-status-run': '原始实测',
+        'engine-status-run-value': '已在双卡 Ascend 910B2 上完成 MMLU-Pro 固定 200 题实测',
+        'engine-status-hash': 'Release 附件',
+        'engine-status-hash-value': '四个附件下载后 SHA256 均一致',
+        'engine-status-startup': '独立部署和 NPU 启动',
+        'engine-status-startup-value': '待验收',
+        'engine-footer-home': '← vLLM-HUST 运行时栈',
+        'engine-footer-repo': '私有仓库 ↗'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=public-audit-20261101"></script>
+</body>
+</html>
