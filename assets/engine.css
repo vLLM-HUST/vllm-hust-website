@@ -155,8 +155,8 @@ body[data-page="engine"] {
 
 .engine-section { padding-block: clamp(36px, 6vw, 66px); }
 
-.engine-section h2,
-.engine-section h3 { color: var(--engine-ink); }
+body[data-page="engine"] .engine-section h2,
+body[data-page="engine"] .engine-section h3 { color: var(--engine-ink); }
 
 .engine-section h2 {
     margin: 0 0 20px;
