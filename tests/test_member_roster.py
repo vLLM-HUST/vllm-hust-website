@@ -124,7 +124,7 @@ def test_confirmed_mod_owners_are_visible_with_internal_advisors() -> None:
         "雷翔麟": ("llxler", "万瑶"),
         "张家万": ("Jiawan23", "万瑶"),
         "郁硕": ("Yushuo-star", "王雄"),
-        "毛潮云": ("Irisuko", "罗瑞坤"),
+        "毛瀚云": ("Irisuko", "罗瑞坤"),
     }
     roster_by_name = {item["name_zh"]: item for item in roster["members"]}
     profiles = snapshot["member_profiles"]
