@@ -1694,8 +1694,9 @@ def test_unfinished_mods_have_safe_inspection_commands_and_owner_issues() -> Non
 
 def test_unified_communication_is_host_integrated_and_hardware_restricted() -> None:
     component = by_id("unified-communication-migration")
-    assert component["ownership"] == "organization_maintained"
-    assert component["maintainers"] == ["ShuhaoZhangTony"]
+    assert component["ownership"] == "original_contributor_maintained"
+    assert component["maintainers"] == ["machuanhu"]
+    assert component["advisors"][0]["name_zh"] == "王雄"
     assert component["maturity"] == "experimental"
     assert component["compatibility"]["status"] == "experimental"
     assert "vllm-hust merge 8ec6ac0" in component["compatibility"]["versions"]
@@ -1721,7 +1722,7 @@ def test_unified_communication_is_host_integrated_and_hardware_restricted() -> N
     maintainers = WORKSHOP_METADATA["plugins"]["unified-communication-migration"][
         "maintainers"
     ]
-    assert [person["login"] for person in maintainers] == ["ShuhaoZhangTony"]
+    assert [person["login"] for person in maintainers] == ["machuanhu"]
 
 
 def test_promoted_runtime_entries_publish_current_hardware_contracts() -> None:
