@@ -25,7 +25,7 @@ def test_muxpd_joins_as_a_restricted_runtime_mod_with_organization_support():
     assert row["maturity"] == "experimental"
     assert row["evidence_level"] == "hardware_verified"
     assert row["maintainers"] == ["Irisuko"]
-    assert row["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛潮云"}]
+    assert row["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛瀚云"}]
     assert row["support_url"] == row["canonical_repository"] + "/issues"
     taxonomy = load("mod-taxonomy.json")["components"]["muxpd"]
     assert taxonomy["kind"] == "runtime_mod"
