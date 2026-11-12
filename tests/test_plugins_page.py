@@ -1606,7 +1606,7 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
             [
                 ("郑凌峰", "Amber1qq"),
                 ("王杰", "WMASTER123"),
-                ("Adr1anZheng", "Adr1anZheng"),
+                ("郑榆锦", "Adr1anZheng"),
             ],
             ["刘海坤", "张书豪"],
         ),
@@ -1649,7 +1649,7 @@ def test_confirmed_people_and_advisor_relationships_are_preserved() -> None:
 
     pyramid = by_id("pyramidkv-ascend-migration")
     assert pyramid["public_surface"] is True
-    assert pyramid["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛潮云"}]
+    assert pyramid["maintainer_profiles"] == [{"login": "Irisuko", "name": "毛瀚云"}]
     assert any(
         advisor["name_zh"] == "罗瑞坤" and advisor["relationship"] == "internal"
         for advisor in pyramid["advisors"]
