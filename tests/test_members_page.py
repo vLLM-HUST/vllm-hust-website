@@ -27,7 +27,7 @@ def test_verified_member_snapshot_is_minimized_and_unique() -> None:
         for login in ("ilnnfover", "Irisuko", "Jiawan23", "llxler", "Yushuo-star")
     } == {
         "ilnnfover": "李上上",
-        "Irisuko": "毛潮云",
+        "Irisuko": "毛瀚云",
         "Jiawan23": "张家万",
         "llxler": "雷翔麟",
         "Yushuo-star": "郁硕",
