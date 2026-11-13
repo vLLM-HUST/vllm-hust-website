@@ -19,7 +19,7 @@
   </div></nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
   <main class="site-shell standard-main">
-    <a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a>
+    <div class="guide-topbar"><a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><button id="download-test-script" class="secondary-download" type="button" disabled>下载一键测试脚本 ↓</button></div><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div>
     <header class="guide-hero">
       <p class="guide-eyebrow" data-guide-copy="eyebrow">执行指南 / 固定协议 v1</p>
       <h1 data-guide-copy="title">标准测试，按这四步完成</h1>
@@ -54,7 +54,7 @@
           <p class="guide-actions"><a id="engine-instructions" class="guide-text-link" data-guide-copy="engineDocs">打开固定版本的部署与运行说明 ↗</a><a id="runner-source" data-guide-copy="runnerSource">查看执行器源码 ↗</a></p>
         </section>
         <section id="run" class="guide-step">
-          <div class="step-heading"><span class="step-number">03</span><div><h2 data-guide-copy="run">执行配对测试</h2><p data-guide-copy="runLead">在 Engine 仓库根目录运行。先填写本机路径和物理卡号；输出目录必须全新。</p></div></div>
+          <div class="step-heading"><span class="step-number">03</span><div><h2 data-guide-copy="run">执行配对测试</h2><p data-guide-copy="runLead">使用 Engine 入口，或下载顶部的一键脚本，在 one_click.py 所在目录运行。先填写本机路径和卡号；输出目录必须全新。</p></div></div>
           <form id="run-parameters" class="run-parameters">
             <label><span data-guide-copy="modelPath">模型目录</span><input name="model" value="/path/to/model" autocomplete="off" spellcheck="false" required></label>
             <label><span data-guide-copy="sdkPath">固定 B1 SDK 的 Python</span><input name="sdk" value="/path/to/fixed-b1-sdk/bin/python" autocomplete="off" spellcheck="false" required></label>
@@ -88,6 +88,7 @@
   </main>
   <footer class="site-footer"><span id="footer-copy">固定标准 · 执行步骤 · 可复核证据</span></footer>
   <script src="./assets/site.js?v=public-audit-20261101"></script>
+  <script src="./assets/dataset-test-prompt.js?v=workflow-prompt-20261113"></script>
   <script src="./assets/dataset-standard-guide.js?v=workflow-20261113"></script>
   <script src="./assets/dataset-standard.js?v=workflow-20261113"></script>
 </body>
