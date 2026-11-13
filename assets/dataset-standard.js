@@ -1,3 +1,4 @@
+window.vllmHustPageDict = {en: {title: "Frozen dataset standard · vLLM-HUST", "footer-copy": "Frozen dataset protocol and input identities."}, zh: {title: "数据集固定标准 · vLLM-HUST", "footer-copy": "固定数据集协议与输入身份。"}};
 "use strict";
 (async () => {
   const status = document.getElementById("standard-status");
