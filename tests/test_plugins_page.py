@@ -2070,7 +2070,6 @@ def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():
     assert "python -m pip install vllm-hust-clm-lifecycle==0.1.1" in SCRIPT
 
 
-
 def test_instance_controller_uses_the_control_plane_catalog_grid() -> None:
     assert '<section id="instance-controller"' not in PAGE
     assert by_id("instance-controller")["system_role"] == "lifecycle_control_plane"
