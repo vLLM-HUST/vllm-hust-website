@@ -41,6 +41,11 @@ def main():
                         )
                         == "rgb(240, 179, 65)"
                     )
+                    page.wait_for_selector("#standard-content:not([hidden])")
+                    assert page.locator("#test-mode-quick").is_visible()
+                    assert page.locator("#test-mode-full").is_visible()
+                    assert not page.locator("#upstream-guides").evaluate("e => e.open")
+                    page.locator("#upstream-guides > summary").click()
                     page.wait_for_function(
                         "document.querySelectorAll('#designated-cards .focus-card').length === 5"
                     )
