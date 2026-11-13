@@ -1,4 +1,6 @@
-window.vllmHustPageDict = {en: {title: "Frozen dataset standard · vLLM-HUST", "footer-copy": "Frozen dataset protocol and input identities."}, zh: {title: "数据集固定标准 · vLLM-HUST", "footer-copy": "固定数据集协议与输入身份。"}};
+if (document.body.dataset.page === "dataset-standard") {
+  window.vllmHustPageDict = {en: {title: "Frozen dataset standard · vLLM-HUST", "footer-copy": "Frozen dataset protocol and input identities."}, zh: {title: "数据集固定标准 · vLLM-HUST", "footer-copy": "固定数据集协议与输入身份。"}};
+}
 "use strict";
 (async () => {
   const status = document.getElementById("standard-status");
@@ -62,15 +64,17 @@ window.vllmHustPageDict = {en: {title: "Frozen dataset standard · vLLM-HUST", "
       for (const value of [dataset.name, `${dataset.tasks} / ${dataset.source_tasks}`, dataset.requests_per_arm, scope, `${dataset.selection_zh} ${dataset.selection_en}`, settings]) row.append(text("td", String(value)));
       document.getElementById("standard-rows").append(row);
     }
-    for (const [name, artifact] of Object.entries(data.artifacts)) {
+    for (const [name, artifact] of Object.entries(document.getElementById("standard-files") ? data.artifacts : {})) {
       const item = document.createElement("li"); const link = text("a", name);
       link.href = `./data/dataset-standard-v1/${name}`; link.download = name;
       item.append(link, text("code", ` ${artifact.bytes} bytes · ${artifact.sha256}`));
       document.getElementById("standard-files").append(item);
     }
-    for (const [name, value] of Object.entries(data.metrics)) document.getElementById("standard-metrics").append(text("dt", name), text("dd", value));
-    for (const value of data.invariants) document.getElementById("standard-invariants").append(text("li", value));
-    document.getElementById("standard-access").textContent = `${data.execution.access} ${data.execution.engine_binding} ${data.execution.trace_model_binding} ${data.execution.judge}`;
+    if (document.getElementById("standard-metrics")) {
+      for (const [name, value] of Object.entries(data.metrics)) document.getElementById("standard-metrics").append(text("dt", name), text("dd", value));
+      for (const value of data.invariants) document.getElementById("standard-invariants").append(text("li", value));
+      document.getElementById("standard-access").textContent = `${data.execution.access} ${data.execution.engine_binding} ${data.execution.trace_model_binding} ${data.execution.judge}`;
+    }
     document.getElementById("standard-content").hidden = false;
     status.textContent = "来源与标准校验通过 / Source and standard verified";
   } catch (error) {

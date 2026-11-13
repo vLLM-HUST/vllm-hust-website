@@ -285,8 +285,8 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
 
   function render() {
     const labels = {
-      'entry-title': ['Project-designated datasets', '项目指定数据集测试'],
-      'entry-lead': ['Original data, installation, execution and scoring for the five designated datasets.', '指定五项数据集的原始来源、安装、测试入口与评分说明。先选择数据集，再按对应客户端或沙箱流程执行。'],
+      'entry-title': ['Frozen dataset tests', '冻结数据集测试'],
+      'entry-lead': ['Choose quick or full testing with the frozen samples, budgets and one-click commands below.', '选择快速或全量测试，使用下方冻结的样本、预算与一键命令。'],
       'entry-jump-basic': ['The five datasets', '指定五项数据集'], 'entry-jump-special': ['2. Special scoring', '2. 特殊评分'], 'entry-jump-sandbox': ['3. Agent sandboxes', '3. 闭环任务'],
       'entry-all-link': ['All 118 sources', '全部 118 来源'],
       'entry-install-title': ['1. Shared preparation, then a supported runner', '1. 统一准备，再选择已支持的执行入口'],
@@ -315,7 +315,11 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
   function revealHash() {
     const id = decodeURIComponent(location.hash.slice(1));
     const target = id && document.getElementById(id);
-    if (target && target.tagName === 'DETAILS') target.open = true;
+    if (target) {
+      for (let node = target; node; node = node.parentElement) {
+        if (node.tagName === 'DETAILS') node.open = true;
+      }
+    }
   }
   document.getElementById('entry-search').addEventListener('input', () => { if (catalog) sources(); });
   document.getElementById('entry-filter').addEventListener('change', () => { if (catalog) sources(); });
