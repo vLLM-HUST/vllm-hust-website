@@ -23,7 +23,7 @@
     <header class="guide-hero">
       <p class="guide-eyebrow" data-guide-copy="eyebrow">执行指南 / 固定协议 v1</p>
       <h1 data-guide-copy="title">标准测试，按这四步完成</h1>
-      <p class="guide-lead" data-guide-copy="lead">B0 是对照配置，B1 是你的 MOD 候选配置；用同一批输入比较质量和性能。</p>
+      <p class="guide-lead" data-guide-copy="lead">B0 是对照配置，B1 是启用待测 MOD 的候选配置；用同一批输入比较质量和性能。</p>
       <p class="guide-boundary" data-guide-copy="boundary">完整测试覆盖项目冻结的五项范围；SWE / Terminal 仅测轨迹回放性能。跑完测试后，还须单独判断各项验收目标是否达标。</p>
     </header>
     <p id="standard-status" class="guide-status" role="status">正在校验测试标准与运行指南…</p>
@@ -42,8 +42,8 @@
       <div class="guide-body">
         <section id="choose-scope" class="guide-step">
           <div class="step-heading"><span class="step-number">01</span><div><h2 data-guide-copy="choose">选择测试范围</h2><p data-guide-copy="chooseLead">联调选快速；正式完整测试选五项。两种模式都需要 B0 / B1。</p></div></div>
-          <fieldset class="test-targets"><legend data-guide-copy="targetTitle">先选择要测什么</legend><label><input type="radio" name="test-target" value="mod" checked><span><strong data-guide-copy="modTarget">评估自己的 MOD</strong><small data-guide-copy="modTargetNote">默认：同一基础引擎，关闭 / 启用目标 MOD</small></span></label><label><input type="radio" name="test-target" value="reference-engine"><span><strong data-guide-copy="engineTarget">复跑参考 Engine</strong><small data-guide-copy="engineTargetNote">可选：已冻结的 vLLM-HUST Engine 组合</small></span></label></fieldset>
-          <p class="guide-boundary" data-guide-copy="armDefinitions">本页 MOD 对比默认 B0 = 同一基础配置关闭目标 MOD，B1 = 启用你的 MOD。每轮冻结实际版本与开关，不把 B1 固定为某个 Engine。</p>
+          <fieldset class="test-targets"><legend data-guide-copy="targetTitle">先选择要测什么</legend><label><input type="radio" name="test-target" value="mod" checked><span><strong data-guide-copy="modTarget">评估待测 MOD</strong><small data-guide-copy="modTargetNote">默认：同一基础引擎，关闭 / 启用目标 MOD</small></span></label><label><input type="radio" name="test-target" value="reference-engine"><span><strong data-guide-copy="engineTarget">复跑参考 Engine</strong><small data-guide-copy="engineTargetNote">可选：已冻结的 vLLM-HUST Engine 组合</small></span></label></fieldset>
+          <p class="guide-boundary" data-guide-copy="armDefinitions">本页 MOD 对比默认 B0 = 同一基础配置关闭目标 MOD，B1 = 启用待测 MOD。每轮冻结实际版本与开关，不把 B1 固定为某个 Engine。</p>
           <div id="test-modes"><div id="test-mode-cards" class="test-mode-cards" role="radiogroup" aria-label="测试范围"></div></div>
           <p id="test-mode-scope" class="guide-note"></p>
           <details class="guide-details" id="time-details"><summary data-guide-copy="timing">预计耗时包含什么？</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p></details>
@@ -59,14 +59,14 @@
           <div class="step-heading"><span class="step-number">03</span><div><h2 data-guide-copy="run">执行配对测试</h2><p data-guide-copy="runLead">使用 Engine 入口，或下载顶部的一键脚本，在 one_click.py 所在目录运行。先填写本机路径和卡号；输出目录必须全新。</p></div></div>
           <div id="mod-run">
             <form id="mod-parameters" class="run-parameters">
-              <label><span data-guide-copy="modRepo">MOD 仓库或本地路径</span><input name="mod_repository" placeholder="https://github.com/your-team/your-mod" autocomplete="off" spellcheck="false"></label>
+              <label><span data-guide-copy="modRepo">MOD 仓库或本地路径</span><input name="mod_repository" placeholder="https://github.com/example-org/candidate-mod" autocomplete="off" spellcheck="false"></label>
               <label><span data-guide-copy="modRevision">MOD 提交或版本</span><input name="mod_revision" placeholder="commit / tag" autocomplete="off" spellcheck="false"></label>
               <label><span data-guide-copy="baseRuntime">基础引擎与版本</span><input name="base_runtime" placeholder="engine + commit / version" autocomplete="off" spellcheck="false"></label>
               <label><span data-guide-copy="modActivation">MOD 启用与关闭方式</span><input name="mod_activation" placeholder="install / enable / disable" autocomplete="off" spellcheck="false"></label>
             </form>
             <p class="guide-note" data-guide-copy="modParameterHint">可先填写项目信息，再下载 AI 提示词；填写内容仅用于本地生成文件。</p>
-            <button id="download-mod-prompt" type="button" class="mod-prompt-button" data-guide-copy="downloadModPrompt">下载自己的 MOD 测试提示词 ↓</button>
-            <p class="guide-callout" data-guide-copy="modRunnerBoundary">接入你项目中实际可用的测试执行器，核对安装、启用 / 关闭、推理与评分接口。顶部参考 Engine 脚本只复跑固定组合，不会自动装载任意 MOD；不能只改一个 B1 名称就声称完成接入。</p>
+            <button id="download-mod-prompt" type="button" class="mod-prompt-button" data-guide-copy="downloadModPrompt">下载待测 MOD 测试提示词 ↓</button>
+            <p class="guide-callout" data-guide-copy="modRunnerBoundary">接入项目中实际可用的测试执行器，核对安装、启用 / 关闭、推理与评分接口。顶部参考 Engine 脚本只复跑固定组合，不会自动装载任意 MOD；不能只改一个 B1 名称就声称完成接入。</p>
           </div>
           <div id="reference-run" hidden>
           <form id="run-parameters" class="run-parameters">
