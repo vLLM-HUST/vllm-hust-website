@@ -1,6 +1,7 @@
 """Verify the execution guide, commands, languages, contrast and integrity guards."""
 
 import argparse
+import hashlib
 import json
 import re
 import shlex
@@ -15,6 +16,55 @@ p.add_argument("--output", required=True)
 args = p.parse_args()
 out = Path(args.output)
 out.mkdir(parents=True, exist_ok=True)
+prompts = {}
+
+
+def check_prompt_download(page, language):
+    button = page.locator("#download-test-prompt")
+    assert button.is_enabled()
+    with page.expect_download() as pending:
+        button.click()
+    download = pending.value
+    assert download.suggested_filename.endswith(f"-ai-prompt-{language}.txt")
+    content = Path(download.path()).read_text(encoding="utf-8-sig")
+    for required in (
+        "five-datasets-20261113-v1",
+        "standard_sha256:",
+        "run_guide_sha256:",
+        "reference_runner_commit:",
+        "--datasets mmlu,hle,frontier,swe,terminal",
+        "--b1-python /path/to/fixed-b1-sdk/bin/python",
+        "--physical-devices 0,1",
+        "execution-checklist.json",
+        "max_output_tokens=16384",
+        "judge_max_tokens=8192",
+        "tool_choice=none",
+        "3.4.1",
+        "3.4.2",
+        "3.4.3",
+        "3.4.4",
+    ):
+        assert required in content, required
+    if language == "zh":
+        assert "标准测试 AI 提示词" in content and "不测任务解决率" in content
+    else:
+        assert "AI prompt for standard testing" in content
+        assert not re.search(r"[\u4e00-\u9fff]", content)
+    if language in prompts:
+        assert prompts[language] == content, (
+            "Both pages must download the same standard"
+        )
+    prompts[language] = content
+    with page.expect_download() as pending_script:
+        page.locator("#download-test-script").click()
+    script = pending_script.value
+    assert script.suggested_filename == "one_click.py"
+    raw = Path(script.path()).read_bytes()
+    expected = re.search(r"downloaded_script_sha256: ([a-f0-9]{64})", content)[1]
+    assert hashlib.sha256(raw).hexdigest() == expected
+    runner = re.search(r"reference_runner_commit: ([a-f0-9]{40})", content)[1]
+    assert f'COMMIT = "{runner}"' in raw.decode()
+    compile(raw, "downloaded-one_click.py", "exec")
 
 
 def no_overflow(page):
@@ -177,6 +227,8 @@ with sync_playwright() as play:
                             ".summary-links a",
                         ],
                     )
+                check_prompt_download(page, "en")
+                check_contrast(page, ["#download-test-prompt", "#download-test-script"])
                 no_overflow(page)
                 page.evaluate("window.scrollTo(0,0)")
                 page.screenshot(
@@ -202,6 +254,7 @@ with sync_playwright() as play:
                         details.evaluate("element => element.open = false")
                 else:
                     assert page.locator("#entry-title").inner_text() == "测试数据集"
+                check_prompt_download(page, "zh")
                 no_overflow(page)
                 assert not errors, errors
                 page.evaluate("window.scrollTo(0,0)")
@@ -225,10 +278,28 @@ with sync_playwright() as play:
             page.goto(url, wait_until="networkidle")
             page.wait_for_selector("#standard-status[role=alert]")
             assert page.locator("#standard-content").is_hidden()
+            assert page.locator("#download-test-prompt").is_disabled()
+            assert page.locator("#download-test-script").is_disabled()
             assert expected in page.locator("#standard-status").get_attribute(
                 "data-error"
             )
             page.close()
+        page = browser.new_page()
+        page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
+        page.goto(url, wait_until="networkidle")
+        page.wait_for_selector("#standard-content:not([hidden])")
+        page.route(
+            "**/downloads/standard-test/one_click.py",
+            lambda route: route.fulfill(status=200, body="print('modified')"),
+        )
+        downloads = []
+        page.on("download", lambda download: downloads.append(download))
+        page.locator("#download-test-script").click()
+        page.wait_for_function(
+            "document.querySelector('#prompt-download-status').textContent.includes('verification failed')"
+        )
+        assert not downloads
+        page.close()
     browser.close()
 print(
     json.dumps(
@@ -239,6 +310,7 @@ print(
             languages=["en", "zh"],
             contrast="at least 4.5:1",
             commands="mode selection, shell quoting, clipboard and validation",
+            downloads="bilingual prompts, pinned executable, tamper rejection",
             integrity_failure="rejected",
         )
     )

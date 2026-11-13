@@ -29,12 +29,14 @@
     if (guideDigest !== guideEntry.sha256 || guideRaw.byteLength !== guideEntry.bytes) throw new Error("run guide checksum mismatch");
     const guide = JSON.parse(new TextDecoder().decode(guideRaw));
     if (guide.standard_id !== data.standard_id || guide.standard_sha256 !== digest || guide.modes.length !== 2) throw new Error("run guide standard mismatch");
+    window.vllmHustTestPrompt.setPayload({data, guide, source, entry, digest, guideSource, guideEntry, guideDigest});
     if (document.body.dataset.page === "dataset-entrypoints") {
       window.vllmHustTestSummary.render({data, guide, source, entry, digest, guideSource, guideEntry, guideDigest});
       return;
     }
     window.vllmHustStandardGuide.render({data, guide, source, entry, digest, guideSource, guideEntry, guideDigest});
   } catch (error) {
+    window.vllmHustTestPrompt.fail();
     if (document.body.dataset.page === "dataset-entrypoints") {
       window.vllmHustTestSummary.fail(error);
       return;
