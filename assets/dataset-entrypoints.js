@@ -286,7 +286,7 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
   function render() {
     const labels = {
       'entry-title': ['Test datasets', '测试数据集'],
-      'entry-lead': ['Evaluate your MOD: compare the same base configuration with the target MOD off / on using frozen workloads.', '测试自己的 MOD：用同一基础配置关闭 / 启用目标 MOD，按冻结数据范围比较 B0 / B1。'],
+      'entry-lead': ['Evaluate the target MOD: compare the same base configuration with the target MOD off / on using frozen workloads.', 'MOD 效果测试：用同一基础配置关闭 / 启用目标 MOD，按冻结数据范围比较 B0 / B1。'],
       'entry-jump-basic': ['The five datasets', '指定五项数据集'], 'entry-jump-special': ['2. Special scoring', '2. 特殊评分'], 'entry-jump-sandbox': ['3. Agent sandboxes', '3. 闭环任务'],
       'entry-all-link': ['All 118 sources', '全部 118 来源'],
       'entry-install-title': ['1. Shared preparation, then a supported runner', '1. 统一准备，再选择已支持的执行入口'],

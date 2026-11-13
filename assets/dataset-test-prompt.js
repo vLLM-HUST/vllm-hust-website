@@ -18,8 +18,8 @@
   const language = () => (window.vllmHustSite?.getCurrentLang()
     || localStorage.getItem('vllm-hust_lang') || navigator.language || 'en').startsWith('zh') ? 'zh' : 'en';
   const copy = {
-    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '参考 Engine 一键脚本 ↓', scriptReady: '仅复跑固定 vLLM-HUST Engine 组合，不能自动接入自有 MOD', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: '默认测自己的 MOD；脚本仅用于参考 Engine'},
-    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Reference Engine script ↓', scriptReady: 'Reproduces the fixed vLLM-HUST Engine only; does not integrate arbitrary MODs', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Own MOD by default; script is for the reference Engine'},
+    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '参考 Engine 一键脚本 ↓', scriptReady: '仅复跑固定 vLLM-HUST Engine 组合，不能自动接入待测 MOD', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: '默认评估待测 MOD；脚本仅用于参考 Engine'},
+    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Reference Engine script ↓', scriptReady: 'Reproduces the fixed vLLM-HUST Engine only; does not integrate arbitrary MODs', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Target MOD evaluation by default; script is for the reference Engine'},
   };
 
   function command(guide, mode) {
@@ -76,16 +76,16 @@
       const configuration = form ? Object.fromEntries(new FormData(form)) : {};
       const project = JSON.stringify(Object.fromEntries(['mod_repository', 'mod_revision', 'base_runtime', 'mod_activation']
         .map(key => [key, configuration[key]?.trim() || (zh ? '待核对' : 'To be confirmed')])), null, 2);
-      if (zh) return `# 标准测试 AI 提示词：评估自己的 MOD
+      if (zh) return `# 标准测试 AI 提示词：评估待测 MOD
 
 test_target: own_mod
 selected_scope: ${selected.id}
 selected_profiles: ${selected.datasets_flag}
 
-请在已授权环境中评估我的 MOD。先读取实际 MOD 仓库、基础引擎文档与已有测试执行器，核对接入方式，具备条件后实际执行并交付可复核报告。缺少仓库/提交、环境或输入时先核对缺项；未执行、准备通过和历史成绩分别记录。
+请在已授权环境中评估待测 MOD。先读取实际 MOD 仓库、基础引擎文档与已有测试执行器，核对接入方式，具备条件后实际执行并交付可复核报告。缺少仓库/提交、环境或输入时先核对缺项；未执行、准备通过和历史成绩分别记录。
 
 ## 1. 先定义 B0 / B1，而不是指定某个 Engine
-B0 默认是同一基础引擎、提交与配置关闭目标 MOD；B1 是该基础配置启用我开发的 MOD。B1 不默认等于 vllm-hust-engine。保留基础引擎已经默认提供的优化，不能人为削弱共同基线；课题另有基线约定时须先明确其身份及本轮适用范围。
+B0 默认是同一基础引擎、提交与配置关闭目标 MOD；B1 是该基础配置启用待测 MOD。B1 不默认等于 vllm-hust-engine。保留基础引擎已经默认提供的优化，不能人为削弱共同基线；课题另有基线约定时须先明确其身份及本轮适用范围。
 以下是用户填写的项目信息，需到仓库核对：
 ${project}
 
@@ -94,7 +94,7 @@ ${project}
 ## 2. 沿用冻结工作负载
 ${identities}
 
-以上 reference_runner 与公开 bootstrap 是可选参考实现的身份，不定义本轮 B1，也不是必须安装的运行环境。默认不要恢复固定 Engine 替换我的 MOD，不给既有参考脚本添加其不支持的通用 MOD 参数。通用自有 MOD 接入必须按实际执行器实现；未接入不得宣称已支持。
+以上 reference_runner 与公开 bootstrap 是可选参考实现的身份，不定义本轮 B1，也不是必须安装的运行环境。默认不要恢复固定 Engine 替换待测 MOD，不给既有参考脚本添加其不支持的通用 MOD 参数。通用待测 MOD 接入必须按实际执行器实现；未接入不得宣称已支持。
 核对标准、指南与附件的版本和 SHA256。本次执行 ${field(selected, 'title')}（${selected.datasets_flag}）；快速检查不能替代五项验收。
 ${field(guide, 'scope')}
 
@@ -103,7 +103,7 @@ ${scope}
 ## 3. 固定可比条件
 两臂使用相同模型权重、tokenizer/模板、硬件与设备数、并行方式、任务/顺序/提示词、并发、生成预算、EOS、评分器及测量区间。保持共同基线优化，记录必须的 MOD 适配差异与额外开销。根据本轮实际引擎准备依赖、设备与数据访问权；不把参考 Engine 的私有源码、固定 SDK 或双卡环境列为所有 MOD 的通用前提。
 trace 仍受本标准 Qwen3.5-35B-A3B BF16 tokenizer 与 16K 输入资格绑定；换模型/tokenizer 须新建 profile，不在原标准下静默重算。两臂匹配冻结 token ID 哈希，使用新 cache_salt 与零 KV 复用；不执行历史工具命令。
-参考指南的耗时只对应其固定 Engine/模型/硬件；为自己的 MOD 重新排期，不承诺同样时长。
+参考指南的耗时只对应其固定 Engine/模型/硬件；为待测 MOD 重新排期，不承诺同样时长。
 
 ## 4. 接入实际执行器并运行
 先找到项目实际支持的输入格式、服务/推理入口、MOD 开关和原始评分器，将冻结清单逐项绑定到实际请求；给出可在当前环境执行的两臂命令，不能杜撰通用 --mod 参数或把改名当成接入。
@@ -124,21 +124,21 @@ ${invariants}
 
 ## 6. 交付证据与结论
 交付本轮 B0/B1 定义与实际命令、MOD/基础引擎/依赖提交、配置差异、启用证据、模型/硬件/judge 身份、冻结输入与校验、原始 SSE/时间戳、评分、设备采样、清理、失败和未执行阶段，以及可复算报告。
-逐项列出所选范围和两臂计划/实际/成功/失败/截断/未决/未完成数；质量、吞吐、TTFT/TPOT、连续 C8、成本与额外开销；MOD 收益/回退及条件。不能借参考 Engine 的历史成绩证明我的 MOD 达标。
+逐项列出所选范围和两臂计划/实际/成功/失败/截断/未决/未完成数；质量、吞吐、TTFT/TPOT、连续 C8、成本与额外开销；MOD 收益/回退及条件。不能借参考 Engine 的历史成绩证明待测 MOD 达标。
 MOD 机制收益和项目四项目标验收分开。若同时申请项目验收，按相应大纲核对 3.4.1 有效算力、3.4.2 吞吐与时延、3.4.3 数据集与长稳、3.4.4 成本的正式基线、门槛与适用条件，未测项明确保留。
 执行指南：https://vllm-hust.sage.org.ai/dataset-standard.html
 项目验收入口：https://vllm-hust.sage.org.ai/b0-b1.html
 `;
-      return `# AI prompt for standard testing: evaluate my MOD
+      return `# AI prompt for standard testing: evaluate the target MOD
 
 test_target: own_mod
 selected_scope: ${selected.id}
 selected_profiles: ${selected.datasets_flag}
 
-Evaluate my MOD in an authorized environment. Read the actual MOD repository, base-engine documentation and existing test runner, establish integration, execute when prerequisites are available and deliver reproducible evidence. Identify missing repository/commit, inputs or runtime facts first. Keep unexecuted stages, preparation checks and historical measurements distinct.
+Evaluate the target MOD in an authorized environment. Read the actual MOD repository, base-engine documentation and existing test runner, establish integration, execute when prerequisites are available and deliver reproducible evidence. Identify missing repository/commit, inputs or runtime facts first. Keep unexecuted stages, preparation checks and historical measurements distinct.
 
 ## 1. Define B0 / B1 for this comparison
-B0 defaults to the same base engine commit/configuration with the target MOD off; B1 enables my MOD in that configuration. B1 does not default to vllm-hust-engine. Preserve optimizations already enabled in the base engine rather than weakening the control. Document any project-mandated alternative baseline and its applicability.
+B0 defaults to the same base engine commit/configuration with the target MOD off; B1 enables the target MOD in that configuration. B1 does not default to vllm-hust-engine. Preserve optimizations already enabled in the base engine rather than weakening the control. Document any project-mandated alternative baseline and its applicability.
 User-supplied project details to verify in the repository:
 ${project}
 
@@ -147,7 +147,7 @@ Freeze MOD/base-engine/dependency commits, installation/build instructions, enab
 ## 2. Reuse the frozen workload
 ${identities}
 
-reference_runner and bootstrap identities describe an optional reference implementation, not the required B1 or runtime. Do not restore that fixed Engine in place of my MOD, invent unsupported generic MOD flags for it, or claim integration merely by renaming B1. Integrate my actual runner before claiming support.
+reference_runner and bootstrap identities describe an optional reference implementation, not the required B1 or runtime. Do not restore that fixed Engine in place of the target MOD, invent unsupported generic MOD flags for it, or claim integration merely by renaming B1. Integrate the project’s actual runner before claiming support.
 Verify standard/guide/artifact versions and SHA256. Run the selected ${field(selected, 'title')} scope (${selected.datasets_flag}); quick cannot replace five-profile acceptance.
 ${field(guide, 'scope')}
 
@@ -176,7 +176,7 @@ From this pair compute throughput change (B1/B0−1), TTFT/TPOT improvement (1�
 
 ## 6. Deliver
 Provide actual B0/B1 definitions and commands, MOD/base-engine/dependency commits, differences, activation evidence, model/hardware/judge identities, frozen inputs/checks, raw SSE/timestamps, grading, device samples, cleanup, failed/unexecuted stages and recomputable reports.
-List selected scope and both arms' planned/executed/success/failure/truncation/unresolved/unfinished counts; quality, throughput, TTFT/TPOT, C8, costs and overhead; MOD gains/regressions and conditions. Do not use historical reference Engine measurements to certify my MOD.
+List selected scope and both arms' planned/executed/success/failure/truncation/unresolved/unfinished counts; quality, throughput, TTFT/TPOT, C8, costs and overhead; MOD gains/regressions and conditions. Do not use historical reference Engine measurements to certify the target MOD.
 Keep mechanism effects separate from project acceptance. If project acceptance is requested, verify the formal baseline, thresholds and applicability for 3.4.1 compute, 3.4.2 throughput/latency, 3.4.3 datasets/stability and 3.4.4 cost. Retain unmeasured targets.
 Guide: https://vllm-hust.sage.org.ai/dataset-standard.html
 Project targets: https://vllm-hust.sage.org.ai/b0-b1.html
