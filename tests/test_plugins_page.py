@@ -927,7 +927,9 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         )
     }
     people_cards |= {"core-attention-boundary", "ascend-attention-boundary"}
-    assert set(WORKSHOP_METADATA["plugins"]) == people_cards
+    # A live metadata refresh also includes the external Instance Controller.
+    # The published catalog already carries its maintainer independently.
+    assert set(WORKSHOP_METADATA["plugins"]) - {"instance-controller"} == people_cards
     public_catalog_ids = {
         item["id"]
         for item in REGISTRY["components"]
