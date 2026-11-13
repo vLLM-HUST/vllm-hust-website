@@ -1,4 +1,6 @@
-# 标准测试一键引导脚本
+# 固定参考 Engine 一键引导脚本
+
+本脚本只复跑已冻结的参考 Engine 组合，不会自动装载任意 MOD。评估自己的 MOD 时，请在执行指南中选择默认的 MOD 流程，使用项目实际执行器。
 
 `one_click.py` 是公开 benchmark 中 `engine_bootstrap.py` 的逐字节副本，仅改下载文件名。
 

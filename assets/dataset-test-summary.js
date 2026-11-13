@@ -12,14 +12,14 @@
   };
   const copy = {
     zh: {
-      title: '测试数据集', lead: '先选测试范围，再按执行指南完成 B0/B1 配对与结果核对。', guideTitle: '第一次做标准测试？从这里开始', guideLead: '准备条件、可复制命令、结果核对，按四步完成。', copy: '复制命令', copied: '已复制', copyFailed: '请选中命令手动复制', timingHint: '时间为参考配置的排期估算，安装、下载和失败重跑另计。首次运行前请先检查执行指南的环境要求。', scope: '测试范围', dataset: '数据集', tasks: '固定任务',
+      title: '测试数据集', lead: '测试自己的 MOD：用同一基础配置关闭 / 启用目标 MOD，按冻结数据范围比较 B0 / B1。', guideTitle: '第一次做标准测试？从这里开始', guideLead: '准备条件、可复制命令、结果核对，按四步完成。', copy: '复制命令', copied: '已复制', copyFailed: '请选中命令手动复制', timingHint: '时间仅为固定参考 Engine 组合的排期估算。自己的 MOD 需按实际引擎和硬件重新估时；先在指南中定义 B0 / B1。', scope: '测试范围', dataset: '数据集', tasks: '固定任务',
       requests: '每臂请求', purpose: '用途', protocol: '查看测试执行指南 →',
       notes: '运行说明', upstream: '原始数据集与工具', loading: '加载中…',
       error: '测试标准加载失败，请稍后重试。', quality: '质量与性能',
       trace: '轨迹回放性能', guide: '运行指南', source: '标准来源',
     },
     en: {
-      title: 'Test datasets', lead: 'Choose a scope, then follow the guide to run B0/B1 and review the results.', guideTitle: 'Running a standard test for the first time?', guideLead: 'Prerequisites, commands and result checks in four steps.', copy: 'Copy command', copied: 'Copied', copyFailed: 'Select the command and copy manually', timingHint: 'Planning estimates for the reference configuration; installation, downloads and failed-run repeats are extra. Check the execution guide before your first run.', scope: 'Test scope', dataset: 'Dataset', tasks: 'Fixed tasks',
+      title: 'Test datasets', lead: 'Evaluate your MOD: compare the same base configuration with the target MOD off / on using frozen workloads.', guideTitle: 'Running a standard test for the first time?', guideLead: 'Prerequisites, commands and result checks in four steps.', copy: 'Copy command', copied: 'Copied', copyFailed: 'Select the command and copy manually', timingHint: 'Estimates apply only to the fixed reference Engine. Re-estimate for your MOD, runtime and hardware; define B0 / B1 in the guide first.', scope: 'Test scope', dataset: 'Dataset', tasks: 'Fixed tasks',
       requests: 'Requests per arm', purpose: 'Purpose', protocol: 'Open the execution guide →',
       notes: 'Run details', upstream: 'Original datasets and tools', loading: 'Loading…',
       error: 'Unable to load the test standard. Please try again.', quality: 'Quality and performance',
@@ -51,7 +51,7 @@
       const card = node('article');
       card.className = 'test-mode'; card.id = `test-mode-${mode.id}`;
       card.append(node('h2', field(mode, 'title')));
-      const duration = node('p', value({zh: `预计 ${mode.hours[0]}–${mode.hours[1]} 小时`, en: `About ${mode.hours[0]}–${mode.hours[1]} hours`}));
+      const duration = node('p', value({zh: `参考组合约 ${mode.hours[0]}–${mode.hours[1]} 小时`, en: `Reference setup: about ${mode.hours[0]}–${mode.hours[1]} hours`}));
       duration.className = 'duration'; card.append(duration);
       const datasets = mode.datasets.map(id => data.datasets.find(dataset => dataset.id === id));
       const scope = mode.id === 'quick'
@@ -60,7 +60,10 @@
       card.append(node('p', scope));
       const command = node('pre');
       command.append(node('code', guide.execution.command_template.replace('{datasets}', mode.datasets_flag)));
-      card.append(command);
+      const start = node('a', value({zh: '用自己的 MOD 开始 →', en: 'Start with your MOD →'}));
+      start.href = `./dataset-standard.html?scope=${mode.id}`; start.className = 'mode-start-link'; card.append(start);
+      const reference = node('details'); reference.className = 'entry-reference-command';
+      reference.append(node('summary', value({zh: '参考 Engine 命令（可选）', en: 'Reference Engine command (optional)'})), command);
       const copyButton = node('button', labels.copy); copyButton.type = 'button'; copyButton.className = 'entry-copy-command';
       const feedback = node('span'); feedback.className = 'entry-copy-feedback'; feedback.setAttribute('role', 'status');
       copyButton.setAttribute('aria-label', `${labels.copy} · ${field(mode, 'title')}`);
@@ -72,7 +75,7 @@
           feedback.textContent = labels.copyFailed;
         }
       });
-      card.append(copyButton, feedback); cards.append(card);
+      reference.append(copyButton, feedback); card.append(reference); cards.append(card);
     }
 
     document.getElementById('entry-timing-note').textContent = labels.timingHint;

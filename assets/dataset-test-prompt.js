@@ -2,6 +2,7 @@
 (function () {
   'use strict';
   let payload;
+  let testTarget = 'mod';
   let downloadingScript = false;
   const button = document.getElementById('download-test-prompt');
   const scriptButton = document.getElementById('download-test-script');
@@ -17,8 +18,8 @@
   const language = () => (window.vllmHustSite?.getCurrentLang()
     || localStorage.getItem('vllm-hust_lang') || navigator.language || 'en').startsWith('zh') ? 'zh' : 'en';
   const copy = {
-    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '下载一键测试脚本 ↓', scriptReady: 'Python 3.11+ 引导脚本；按指南配置模型、SDK、卡号与访问权限', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: 'TXT 提示词 · Python 脚本，须配置本机环境'},
-    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Download one-click script ↓', scriptReady: 'Python 3.11+ bootstrap; configure model, SDK, devices and source access using the guide', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'TXT prompt · Python script; local setup required'},
+    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '参考 Engine 一键脚本 ↓', scriptReady: '仅复跑固定 vLLM-HUST Engine 组合，不能自动接入自有 MOD', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: '默认测自己的 MOD；脚本仅用于参考 Engine'},
+    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Reference Engine script ↓', scriptReady: 'Reproduces the fixed vLLM-HUST Engine only; does not integrate arbitrary MODs', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Own MOD by default; script is for the reference Engine'},
   };
 
   function command(guide, mode) {
@@ -34,6 +35,8 @@
     const field = (object, key) => object[`${key}_${zh ? 'zh' : 'en'}`];
     const full = guide.modes.find(mode => mode.id === 'full');
     const quick = guide.modes.find(mode => mode.id === 'quick');
+    const selectedScope = document.querySelector('[name="test-scope"]:checked')?.value || 'full';
+    const selected = guide.modes.find(mode => mode.id === selectedScope) || full;
     const engine = `https://github.com/${guide.execution.engine_repository}/blob/${guide.execution.verified_runner_commit}`;
     const identities = [
       `standard_id: ${data.standard_id}`,
@@ -68,7 +71,121 @@
     const invariants = data.invariants.map((value, index) => `${index + 1}. ${value}`).join('\n');
     const estimates = [full, quick].map(mode => `${field(mode, 'title')}: ${mode.hours[0]}–${mode.hours[1]} ${zh ? '小时' : 'hours'}`).join('; ');
 
-    if (zh) return `# 标准测试 AI 提示词
+    if (testTarget === 'mod') {
+      const form = document.getElementById('mod-parameters');
+      const configuration = form ? Object.fromEntries(new FormData(form)) : {};
+      const project = JSON.stringify(Object.fromEntries(['mod_repository', 'mod_revision', 'base_runtime', 'mod_activation']
+        .map(key => [key, configuration[key]?.trim() || (zh ? '待核对' : 'To be confirmed')])), null, 2);
+      if (zh) return `# 标准测试 AI 提示词：评估自己的 MOD
+
+test_target: own_mod
+selected_scope: ${selected.id}
+selected_profiles: ${selected.datasets_flag}
+
+请在已授权环境中评估我的 MOD。先读取实际 MOD 仓库、基础引擎文档与已有测试执行器，核对接入方式，具备条件后实际执行并交付可复核报告。缺少仓库/提交、环境或输入时先核对缺项；未执行、准备通过和历史成绩分别记录。
+
+## 1. 先定义 B0 / B1，而不是指定某个 Engine
+B0 默认是同一基础引擎、提交与配置关闭目标 MOD；B1 是该基础配置启用我开发的 MOD。B1 不默认等于 vllm-hust-engine。保留基础引擎已经默认提供的优化，不能人为削弱共同基线；课题另有基线约定时须先明确其身份及本轮适用范围。
+以下是用户填写的项目信息，需到仓库核对：
+${project}
+
+冻结 MOD 仓库/提交、基础引擎与依赖、安装/构建步骤、启用与关闭命令、两臂实际启动命令和参数差异。核验 MOD 实际加载、调用与触发证据；参数存在、安装成功或 HTTP 成功不等于机制生效。需同时修改其他配置时披露全部变化，不能把组合变化的效果都归因于单一 MOD。
+
+## 2. 沿用冻结工作负载
+${identities}
+
+以上 reference_runner 与公开 bootstrap 是可选参考实现的身份，不定义本轮 B1，也不是必须安装的运行环境。默认不要恢复固定 Engine 替换我的 MOD，不给既有参考脚本添加其不支持的通用 MOD 参数。通用自有 MOD 接入必须按实际执行器实现；未接入不得宣称已支持。
+核对标准、指南与附件的版本和 SHA256。本次执行 ${field(selected, 'title')}（${selected.datasets_flag}）；快速检查不能替代五项验收。
+${field(guide, 'scope')}
+
+${scope}
+
+## 3. 固定可比条件
+两臂使用相同模型权重、tokenizer/模板、硬件与设备数、并行方式、任务/顺序/提示词、并发、生成预算、EOS、评分器及测量区间。保持共同基线优化，记录必须的 MOD 适配差异与额外开销。根据本轮实际引擎准备依赖、设备与数据访问权；不把参考 Engine 的私有源码、固定 SDK 或双卡环境列为所有 MOD 的通用前提。
+trace 仍受本标准 Qwen3.5-35B-A3B BF16 tokenizer 与 16K 输入资格绑定；换模型/tokenizer 须新建 profile，不在原标准下静默重算。两臂匹配冻结 token ID 哈希，使用新 cache_salt 与零 KV 复用；不执行历史工具命令。
+参考指南的耗时只对应其固定 Engine/模型/硬件；为自己的 MOD 重新排期，不承诺同样时长。
+
+## 4. 接入实际执行器并运行
+先找到项目实际支持的输入格式、服务/推理入口、MOD 开关和原始评分器，将冻结清单逐项绑定到实际请求；给出可在当前环境执行的两臂命令，不能杜撰通用 --mod 参数或把改名当成接入。
+运行前封存本轮执行计划和参数差异；核验两臂运行资格及输入身份，按协议保留连续 4K/16K C8 证据（原 60 秒预热/300 秒正式窗口）；以相同范围、预算和评分器完成配对。HLE/Frontier 两臂使用同一固定 judge，judge 流量不计 solver 吞吐或成本。两臂输出目录和缓存隔离，使用可比的资源/冷暖条件，保留设备采样与 MOD 实际激活记录。
+完整测试范围标识为 mmlu,hle,frontier,swe,terminal；快速检查为 mmlu。这是范围标识，不代表任何自定义执行器已经支持这些 CLI 参数。--prepare-only、诊断小样本和缺失阶段不能算正式完成。
+失败保留原始记录、计划分母与未执行阶段，不暗中缩短预算、补造请求、换题或反复挑最好一轮。结束时清理自己的进程并释放设备。
+
+## 5. 核对质量与性能，报告收益和回退
+用独立题目答案和原任务评分器判断质量；生成 token 不同本身不能证明质量下降，token 相同也不能证明答案正确。数值/状态错误与重复性诊断另列，不能默认要求跨配置逐 token 一致。报告配对样本量、截断/无法解析/未决比例及不确定性，不把“不显著”写成“等价”。
+保留失败、缺失、length stop 与未决 judge 的计划分母，HLE 四层与 Frontier 两轨单列。SWE/Terminal 只报告轨迹推理性能，不给任务解决率。
+严格采用原协议统计定义：
+${metrics}
+
+原协议执行约束：
+${invariants}
+
+从本轮配对计算吞吐变化 (B1/B0−1)、TTFT/TPOT 改善 (1−B1/B0) 与可比成本变化，说明单位和费用范围，保留负收益。单列初始化/编译/准备成本、主机与设备内存、适用和失效条件，不把有利前置条件当成免费收益。未测或不可比项标为未验证，不能记零。
+
+## 6. 交付证据与结论
+交付本轮 B0/B1 定义与实际命令、MOD/基础引擎/依赖提交、配置差异、启用证据、模型/硬件/judge 身份、冻结输入与校验、原始 SSE/时间戳、评分、设备采样、清理、失败和未执行阶段，以及可复算报告。
+逐项列出所选范围和两臂计划/实际/成功/失败/截断/未决/未完成数；质量、吞吐、TTFT/TPOT、连续 C8、成本与额外开销；MOD 收益/回退及条件。不能借参考 Engine 的历史成绩证明我的 MOD 达标。
+MOD 机制收益和项目四项目标验收分开。若同时申请项目验收，按相应大纲核对 3.4.1 有效算力、3.4.2 吞吐与时延、3.4.3 数据集与长稳、3.4.4 成本的正式基线、门槛与适用条件，未测项明确保留。
+执行指南：https://vllm-hust.sage.org.ai/dataset-standard.html
+项目验收入口：https://vllm-hust.sage.org.ai/b0-b1.html
+`;
+      return `# AI prompt for standard testing: evaluate my MOD
+
+test_target: own_mod
+selected_scope: ${selected.id}
+selected_profiles: ${selected.datasets_flag}
+
+Evaluate my MOD in an authorized environment. Read the actual MOD repository, base-engine documentation and existing test runner, establish integration, execute when prerequisites are available and deliver reproducible evidence. Identify missing repository/commit, inputs or runtime facts first. Keep unexecuted stages, preparation checks and historical measurements distinct.
+
+## 1. Define B0 / B1 for this comparison
+B0 defaults to the same base engine commit/configuration with the target MOD off; B1 enables my MOD in that configuration. B1 does not default to vllm-hust-engine. Preserve optimizations already enabled in the base engine rather than weakening the control. Document any project-mandated alternative baseline and its applicability.
+User-supplied project details to verify in the repository:
+${project}
+
+Freeze MOD/base-engine/dependency commits, installation/build instructions, enable/disable commands, actual launch commands and configuration differences. Verify runtime loading, calls and activation. A parameter, installation or HTTP success does not prove that the mechanism ran. Disclose required additional changes instead of attributing a combined intervention to one MOD.
+
+## 2. Reuse the frozen workload
+${identities}
+
+reference_runner and bootstrap identities describe an optional reference implementation, not the required B1 or runtime. Do not restore that fixed Engine in place of my MOD, invent unsupported generic MOD flags for it, or claim integration merely by renaming B1. Integrate my actual runner before claiming support.
+Verify standard/guide/artifact versions and SHA256. Run the selected ${field(selected, 'title')} scope (${selected.datasets_flag}); quick cannot replace five-profile acceptance.
+${field(guide, 'scope')}
+
+${scope}
+
+## 3. Control comparability
+Fix weights, tokenizer/template, hardware/device count, parallelism, tasks/order/prompts, concurrency, generation budgets, EOS, graders and measurement intervals. Preserve base-engine optimizations and disclose necessary MOD adaptations and overhead. Use dependencies, device resources and data access appropriate to the actual engine; the reference Engine's private source, fixed SDK and two-card setup are not universal MOD prerequisites.
+Trace inputs remain bound to the frozen Qwen3.5-35B-A3B BF16 tokenizer and 16K eligibility. A changed model/tokenizer requires a new profile. Match frozen input token hashes, use fresh cache_salt and zero KV reuse; execute no historical tools. Re-estimate timing for the actual MOD/runtime instead of applying reference Engine estimates as guarantees.
+
+## 4. Integrate and run the actual executor
+Inspect actual input formats, inference/service entrypoints, MOD switches and original graders. Bind frozen items to requests and produce commands supported by that project. Do not invent a universal --mod argument or treat renaming as integration.
+Seal the plan and differences before running. Qualify both arms and retain continuous 4K/16K C8 evidence with the original 60-second warmup/300-second measurement windows. Use the same scope, budgets and graders; HLE/Frontier share a fixed judge whose traffic is excluded from solver throughput/cost. Isolate outputs/caches, match resource and cold/warm conditions, retain device samples and MOD activation evidence.
+Scope identifiers are mmlu,hle,frontier,swe,terminal for full and mmlu for quick; these identifiers do not imply an arbitrary runner accepts corresponding CLI flags. Preparation-only, diagnostic samples and missing stages are not formal completion.
+Preserve failures and planned denominators. No hidden budget reduction, fabricated requests, replacement tasks or best-of retries. Clean up owned processes and release devices.
+
+## 5. Assess independent quality and paired effects
+Use independent task answers and unchanged graders for quality. Different generated tokens alone do not prove quality loss, and identical tokens do not prove correctness. Separate numerical/state faults and repeatability diagnostics; do not impose cross-configuration token equality by default. Report paired sample sizes, truncation/unparsed/unresolved rates and uncertainty; non-significance is not equivalence.
+Retain failures, missing responses, length stops and unresolved judges in planned denominators. Report four HLE strata and both Frontier tracks. SWE/Terminal measure inference only, with no solve rate.
+Exact metrics:
+${metrics}
+
+Execution invariants:
+${invariants}
+
+From this pair compute throughput change (B1/B0−1), TTFT/TPOT improvement (1−B1/B0) and comparable cost changes, with units and pricing scope. Preserve regressions. Report startup/compile/preparation overhead, host/device memory and applicable/failure conditions; favorable prerequisites are not free gains. Mark unmeasured or incomparable items unverified rather than zero.
+
+## 6. Deliver
+Provide actual B0/B1 definitions and commands, MOD/base-engine/dependency commits, differences, activation evidence, model/hardware/judge identities, frozen inputs/checks, raw SSE/timestamps, grading, device samples, cleanup, failed/unexecuted stages and recomputable reports.
+List selected scope and both arms' planned/executed/success/failure/truncation/unresolved/unfinished counts; quality, throughput, TTFT/TPOT, C8, costs and overhead; MOD gains/regressions and conditions. Do not use historical reference Engine measurements to certify my MOD.
+Keep mechanism effects separate from project acceptance. If project acceptance is requested, verify the formal baseline, thresholds and applicability for 3.4.1 compute, 3.4.2 throughput/latency, 3.4.3 datasets/stability and 3.4.4 cost. Retain unmeasured targets.
+Guide: https://vllm-hust.sage.org.ai/dataset-standard.html
+Project targets: https://vllm-hust.sage.org.ai/b0-b1.html
+`;
+    }
+
+    if (zh) return `# 标准测试 AI 提示词：复跑固定参考 Engine
+
+test_target: reference-engine
 
 请作为测试执行负责人，在已授权的测试环境中，按照以下冻结协议完成可复核的标准测试。不要只给计划；具备条件后实际执行、核对原始证据并交付报告。缺少环境、权限或输入时，明确列出缺项与实际停止阶段，不得把准备、CPU 检查或历史成绩当作本轮实测。
 
@@ -125,7 +242,9 @@ ${invariants}
 执行指南：https://vllm-hust.sage.org.ai/dataset-standard.html
 `;
 
-    return `# AI prompt for standard testing
+    return `# AI prompt for standard testing: reproduce the fixed reference Engine
+
+test_target: reference-engine
 
 Act as the test execution lead in an authorized environment. Perform, verify and report the frozen standard below; do not stop at a plan when prerequisites are available. If access, inputs or runtime requirements are missing, name the missing items and actual stopping stage. Preparation, CPU checks and historical measurements are not new model measurements.
 
@@ -203,7 +322,7 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
 
   function render() {
     const c = copy[language()];
-    button.textContent = c.button;
+    button.textContent = testTarget === 'mod' ? (language() === 'zh' ? '下载 MOD 测试提示词 ↓' : 'Download MOD test prompt ↓') : c.button;
     button.title = payload ? c.ready : c.loading;
     button.disabled = !payload;
     scriptButton.textContent = c.script;
@@ -215,7 +334,7 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
     if (!payload) return;
     try {
       saveDownload(new Blob(['\uFEFF', buildPrompt()], {type: 'text/plain;charset=utf-8'}),
-        `vllm-hust-${payload.data.standard_id}-ai-prompt-${language()}.txt`);
+        `vllm-hust-${payload.data.standard_id}-${testTarget}-ai-prompt-${language()}.txt`);
       status.textContent = copy[language()].done;
     } catch {
       status.textContent = copy[language()].failed;
@@ -239,6 +358,7 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
     }
   });
   window.vllmHustTestPrompt = {
+    setTarget(value) { testTarget = value === 'reference-engine' ? value : 'mod'; render(); },
     setPayload(value) { payload = value; render(); },
     fail() { payload = undefined; render(); },
   };
