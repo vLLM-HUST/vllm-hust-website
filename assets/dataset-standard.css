@@ -168,3 +168,19 @@ body[data-page="dataset-entrypoints"] .entry-main { max-width: 1120px; }
   .command-toolbar { padding: 12px 14px; }
   .entry-main .summary-links { align-items: flex-start; flex-direction: column; gap: 16px; padding: 20px; }
 }
+
+.test-targets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border: 0; padding: 0; margin: 0 0 18px; min-width: 0; }
+.test-targets legend { padding: 0 0 12px; font-size: 14px; font-weight: 650; }
+.test-targets label { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--guide-line); border-radius: 7px; cursor: pointer; background: #fff; }
+.test-targets label:has(input:checked) { border-color: #006b70; background: #edf6f4; }
+.test-targets input { appearance: none; width: 18px; height: 18px; margin: 3px 0 0; flex-shrink: 0; background: #fff; border: 2px solid #687d7e; border-radius: 50%; }
+.test-targets input:checked { background: #006b70; border-color: #006b70; box-shadow: inset 0 0 0 3px #fff; }
+.test-targets strong { font-size: 14px; }
+.test-targets small { display: block; color: var(--guide-muted); font-size: 12px; line-height: 1.6; margin-top: 6px; }
+.test-targets + .guide-boundary { margin-bottom: 22px; }
+.mod-prompt-button { color: #fff; background: #006b70; border: 1px solid #006b70; border-radius: 5px; padding: 12px 18px; font: 600 14px/1.6 system-ui,sans-serif; cursor: pointer; }
+#mod-run .guide-callout { margin-top: 20px; }
+.entry-reference-command { margin-top: 16px; border-top: 1px solid var(--guide-line); padding-top: 12px; }
+.entry-reference-command summary { font-size: 12px; }
+.entry-main .test-mode a.mode-start-link { margin-top: auto; padding-top: 16px; font-size: 14px; font-weight: 650; }
+@media (max-width: 600px) { .test-targets { grid-template-columns: 1fr; } }
