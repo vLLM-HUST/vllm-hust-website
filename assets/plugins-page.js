@@ -1989,6 +1989,8 @@ vllm-hust-ext extension check ${extensionId}`
       renderDiscoveryNavigation();
       renderCatalog();
       renderBoundaries();
+      const linkedCard = document.getElementById(window.location.hash.slice(1));
+      if (linkedCard && catalog.contains(linkedCard)) linkedCard.scrollIntoView();
     })
     .catch((error) => {
       status.textContent = (language() === "zh" ? "生态目录加载失败：" : "The ecosystem catalog could not be loaded: ") + error.message;
