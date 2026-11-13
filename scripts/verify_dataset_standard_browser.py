@@ -14,7 +14,10 @@ out = Path(args.output)
 out.mkdir(parents=True, exist_ok=True)
 with sync_playwright() as play:
     browser = play.chromium.launch(headless=True, args=["--no-sandbox"])
-    for name, url in [("standard", args.url), ("entry", urljoin(args.url, "dataset-introductions.html"))]:
+    for name, url in [
+        ("standard", args.url),
+        ("entry", urljoin(args.url, "dataset-introductions.html")),
+    ]:
         for width in [1440, 390]:
             page = browser.new_page(viewport=dict(width=width, height=1100))
             errors = []
@@ -35,7 +38,10 @@ with sync_playwright() as play:
             else:
                 assert not page.locator("#upstream-guides").evaluate("e => e.open")
                 assert page.locator("#test-modes").is_visible()
-                assert page.locator("#test-mode-full").bounding_box()["y"] < page.locator("#upstream-guides").bounding_box()["y"]
+                assert (
+                    page.locator("#test-mode-full").bounding_box()["y"]
+                    < page.locator("#upstream-guides").bounding_box()["y"]
+                )
             assert "2–3" in page.locator("#test-mode-quick").inner_text()
             assert "12–16" in page.locator("#test-mode-full").inner_text()
             assert (
@@ -78,7 +84,8 @@ with sync_playwright() as play:
         page.wait_for_selector("#standard-status[role=alert]")
         assert page.locator("#standard-content").is_hidden()
         assert (
-            "run guide checksum mismatch" in page.locator("#standard-status").inner_text()
+            "run guide checksum mismatch"
+            in page.locator("#standard-status").inner_text()
         )
     browser.close()
 print(
