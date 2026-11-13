@@ -541,7 +541,7 @@ traceloom-graph-coverage examples/base.json --enable`
       title_zh: "安装并查看短请求准入配置",
       action_en: "configuration commands",
       action_zh: "配置命令",
-      note_en: "The stock per-request cap is224; the global budget remains256 and capture sizes stay unchanged. This command prints kwargs only. Compare short-request TTFT together with total batch completion.",
+      note_en: "The stock per-request cap is 224; the global budget remains 256 and capture sizes stay unchanged. This command prints kwargs only. Compare short-request TTFT together with total batch completion.",
       note_zh: "原生单请求上限设为 224，全局预算保持 256，图捕获尺寸不变；以下命令只输出参数。使用时同时评估短请求首字延迟和整批完成时间。",
       guide: "https://github.com/vLLM-HUST/vllm-hust-prefill-admission#install-and-use",
       guide_en: "Runtime conditions and rollback →",
