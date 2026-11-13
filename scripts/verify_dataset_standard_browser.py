@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 from urllib.parse import urljoin
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -26,17 +27,31 @@ with sync_playwright() as play:
             page.wait_for_selector("#standard-content:not([hidden])")
             assert page.locator("#standard-rows tr").count() == 5
             rows = page.locator("#standard-rows tr").all_text_contents()
-            assert (
-                "200 / 12032" in rows[0]
-                and "200 / 1811" in rows[1]
-                and "160 / 160" in rows[2]
-            )
             assert "64" in rows[3] and "48" in rows[4]
-            assert sum("Inference only" in row for row in rows) == 2
             if name == "standard":
+                assert (
+                    "200 / 12032" in rows[0]
+                    and "200 / 1811" in rows[1]
+                    and "160 / 160" in rows[2]
+                )
+                assert sum("Inference only" in row for row in rows) == 2
                 assert page.locator("#standard-files a").count() == 6
+                assert "not every item" in page.locator("#test-mode-scope").inner_text()
+                assert "verified" in page.locator("#standard-status").inner_text()
             else:
+                assert [
+                    row.locator("td").nth(1).inner_text()
+                    for row in page.locator("#standard-rows tr").all()
+                ] == ["200", "200", "160", "32", "32"]
+                assert sum("Trace inference" in row for row in rows) == 2
                 assert not page.locator("#upstream-guides").evaluate("e => e.open")
+                assert not page.locator("#test-mode-notes-panel").evaluate(
+                    "e => e.open"
+                )
+                assert page.locator("#standard-status").is_hidden()
+                assert not re.search(
+                    r"[\u4e00-\u9fff]", page.locator("main").inner_text()
+                )
                 assert page.locator("#test-modes").is_visible()
                 assert (
                     page.locator("#test-mode-full").bounding_box()["y"]
@@ -54,13 +69,28 @@ with sync_playwright() as play:
                 .inner_text()
                 .endswith("--datasets mmlu,hle,frontier,swe,terminal")
             )
-            assert "not every item" in page.locator("#test-mode-scope").inner_text()
-            assert "verified" in page.locator("#standard-status").inner_text()
             assert not errors, errors
             assert page.evaluate(
                 "document.documentElement.scrollWidth <= window.innerWidth"
             ), width
             page.screenshot(path=str(out / f"{name}-{width}.png"), full_page=True)
+            if name == "entry":
+                page.locator("#langToggle").click()
+                assert page.locator("#entry-title").inner_text() == "测试数据集"
+                assert page.locator("#test-mode-quick h2").inner_text() == "快速测试"
+                assert page.locator("#test-mode-full h2").inner_text() == "全量测试"
+                assert "About" not in page.locator("#standard-content").inner_text()
+                assert (
+                    "Trace inference"
+                    not in page.locator("#standard-content").inner_text()
+                )
+                assert page.locator("#standard-rows tr").count() == 5
+                page.screenshot(
+                    path=str(out / f"{name}-zh-{width}.png"), full_page=True
+                )
+                page.locator("#langToggle").click()
+                assert page.locator("#entry-title").inner_text() == "Test datasets"
+                assert page.locator("#standard-rows tr").count() == 5
             page.close()
         page = browser.new_page()
         page.route(
@@ -72,7 +102,10 @@ with sync_playwright() as play:
         page.goto(url, wait_until="networkidle")
         page.wait_for_selector("#standard-status[role=alert]")
         assert page.locator("#standard-content").is_hidden()
-        assert "checksum mismatch" in page.locator("#standard-status").inner_text()
+        error = page.locator("#standard-status")
+        assert "checksum mismatch" in (
+            error.get_attribute("data-error") if name == "entry" else error.inner_text()
+        )
         page = browser.new_page()
         page.route(
             "**/dataset-run-guide-v1.json",
@@ -83,9 +116,9 @@ with sync_playwright() as play:
         page.goto(url, wait_until="networkidle")
         page.wait_for_selector("#standard-status[role=alert]")
         assert page.locator("#standard-content").is_hidden()
-        assert (
-            "run guide checksum mismatch"
-            in page.locator("#standard-status").inner_text()
+        error = page.locator("#standard-status")
+        assert "run guide checksum mismatch" in (
+            error.get_attribute("data-error") if name == "entry" else error.inner_text()
         )
     browser.close()
 print(

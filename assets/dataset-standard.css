@@ -7,3 +7,6 @@ p,h2,li,dd{overflow-wrap:anywhere}main{min-width:0}
 body[data-page="dataset-standard"] main a{color:inherit;text-decoration:underline}
 
 body[data-page="dataset-entrypoints"] #standard-content{margin-bottom:2rem}#upstream-guides>summary{cursor:pointer;font-size:1.15rem;font-weight:700;padding:1rem 0}#upstream-guides>p{overflow-wrap:anywhere}#standard-provenance{overflow-wrap:anywhere}
+
+body[data-page="dataset-entrypoints"] #standard-rows td:last-child{min-width:0}body[data-page="dataset-entrypoints"] .test-mode h2{margin:0;font-size:1.15rem}body[data-page="dataset-entrypoints"] #test-mode-notes-panel{margin:1rem 0}body[data-page="dataset-entrypoints"] #test-mode-notes-panel>summary{cursor:pointer}body[data-page="dataset-entrypoints"] #test-mode-notes-panel small{font-size:.75rem;overflow-wrap:anywhere}body[data-page="dataset-entrypoints"] .summary-links{margin-bottom:.5rem}
+body[data-page="dataset-entrypoints"] #test-modes{border-top:0;padding-top:0}body[data-page="dataset-entrypoints"] #standard-content table{min-width:36rem}body[data-page="dataset-entrypoints"] #standard-rows td:last-child{white-space:nowrap}

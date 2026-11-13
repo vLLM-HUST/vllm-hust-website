@@ -34,6 +34,10 @@ if (document.body.dataset.page === "dataset-standard") {
     if (guideDigest !== guideEntry.sha256 || guideRaw.byteLength !== guideEntry.bytes) throw new Error("run guide checksum mismatch");
     const guide = JSON.parse(new TextDecoder().decode(guideRaw));
     if (guide.standard_id !== data.standard_id || guide.standard_sha256 !== digest || guide.modes.length !== 2) throw new Error("run guide standard mismatch");
+    if (document.body.dataset.page === "dataset-entrypoints") {
+      window.vllmHustTestSummary.render({data, guide, source, entry, digest, guideSource, guideEntry, guideDigest});
+      return;
+    }
     for (const mode of guide.modes) {
       const card = document.createElement("article"); card.className = "test-mode"; card.id = `test-mode-${mode.id}`;
       card.append(text("h3", `${mode.title_zh} / ${mode.title_en}`));
@@ -78,6 +82,10 @@ if (document.body.dataset.page === "dataset-standard") {
     document.getElementById("standard-content").hidden = false;
     status.textContent = "来源与标准校验通过 / Source and standard verified";
   } catch (error) {
+    if (document.body.dataset.page === "dataset-entrypoints") {
+      window.vllmHustTestSummary.fail(error);
+      return;
+    }
     status.textContent = `加载或校验失败 / Load or integrity failure: ${error.message}`;
     status.setAttribute("role", "alert");
   }
