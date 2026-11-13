@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: e975308aa6e49ded1b37b2f8247f575f1323c5b7 # pragma: allowlist secret
+          ref: ac9f1b84b99c26f0927d2b98b118e480844db73a # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -36,9 +36,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision e975308aa6e49ded1b37b2f8247f575f1323c5b7 --website .
+            --revision ac9f1b84b99c26f0927d2b98b118e480844db73a --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision e975308aa6e49ded1b37b2f8247f575f1323c5b7 --website .
+            --revision ac9f1b84b99c26f0927d2b98b118e480844db73a --website .
       - name: Assemble pinned benchmark navigation
         env:
           GH_TOKEN: ${{ github.token }}
@@ -88,7 +88,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: e975308aa6e49ded1b37b2f8247f575f1323c5b7 # pragma: allowlist secret
+          ref: ac9f1b84b99c26f0927d2b98b118e480844db73a # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -98,9 +98,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision e975308aa6e49ded1b37b2f8247f575f1323c5b7 --website .
+            --revision ac9f1b84b99c26f0927d2b98b118e480844db73a --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision e975308aa6e49ded1b37b2f8247f575f1323c5b7 --website .
+            --revision ac9f1b84b99c26f0927d2b98b118e480844db73a --website .
       - name: Install browser test dependencies
         run: |
           python -m pip install playwright
@@ -118,6 +118,7 @@ jobs:
           trap 'kill "$website_server_pid"' EXIT
           python scripts/verify_dataset_matrix_browser.py --url http://127.0.0.1:8769
           python scripts/verify_dataset_entrypoints_browser.py --url http://127.0.0.1:8769
+          python scripts/verify_dataset_standard_browser.py http://127.0.0.1:8769/dataset-standard.html --output output/dataset-standard
           python scripts/verify_b1_definition_browser.py --url http://127.0.0.1:8769 --output output/playwright/b1-definition
           python scripts/verify_capability_coverage_browser.py --url http://127.0.0.1:8769
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769

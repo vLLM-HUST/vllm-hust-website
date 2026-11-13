@@ -216,3 +216,8 @@ export WEBSITE_PORT=8000
 export WEBSITE_ROOT_DIR=/path/to/vllm-hust-website
 export WEBSITE_SYSTEMD_SERVICE_NAME=vllm-hust-website
 ```
+
+## 冻结数据集标准
+
+[数据集标准](./dataset-standard.html)读取已提交的 benchmark 发布源，显示任务数、每臂请求、生成预算、
+抽样规则和校验下载。网站只维护展示代码；标准内容和新版本提交到 benchmark， 经现有固定来源装配、公开投影、浏览器验证和 Pages artifact 链路发布。
