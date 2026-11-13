@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
   <link rel="stylesheet" href="./assets/site.css?v=site-clarity-20261025-nav-20261029">
   <link rel="stylesheet" href="./assets/dataset-entrypoints.css?v=terminal-arm64-20261028"><link rel="stylesheet" href="./assets/focus.css?v=20261028">
-  <link rel="stylesheet" href="./assets/dataset-standard.css?v=frozen-entry-20261113">
+  <link rel="stylesheet" href="./assets/dataset-standard.css?v=concise-tests-20261113">
 </head>
 <body data-page="dataset-entrypoints">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
@@ -20,18 +20,16 @@
   </div></nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
   <main class="site-shell entry-main"><nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav>
-    <header><p class="entry-eyebrow">vLLM-HUST / DATA & CLIENTS</p><h1 id="entry-title">冻结数据集测试 / Frozen dataset tests</h1>
-<p id="entry-lead">选择快速或全量测试；两种模式均使用已冻结的样本与预算。 / Choose quick or full testing with frozen samples and budgets.</p></header>
-    <p id="standard-status" role="status">正在校验冻结标准与运行指南 / Verifying frozen standard and run guide…</p>
-    <section id="standard-content" hidden aria-label="Frozen evaluation profiles">
-      <section id="test-modes" aria-labelledby="test-modes-title"><h2 id="test-modes-title">选择测试范围与预留时间 / Choose scope and plan your time</h2><div id="test-mode-cards" class="test-mode-cards"></div><p id="test-mode-scope"></p><details><summary>时间依据与执行说明 / Timing basis and execution</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p></details></section>
-      <h2>五项冻结范围 / Five frozen profiles</h2>
-      <div class="scroll"><table><thead><tr><th>数据集 / Dataset</th><th>任务 / Tasks</th><th>每臂请求 / Requests per arm</th><th>用途 / Scope</th><th>固定规则 / Selection</th><th>生成设置 / Generation</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
-      <p id="standard-title"></p><p id="standard-provenance"></p>
-      <p><a href="./dataset-standard.html">完整冻结协议、下载与统计口径 / Full protocol, downloads and metrics →</a></p>
+    <header><h1 id="entry-title">测试数据集</h1><p id="entry-lead" hidden></p></header>
+    <p id="standard-status" role="status">加载中…</p>
+    <section id="standard-content" hidden>
+      <section id="test-modes" aria-label="测试模式"><div id="test-mode-cards" class="test-mode-cards"></div></section>
+      <h2 data-summary-copy="scope">测试范围</h2>
+      <div class="scroll"><table><thead><tr><th data-summary-copy="dataset">数据集</th><th data-summary-copy="tasks">固定任务</th><th data-summary-copy="requests">每臂请求</th><th data-summary-copy="purpose">用途</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
+      <p class="summary-links"><a href="./dataset-standard.html" data-summary-copy="protocol">完整测试标准</a></p>
+      <details id="test-mode-notes-panel"><summary data-summary-copy="notes">运行说明</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p><p id="standard-title"></p><p id="standard-provenance"></p></details>
     </section>
-    <details id="upstream-guides"><summary>上游原始数据集与完整任务评测（补充资料） / Upstream datasets and full task evaluation (reference)</summary>
-    <p>以下保留原始来源及独立客户端、沙箱说明；本项目的一键冻结测试使用上方范围和命令。SWE/Terminal 的沙箱任务执行不属于本轮 trace 推理性能测试。 / The original sources and standalone clients/sandboxes below are reference material. Use the frozen scopes and commands above for this campaign; sandbox task execution is separate from trace inference testing.</p>
+    <details id="upstream-guides"><summary data-summary-copy="upstream">原始数据集与工具</summary>
     <nav class="entry-jump" aria-label="Quickstarts"><a href="#designated" id="entry-jump-basic">指定五项数据集</a><a href="#special" id="entry-jump-special">2. Special scoring</a><a href="#sandbox" id="entry-jump-sandbox">3. Agent sandboxes</a><a hidden href="#all-sources" id="entry-all-link">All 118 sources</a></nav>
     <section id="designated" aria-label="Project-designated datasets"><div id="designated-cards" class="focus-cards"></div></section>
     <div hidden><section id="ordinary" aria-labelledby="entry-install-title"><h2 id="entry-install-title">1. Shared preparation, then a supported runner</h2><p id="entry-install-note"></p><pre><code id="entry-install"></code></pre><p id="entry-install-output"></p><div id="entry-basic"></div></section>
@@ -44,14 +42,15 @@
       <div id="entry-sources" aria-live="polite"></div>
     </section>
     </div>
-    <p id="entry-load-status" role="status">Loading catalog… / 正在加载目录…</p>
+    <p id="entry-load-status" role="status">加载中…</p>
     <p><a href="./assets/data/dataset-entrypoints-v1.json" id="entry-json">Versioned catalog (JSON)</a> · <a href="./b0-b1.html" id="entry-old-results">Existing results remain available</a></p>
     </details>
-    <noscript><p>请启用 JavaScript 以校验并显示冻结范围与一键命令。 / Enable JavaScript to verify and show frozen scopes and one-click commands. <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/website-publication/data/dataset-run-guide-v1.json">版本化运行指南 / Versioned run guide</a></p></noscript>
+    <noscript><p><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/website-publication/data/dataset-run-guide-v1.json">查看测试运行指南</a></p></noscript>
   </main>
   <footer class="site-footer"><span id="footer-copy">Dataset sources, test instructions and evaluation tools.</span></footer>
   <script src="./assets/site.js?v=public-audit-20261101"></script>
-  <script src="./assets/dataset-standard.js?v=frozen-entry-20261113"></script>
-  <script src="./assets/dataset-entrypoints.js?v=frozen-entry-20261113"></script>
+  <script src="./assets/dataset-test-summary.js?v=concise-tests-20261113"></script>
+  <script src="./assets/dataset-standard.js?v=concise-tests-20261113"></script>
+  <script src="./assets/dataset-entrypoints.js?v=concise-tests-20261113"></script>
 </body>
 </html>
