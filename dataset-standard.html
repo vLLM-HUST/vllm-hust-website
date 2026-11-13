@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="standard-source" content="./data/benchmark-source-manifest.json"><title>数据集标准 · Dataset standard</title>
+<link rel="stylesheet" href="./assets/dataset-standard.css"><script defer src="./assets/dataset-standard.js"></script></head>
+<body><main><nav><a href="./">首页 / Home</a> · <a href="./dataset-validation.html">实测 / Measurements</a></nav>
+<h1>数据集固定标准 <small>Frozen dataset standard</small></h1>
+<p>两个项目共用冻结的样本、顺序、预算和统计口径。<br>Shared frozen membership, order, generation budgets and metrics.</p>
+<p>这是项目评测协议，标准冻结不表示实测完成。公开 trace 测推理性能，不测任务解决率。<br>A project-defined protocol, not an upstream official serving trace. A frozen plan is not a measurement. Trace replay measures inference, not task success.</p>
+<p id="standard-status" role="status">正在校验来源 / Verifying source…</p>
+<section id="standard-content" hidden><h2 id="standard-title"></h2><p id="standard-provenance"></p>
+<div class="scroll"><table><thead><tr><th>数据集 / Dataset</th><th>任务 / Tasks</th><th>每臂请求 / Requests per arm</th><th>用途 / Scope</th><th>固定规则 / Selection</th><th>生成设置 / Generation</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
+<h2>协议下载 / Protocol downloads</h2><p>只含任务身份与校验信息，不分发题目、答案或原始对话。来源数据遵守原授权。<br>Identity and integrity metadata only; no questions, answers or raw conversations. Original source terms apply.</p><ul id="standard-files"></ul>
+<h2>统计口径 / Metrics</h2><dl id="standard-metrics"></dl><h2>执行边界 / Execution</h2><ul id="standard-invariants"></ul>
+<p id="standard-access"></p><p><a href="./data/dataset-standard-v1/README.md">完整说明 / Full protocol</a> · <a href="./data/dataset-standard-v1/SHA256SUMS">SHA256SUMS</a> · <a href="./data/dataset-standard-v1/verify.py">离线校验 / Offline verifier</a></p></section>
+</main></body></html>
