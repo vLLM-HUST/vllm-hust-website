@@ -1314,8 +1314,8 @@ def test_adm_mod_catalog_keeps_the_published_comparator_and_runtime_scope() -> N
 def test_repository_portfolio_is_separate_and_complete() -> None:
     assert PORTFOLIO["canonical_owner"] == "vLLM-HUST/vllm-hust-benchmark"
     assert PORTFOLIO["scope"] == "active_public_repositories_and_completed_archives"
-    assert PORTFOLIO["inventory_as_of"] == "2026-11-06"
-    assert len(PORTFOLIO["repositories"]) == 65
+    assert PORTFOLIO["inventory_as_of"] == "2026-11-13"
+    assert len(PORTFOLIO["repositories"]) == 68
     names = {item["name"] for item in PORTFOLIO["repositories"]}
     assert {
         "agentx-bench",
@@ -1789,7 +1789,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 40
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 43
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
