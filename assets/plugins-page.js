@@ -520,6 +520,54 @@ vllm-hust-ext extension check org.vllm-hust.simllm
 vllm-hust-ext extension enable org.vllm-hust.simllm
 VLLM_ASCEND_SIMLLM_ENABLED=1 vllm-hust-ext run -- vllm serve /path/to/model --block-size 128`
     },
+    "graph-coverage": {
+      title_en: "Install and inspect graph coverage configuration",
+      title_zh: "安装并查看图捕获覆盖配置",
+      action_en: "configuration commands",
+      action_zh: "配置命令",
+      note_en: "This uses stock vLLM controls. The command prints checked kwargs without starting an engine. Apply them before LLM construction in the qualified runtime; preserve the original kwargs for rollback.",
+      note_zh: "使用 vLLM 原生控制项；以下命令只输出检查后的参数，不启动引擎。在适配运行时构造 LLM 前应用参数，保留原参数用于回滚。",
+      guide: "https://github.com/vLLM-HUST/vllm-hust-graph-coverage#install-and-use",
+      guide_en: "Runtime conditions and rollback →",
+      guide_zh: "适配条件与回滚方法 →",
+      command: `git clone https://github.com/vLLM-HUST/vllm-hust-graph-coverage.git
+cd vllm-hust-graph-coverage
+git checkout 40e9ce1e52185ffc7b1bab09d99e09e11d3a1851
+python -m pip install .
+traceloom-graph-coverage examples/base.json --enable`
+    },
+    "prefill-admission": {
+      title_en: "Install and inspect short-request admission configuration",
+      title_zh: "安装并查看短请求准入配置",
+      action_en: "configuration commands",
+      action_zh: "配置命令",
+      note_en: "The stock per-request cap is 224; the global budget remains 256 and capture sizes stay unchanged. This command prints kwargs only. Compare short-request TTFT together with total batch completion.",
+      note_zh: "原生单请求上限设为 224，全局预算保持 256，图捕获尺寸不变；以下命令只输出参数。使用时同时评估短请求首字延迟和整批完成时间。",
+      guide: "https://github.com/vLLM-HUST/vllm-hust-prefill-admission#install-and-use",
+      guide_en: "Runtime conditions and rollback →",
+      guide_zh: "适配条件与回滚方法 →",
+      command: `git clone https://github.com/vLLM-HUST/vllm-hust-prefill-admission.git
+cd vllm-hust-prefill-admission
+git checkout 28544ba9638f4b901b08924195c4c4eeb60eef3e
+python -m pip install .
+traceloom-prefill-admission examples/base.json --enable`
+    },
+    "sglang-prepared-dispatch": {
+      title_en: "Install and inspect SGLang prepared dispatch",
+      title_zh: "安装并检查 SGLang 预封装派发",
+      action_en: "installation and checks",
+      action_zh: "安装与检查命令",
+      note_en: "Use the pinned SGLang/TorchNPU stack. Installation is inert. The guide covers the dedicated source mount, native rebuild, explicit worker activation and exact rollback; packaged device requalification is pending.",
+      note_zh: "须使用固定版本的 SGLang/TorchNPU 环境，安装后默认不生效。指南包含独立源码挂载、native 重建、worker 显式启用及精确回滚；封装版设备复验正在推进。",
+      guide: "https://github.com/vLLM-HUST/sglang-hust-prepared-dispatch#install-on-the-pinned-stack",
+      guide_en: "Pinned runtime, mount and rollback →",
+      guide_zh: "固定运行时、挂载与回滚 →",
+      command: `git clone https://github.com/vLLM-HUST/sglang-hust-prepared-dispatch.git
+cd sglang-hust-prepared-dispatch
+git checkout 615dfd7d5b9eade24123d37b8fb3e86090c52f97
+python -m pip install .
+traceloom-prepared-dispatch --help`
+    },
     traceloom: {
       title_en: "Install the TraceLoom runtime plugin",
       title_zh: "安装 TraceLoom 运行时插件",
