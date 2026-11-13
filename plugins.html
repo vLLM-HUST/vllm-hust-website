@@ -951,24 +951,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       <span class="lang-en">The catalog separates runtime MODs, connector MODs, tool MODs, control planes, external systems, and retired prototypes. Only runtime and connector MODs enter performance selection; measured gains and regressions are both retained.</span>
       <span class="lang-zh">目录分别展示运行时 MOD、连接器 MOD、工具 MOD、控制面、外部系统和退役原型。只有运行时与连接器 MOD 进入性能筛选，提升与回退都如实保留。</span>
     </p>
-    <section id="instance-controller" class="content-panel" aria-labelledby="instance-controller-title">
-      <div>
-        <span class="eyebrow"><span class="lang-en">RIDE control plane</span><span class="lang-zh">RIDE 控制面</span></span>
-        <h2 id="instance-controller-title">Instance Controller</h2>
-      </div>
-      <div>
-        <p>
-          <span class="lang-en">Adjusts the number of vLLM inference replicas within an existing Ray cluster. New replicas receive traffic when they are ready. Replicas scheduled for removal finish serving in-flight requests before releasing resources.</span>
-          <span class="lang-zh">在现有 Ray 集群内调整 vLLM 推理副本数。新副本就绪后接收流量，待移除的副本完成进行中的请求后释放资源。</span>
-        </p>
-        <p>
-          <span class="lang-en">Ascend validation covered real inference on four serving replicas and scale-down after draining. Performance is evaluated separately against static replicas and native Ray Serve autoscaling.</span>
-          <span class="lang-zh">Ascend 验证已覆盖四副本真实推理和排空后缩容。性能另以固定副本和 Ray Serve 原生扩缩容为基线评估。</span>
-        </p>
-        <a href="https://ride-lab.github.io/#portfolio"><span class="lang-en">RIDE research portfolio</span><span class="lang-zh">RIDE 研究项目</span> ↗</a>
-      </div>
-    </section>
-    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=taxonomy-v2-20261012" aria-labelledby="workload-navigation-title">
+    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=catalog-card-20261113" aria-labelledby="workload-navigation-title">
       <header>
         <div>
           <span class="workload-navigation-kicker"><span class="lang-en">Find by intervention point or scenario</span><span class="lang-zh">按介入阶段或场景找 MOD</span></span>
@@ -1003,7 +986,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       </div>
     </aside>
     <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=effects-20261030" data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106" data-taxonomy="./data/mod-taxonomy.json?v=effects-20261030">
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=catalog-card-20261113" data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106" data-taxonomy="./data/mod-taxonomy.json?v=catalog-card-20261113">
 </div>
     <button class="plugin-more" data-plugin-more type="button" hidden>Show all extensions</button>
     <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
@@ -1111,7 +1094,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
 </script>
 <script src="./assets/plugin-performance.js?v=mod-review-20261110"></script>
 <script src="./assets/ecosystem-catalog.js?v=catalog-audit-20261105"></script>
-<script src="./assets/plugins-page.js?v=mod-review-20261110">
+<script src="./assets/plugins-page.js?v=catalog-card-20261113">
 </script>
 </body>
 </html>

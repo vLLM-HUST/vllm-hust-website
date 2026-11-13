@@ -905,7 +905,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=effects-20261030"' in PAGE
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=catalog-card-20261113"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -927,7 +927,9 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         )
     }
     people_cards |= {"core-attention-boundary", "ascend-attention-boundary"}
-    assert set(WORKSHOP_METADATA["plugins"]) == people_cards
+    # A live metadata refresh also includes the external Instance Controller.
+    # The published catalog already carries its maintainer independently.
+    assert set(WORKSHOP_METADATA["plugins"]) - {"instance-controller"} == people_cards
     public_catalog_ids = {
         item["id"]
         for item in REGISTRY["components"]
@@ -1181,7 +1183,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=mod-review-20261110" in PAGE
-    assert "plugins-page.js?v=mod-review-20261110" in PAGE
+    assert "plugins-page.js?v=catalog-card-20261113" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1231,7 +1233,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_benchmark_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=effects-20261030"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=catalog-card-20261113"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
@@ -1240,7 +1242,7 @@ def test_page_consumes_the_benchmark_owned_registry() -> None:
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
-        'v=taxonomy-v2-20261012"' in PAGE
+        'v=catalog-card-20261113"' in PAGE
     )
     assert (
         SCRIPT.count('payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark"') == 2
@@ -1787,7 +1789,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 39
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 40
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -1888,7 +1890,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
         'data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106"'
         in PAGE
     )
-    assert "taxonomy-v2-20261012" in PAGE
+    assert "catalog-card-20261113" in PAGE
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:
@@ -2068,3 +2070,10 @@ def test_clm_is_cataloged_as_a_tool_control_plane_without_a_speedup_claim():
     }
     assert '"clm-lifecycle": "org.vllm-hust.clm-lifecycle"' in SCRIPT
     assert "python -m pip install vllm-hust-clm-lifecycle==0.1.1" in SCRIPT
+
+
+def test_instance_controller_uses_the_control_plane_catalog_grid() -> None:
+    assert '<section id="instance-controller"' not in PAGE
+    assert by_id("instance-controller")["system_role"] == "lifecycle_control_plane"
+    assert MOD_TAXONOMY["components"]["instance-controller"]["kind"] == "control_plane"
+    assert "lifecycle_control" in WORKLOAD_NAVIGATION["plugins"]["instance-controller"]
