@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="standard-source" content="./data/benchmark-source-manifest.json"><title>数据集标准 · Dataset standard</title>
+<meta name="standard-source" content="./data/benchmark-source-manifest.json"><meta name="run-guide-source" content="./data/benchmark-source-manifest.json"><title>数据集标准 · Dataset standard</title>
 <link rel="stylesheet" href="./assets/site.css?v=public-audit-20261101"><link rel="stylesheet" href="./assets/dataset-standard.css"></head>
 <body data-page="dataset-standard">  <nav class="site-nav"><div class="site-shell site-nav-inner">
     <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
@@ -13,7 +13,8 @@
 <p>这是项目评测协议，标准冻结不表示实测完成。公开 trace 测推理性能，不测任务解决率。<br>A project-defined protocol, not an upstream official serving trace. A frozen plan is not a measurement. Trace replay measures inference, not task success.</p>
 <p id="standard-status" role="status">正在校验来源 / Verifying source…</p>
 <section id="standard-content" hidden><h2 id="standard-title"></h2><p id="standard-provenance"></p>
-<div class="scroll"><table><thead><tr><th>数据集 / Dataset</th><th>任务 / Tasks</th><th>每臂请求 / Requests per arm</th><th>用途 / Scope</th><th>固定规则 / Selection</th><th>生成设置 / Generation</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
+<section id="test-modes" aria-labelledby="test-modes-title"><h2 id="test-modes-title">选择测试范围与预留时间 / Choose scope and plan your time</h2><div id="test-mode-cards" class="test-mode-cards"></div><p id="test-mode-scope"></p><details><summary>时间依据与执行说明 / Timing basis and execution</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p></details></section>
+<h2>固定数据集 / Frozen datasets</h2><div class="scroll"><table><thead><tr><th>数据集 / Dataset</th><th>任务 / Tasks</th><th>每臂请求 / Requests per arm</th><th>用途 / Scope</th><th>固定规则 / Selection</th><th>生成设置 / Generation</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
 <h2>协议下载 / Protocol downloads</h2><p>只含任务身份与校验信息，不分发题目、答案或原始对话。来源数据遵守原授权。<br>Identity and integrity metadata only; no questions, answers or raw conversations. Original source terms apply.</p><ul id="standard-files"></ul>
 <h2>统计口径 / Metrics</h2><dl id="standard-metrics"></dl><h2>执行边界 / Execution</h2><ul id="standard-invariants"></ul>
 <p id="standard-access"></p><p><a href="./data/dataset-standard-v1/README.md">完整说明 / Full protocol</a> · <a href="./data/dataset-standard-v1/SHA256SUMS">SHA256SUMS</a> · <a href="./data/dataset-standard-v1/verify.py">离线校验 / Offline verifier</a></p></section>
