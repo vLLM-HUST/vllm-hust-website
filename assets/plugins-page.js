@@ -1989,6 +1989,16 @@ vllm-hust-ext extension check ${extensionId}`
       renderDiscoveryNavigation();
       renderCatalog();
       renderBoundaries();
+      const linkedCard = document.getElementById(window.location.hash.slice(1));
+      if (linkedCard && catalog.contains(linkedCard)) {
+        linkedCard.scrollIntoView();
+        const controls = document.querySelector(".plugin-controls");
+        const topBar = document.querySelector(".site-nav");
+        const obstruction = controls && getComputedStyle(controls).position === "sticky"
+          ? controls.getBoundingClientRect().bottom
+          : (topBar?.getBoundingClientRect().bottom || 0);
+        window.scrollBy(0, -obstruction - 12);
+      }
     })
     .catch((error) => {
       status.textContent = (language() === "zh" ? "生态目录加载失败：" : "The ecosystem catalog could not be loaded: ") + error.message;

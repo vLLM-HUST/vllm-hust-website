@@ -87,7 +87,8 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
     mod_count = len(mod_projects)
-    assert mod_count == 42
+    assert "instance-controller" in mod_projects
+    assert mod_count == 43
     scenario_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
