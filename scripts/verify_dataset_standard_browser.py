@@ -29,6 +29,19 @@ with sync_playwright() as play:
         assert "64" in rows[3] and "48" in rows[4]
         assert sum("Inference only" in row for row in rows) == 2
         assert page.locator("#standard-files a").count() == 6
+        assert "2–3" in page.locator("#test-mode-quick").inner_text()
+        assert "12–16" in page.locator("#test-mode-full").inner_text()
+        assert (
+            page.locator("#test-mode-quick code")
+            .inner_text()
+            .endswith("--datasets mmlu")
+        )
+        assert (
+            page.locator("#test-mode-full code")
+            .inner_text()
+            .endswith("--datasets mmlu,hle,frontier,swe,terminal")
+        )
+        assert "not every item" in page.locator("#test-mode-scope").inner_text()
         assert "verified" in page.locator("#standard-status").inner_text()
         assert not errors, errors
         assert page.evaluate(
@@ -47,6 +60,19 @@ with sync_playwright() as play:
     page.wait_for_selector("#standard-status[role=alert]")
     assert page.locator("#standard-content").is_hidden()
     assert "checksum mismatch" in page.locator("#standard-status").inner_text()
+    page = browser.new_page()
+    page.route(
+        "**/dataset-run-guide-v1.json",
+        lambda route: route.fulfill(
+            status=200, body="{}", content_type="application/json"
+        ),
+    )
+    page.goto(args.url, wait_until="networkidle")
+    page.wait_for_selector("#standard-status[role=alert]")
+    assert page.locator("#standard-content").is_hidden()
+    assert (
+        "run guide checksum mismatch" in page.locator("#standard-status").inner_text()
+    )
     browser.close()
 print(
     json.dumps(
