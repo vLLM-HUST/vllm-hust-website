@@ -285,7 +285,7 @@ python3 bootstrap_terminal_arm64.py status --directory "$RUN_DIR"`,
 
   function render() {
     const labels = {
-      'entry-title': ['Frozen dataset tests', '冻结数据集测试'],
+      'entry-title': ['Test datasets', '测试数据集'],
       'entry-lead': ['Choose quick or full testing with the frozen samples, budgets and one-click commands below.', '选择快速或全量测试，使用下方冻结的样本、预算与一键命令。'],
       'entry-jump-basic': ['The five datasets', '指定五项数据集'], 'entry-jump-special': ['2. Special scoring', '2. 特殊评分'], 'entry-jump-sandbox': ['3. Agent sandboxes', '3. 闭环任务'],
       'entry-all-link': ['All 118 sources', '全部 118 来源'],
