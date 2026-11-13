@@ -1,21 +1,95 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="standard-source" content="./data/benchmark-source-manifest.json"><meta name="run-guide-source" content="./data/benchmark-source-manifest.json"><title>数据集标准 · Dataset standard</title>
-<link rel="stylesheet" href="./assets/site.css?v=public-audit-20261101"><link rel="stylesheet" href="./assets/dataset-standard.css"></head>
-<body data-page="dataset-standard">  <nav class="site-nav"><div class="site-shell site-nav-inner">
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="standard-source" content="./data/benchmark-source-manifest.json">
+  <meta name="run-guide-source" content="./data/benchmark-source-manifest.json">
+  <meta name="description" content="按四步完成冻结标准测试：选择范围、准备环境、执行 B0/B1 配对、核对结果与交付证据。">
+  <title>标准测试执行指南 · vLLM-HUST</title>
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-standard.html">
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="stylesheet" href="./assets/site.css?v=public-audit-20261101">
+  <link rel="stylesheet" href="./assets/dataset-standard.css?v=workflow-20261113">
+</head>
+<body data-page="dataset-standard">
+  <nav class="site-nav"><div class="site-shell site-nav-inner">
     <a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a>
-    <div class="nav-links"><a href="./index.html" id="entry-home">Home</a><a href="./b0-b1.html" id="entry-results">Evaluation results</a><a href="./plugins.html" id="entry-plugins">MOD integration</a></div>
+    <div class="nav-links"><a href="./index.html" data-i18n-common="navHome">首页</a><a href="./b0-b1.html" data-i18n-common="navComparison">B0/B1 大纲对比</a><a href="./plugins.html" data-i18n-common="navPlugins">MOD 目录</a></div>
   </div></nav>
-  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
-<main class="site-shell">
-<h1>数据集固定标准 <small>Frozen dataset standard</small></h1>
-<p>两个项目共用冻结的样本、顺序、预算和统计口径。<br>Shared frozen membership, order, generation budgets and metrics.</p>
-<p>这是项目评测协议，标准冻结不表示实测完成。公开 trace 测推理性能，不测任务解决率。<br>A project-defined protocol, not an upstream official serving trace. A frozen plan is not a measurement. Trace replay measures inference, not task success.</p>
-<p id="standard-status" role="status">正在校验来源 / Verifying source…</p>
-<section id="standard-content" hidden><h2 id="standard-title"></h2><p id="standard-provenance"></p>
-<section id="test-modes" aria-labelledby="test-modes-title"><h2 id="test-modes-title">选择测试范围与预留时间 / Choose scope and plan your time</h2><div id="test-mode-cards" class="test-mode-cards"></div><p id="test-mode-scope"></p><details><summary>时间依据与执行说明 / Timing basis and execution</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p></details></section>
-<h2>固定数据集 / Frozen datasets</h2><div class="scroll"><table><thead><tr><th>数据集 / Dataset</th><th>任务 / Tasks</th><th>每臂请求 / Requests per arm</th><th>用途 / Scope</th><th>固定规则 / Selection</th><th>生成设置 / Generation</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
-<h2>协议下载 / Protocol downloads</h2><p>只含任务身份与校验信息，不分发题目、答案或原始对话。来源数据遵守原授权。<br>Identity and integrity metadata only; no questions, answers or raw conversations. Original source terms apply.</p><ul id="standard-files"></ul>
-<h2>统计口径 / Metrics</h2><dl id="standard-metrics"></dl><h2>执行边界 / Execution</h2><ul id="standard-invariants"></ul>
-<p id="standard-access"></p><p><a href="./data/dataset-standard-v1/README.md">完整说明 / Full protocol</a> · <a href="./data/dataset-standard-v1/SHA256SUMS">SHA256SUMS</a> · <a href="./data/dataset-standard-v1/verify.py">离线校验 / Offline verifier</a></p></section>
-</main><footer class="site-footer"><span id="footer-copy">Frozen dataset protocol and input identities.</span></footer><script src="./assets/dataset-standard.js"></script><script src="./assets/site.js?v=public-audit-20261101"></script></body></html>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
+  <main class="site-shell standard-main">
+    <div class="guide-topbar"><a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><button id="download-test-script" class="secondary-download" type="button" disabled>下载一键测试脚本 ↓</button></div><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div>
+    <header class="guide-hero">
+      <p class="guide-eyebrow" data-guide-copy="eyebrow">执行指南 / 固定协议 v1</p>
+      <h1 data-guide-copy="title">标准测试，按这四步完成</h1>
+      <p class="guide-lead" data-guide-copy="lead">先选范围，再用同一批输入完成 B0/B1 配对，最后逐项核对报告。</p>
+      <p class="guide-boundary" data-guide-copy="boundary">完整测试覆盖项目冻结的五项范围；SWE / Terminal 仅测轨迹回放性能。跑完测试后，还须单独判断各项验收目标是否达标。</p>
+    </header>
+    <p id="standard-status" class="guide-status" role="status">正在校验测试标准与运行指南…</p>
+    <div id="standard-content" class="guide-layout" hidden>
+      <aside class="guide-sidebar">
+        <nav aria-label="测试步骤" data-guide-nav>
+          <p data-guide-copy="onThisPage">按顺序执行</p>
+          <a href="#choose-scope"><span>01</span><span data-guide-copy="choose">选择测试范围</span></a>
+          <a href="#prepare"><span>02</span><span data-guide-copy="prepare">准备运行环境</span></a>
+          <a href="#run"><span>03</span><span data-guide-copy="run">执行配对测试</span></a>
+          <a href="#review"><span>04</span><span data-guide-copy="review">核对结果与交付</span></a>
+          <a href="#protocol-details" data-guide-copy="detailsNav">协议细节与下载 ↓</a>
+        </nav>
+        <p class="guide-side-note" data-guide-copy="sideNote">第一次运行？从第 01 步开始。复核协议？直接看底部详情。</p>
+      </aside>
+      <div class="guide-body">
+        <section id="choose-scope" class="guide-step">
+          <div class="step-heading"><span class="step-number">01</span><div><h2 data-guide-copy="choose">选择测试范围</h2><p data-guide-copy="chooseLead">联调选快速；正式完整测试选五项。两种模式都需要 B0 / B1。</p></div></div>
+          <div id="test-modes"><div id="test-mode-cards" class="test-mode-cards" role="radiogroup" aria-label="测试范围"></div></div>
+          <p id="test-mode-scope" class="guide-note"></p>
+          <details class="guide-details" id="time-details"><summary data-guide-copy="timing">预计耗时包含什么？</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p></details>
+          <details class="guide-details" id="dataset-scope"><summary data-guide-copy="scopeTable">查看五项任务数与请求数</summary><div class="scroll"><table><caption data-guide-copy="tableCaption">每臂 = B0 或 B1；每臂都使用同一份冻结清单。</caption><thead><tr><th data-guide-copy="dataset">数据集</th><th data-guide-copy="tasks">固定任务 / 源任务</th><th data-guide-copy="requests">每臂请求</th><th data-guide-copy="purpose">测什么</th></tr></thead><tbody id="standard-rows"></tbody></table></div></details>
+        </section>
+        <section id="prepare" class="guide-step">
+          <div class="step-heading"><span class="step-number">02</span><div><h2 data-guide-copy="prepare">准备运行环境</h2><p data-guide-copy="prepareLead">以下命令用于 vLLM-HUST Engine。先确认条件，再启动测试。</p></div></div>
+          <ul class="guide-checklist" id="preparation-list"></ul>
+          <p class="guide-note" data-guide-copy="otherEngines">其他引擎沿用同一冻结数据范围，使用各自执行器；模型或 tokenizer 改变时，trace 必须另立 profile。</p>
+          <p class="guide-actions"><a id="engine-instructions" class="guide-text-link" data-guide-copy="engineDocs">打开固定版本的部署与运行说明 ↗</a><a id="runner-source" data-guide-copy="runnerSource">查看执行器源码 ↗</a></p>
+        </section>
+        <section id="run" class="guide-step">
+          <div class="step-heading"><span class="step-number">03</span><div><h2 data-guide-copy="run">执行配对测试</h2><p data-guide-copy="runLead">使用 Engine 入口，或下载顶部的一键脚本，在 one_click.py 所在目录运行。先填写本机路径和卡号；输出目录必须全新。</p></div></div>
+          <form id="run-parameters" class="run-parameters">
+            <label><span data-guide-copy="modelPath">模型目录</span><input name="model" value="/path/to/model" autocomplete="off" spellcheck="false" required></label>
+            <label><span data-guide-copy="sdkPath">固定 B1 SDK 的 Python</span><input name="sdk" value="/path/to/fixed-b1-sdk/bin/python" autocomplete="off" spellcheck="false" required></label>
+            <label><span data-guide-copy="devices">物理 NPU 卡号</span><input name="devices" value="0,1" autocomplete="off" spellcheck="false" required></label>
+            <label><span data-guide-copy="outPath">全新结果目录</span><input name="out" value="/path/to/new-results" autocomplete="off" spellcheck="false" required></label>
+          </form>
+          <div class="guide-command"><div class="command-toolbar"><span id="selected-mode-label"></span><button id="copy-run-command" type="button" data-guide-copy="copy">复制命令</button></div><pre><code id="run-command"></code></pre></div>
+          <p id="command-feedback" class="guide-note" role="status" aria-live="polite" data-guide-copy="commandHint">路径与卡号只在本页生成命令，网页不会启动测试。</p>
+          <ol id="execution-stages" class="execution-stages"></ol>
+          <p class="guide-callout" data-guide-copy="stopRule">失败时保留原始记录与未执行阶段。不要删掉失败项、缩短输出预算或换题补跑来凑齐结果。</p>
+        </section>
+        <section id="review" class="guide-step">
+          <div class="step-heading"><span class="step-number">04</span><div><h2 data-guide-copy="review">核对结果与交付</h2><p data-guide-copy="reviewLead">先检查所选范围是否执行完整，再检查四项目标。两者分开记录。</p></div></div>
+          <div id="review-list" class="review-list"></div>
+          <div class="guide-delivery"><h3 data-guide-copy="deliveryTitle">交付时带上这些证据</h3><ul id="delivery-list"></ul></div>
+          <p class="guide-actions"><a href="./b0-b1.html" class="guide-button" data-guide-copy="acceptanceLink">查看 B0/B1 四项目标 →</a></p>
+        </section>
+        <section id="protocol-details" class="guide-step protocol-details">
+          <p class="guide-eyebrow" data-guide-copy="referenceEyebrow">需要复核时再展开</p>
+          <h2 data-guide-copy="detailsTitle">协议细节与下载</h2>
+          <p class="guide-note" data-guide-copy="immutable">样本、顺序、来源、预算、评分或 tokenizer 变化须发布新版本。冻结协议不代表实测已完成。</p>
+          <details class="guide-details"><summary data-guide-copy="frozenRules">各数据集的抽样与生成设置</summary><div id="dataset-rules"></div></details>
+          <details class="guide-details"><summary data-guide-copy="metrics">统计口径：吞吐、TTFT、TPOT 与质量</summary><dl id="standard-metrics"></dl></details>
+          <details class="guide-details"><summary data-guide-copy="invariants">执行约束与访问要求</summary><ul id="standard-invariants"></ul><p id="standard-access"></p></details>
+          <details class="guide-details"><summary data-guide-copy="downloads">协议文件与 SHA256</summary><p data-guide-copy="downloadNote">仅含任务身份与校验信息，不分发题目、答案或原始对话。使用原始数据须遵守来源授权。</p><ul id="standard-files"></ul><p><a href="./data/dataset-standard-v1/README.md" data-guide-copy="fullProtocol">完整协议说明</a> · <a href="./data/dataset-standard-v1/SHA256SUMS">SHA256SUMS</a> · <a href="./data/dataset-standard-v1/verify.py" data-guide-copy="verifier">离线校验脚本</a></p><pre><code>python verify.py</code></pre><p class="guide-note" data-guide-copy="verifyHint">下载全部附件后，在协议文件所在目录执行。</p></details>
+          <details class="guide-details"><summary data-guide-copy="provenance">版本身份与固定来源</summary><p id="standard-title"></p><p id="standard-provenance"></p></details>
+        </section>
+      </div>
+    </div>
+    <noscript><p>本页需要 JavaScript 校验冻结标准。<a href="./data/dataset-standard-v1/README.md">阅读完整协议</a>。</p></noscript>
+  </main>
+  <footer class="site-footer"><span id="footer-copy">固定标准 · 执行步骤 · 可复核证据</span></footer>
+  <script src="./assets/site.js?v=public-audit-20261101"></script>
+  <script src="./assets/dataset-test-prompt.js?v=workflow-prompt-20261113"></script>
+  <script src="./assets/dataset-standard-guide.js?v=workflow-20261113"></script>
+  <script src="./assets/dataset-standard.js?v=workflow-20261113"></script>
+</body>
+</html>
