@@ -19,7 +19,7 @@ out.mkdir(parents=True, exist_ok=True)
 prompts = {}
 
 
-def check_prompt_download(page, language):
+def check_prompt_download(page, language, target="mod"):
     button = page.locator("#download-test-prompt")
     assert button.is_enabled()
     with page.expect_download() as pending:
@@ -32,10 +32,6 @@ def check_prompt_download(page, language):
         "standard_sha256:",
         "run_guide_sha256:",
         "reference_runner_commit:",
-        "--datasets mmlu,hle,frontier,swe,terminal",
-        "--b1-python /path/to/fixed-b1-sdk/bin/python",
-        "--physical-devices 0,1",
-        "execution-checklist.json",
         "max_output_tokens=16384",
         "judge_max_tokens=8192",
         "tool_choice=none",
@@ -45,16 +41,26 @@ def check_prompt_download(page, language):
         "3.4.4",
     ):
         assert required in content, required
+    if target == "mod":
+        assert "test_target: own_mod" in content
+        assert "selected_scope: full" in content
+        assert "selected_profiles: mmlu,hle,frontier,swe,terminal" in content
+        assert "--b1-python" not in content
+        assert "MOD" in content
+    else:
+        assert "test_target: reference-engine" in content
+        assert "--datasets mmlu,hle,frontier,swe,terminal" in content
+        assert "--b1-python /path/to/fixed-b1-sdk/bin/python" in content
+        assert "execution-checklist.json" in content
     if language == "zh":
         assert "标准测试 AI 提示词" in content and "不测任务解决率" in content
     else:
         assert "AI prompt for standard testing" in content
         assert not re.search(r"[\u4e00-\u9fff]", content)
-    if language in prompts:
-        assert prompts[language] == content, (
-            "Both pages must download the same standard"
-        )
-    prompts[language] = content
+    key = (language, target)
+    if key in prompts:
+        assert prompts[key] == content, "Both pages must download the same standard"
+    prompts[key] = content
     with page.expect_download() as pending_script:
         page.locator("#download-test-script").click()
     script = pending_script.value
@@ -137,6 +143,34 @@ with sync_playwright() as play:
                     assert not page.locator("#protocol-details details[open]").count()
                     assert page.locator(".guide-step").count() == 5
                     assert page.locator('input[value="full"]').is_checked()
+                    assert page.locator(
+                        '[name="test-target"][value="mod"]'
+                    ).is_checked()
+                    assert page.locator("#mod-run").is_visible()
+                    assert page.locator("#reference-run").is_hidden()
+                    page.locator('[name="mod_repository"]').fill(
+                        "https://example.org/student-mod"
+                    )
+                    page.locator('[name="mod_revision"]').fill("student-v1")
+                    with page.expect_download() as project_prompt:
+                        page.locator("#download-mod-prompt").click()
+                    project_content = Path(project_prompt.value.path()).read_text(
+                        encoding="utf-8-sig"
+                    )
+                    assert "https://example.org/student-mod" in project_content
+                    assert "student-v1" in project_content
+                    assert "--b1-python" not in project_content
+                    page.locator(
+                        '[name="test-target"][value="reference-engine"]'
+                    ).check()
+                    assert page.locator("#reference-run").is_visible()
+                    assert page.locator("#mod-run").is_hidden()
+                    assert (
+                        page.locator('[name="mod_repository"]').input_value()
+                        == "https://example.org/student-mod"
+                    )
+                    page.locator('input[value="full"]').check()
+                    check_prompt_download(page, "en", "reference-engine")
                     command = page.locator("#run-command").inner_text()
                     assert (
                         shlex.split(command.replace("\\\n", ""))[-1]
@@ -186,6 +220,9 @@ with sync_playwright() as play:
                         "/path/to/fixed-b1-sdk/bin/python"
                     )
                     page.locator('[name="devices"]').fill("0,1")
+                    page.locator('[name="test-target"][value="mod"]').check()
+                    page.locator('[name="mod_repository"]').fill("")
+                    page.locator('[name="mod_revision"]').fill("")
                 else:
                     assert [
                         row.locator("td").nth(1).inner_text()
@@ -201,6 +238,15 @@ with sync_playwright() as play:
                         page.locator(".summary-links a").get_attribute("href")
                         == "./dataset-standard.html"
                     )
+                    assert "scope=quick" in page.locator(
+                        "#test-mode-quick .mode-start-link"
+                    ).get_attribute("href")
+                    assert "scope=full" in page.locator(
+                        "#test-mode-full .mode-start-link"
+                    ).get_attribute("href")
+                    assert page.locator(".entry-reference-command[open]").count() == 0
+                    for detail in page.locator(".entry-reference-command").all():
+                        detail.evaluate("element => element.open = true")
                     assert (
                         page.locator("#test-mode-quick code")
                         .inner_text()
@@ -227,6 +273,9 @@ with sync_playwright() as play:
                             ".summary-links a",
                         ],
                     )
+                if name == "entry":
+                    for detail in page.locator(".entry-reference-command").all():
+                        detail.evaluate("element => element.open = false")
                 check_prompt_download(page, "en")
                 check_contrast(page, ["#download-test-prompt", "#download-test-script"])
                 no_overflow(page)
@@ -246,6 +295,9 @@ with sync_playwright() as play:
                 if name == "standard":
                     assert page.locator('[name="devices"]').input_value() == "0,1"
                     assert page.locator('input[value="full"]').is_checked()
+                    assert page.locator(
+                        '[name="test-target"][value="mod"]'
+                    ).is_checked()
                     assert "标准测试" in page.locator("h1").inner_text()
                     for details in page.locator(".guide-details").all():
                         details.evaluate("element => element.open = true")
@@ -300,6 +352,19 @@ with sync_playwright() as play:
         )
         assert not downloads
         page.close()
+    page = browser.new_page()
+    page.goto(
+        urljoin(args.url, "dataset-standard.html?scope=quick"), wait_until="networkidle"
+    )
+    page.wait_for_selector("#standard-content:not([hidden])")
+    assert page.locator('input[value="quick"]').is_checked()
+    assert page.locator('[name="test-target"][value="mod"]').is_checked()
+    with page.expect_download() as quick_prompt:
+        page.locator("#download-test-prompt").click()
+    quick_content = Path(quick_prompt.value.path()).read_text(encoding="utf-8-sig")
+    assert "selected_scope: quick" in quick_content
+    assert re.search(r"^selected_profiles: mmlu$", quick_content, re.M)
+    page.close()
     browser.close()
 print(
     json.dumps(

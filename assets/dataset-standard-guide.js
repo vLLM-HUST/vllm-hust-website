@@ -2,7 +2,9 @@
   'use strict';
   let payload;
   let failure;
-  let selectedMode = 'full';
+  const query = new URLSearchParams(location.search);
+  let selectedMode = query.get('scope') === 'quick' ? 'quick' : 'full';
+  let selectedTarget = query.get('target') === 'reference-engine' ? 'reference-engine' : 'mod';
   const language = () => (window.vllmHustSite?.getCurrentLang()
     || localStorage.getItem('vllm-hust_lang') || navigator.language || 'en').startsWith('zh') ? 'zh' : 'en';
   const node = (tag, value, className) => {
@@ -14,7 +16,7 @@
   const copy = {
     zh: {
       back: '← 返回测试数据集', eyebrow: '执行指南 / 固定协议 v1', title: '标准测试，按这四步完成',
-      lead: '先选范围，再用同一批输入完成 B0/B1 配对，最后逐项核对报告。',
+      lead: 'B0 是对照配置，B1 是你的 MOD 候选配置；用同一批输入比较质量和性能。',
       boundary: '完整测试覆盖项目冻结的五项范围；SWE / Terminal 仅测轨迹回放性能。跑完测试后，还须单独判断各项验收目标是否达标。',
       onThisPage: '按顺序执行', choose: '选择测试范围', prepare: '准备运行环境', run: '执行配对测试', review: '核对结果与交付',
       detailsNav: '协议细节与下载 ↓', sideNote: '第一次运行？从第 01 步开始。复核协议？直接看底部详情。',
@@ -82,7 +84,7 @@
     },
     en: {
       back: '← Back to test datasets', eyebrow: 'EXECUTION GUIDE / FROZEN PROTOCOL v1', title: 'Run a standard test in four steps',
-      lead: 'Choose a scope, run B0 and B1 on the same inputs, then check the report item by item.',
+      lead: 'B0 is the control and B1 is your MOD candidate. Compare quality and performance using the same inputs.',
       boundary: 'Full testing covers five project-frozen profiles. SWE / Terminal measure trace inference only. After execution, assess each acceptance target separately.',
       onThisPage: 'FOLLOW THE STEPS', choose: 'Choose a test scope', prepare: 'Prepare the environment', run: 'Run the paired test', review: 'Review and deliver',
       detailsNav: 'Protocol details & downloads ↓', sideNote: 'First run? Start at step 01. Auditing the protocol? Jump to the details below.',
@@ -130,6 +132,66 @@
         'Reports: execution checklist, paired report and figures; state selected-scope completeness, each target conclusion and limitations.',
       ],
       metricNames: {throughput: 'Throughput', ttft: 'Time to first token (TTFT)', tpot: 'Time per output token (TPOT)', percentiles: 'Percentiles', quality: 'Quality', trace_quality: 'Trace task quality'},
+    },
+  };
+  const modCopy = {
+    zh: {
+      targetTitle: '先选择要测什么', modTarget: '评估自己的 MOD', modTargetNote: '默认：同一基础引擎，关闭 / 启用目标 MOD',
+      engineTarget: '复跑参考 Engine', engineTargetNote: '可选：已冻结的 vLLM-HUST Engine 组合',
+      armDefinitions: '本页 MOD 对比默认 B0 = 同一基础配置关闭目标 MOD，B1 = 启用你的 MOD。每轮冻结实际版本与开关，不把 B1 固定为某个 Engine。',
+      prepareLead: '先固定本轮的基础引擎、目标 MOD 与对照方式，再准备同一冻结数据范围。',
+      otherEngines: '先核对基础引擎是否已默认具备目标能力。保留共同基线的现有优化；以实际启用记录和受益条件解释 MOD 增量效果。',
+      runLead: '使用自己项目的执行器跑 B0 / B1。可填写下方信息，让 AI 按实际仓库完成接入、运行和报告。',
+      modRepo: 'MOD 仓库或本地路径', modRevision: 'MOD 提交或版本', baseRuntime: '基础引擎与版本', modActivation: 'MOD 启用与关闭方式',
+      modParameterHint: '可先填写项目信息，再下载 AI 提示词；填写内容仅用于本地生成文件。', downloadModPrompt: '下载自己的 MOD 测试提示词 ↓',
+      modRunnerBoundary: '接入你项目中实际可用的测试执行器，核对安装、启用 / 关闭、推理与评分接口。顶部参考 Engine 脚本只复跑固定组合，不会自动装载任意 MOD；不能只改一个 B1 名称就声称完成接入。',
+      reviewLead: '先确认所选范围执行完整，再判断本轮 MOD 收益。项目四项目标按各自基线和门槛另行核对。',
+      preparations: [
+        ['冻结 B0 / B1', '默认使用同一基础引擎、提交和配置：B0 关闭目标 MOD，B1 启用你的 MOD。如课题指定其他基线，另记其定义与差异，不能把多项变化都归因于一个 MOD。'],
+        ['固定可比条件', '固定模型权重、tokenizer、硬件、设备数、并行方式、输入、顺序、并发、生成预算与评分器。MOD 必需的配置变化须披露；trace 换模型或 tokenizer 须另立 profile。'],
+        ['核验实际启用', '记录 MOD 仓库与提交、安装/构建方式、启停开关、依赖和运行时日志，确认候选确实调用目标机制。仅安装成功或参数存在不能证明已生效。'],
+        ['准备设备与证据', '按所选引擎和 MOD 准备依赖、数据访问权、设备与结果空间。两臂使用独立输出和缓存；连续 4K / 16K C8 资格与清理回执单列，参考 Engine 的 SDK 不是通用前提。'],
+      ],
+      stages: [
+        ['核验接入并冻结计划', '读取 MOD 与基础引擎的实际文档和执行器；冻结样本、参数、B0/B1 身份、启停方式和评分配置。'],
+        ['分别取得运行资格', '确认两臂的运行时、资源、输入身份和目标 MOD 状态；按协议保留连续 4K / 16K C8 证据。'],
+        ['执行同范围配对', '按相同样本与预算测 B0 / B1；HLE / Frontier 共用固定 judge。保留全部计划项和原始流，记录 MOD 触发与额外开销。'],
+        ['复算 MOD 收益', '封存与清理后，从本轮两臂证据复算质量、吞吐、TTFT、TPOT、长稳与成本，报告正收益、负收益和适用条件。'],
+      ],
+      delivery: [
+        '身份与差异：基础引擎、B0/B1、MOD 仓库/提交、启停命令、实际激活证据、模型、硬件与 judge。',
+        '原始证据：冻结清单、SSE / 时间戳、评分、设备采样、失败/未执行阶段、清理与校验清单。',
+        '收益报告：本轮 MOD 对比的质量、性能、长稳和成本、额外开销、适用与失效条件；项目验收结论另列。',
+      ],
+    },
+    en: {
+      targetTitle: 'Choose what to evaluate', modTarget: 'Evaluate your own MOD', modTargetNote: 'Default: the same base engine with the target MOD off / on',
+      engineTarget: 'Reproduce the reference Engine', engineTargetNote: 'Optional: the frozen vLLM-HUST Engine combination',
+      armDefinitions: 'For this MOD comparison, B0 defaults to the same base configuration with the target MOD off; B1 enables your MOD. Freeze actual versions and switches for each run. B1 is not a fixed Engine product.',
+      prepareLead: 'Define the base engine, target MOD and control before preparing the frozen workload.',
+      otherEngines: 'Check whether the base engine already provides the target capability. Preserve its existing optimizations and explain incremental MOD effects using activation evidence and applicable conditions.',
+      runLead: 'Use your project runner for B0 / B1. Fill in the project details below so the AI can inspect the repository, integrate, execute and report.',
+      modRepo: 'MOD repository or local path', modRevision: 'MOD commit or version', baseRuntime: 'Base engine and version', modActivation: 'MOD enable / disable method',
+      modParameterHint: 'Optionally fill in project details before downloading the prompt. Values are used locally to generate the file.', downloadModPrompt: 'Download your MOD test prompt ↓',
+      modRunnerBoundary: 'Integrate the actual installation, enable/disable, inference and grading interfaces of your runner. The reference Engine script reproduces a fixed combination; it does not load arbitrary MODs. Renaming B1 alone does not establish integration.',
+      reviewLead: 'Check execution completeness, then assess this MOD comparison. Evaluate the four project targets separately against their own baseline contracts and thresholds.',
+      preparations: [
+        ['Freeze B0 / B1', 'By default use the same base engine commit and configuration: target MOD off in B0 and on in B1. Document a project-mandated alternative baseline and all differences. Do not attribute multiple changes to one MOD.'],
+        ['Control comparison conditions', 'Fix weights, tokenizer, hardware, device count, parallelism, inputs/order, concurrency, budgets and graders. Disclose required MOD configuration changes. A changed trace model/tokenizer requires a new profile.'],
+        ['Verify activation', 'Record MOD repository/commit, installation/build, switches, dependencies and runtime logs showing that the mechanism ran. Installation or a parameter alone does not prove activation.'],
+        ['Prepare devices and evidence', 'Use dependencies and source access required by your engine/MOD. Keep separate outputs/caches for both arms, continuous 4K/16K C8 evidence and cleanup receipts. The reference Engine SDK is not a universal prerequisite.'],
+      ],
+      stages: [
+        ['Inspect integration and freeze the plan', 'Read actual MOD/base-engine docs and runners; freeze samples, parameters, B0/B1 identities, activation and grading.'],
+        ['Qualify each arm', 'Verify runtime, resources, input identities and target MOD state; retain continuous 4K/16K C8 evidence under the protocol.'],
+        ['Run the same paired scope', 'Use identical samples and budgets. HLE/Frontier share one frozen judge. Retain planned items/raw streams and record mechanism activation and overhead.'],
+        ['Recompute MOD effects', 'After sealing and cleanup, compute quality, throughput, TTFT, TPOT, stability and cost from this pair. Report gains, regressions and applicable conditions.'],
+      ],
+      delivery: [
+        'Identities and differences: base engine, B0/B1, MOD repository/commit, activation commands and evidence, model, hardware and judge.',
+        'Raw evidence: frozen manifests, SSE/timestamps, grading, device samples, failed/unexecuted stages, cleanup and checksums.',
+        'MOD report: paired quality, performance, stability, cost, overhead and applicable/failure conditions. Keep project acceptance separate.',
+      ],
     },
   };
   const labels = () => copy[language()];
@@ -181,9 +243,13 @@
 
   function render() {
     const lang = language();
-    const c = labels();
+    const c = {...labels(), ...(selectedTarget === 'mod' ? modCopy[lang] : {})};
+    if (selectedTarget === 'reference-engine') c.armDefinitions = lang === 'zh'
+      ? '参考复跑使用已冻结的 B0 / B1 组合；此路径不注入自有 MOD，模型、硬件与 SDK 按参考文档准备。'
+      : 'Reference reproduction uses the frozen B0 / B1 combination. It does not inject your MOD; prepare the model, hardware and SDK specified by the reference documentation.';
     document.querySelectorAll('[data-guide-copy]').forEach(element => {
-      element.textContent = c[element.dataset.guideCopy];
+      const value = c[element.dataset.guideCopy] ?? modCopy[lang][element.dataset.guideCopy];
+      if (value !== undefined) element.textContent = value;
     });
     document.querySelector('[data-guide-nav]').setAttribute('aria-label', c.onThisPage);
     document.getElementById('test-mode-cards').setAttribute('aria-label', c.choose);
@@ -202,7 +268,7 @@
       input.addEventListener('change', () => { selectedMode = mode.id; updateCommand(); });
       top.append(node('span', mode.id === 'full' ? c.fullTag : c.quickTag), input);
       card.append(top, node('strong', field(mode, 'title'), 'mode-title'),
-        node('span', `${c.estimate} ${mode.hours[0]}–${mode.hours[1]} ${c.hours}`, 'duration'),
+        node('span', `${lang === 'zh' ? '参考组合约' : 'Reference setup: about'} ${mode.hours[0]}–${mode.hours[1]} ${c.hours}`, 'duration'),
         node('span', field(mode, 'scope'), 'mode-scope'));
       const requests = mode.datasets.reduce((sum, id) => sum + data.datasets.find(item => item.id === id).requests_per_arm, 0);
       card.append(node('span', `${c.planned} · ${requests}`, 'mode-requests'));
@@ -218,6 +284,11 @@
     const engineBase = `https://github.com/${guide.execution.engine_repository}/blob/${guide.execution.verified_runner_commit}`;
     document.getElementById('engine-instructions').href = `${engineBase}/README.md`;
     document.getElementById('runner-source').href = `${engineBase}/one_click.py`;
+    document.getElementById('mod-run').hidden = selectedTarget !== 'mod';
+    document.getElementById('reference-run').hidden = selectedTarget !== 'reference-engine';
+    document.getElementById('reference-engine-links').hidden = selectedTarget !== 'reference-engine';
+    document.querySelectorAll('[name="test-target"]').forEach(input => { input.checked = input.value === selectedTarget; });
+    window.vllmHustTestPrompt.setTarget(selectedTarget);
     pairList('preparation-list', c.preparations);
     pairList('execution-stages', c.stages);
     pairList('review-list', c.reviews);
@@ -255,6 +326,11 @@
     document.getElementById('standard-content').hidden = false;
   }
 
+  document.querySelectorAll('[name="test-target"]').forEach(input => input.addEventListener('change', () => {
+    selectedTarget = input.value; render();
+  }));
+  document.getElementById('mod-parameters').addEventListener('submit', event => event.preventDefault());
+  document.getElementById('download-mod-prompt').addEventListener('click', () => document.getElementById('download-test-prompt').click());
   document.getElementById('run-parameters').addEventListener('submit', event => event.preventDefault());
   document.getElementById('run-parameters').addEventListener('input', updateCommand);
   document.getElementById('copy-run-command').addEventListener('click', async () => {
