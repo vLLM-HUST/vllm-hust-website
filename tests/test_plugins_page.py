@@ -928,9 +928,9 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         and item["id"] in MOD_TAXONOMY["components"]
     }
     people_cards |= {"core-attention-boundary", "ascend-attention-boundary"}
-    # A live metadata refresh also includes the external Instance Controller.
-    # The published catalog already carries its maintainer independently.
-    assert set(WORKSHOP_METADATA["plugins"]) - {"instance-controller"} == people_cards
+    # External RIDE controllers carry their maintainers in the canonical catalog.
+    refreshed_external = {"instance-controller", "kv-controller"}
+    assert set(WORKSHOP_METADATA["plugins"]) - refreshed_external == people_cards
     public_catalog_ids = {
         item["id"]
         for item in REGISTRY["components"]
