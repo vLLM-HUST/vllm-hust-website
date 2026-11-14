@@ -320,7 +320,7 @@
     if (!judgeNotice) {
       judgeNotice = node('p', undefined, 'judge-disclosure');
       judgeNotice.id = 'judge-disclosure';
-      document.getElementById('standard-access').after(judgeNotice);
+      document.getElementById('test-mode-scope').after(judgeNotice);
     }
     judgeNotice.textContent = c.judgeNotice;
     const files = document.getElementById('standard-files'); files.replaceChildren();
