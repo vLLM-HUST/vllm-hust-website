@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   // Update this committed source path only after the new benchmark report is audited.
-  const summaryPath = 'data/five-datasets-standard-20261113/summary-public-v2.json';
+  const summaryPath = 'data/five-datasets-r6-20261114/summary-public-v1.json';
   const root = document.getElementById('five-dataset-comparison');
   if (!root) return;
   let data, manifest;
