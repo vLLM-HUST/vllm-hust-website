@@ -39,6 +39,14 @@ def verify(url, output):
                     "data-loaded", data["run_id"], timeout=30000
                 )
                 expect(root.locator("table")).to_have_count(6)
+                expect(root.locator(".judge-disclosure")).to_contain_text(
+                    "无需另备模型或外部裁判服务"
+                    if lang == "zh"
+                    else "no additional model or external judge service is required"
+                )
+                expect(root.locator(".judge-disclosure")).to_contain_text(
+                    "评分增加总耗时" if lang == "zh" else "Scoring adds total runtime"
+                )
                 for row in data["datasets"]:
                     expect(root).to_contain_text(row["name"])
                     expect(root).to_contain_text(
