@@ -154,10 +154,10 @@ def main():
                             expect(page.locator(".plugin-card").first).to_be_visible()
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("46")
+                            ).to_contain_text("47")
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("49")
+                            ).to_contain_text("50")
                             expect(
                                 page.locator('[data-scenario="service_suspend_resume"]')
                             ).to_be_disabled()
