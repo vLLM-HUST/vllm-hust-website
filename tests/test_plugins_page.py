@@ -106,6 +106,10 @@ def test_mod_taxonomy_is_complete_typed_and_orthogonal() -> None:
     assert profiles["mooncake-vllm-connectors"]["kind"] == "connector_mod"
     assert profiles["traceloom"]["evidence"] == "no_performance_claim"
     assert profiles["vllm-hust-opset"]["evidence"] == "measured_beneficial"
+    assert profiles["ascend-attention-boundary"]["kind"] == "runtime_mod"
+    assert profiles["ascend-attention-boundary"]["evidence"] == (
+        "runtime_effective_no_causal_attribution"
+    )
     assert profiles["core-attention-boundary"]["kind"] == "runtime_mod"
     assert profiles["stateaxis-pipelined-weight-loading"]["capability"] == (
         "startup_deployment"
@@ -921,10 +925,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         and item.get("canonical_repository", "").startswith(
             ("https://github.com/vLLM-HUST/", "https://github.com/Qixin-Gaoke/")
         )
-        and (
-            item["id"] in MOD_TAXONOMY["components"]
-            or item["id"] == "ascend-attention-boundary"
-        )
+        and item["id"] in MOD_TAXONOMY["components"]
     }
     people_cards |= {"core-attention-boundary", "ascend-attention-boundary"}
     # A live metadata refresh also includes the external Instance Controller.
@@ -1789,7 +1790,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 43
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 44
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
