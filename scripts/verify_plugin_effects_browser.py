@@ -161,6 +161,7 @@ def main():
                         "request-lifecycle-profiler",
                         "kvcompress-ascend",
                         "pegaflow-vllm-connectors",
+                        "muxpd",
                     } <= set(checked)
                     simllm = page.locator("#simllm-migration")
                     expect(simllm).to_contain_text("5/12")
@@ -169,6 +170,7 @@ def main():
                     for component_id, value in (
                         ("pegaflow-vllm-connectors", "+6.34%"),
                         ("bidkv", "+13.83%"),
+                        ("muxpd", "+23.31%"),
                         ("kvcompress-ascend", "-3.55%"),
                     ):
                         expect(
@@ -187,6 +189,15 @@ def main():
                     )
                     assert not errors, errors
                     stem = f"{width}-{lang}-{theme}"
+                    muxpd = page.locator("#muxpd")
+                    expect(muxpd).to_contain_text("+7.40%")
+                    expect(muxpd.locator(".plugin-performance")).to_contain_text(
+                        "161.68 → 199.37 token/s"
+                    )
+                    expect(muxpd.locator(".plugin-performance")).to_contain_text(
+                        "未评估答案质量" if lang == "zh" else "quality not evaluated"
+                    )
+                    muxpd.screenshot(path=str(args.output / f"muxpd-{stem}.png"))
                     simllm.screenshot(path=str(args.output / f"simllm-{stem}.png"))
                     page.locator("#pyramidkv-ascend-migration").screenshot(
                         path=str(args.output / f"pyramidkv-{stem}.png")
