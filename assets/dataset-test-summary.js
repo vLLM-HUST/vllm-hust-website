@@ -87,6 +87,9 @@
       document.getElementById('entry-timing-note').after(judgeNotice);
     }
     judgeNotice.textContent = labels.judgeNotice;
+    let acceptanceNotice = document.getElementById('acceptance-policy-note');
+    if (!acceptanceNotice) { acceptanceNotice = node('p'); acceptanceNotice.id = 'acceptance-policy-note'; judgeNotice.after(acceptanceNotice); }
+    acceptanceNotice.textContent = language() === 'zh' ? '新版验收口径：一个固定数据集同时满足该项目标全部条件即可，不要求五项均达标，不跨数据集拼接指标。五项结果仍完整披露，参考算力、长上下文和多租户等专项分别判定。' : 'Updated acceptance: one fixed dataset meeting all conditions of a target is sufficient; all five need not pass. Never combine metrics across datasets. Disclose all results and assess reference compute, long-context and multi-tenant requirements separately.';
 
     const rows = document.getElementById('standard-rows'); rows.replaceChildren();
     for (const dataset of data.datasets) {
