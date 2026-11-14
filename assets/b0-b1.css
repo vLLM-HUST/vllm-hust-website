@@ -40,3 +40,9 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .compute-step .focus-table table { min-width: 0; width: 100%; }
 .compute-step .focus-table th, .compute-step .focus-table td { white-space: normal; overflow-wrap: anywhere; }
 .compute-step { font-variant-numeric: tabular-nums; }
+
+#five-dataset-comparison { min-width: 0; }
+#five-dataset-comparison details { padding: 10px 0; }
+#five-dataset-comparison summary { cursor: pointer; font-weight: 600; }
+#five-dataset-comparison p { overflow-wrap: anywhere; }
+#five-dataset-comparison .focus-table { max-width: 100%; overflow-x: auto; }
