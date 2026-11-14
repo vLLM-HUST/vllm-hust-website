@@ -56,7 +56,7 @@ def verify(url, output):
                 page.add_init_script(
                     f"localStorage.setItem('vllm-hust_lang', '{language}')"
                 )
-                page.goto(url + "/b0-b1.html#method-2")
+                page.goto(url + "/b0-b1-legacy.html#method-2")
                 root = page.locator("#comparison")
                 expect(root).to_have_attribute("data-loaded", "V1.03", timeout=30000)
                 expect(root.locator(".comparison-group")).to_have_count(4)
@@ -273,7 +273,7 @@ def verify(url, output):
                     "**/data/benchmark-source-manifest.json",
                     lambda route, _request, doc=altered: route.fulfill(json=doc),
                 )
-            page.goto(url + "/b0-b1.html")
+            page.goto(url + "/b0-b1-legacy.html")
             expect(page.locator("#comparison")).to_contain_text(
                 "结果加载失败", timeout=30000
             )
