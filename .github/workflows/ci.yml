@@ -120,6 +120,7 @@ jobs:
           python scripts/verify_dataset_entrypoints_browser.py --url http://127.0.0.1:8769
           python scripts/verify_dataset_standard_browser.py http://127.0.0.1:8769/dataset-standard.html --output output/dataset-standard
           python scripts/verify_b1_definition_browser.py --url http://127.0.0.1:8769 --output output/playwright/b1-definition
+          python scripts/verify_five_dataset_comparison_browser.py --url http://127.0.0.1:8769 --output output/playwright/five-dataset-comparison
           python scripts/verify_capability_coverage_browser.py --url http://127.0.0.1:8769
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_clarity_browser.py --url http://127.0.0.1:8769
@@ -137,6 +138,7 @@ jobs:
             output/playwright/dataset-matrix/
             output/playwright/dataset-entrypoints/
             output/playwright/b1-definition/
+            output/playwright/five-dataset-comparison/
             output/playwright/site-repair/
             output/playwright/clarity/
             output/playwright/public-pages/

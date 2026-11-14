@@ -34,6 +34,7 @@
       reviewLead: '先核对本轮执行范围，再按证据逐项判定。联合报告中的归档 3.4.1 结果仅适用于页面标明的固定工况。新工况须从本轮记录重算参考算力和达成率。', deliveryTitle: '交付时带上这些证据',
       acceptanceLink: '查看 B0/B1 四项目标 →', referenceEyebrow: '需要复核时再展开', detailsTitle: '协议细节与下载',
       immutable: '样本、顺序、来源、预算、评分或 tokenizer 变化须发布新版本。冻结协议不代表实测已完成。',
+      judgeNotice: '参考Engine的HLE/Frontier评分复用同一份35B权重，由脚本单独启动固定B1阶段，无需另备模型或外部裁判服务。评分增加总耗时，其流量不计solver性能和单位token成本。同模型辅助评分不构成独立模型验证；裁判未决单列，不等同引擎请求失败。MMLU200使用规则评分。',
       frozenRules: '各数据集的抽样与生成设置', metrics: '统计口径：吞吐、TTFT、TPOT 与质量', invariants: '执行约束与访问要求',
       downloads: '协议文件与 SHA256', downloadNote: '仅含任务身份与校验信息，不分发题目、答案或原始对话。使用原始数据须遵守来源授权。',
       fullProtocol: '完整协议说明', verifier: '离线校验脚本', verifyHint: '下载全部附件后，在协议文件所在目录执行。', provenance: '版本身份与固定来源',
@@ -102,6 +103,7 @@
       reviewLead: 'Verify this run’s coverage, then assess each target from its evidence. The archived 3.4.1 result in the joint report applies to the stated workload. For a new workload, recompute reference compute and efficiency from the current run.', deliveryTitle: 'Include these in the handoff',
       acceptanceLink: 'View the four B0/B1 targets →', referenceEyebrow: 'EXPAND WHEN YOU NEED THE DETAILS', detailsTitle: 'Protocol details & downloads',
       immutable: 'Changes to samples, order, sources, budgets, grading or tokenizer require a new version. A frozen protocol is not a completed measurement.',
+      judgeNotice: 'The reference Engine reuses the same 35B weights in separate fixed-B1 HLE/Frontier scoring stages; no additional model or external judge service is required. Scoring adds total runtime and is excluded from solver performance and unit-token cost. Same-model auxiliary scores are not independent-model validation; unresolved judgments are listed separately from engine request failures. MMLU200 uses rule scoring.',
       frozenRules: 'Selection and generation settings by dataset', metrics: 'Metrics: throughput, TTFT, TPOT and quality', invariants: 'Execution constraints and access requirements',
       downloads: 'Protocol files and SHA256', downloadNote: 'Identity and integrity metadata only. No questions, answers or raw conversations are redistributed. Original source terms apply.',
       fullProtocol: 'Full protocol', verifier: 'Offline verifier', verifyHint: 'After downloading all artifacts, run in the protocol directory.', provenance: 'Version identity and pinned sources',
@@ -314,6 +316,16 @@
     document.getElementById('standard-invariants').replaceChildren(...invariants.map(value => node('li', value)));
     document.getElementById('standard-access').textContent = lang === 'zh' ? c.access
       : [data.execution.access, data.execution.engine_binding, data.execution.trace_model_binding, data.execution.judge].join(' ');
+    let judgeNotice = document.getElementById('judge-disclosure');
+    if (!judgeNotice) {
+      judgeNotice = node('p', undefined, 'judge-disclosure');
+      judgeNotice.id = 'judge-disclosure';
+      document.getElementById('test-mode-scope').after(judgeNotice);
+    }
+    judgeNotice.textContent = c.judgeNotice;
+    let acceptanceNotice = document.getElementById('acceptance-policy-note');
+    if (!acceptanceNotice) { acceptanceNotice = node('p'); acceptanceNotice.id = 'acceptance-policy-note'; judgeNotice.after(acceptanceNotice); }
+    acceptanceNotice.textContent = language() === 'zh' ? '新版验收口径：一个固定数据集同时满足该项目标全部条件即可，不要求五项均达标，不跨数据集拼接指标。五项结果仍完整披露，参考算力、长上下文和多租户等专项分别判定。' : 'Updated acceptance: one fixed dataset meeting all conditions of a target is sufficient; all five need not pass. Never combine metrics across datasets. Disclose all results and assess reference compute, long-context and multi-tenant requirements separately.';
     const files = document.getElementById('standard-files'); files.replaceChildren();
     for (const [name, artifact] of Object.entries(data.artifacts)) {
       const link = node('a', name); link.href = `./data/dataset-standard-v1/${name}`; link.download = name;

@@ -219,6 +219,8 @@ ${command(guide, full)}
 ${command(guide, quick)}
 
 执行顺序：恢复并校验两侧 SDK → 冻结任务、源码、评分配置并写出 execution-checklist.json → 本机连续 4K/16K C8 资格 → 所选范围的 B0/B1 配对 → 共同 judge 评分（HLE/Frontier）→ 退出清理、释放设备、封存原始记录 → 复算并生成报告。
+参考Engine的HLE/Frontier评分复用同一份35B权重，由脚本单独启动固定B1阶段，无需另备模型或外部裁判服务。评分增加总耗时，其流量不计solver性能和单位token成本。同模型辅助评分不构成独立模型验证；裁判未决单列，不等同引擎请求失败。MMLU200使用规则评分。
+
 保留原 60 秒预热/300 秒正式窗口及所有冻结生成预算；不能把有限批次 P95/P99 当成连续长稳。不要用 --prepare-only、--smoke-evaluators 或 --hle-profile full1811 代替本次正式标准。其他引擎使用各自执行器，但不得改变冻结范围或比较口径。
 
 排期参考：${estimates}。${field(guide.timing, 'reference')} ${field(guide.timing, 'includes')} ${field(guide.timing, 'excludes')} ${field(guide.timing, 'basis')}
@@ -280,6 +282,8 @@ Only for an explicitly requested quick check:
 ${command(guide, quick)}
 
 Order: restore and verify SDKs → freeze tasks/source/graders and write execution-checklist.json → local continuous 4K/16K C8 qualification → selected B0/B1 profiles → shared HLE/Frontier judge → process cleanup, device release and raw-record sealing → recompute reports.
+The reference Engine reuses the same 35B weights in separate fixed-B1 HLE/Frontier scoring stages; no additional model or external judge service is required. Scoring adds total runtime and is excluded from solver performance and unit-token cost. Same-model auxiliary scores are not independent-model validation; unresolved judgments are listed separately from engine request failures. MMLU200 uses rule scoring.
+
 Preserve the original 60-second warmup/300-second measurement windows and all frozen generation budgets. Finite-batch P95/P99 do not establish continuous stability. --prepare-only, --smoke-evaluators and --hle-profile full1811 do not represent this formal scope. Other engines use their own runners with unchanged workload and comparison contracts.
 
 Planning estimates: ${estimates}. ${field(guide.timing, 'reference')} ${field(guide.timing, 'includes')} ${field(guide.timing, 'excludes')} ${field(guide.timing, 'basis')}

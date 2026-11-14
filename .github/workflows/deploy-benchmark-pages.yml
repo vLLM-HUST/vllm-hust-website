@@ -92,6 +92,7 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           python website/scripts/verify_public_comparison_browser.py --url http://127.0.0.1:8771 --output website/output/public-comparison
+          python website/scripts/verify_five_dataset_comparison_browser.py --url http://127.0.0.1:8771 --output website/output/five-dataset-comparison
           python website/scripts/verify_dataset_standard_browser.py http://127.0.0.1:8771/dataset-standard.html --output website/output/dataset-standard
           python website/scripts/verify_public_site_browser.py --root public-site --url http://127.0.0.1:8771 --output website/output/public-site-audit
       - name: Upload public comparison verification
@@ -101,6 +102,7 @@ jobs:
           name: public-comparison-verification
           path: |
             website/output/public-comparison/
+            website/output/five-dataset-comparison/
             website/output/public-site-audit/
             website/output/dataset-standard/
       - name: Upload assembled site without committing generated data

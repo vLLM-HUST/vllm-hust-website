@@ -3,8 +3,8 @@ body[data-page="b0-b1"] .focus-hero { padding: 4px 0 12px; }
 body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); margin: 10px 0; }
 .comparison-overview > h2 { font-size: 22px; margin: 8px 0; }
 .comparison-context { font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
-.comparison-group { border: 1px solid #75868a; border-radius: 12px; padding: 20px; margin: 18px 0; scroll-margin-top: 110px; }
-.comparison-group h2 { font-size: 20px; margin: 0 0 16px; }
+.comparison-group, .five-dataset-panel { border: 1px solid #75868a; border-radius: 12px; padding: 20px; margin: 18px 0; scroll-margin-top: 110px; }
+.comparison-group h2, .five-dataset-panel h2 { font-size: 20px; margin: 0 0 16px; }
 .comparison-row + .comparison-row { border-top: 1px solid #75868a; padding-top: 16px; margin-top: 16px; }
 .comparison-row h3 { font-size: 16px; margin: 0 0 12px; }
 .comparison-row dl { display: grid; grid-template-columns: 1fr 1fr 1.4fr 1.6fr; gap: 18px; margin: 0; }
@@ -22,7 +22,7 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .comparison-method[open] > summary { margin-bottom: 22px; }
 .comparison-method summary:focus-visible, .comparison-detail-link:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
 @media (max-width: 700px) {
- .comparison-group { padding: 16px; }
+ .comparison-group, .five-dataset-panel { padding: 16px; }
  .comparison-row dl { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
  .comparison-row dl > div:nth-child(n+3) { grid-column: 1 / -1; }
  body[data-page="b0-b1"] .focus-main > .benchmark-tabs { gap: 0; }
@@ -40,3 +40,9 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .compute-step .focus-table table { min-width: 0; width: 100%; }
 .compute-step .focus-table th, .compute-step .focus-table td { white-space: normal; overflow-wrap: anywhere; }
 .compute-step { font-variant-numeric: tabular-nums; }
+
+#five-dataset-comparison { min-width: 0; }
+#five-dataset-comparison details { padding: 10px 0; }
+#five-dataset-comparison summary { cursor: pointer; font-weight: 600; }
+#five-dataset-comparison p { overflow-wrap: anywhere; }
+#five-dataset-comparison .focus-table { max-width: 100%; overflow-x: auto; }
