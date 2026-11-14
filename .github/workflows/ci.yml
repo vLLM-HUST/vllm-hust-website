@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 8c2cfc3d2a78f334e113d38e5dd3c5f0272e373e # pragma: allowlist secret
+          ref: 1c7dffba44edd8951fc32fa47344f7cd69131da2 # pragma: allowlist secret
           path: .publication-policy
           persist-credentials: false
           sparse-checkout: scripts/build_public_site.py
@@ -74,7 +74,7 @@ jobs:
         run: |
           python .publication-policy/scripts/build_public_site.py \
             --website . --output "$RUNNER_TEMP/public-site" \
-            --policy-revision 8c2cfc3d2a78f334e113d38e5dd3c5f0272e373e
+            --policy-revision 1c7dffba44edd8951fc32fa47344f7cd69131da2
 
   browser:
     runs-on: ubuntu-latest

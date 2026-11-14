@@ -25,7 +25,15 @@ jobs:
           sparse-checkout: |
             website-publication
             scripts/sync_website_publication.py
-            scripts/build_public_site.py
+          sparse-checkout-cone-mode: false
+      - name: Checkout the pinned public visibility policy
+        uses: actions/checkout@v4
+        with:
+          repository: vLLM-HUST/vllm-hust-benchmark
+          ref: 1c7dffba44edd8951fc32fa47344f7cd69131da2 # pragma: allowlist secret
+          path: .publication-policy
+          persist-credentials: false
+          sparse-checkout: scripts/build_public_site.py
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
@@ -36,7 +44,9 @@ jobs:
       - name: Assemble the public projection
         run: |
           python benchmark/scripts/sync_website_publication.py publish --revision "$(git -C benchmark rev-parse HEAD)" --website website
-          python benchmark/scripts/build_public_site.py --website website --output public-site --policy-revision 8c2cfc3d2a78f334e113d38e5dd3c5f0272e373e
+          python .publication-policy/scripts/build_public_site.py \
+            --website website --output public-site \
+            --policy-revision 1c7dffba44edd8951fc32fa47344f7cd69131da2
           python -m pip install playwright
           python -m playwright install --with-deps chromium
       - name: Verify all visible MOD results, languages, themes and viewports
