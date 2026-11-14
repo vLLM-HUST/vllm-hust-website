@@ -124,8 +124,8 @@
   }
 
   function render() {
-    document.getElementById('comparison-title').textContent=t('B0/B1 大纲对比','B0/B1 results by test outline');
-    document.getElementById('comparison-lead').textContent=t('按大纲展示有效算力、吞吐与时延、稳定性和成本；固定 B0 为比较基线。','Effective compute, throughput and latency, stability and cost by the test outline, compared with fixed B0.');
+    document.getElementById('comparison-title').textContent=t('历史 B0/B1 资料','Historical B0/B1 material');
+    document.getElementById('comparison-lead').textContent=t('历史材料合集（2026-10-30、11-03、11-04）；页面保留当时的“本次/当前”措辞及判定，均不代表最新复测结果。','Historical collection (2026-10-30, 11-03 and 11-04). Original “current” wording and judgments refer to those archived workloads, not the latest retest.');
     if (!data) return;
     const joint=data.full_answer_joint, [a,b]=joint.arms;
     const continuous=data.packed_continuous;

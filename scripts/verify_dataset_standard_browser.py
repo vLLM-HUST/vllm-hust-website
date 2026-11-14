@@ -185,11 +185,11 @@ with sync_playwright() as play:
                         == "mmlu,hle,frontier,swe,terminal"
                     )
                     page.locator('input[value="quick"]').check()
-                    assert (
-                        page.locator("#run-command")
-                        .inner_text()
-                        .endswith("--datasets mmlu")
+                    quick_tokens = shlex.split(
+                        page.locator("#run-command").inner_text().replace("\\\n", "")
                     )
+                    assert quick_tokens[quick_tokens.index("--datasets") + 1] == "mmlu"
+                    assert "--performance-only" in quick_tokens
                     model = (
                         "/models/a model's $(literal) --datasets /path/to/new-results"
                     )
