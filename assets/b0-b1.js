@@ -209,7 +209,7 @@
         [t('时间与吞吐','Time and throughput'),t('同工作量且 O₀=O₁ 时 S_Q=S_T。本组自然回答长度不同，两个倍率分别计算。','For equal work and O₀=O₁, S_Q=S_T. Natural-answer lengths differ here, so the ratios are calculated separately.')],
         [t('等租价成本','Equal-rate cost'),t('完整部署小时费用相同、计费与测量窗口一致时，降幅=100×(1−1/S_Q)。','With equal complete-deployment hourly rates and matching billing/measurement intervals, reduction=100×(1−1/S_Q).')],
         [t('百分比与重复测量','Percentages and repetitions'),t('η_B0=190%：1.9倍，提升90%。重复测量逐对计算倍率后取中位数，保留全部重复。','η_B0=190%: 1.9×, a 90% gain. For repetitions, take the median of within-pair ratios and retain all runs.')],
-        [t('同工况参考效率 η_ref','Workload-reference efficiency η_ref'),t('η_ref=100×T_ref/T；本次中期目标50%，后续目标90%。T_ref基于B0阶段标定，按必要依赖与资源重叠推导。','η_ref=100×T_ref/T; current milestone: 50%; later target: 90%. T_ref uses B0 stage calibration with necessary dependencies and resource overlap.')]
+        [t('同工况参考效率 η_ref','Workload-reference efficiency η_ref'),t('η_ref=100×T_ref/T；本次中期目标50%，后续目标90%。T_ref 来自独立组件标定，按各受测工况的必要依赖、资源顺序和可重叠部分推导。适用条件一致时可共用参考值。','η_ref=100×T_ref/T; current milestone: 50%; later target: 90%. T_ref is derived from independent component calibration using each tested workload’s required dependencies, resource order and overlap. Matching conditions can share the reference.')]
       ])}
       <p class="focus-source"><a href="${methodSource}">${t('完整公式与只读复算命令','Full method and read-only recomputation command')}</a> · <a href="${source(currentPath+'joint-summary.json')}">${t('本批原始记录','Original paired record')}</a></p>
       </details></section>`;

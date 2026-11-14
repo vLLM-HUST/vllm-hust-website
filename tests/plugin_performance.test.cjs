@@ -62,7 +62,7 @@ test('published paired runs expose both gains and regressions without precompute
     assert.ok(result.published_comparisons.every(row => row.baseline > 0));
     assert.ok(result.published_comparisons.every(row => row.candidate > 0));
   }
-  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 11);
+  assert.equal([...results.values()].filter(result => Number.isFinite(result.gain)).length, 12);
   const diagnostic = results.get('simllm-migration');
   assert.equal(diagnostic.gain, null);
   assert.equal(diagnostic.diagnostic_only, true);
@@ -320,7 +320,7 @@ test('catalog sorts every measured percentage from gain through regression', () 
   const real = M.summarize(data, frontier);
   const sorted = [...real.values()].sort((a, b) => M.compare(a, b, real));
   assert.deepEqual(sorted.map(row => row.id), [
-    'vspec', 'betterscale', 'bidkv', 'pipeline-microbatch-migration',
+    'vspec', 'betterscale', 'muxpd', 'bidkv', 'pipeline-microbatch-migration',
     'kv-materialization-arrival-control', 'pegaflow-vllm-connectors', 'adm', 'dla', 'kv-tiering-migration',
     'kvcompress-ascend', 'latchmoe', 'simllm-migration'
   ]);
@@ -336,4 +336,18 @@ test('ECPA evidence is preserved in metadata without becoming a performance clai
   assert.equal(result.get('kvcompress-ascend').ecpa.launch_acceptance, 'manager-verified');
   assert.equal(result.get('pegaflow-vllm-connectors').ecpa.launch_acceptance, 'manager-verified');
   assert.equal(data.ecpa_experiment_boundary.process_release, 'known-defect');
+});
+
+test('MuxPD displays scoped TP2 output throughput and retains a separate TP4 result', () => {
+  const result = M.summarize(data, frontier).get('muxpd');
+  assert.ok(result, 'MuxPD must be present in the published performance data');
+  assert.equal(result.gain.toFixed(2), '23.31');
+  assert.equal(result.source, 'published-comparison');
+  assert.equal(result.count, 1);
+  assert.equal(result.observations.length, 2);
+  assert.equal(result.observations[1].gain.toFixed(2), '7.40');
+  assert.match(result.setting_label_en, /TP2.*wl38/);
+  assert.match(result.aggregation_note_en, /single-pass/);
+  assert.match(result.aggregation_note_en, /quality not evaluated/);
+  assert.equal(M.summarize(data, frontier, 'Qwen2.5-14B').get('muxpd').gain, null);
 });

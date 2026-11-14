@@ -1,4 +1,4 @@
-"""Keep the joined MuxPD publication within its installed-wheel evidence scope."""
+"""Keep scoped MuxPD performance separate from installed-wheel qualification."""
 
 import json
 import re
@@ -48,19 +48,19 @@ def test_muxpd_qualification_link_is_immutable_and_keeps_numerical_limits():
         r"reports/muxpd-ecpa-20261025/RELEASE-QUALIFICATION\.md",
         row["qualification_report"],
     )
-    assert "6/8" in row["public_effect_en"] and "6/8" in row["public_effect_zh"]
-    assert "do not establish exact output equivalence" in row["public_effect_en"]
-    assert "current-package performance gain is established" in row["public_effect_en"]
-    assert "5/8" in row["public_effect_en"] and "5/8" in row["public_effect_zh"]
-    assert row["public_effect_status"] == "not-beneficial-in-tested-cell"
+    assert "single-pass" in row["public_effect_en"]
+    assert "quality not evaluated" in row["public_effect_en"]
+    assert "23.31%" in row["public_effect_zh"]
+    assert "7.40%" in row["public_effect_zh"]
+    assert row["public_effect_status"] == "measured"
     assert re.fullmatch(
         r"https://github\.com/vLLM-HUST/vllm-hust-benchmark/blob/[0-9a-f]{40}/"
-        r"reports/muxpd-batch14-quota-control-20261030/README\.md",
+        r"reports/tech-outcomes-20261117/muxpd/README\.md",
         row["public_effect_url"],
     )
     assert row["compatibility"]["followup_url"].endswith("/issues/23")
     assert row["historical_evidence_scope"].startswith("Historical scoped TP4")
-    assert "muxpd" not in {
+    assert "muxpd" in {
         item["id"] for item in load("plugin-performance.json")["entries"]
     }
 
