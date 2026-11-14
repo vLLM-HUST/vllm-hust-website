@@ -1544,7 +1544,8 @@ vllm-hust-ext extension check ${extensionId}`
 
   function publicEffectPanel(item) {
     const result = local(item, "public_effect");
-    if (!result || !item.public_effect_status || !item.public_effect_url) return null;
+    const inlineReview = item[`public_effect_detail_${language()}`];
+    if (!result || !item.public_effect_status || (!item.public_effect_url && !inlineReview?.length)) return null;
     const panel = element("section", `plugin-public-effect effect-${item.public_effect_status}`);
     const head = element("div", "plugin-public-effect-head");
     const statusLabel = publicEffectLabels[item.public_effect_status] || {
@@ -1554,11 +1555,14 @@ vllm-hust-ext extension check ${extensionId}`
       element("strong", "plugin-public-effect-title", copy().publicEffect),
       badge(statusLabel[language()], `effect-status status-${item.public_effect_status}`)
     );
-    const evidence = element("a", "plugin-public-effect-link", `${copy().effectSource} ↗`);
-    evidence.href = item.public_effect_url;
-    evidence.target = "_blank";
-    evidence.rel = "noopener noreferrer";
-    panel.append(head, element("p", "", result), evidence);
+    panel.append(head, element("p", "", result));
+    if (item.public_effect_url) {
+      const evidence = element("a", "plugin-public-effect-link", `${copy().effectSource} ↗`);
+      evidence.href = item.public_effect_url;
+      evidence.target = "_blank";
+      evidence.rel = "noopener noreferrer";
+      panel.append(evidence);
+    }
     return panel;
   }
 
@@ -1633,7 +1637,15 @@ vllm-hust-ext extension check ${extensionId}`
     if (compatibility) detailBody.append(compatibility);
     const measuredResultDetails = modEvidenceDetails(item);
     if (measuredResultDetails) detailBody.append(measuredResultDetails);
-    detailBody.append(modTestReview(item, performance));
+    const inlineReview = item[`public_effect_detail_${language()}`];
+    if (inlineReview?.length) {
+      const review = element("section", "plugin-test-review");
+      review.append(element("h3", "plugin-test-review-title", copy().testReview));
+      inlineReview.forEach(text => review.append(element("p", "", text)));
+      detailBody.append(review);
+    } else {
+      detailBody.append(modTestReview(item, performance));
+    }
     if (performance?.diagnostic_only && performance.url) {
       const diagnostic = element("a", "plugin-public-effect-link", language() === "zh"
         ? "历史吞吐诊断原件 ↗" : "Historical throughput diagnostic ↗");
