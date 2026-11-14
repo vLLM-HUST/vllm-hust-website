@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: a3d96977005f7257502ded2938a051c70de60b02 # pragma: allowlist secret
+          ref: 21173d14f13c1a75a5c53676f413346721429cba # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -58,9 +58,9 @@ jobs:
       - name: Assemble and verify canonical benchmark data
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision a3d96977005f7257502ded2938a051c70de60b02 --website .
+            --revision 21173d14f13c1a75a5c53676f413346721429cba --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision a3d96977005f7257502ded2938a051c70de60b02 --website .
+            --revision 21173d14f13c1a75a5c53676f413346721429cba --website .
       - run: node --test tests/leaderboard_runs_model.test.cjs tests/leaderboard_frontier_model.test.cjs
       - name: Install review dependencies and run Python tests
         timeout-minutes: 15

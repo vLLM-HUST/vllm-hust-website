@@ -11,6 +11,11 @@
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= 1e-8 * Math.max(1, Math.abs(b));
   const table = (heads, rows) => `<div class="focus-table" tabindex="0" role="region" aria-label="${esc(heads.join(' / '))}"><table><thead><tr>${heads.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map((v,i)=>`<${i?'td':'th scope="row"'}>${esc(v)}</${i?'td':'th'}>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const required = ['3.4.1','3.4.2','3.4.3','3.4.4'];
+  const milestoneStatus = (id, goal) => goal.status === 'current_workload_reference_not_measured'
+    ? t('本轮未验证','Current workload unverified')
+    : id === '3.4.1' && goal.accepted && goal.accepted_scope?.startsWith('Existing qualified M01')
+      ? t('归档工况达标','Historical workload met')
+      : goal.accepted ? t('达标','Met') : t('未通过','Not passed');
   const names = () => t(['有效算力','吞吐与时延','上下文稳定性','成本与利用率'], ['Effective compute','Throughput and latency','Context stability','Cost and utilization']);
 
   function validate(d) {
@@ -66,8 +71,8 @@
     const milestoneRequirements = t(
       ['同工况参考效率 ≥50%','吞吐 ≥10%；TTFT/TPOT 各改善 ≥5%','16K 相对4K吞吐同量级，P95/P99无异常陡升','单位token成本降低 ≥10%；高负载利用率改善'],
       ['Workload-reference efficiency ≥50%','Throughput +10%; TTFT/TPOT each reduced ≥5%','16K vs4K throughput in the same order; no abnormal P95/P99 spike','Unit token cost reduced ≥10%; improved utilization at high load']);
-    const goals = required.map((id,i)=>[`${id} ${names()[i]}`,milestoneRequirements[i],data.formal_targets[id].display_value,
-      data.formal_targets[id].accepted?t('达标','Met'):t('未通过','Not passed'),
+    const goals = required.map((id,i)=>[`${id} ${names()[i]}`,milestoneRequirements[i],t(data.formal_targets[id].display_value,data.formal_targets[id].display_value_en || data.formal_targets[id].display_value),
+      milestoneStatus(id,data.formal_targets[id]),
       t(final[id].requirement,final[id].requirement_en),
       final[id].attainment==='demonstrated'?t('达标','Met'):t('未证明达标','Not demonstrated')]);
     root.innerHTML = `<section class="five-dataset-panel"><h2>${t('固定五数据集 B0/B1 实测','Frozen five-dataset B0/B1 measurements')}</h2>
@@ -76,11 +81,11 @@
       <p>${esc(`${data.hardware.model} · ${data.hardware.dtype} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.parallelism}`)}</p>
       <h3>${t('四项目标：里程碑与项目最终要求','Four goals: milestone and project-final requirements')}</h3>
       ${table(t(['目标','里程碑要求','里程碑观测','里程碑结论','项目最终要求','最终结论'],['Goal','Milestone requirement','Milestone observation','Milestone result','Project-final requirement','Final result']),goals)}
-      ${required.map((id,i)=>`<details><summary>${esc(names()[i])} · ${t('依据与限制','Evidence and limits')}</summary><p>${esc(t(data.formal_targets[id].reason,data.formal_targets[id].accepted_scope || data.formal_targets[id].status))}</p><p>${esc(t(final[id].reason,final[id].evidence_summary_en))}</p></details>`).join('')}
+      ${required.map((id,i)=>`<details><summary>${esc(names()[i])} · ${t('依据与限制','Evidence and limits')}</summary><p>${esc(t(data.formal_targets[id].reason,data.formal_targets[id].reason_en || data.formal_targets[id].accepted_scope || data.formal_targets[id].status))}</p><p>${esc(t(final[id].reason,final[id].evidence_summary_en))}</p></details>`).join('')}
       <h3>${t('输出吞吐（token/s，越高越好）','Output throughput (token/s, higher is better)')}</h3>${metric('output_tokens_per_second')}
       <h3>${t('平均 TTFT（秒，越低越好）','Mean TTFT (seconds, lower is better)')}</h3>${metric('mean_ttft_ms',1000)}
       <h3>${t('平均 TPOT（毫秒，越低越好）','Mean TPOT (ms, lower is better)')}</h3>${metric('mean_tpot_ms')}
-      <p>${t('TTFT 包含本批请求的排队等待；预热在正式计时前完成。性能结果不证明答案正确或统计质量等价。','TTFT includes request queueing within the batch; warmup precedes formal timing. Performance does not establish correct answers or statistical quality equivalence.')}</p>
+      <p>${t('TTFT 包含本批请求的排队等待；预热及编译边界以对应版本的原始回执为准。性能结果不证明答案正确或统计质量等价。','TTFT includes request queueing within the batch; warmup and compilation boundaries follow each version’s original receipts. Performance does not establish correct answers or statistical quality equivalence.')}</p>
       <h3>${t('任务质量与未决数','Task quality and unresolved cases')}</h3>
       ${table(t(['固定数据集','配置','正确/原计划分母','回答截断','无法解析','裁判未决','裁判截断','未返回'],['Frozen dataset','Arm','Correct / planned denominator','Solver truncated','Unparsed','Judge unresolved','Judge truncated','Unreturned']),qualityRows())}
       <p>${t('未决项保留在分母内并计为非成功；HLE/Frontier 使用另行披露的替代裁判。SWE 与 Terminal 只回放公开 trace 测推理性能，不提供任务解决率。','Unresolved cases remain in the planned denominator as nonsuccess. HLE/Frontier use the disclosed substitute judge. SWE and Terminal replay public traces for inference performance and provide no task solve rate.')}</p>

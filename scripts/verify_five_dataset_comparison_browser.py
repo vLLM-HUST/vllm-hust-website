@@ -47,11 +47,30 @@ def verify(url, output):
                 goal_rows = root.locator("table").nth(0).locator("tbody tr")
                 expect(goal_rows).to_have_count(4)
                 for i, key in enumerate(("3.4.1", "3.4.2", "3.4.3", "3.4.4")):
+                    goal = data["formal_targets"][key]
                     expected = (
                         ("达标" if lang == "zh" else "Met")
                         if data["formal_targets"][key]["accepted"]
                         else ("未通过" if lang == "zh" else "Not passed")
                     )
+                    if goal.get("status") == "current_workload_reference_not_measured":
+                        expected = (
+                            "本轮未验证"
+                            if lang == "zh"
+                            else "Current workload unverified"
+                        )
+                    elif (
+                        key == "3.4.1"
+                        and goal["accepted"]
+                        and goal.get("accepted_scope", "").startswith(
+                            "Existing qualified M01"
+                        )
+                    ):
+                        expected = (
+                            "归档工况达标"
+                            if lang == "zh"
+                            else "Historical workload met"
+                        )
                     expect(goal_rows.nth(i).locator("td").nth(2)).to_have_text(expected)
                 expect(root).to_contain_text("64")
                 expect(root).to_contain_text("48")
@@ -75,6 +94,58 @@ def verify(url, output):
                 )
                 checks.append(dict(language=lang, width=width, run_id=data["run_id"]))
                 page.close()
+
+        # Valid source metadata may retain a historical pass while declining
+        # current-workload acceptance; the page must display that distinction.
+        for lang in ("zh", "en"):
+            changed = copy.deepcopy(data)
+            historical = changed["formal_targets"]["3.4.1"]
+            changed["formal_targets"]["3.4.1"] = dict(
+                historical,
+                accepted=False,
+                measured_value=None,
+                status="current_workload_reference_not_measured",
+                display_value="本轮未验证；归档工况另列",
+                display_value_en="Current workload unverified; archive separate",
+                historical_evidence=historical,
+            )
+            raw = (json.dumps(changed) + "\n").encode()
+            updated = copy.deepcopy(manifest)
+            for entry in updated["files"]:
+                if entry["website_path"] == summary_path:
+                    entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+            page = context.new_page()
+            page.add_init_script(f"localStorage.setItem('vllm-hust_lang', '{lang}')")
+            page.route(
+                "**/" + summary_path,
+                lambda route, request, raw=raw: route.fulfill(
+                    body=raw, content_type="application/json"
+                ),
+            )
+            page.route(
+                "**/data/benchmark-source-manifest.json",
+                lambda route, request, updated=updated: route.fulfill(json=updated),
+            )
+            page.goto(url + "/b0-b1.html")
+            root = page.locator("#five-dataset-comparison")
+            expect(root).to_have_attribute("data-loaded", data["run_id"], timeout=30000)
+            status = (
+                root.locator("table")
+                .nth(0)
+                .locator("tbody tr")
+                .nth(0)
+                .locator("td")
+                .nth(2)
+            )
+            expect(status).to_have_text(
+                "本轮未验证" if lang == "zh" else "Current workload unverified"
+            )
+            checks.append(
+                dict(
+                    language=lang, verified="historical_compute_not_current_acceptance"
+                )
+            )
+            page.close()
 
         for label, corrupt, resign in (
             ("bad-hash", False, False),
