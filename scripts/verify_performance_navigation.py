@@ -162,15 +162,28 @@ def main():
                                 )
                                 assert page.evaluate("scrollY") == 0
                             elif name == "dataset-introductions.html":
-                                assert (
-                                    page.locator(
-                                        "#designated-cards .focus-card"
-                                    ).count()
-                                    == 5
+                                expect(page.locator("#standard-rows tr")).to_have_count(
+                                    5, timeout=30000
                                 )
                                 assert page.locator("#ordinary").is_hidden()
                                 assert page.locator("#all-sources").is_hidden()
                             elif name == "b0-b1.html":
+                                expect(
+                                    page.locator("#five-dataset-comparison")
+                                ).to_have_attribute(
+                                    "data-loaded",
+                                    "five-datasets-r6-matched-20261114-r3",
+                                )
+                                expect(page.locator("#comparison")).to_have_count(0)
+                                expect(
+                                    page.locator(
+                                        '#report-history-links a[href="./report-history.html"]'
+                                    )
+                                ).to_be_visible()
+                                page.goto(
+                                    f"{base}/b0-b1-legacy.html",
+                                    wait_until="networkidle",
+                                )
                                 page.wait_for_selector(
                                     '#comparison[data-loaded="V1.03"]'
                                 )
@@ -354,8 +367,11 @@ def main():
                                 )
                                 # Screenshot the default result-first view after interaction.
                                 page.goto(f"{base}/{name}", wait_until="networkidle")
-                                page.wait_for_selector(
-                                    '#comparison[data-loaded="V1.03"]'
+                                expect(
+                                    page.locator("#five-dataset-comparison")
+                                ).to_have_attribute(
+                                    "data-loaded",
+                                    "five-datasets-r6-matched-20261114-r3",
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
@@ -432,7 +448,7 @@ def main():
             # A missing publication cannot become an empty "passed" dashboard.
             page = browser.new_page()
             page.route("**/data/midterm-v103.json", lambda route: route.abort())
-            page.goto(f"{base}/b0-b1.html")
+            page.goto(f"{base}/b0-b1-legacy.html")
             page.wait_for_function(
                 "document.querySelector('#comparison').textContent.includes('retry') || document.querySelector('#comparison').textContent.includes('重试')"
             )

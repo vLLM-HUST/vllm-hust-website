@@ -166,7 +166,12 @@ def test_hle_completion_and_swe_single_attempt_are_not_full_acceptance():
 
 
 def test_all_data_files_match_the_benchmark_publication_manifest():
-    assert "b0-b1.js?v=qualified-pair-20261103" in (ROOT / "b0-b1.html").read_text()
+    current = (ROOT / "b0-b1.html").read_text()
+    assert "b0-b1.js?v=qualified-pair-20261103" not in current
+    assert "report-history.html" in current
+    assert (
+        "b0-b1.js?v=qualified-pair-20261103" in (ROOT / "b0-b1-legacy.html").read_text()
+    )
     manifest_path = ROOT / "data/benchmark-source-manifest.json"
     manifest = json.loads(manifest_path.read_text())
     assert manifest["repository"] == "vLLM-HUST/vllm-hust-benchmark"

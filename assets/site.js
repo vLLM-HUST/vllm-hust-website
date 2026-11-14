@@ -137,6 +137,14 @@
             en: { title: 'vLLM-HUST | Inference Engine for Domestic Compute', 'footer-copy': 'Inference for domestic compute.' },
             zh: { title: 'vLLM-HUST | 面向国产算力的推理引擎', 'footer-copy': '面向国产算力的推理服务。' },
         },
+        'report-history.html': {
+            en: { title: 'Report archive · vLLM-HUST', 'footer-copy': 'Historical reports and original evidence.' },
+            zh: { title: '历史报告 · vLLM-HUST', 'footer-copy': '历史报告与原始证据。' },
+        },
+        'b0-b1-legacy.html': {
+            en: { title: 'Historical B0/B1 material · vLLM-HUST', 'footer-copy': 'Historical reports and original evidence.' },
+            zh: { title: '历史 B0/B1 资料 · vLLM-HUST', 'footer-copy': '历史报告与原始证据。' },
+        },
         'b0-b1.html': {
             en: { title: 'B0/B1 results · vLLM-HUST', 'footer-copy': 'Tests, results and cost.' },
             zh: { title: 'B0/B1 大纲对比 · vLLM-HUST', 'footer-copy': '测试、结果与成本。' },

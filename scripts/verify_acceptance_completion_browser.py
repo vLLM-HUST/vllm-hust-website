@@ -51,7 +51,7 @@ def main():
                         f"localStorage.setItem('vllm-hust_lang','{language}')"
                     )
                     for filename in (
-                        "b0-b1.html",
+                        "b0-b1-legacy.html",
                         "dataset-validation.html",
                         "leaderboard-runs.html",
                     ):
@@ -63,7 +63,7 @@ def main():
                             wait_until="domcontentloaded",
                         )
                         assert response.status == 200
-                        if filename == "b0-b1.html":
+                        if filename == "b0-b1-legacy.html":
                             expect(page.locator("#comparison")).to_have_attribute(
                                 "data-loaded", "V1.03", timeout=30000
                             )
