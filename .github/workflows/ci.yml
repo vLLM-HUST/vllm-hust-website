@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 8e00c97a079d41b540fe2cff8d9bbb34667a88cc # pragma: allowlist secret
+          ref: a188436522492b712d146406ac83489b41d8ee23 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -36,9 +36,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision 8e00c97a079d41b540fe2cff8d9bbb34667a88cc --website .
+            --revision a188436522492b712d146406ac83489b41d8ee23 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision 8e00c97a079d41b540fe2cff8d9bbb34667a88cc --website .
+            --revision a188436522492b712d146406ac83489b41d8ee23 --website .
       - name: Assemble pinned benchmark navigation
         env:
           GH_TOKEN: ${{ github.token }}
@@ -88,7 +88,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 8e00c97a079d41b540fe2cff8d9bbb34667a88cc # pragma: allowlist secret
+          ref: a188436522492b712d146406ac83489b41d8ee23 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -98,9 +98,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision 8e00c97a079d41b540fe2cff8d9bbb34667a88cc --website .
+            --revision a188436522492b712d146406ac83489b41d8ee23 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision 8e00c97a079d41b540fe2cff8d9bbb34667a88cc --website .
+            --revision a188436522492b712d146406ac83489b41d8ee23 --website .
       - name: Install browser test dependencies
         run: |
           python -m pip install playwright
