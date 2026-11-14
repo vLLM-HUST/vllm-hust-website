@@ -228,6 +228,19 @@ def main():
                     )
                     assert switched == people_checked
                     search = page.locator("[data-plugin-search]")
+                    search.fill("ascend-attention-boundary")
+                    op01 = page.locator("#ascend-attention-boundary")
+                    expect(op01).to_be_visible()
+                    expect(op01.locator(".plugin-public-effect p")).to_have_text(
+                        components["ascend-attention-boundary"][
+                            "public_effect_en" if lang == "zh" else "public_effect_zh"
+                        ]
+                    )
+                    op01_details = op01.locator(".plugin-technical-details")
+                    op01_details.locator("summary").click()
+                    expect(
+                        op01_details.locator(".plugin-technical-body")
+                    ).to_be_visible()
                     search.fill("BetterScale")
                     betterscale = page.locator("#betterscale")
                     expect(betterscale).to_be_visible()
