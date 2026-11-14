@@ -70,7 +70,7 @@
       data.formal_targets[id].accepted?t('达标','Met'):t('未通过','Not passed'),
       t(final[id].requirement,final[id].requirement_en),
       final[id].attainment==='demonstrated'?t('达标','Met'):t('未证明达标','Not demonstrated')]);
-    root.innerHTML = `<section class="comparison-group"><h2>${t('固定五数据集 B0/B1 实测','Frozen five-dataset B0/B1 measurements')}</h2>
+    root.innerHTML = `<section class="five-dataset-panel"><h2>${t('固定五数据集 B0/B1 实测','Frozen five-dataset B0/B1 measurements')}</h2>
       <p>${esc(data.report_date)} · ${esc(data.run_id)} · ${esc(data.runtime.engine_release || t('历史 r4 组合','Historical r4 profile'))}</p>
       <p>${esc(t(`全量指固定的五个子集：MMLU200、HLE200、Frontier160、SWE trace32（64请求）、Terminal trace32（48请求）。两臂均完成；复用${data.reused_stages}个已封存阶段，新执行${data.new_inference_stages}个阶段。`,`Full means the five frozen subsets: MMLU200, HLE200, Frontier160, SWE trace32 (64 requests), Terminal trace32 (48 requests). Both arms completed; ${data.reused_stages} sealed stages reused, ${data.new_inference_stages} stages newly executed.`))}</p>
       <p>${esc(`${data.hardware.model} · ${data.hardware.dtype} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.parallelism}`)}</p>
