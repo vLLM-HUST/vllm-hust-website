@@ -1790,7 +1790,7 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 44
+    assert len(WORKLOAD_NAVIGATION["plugins"]) == 45
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
@@ -2078,3 +2078,20 @@ def test_instance_controller_uses_the_control_plane_catalog_grid() -> None:
     assert by_id("instance-controller")["system_role"] == "lifecycle_control_plane"
     assert MOD_TAXONOMY["components"]["instance-controller"]["kind"] == "control_plane"
     assert "lifecycle_control" in WORKLOAD_NAVIGATION["plugins"]["instance-controller"]
+
+
+def test_kv_controller_reports_the_two_experiments_in_the_control_plane_catalog() -> (
+    None
+):
+    item = by_id("kv-controller")
+    taxonomy = MOD_TAXONOMY["components"]["kv-controller"]
+    assert item["maturity"] == "experimental"
+    assert item["compatibility"]["status"] == "external_service"
+    assert taxonomy["kind"] == "control_plane"
+    assert taxonomy["evidence"] == "measured_mixed"
+    assert "1.51%" in item["public_effect_zh"]
+    assert "2.07%" in item["public_effect_zh"]
+    assert any("16.37%" in detail for detail in item["public_effect_detail_zh"])
+    assert item["public_effect_url"].endswith(
+        "/reports/kv-controller-swe-smith-20261114"
+    )
