@@ -27,11 +27,11 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "21173d14f13c1a75a5c53676f413346721429cba"  # pragma: allowlist secret
+        "ba74e3178876e6ac4e158049b877ee1337f0a78c"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
-        "8c2cfc3d2a78f334e113d38e5dd3c5f0272e373e"  # pragma: allowlist secret
+        "1c7dffba44edd8951fc32fa47344f7cd69131da2"  # pragma: allowlist secret
     )
     assert checkouts[2]["with"]["ref"] == policy_revision
     assert checkouts[2]["with"]["repository"] == "vLLM-HUST/vllm-hust-benchmark"
