@@ -233,6 +233,8 @@ ${invariants}
 
 ## 6. 分开判断“执行完整”和“目标达标”
 按大纲逐项核对：3.4.1 单芯片有效算力；3.4.2 吞吐与时延；3.4.3 数据集与长上下文稳定性；3.4.4 单位 token 成本。质量评分、连续 4K/16K C8、费用适用范围和利用率证据均须保留。不能因为进程退出成功或五项跑完就宣布四项目标通过。
+固定参考 Engine 的联合报告可复算已归档的 3.4.1 结果，该结果适用于 MMLU-Pro 固定 200 请求、每请求上限 256 token 的归档工况。新工况的 3.4.1 结论需要本轮独立标定、整链验证、必要算量及同步计时证据。
+
 验收口径入口：https://vllm-hust.sage.org.ai/b0-b1.html 。核对其大纲与固定来源，明确本轮采用的阶段门槛；缺少可比依据时标为未验证，不自行猜测或更改门槛。同费率成本估算须写明报价、费用范围和测量区间，不称为本机账单，也不新增必须发票的要求。
 
 ## 7. 交付
@@ -292,6 +294,8 @@ ${invariants}
 
 ## 6. Separate execution completeness from target acceptance
 Assess each outline target: 3.4.1 effective compute per chip; 3.4.2 throughput and latency; 3.4.3 dataset and long-context stability; 3.4.4 cost per token. Retain quality scores, continuous 4K/16K C8 evidence, pricing scope and utilization evidence. A successful process or all five profiles completing does not establish all four targets.
+The fixed reference Engine report can recompute the archived 3.4.1 result for the frozen MMLU-Pro workload of 200 requests capped at 256 tokens each. A new workload requires independent calibration, whole-chain validation, necessary-work accounting and synchronized timings from the current campaign.
+
 Acceptance entry: https://vllm-hust.sage.org.ai/b0-b1.html . Verify its outline and pinned sources; state the applicable milestone thresholds. Mark missing comparable evidence as unverified rather than inventing thresholds. Identify equal-rate cost estimates, quotation, cost scope and interval; do not call estimates a local invoice or impose a new invoice requirement.
 
 ## 7. Deliver
