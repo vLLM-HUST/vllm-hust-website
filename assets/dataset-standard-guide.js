@@ -226,10 +226,11 @@
       '/path/to/model': quote('model'), '/path/to/new-results': quote('out'),
       '{datasets}': mode.datasets_flag, '{sdk}': quote('sdk'), '{devices}': ids.join(','),
     };
-    const command = payload.guide.execution.command_template
+    let command = payload.guide.execution.command_template
       .replace(/ --/g, `${continuation}--`)
       .replace('--datasets', () => `--b1-python {sdk}${continuation}--physical-devices {devices}${continuation}--datasets`)
       .replace(/\/path\/to\/model|\/path\/to\/new-results|\{datasets\}|\{sdk\}|\{devices\}/g, token => substitutions[token]);
+    if (mode.id === 'quick') command += continuation + '--performance-only';
     document.getElementById('run-command').textContent = command;
   }
 
