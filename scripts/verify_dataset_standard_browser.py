@@ -120,6 +120,14 @@ with sync_playwright() as play:
                 page.goto(url, wait_until="networkidle")
                 page.wait_for_selector("#standard-content:not([hidden])")
                 assert page.locator("#standard-rows tr").count() == 5
+                assert (
+                    "no additional model or external judge service is required"
+                    in page.locator("#judge-disclosure").inner_text()
+                )
+                assert (
+                    "Scoring adds total runtime"
+                    in page.locator("#judge-disclosure").inner_text()
+                )
                 rows = page.locator("#standard-rows tr").all_text_contents()
                 assert "64" in rows[3] and "48" in rows[4]
                 assert not re.search(
