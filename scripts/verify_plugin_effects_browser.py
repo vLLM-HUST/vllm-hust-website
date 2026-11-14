@@ -227,6 +227,44 @@ def main():
                         "en" if lang == "zh" else "zh",
                     )
                     assert switched == people_checked
+                    search = page.locator("[data-plugin-search]")
+                    search.fill("ascend-attention-boundary")
+                    op01 = page.locator("#ascend-attention-boundary")
+                    expect(op01).to_be_visible()
+                    expect(op01.locator(".plugin-public-effect p")).to_have_text(
+                        components["ascend-attention-boundary"][
+                            "public_effect_en" if lang == "zh" else "public_effect_zh"
+                        ]
+                    )
+                    op01_details = op01.locator(".plugin-technical-details")
+                    op01_details.locator("summary").click()
+                    expect(
+                        op01_details.locator(".plugin-technical-body")
+                    ).to_be_visible()
+                    search.fill("BetterScale")
+                    betterscale = page.locator("#betterscale")
+                    expect(betterscale).to_be_visible()
+                    expect(
+                        betterscale.locator(".plugin-public-effect")
+                    ).to_contain_text("39.63%")
+                    expect(
+                        betterscale.locator(".plugin-public-effect")
+                    ).to_contain_text("35.17%")
+                    details = betterscale.locator(".plugin-technical-details")
+                    expect(details).not_to_have_attribute("open", "")
+                    details.locator("summary").click()
+                    expect(details.locator(".plugin-test-review")).to_be_visible()
+                    for token in ("268.89", "375.45", "155.13", "209.68", "32/32"):
+                        expect(details.locator(".plugin-test-review")).to_contain_text(
+                            token
+                        )
+                    expect(
+                        betterscale.locator('a[href*="betterscale.html"]')
+                    ).to_have_count(0)
+                    assert (
+                        context.request.get(f"{args.url}/betterscale.html").status
+                        == 404
+                    )
                     context.close()
         browser.close()
     (args.output / "verification.json").write_text(
