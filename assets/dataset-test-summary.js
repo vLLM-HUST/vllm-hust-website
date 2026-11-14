@@ -14,6 +14,7 @@
     zh: {
       title: '测试数据集', lead: 'MOD 效果测试：用同一基础配置关闭 / 启用目标 MOD，按冻结数据范围比较 B0 / B1。', guideTitle: '第一次做标准测试？从这里开始', guideLead: '准备条件、可复制命令、结果核对，按四步完成。', copy: '复制命令', copied: '已复制', copyFailed: '请选中命令手动复制', timingHint: '时间仅为固定参考 Engine 组合的排期估算。待测 MOD 需按实际引擎和硬件重新估时；先在指南中定义 B0 / B1。', scope: '测试范围', dataset: '数据集', tasks: '固定任务',
       requests: '每臂请求', purpose: '用途', protocol: '查看测试执行指南 →',
+      judgeNotice: '参考Engine的HLE/Frontier评分复用同一份35B权重，由脚本单独启动固定B1阶段，无需另备模型或外部裁判服务。评分增加总耗时，其流量不计solver性能和单位token成本。同模型辅助评分不构成独立模型验证；裁判未决单列，不等同引擎请求失败。MMLU200使用规则评分。',
       notes: '运行说明', upstream: '原始数据集与工具', loading: '加载中…',
       error: '测试标准加载失败，请稍后重试。', quality: '质量与性能',
       trace: '轨迹回放性能', guide: '运行指南', source: '标准来源',
@@ -21,6 +22,7 @@
     en: {
       title: 'Test datasets', lead: 'Evaluate the target MOD: compare the same base configuration with the target MOD off / on using frozen workloads.', guideTitle: 'Running a standard test for the first time?', guideLead: 'Prerequisites, commands and result checks in four steps.', copy: 'Copy command', copied: 'Copied', copyFailed: 'Select the command and copy manually', timingHint: 'Estimates apply only to the fixed reference Engine. Re-estimate for the target MOD, runtime and hardware; define B0 / B1 in the guide first.', scope: 'Test scope', dataset: 'Dataset', tasks: 'Fixed tasks',
       requests: 'Requests per arm', purpose: 'Purpose', protocol: 'Open the execution guide →',
+      judgeNotice: 'The reference Engine reuses the same 35B weights in separate fixed-B1 HLE/Frontier scoring stages; no additional model or external judge service is required. Scoring adds total runtime and is excluded from solver performance and unit-token cost. Same-model auxiliary scores are not independent-model validation; unresolved judgments are listed separately from engine request failures. MMLU200 uses rule scoring.',
       notes: 'Run details', upstream: 'Original datasets and tools', loading: 'Loading…',
       error: 'Unable to load the test standard. Please try again.', quality: 'Quality and performance',
       trace: 'Trace inference', guide: 'Run guide', source: 'Standard source',
@@ -79,6 +81,12 @@
     }
 
     document.getElementById('entry-timing-note').textContent = labels.timingHint;
+    let judgeNotice = document.getElementById('judge-disclosure');
+    if (!judgeNotice) {
+      judgeNotice = node('p'); judgeNotice.id = 'judge-disclosure'; judgeNotice.className = 'guide-note judge-disclosure';
+      document.getElementById('entry-timing-note').after(judgeNotice);
+    }
+    judgeNotice.textContent = labels.judgeNotice;
 
     const rows = document.getElementById('standard-rows'); rows.replaceChildren();
     for (const dataset of data.datasets) {
