@@ -46,3 +46,10 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 #five-dataset-comparison summary { cursor: pointer; font-weight: 600; }
 #five-dataset-comparison p { overflow-wrap: anywhere; }
 #five-dataset-comparison .focus-table { max-width: 100%; overflow-x: auto; }
+
+.report-date-index { line-height: 2; overflow-wrap: anywhere; }
+.report-history-entry { padding: 16px 0; overflow-wrap: anywhere; }
+.report-history-entry + .report-history-entry { border-top: 1px solid #75868a; }
+.report-history-entry h3 { margin: 0 0 8px; font-size: 18px; }
+.report-history-entry p { line-height: 1.7; }
+.report-history-entry summary { cursor: pointer; }
