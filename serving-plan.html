@@ -26,10 +26,8 @@
       rel="stylesheet"
       href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901-public-pages-20261024"
     />
-    <link
-      rel="stylesheet"
-      href="./assets/serving-plan/style.css?v=native-glm-20261013"
-    />
+    <link rel="stylesheet" href="./assets/focus.css?v=capacity-unified-20261115" />
+    <link rel="stylesheet" href="./assets/serving-plan/style.css?v=capacity-unified-20261115" />
   </head>
   <body data-page="serving-plan">
     <nav class="site-nav">
@@ -54,24 +52,13 @@
       <span id="langToggleText">中 / EN</span>
     </button>
 
-    <canvas
-      id="cosmic-background"
-      class="cosmic-background"
-      aria-hidden="true"
-    ></canvas>
-
-    <main class="site-shell serving-plan"><nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav>
-      <section class="page-hero">
-        <div class="content-panel">
-          <span class="eyebrow">Serving Plan · 服务产能与成本</span>
-          <h1 style="margin-top: 16px">服务产能与成本</h1>
-          <p class="hero-lede">
-            从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。
-          </p>
-          <p>按实测吞吐和参考 API 单价估算服务产值，结合输入成本计算差额。</p>
-          <p><a href="#benchmark-source">benchmark 数据源与校验清单</a> · <a href="./data/serving-plans.json">产能方案与价格依据</a></p>
-        </div>
-      </section>
+<main class="site-shell focus-main serving-plan"><nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav>
+      <header class="focus-hero">
+        <p class="focus-eyebrow">vLLM-HUST / CAPACITY &amp; COST</p>
+        <h1>产能与成本</h1>
+        <p>按实测吞吐和参考 API 单价估算服务产值，结合输入成本计算差额。</p>
+        <button type="button" class="plan-detail-button" id="open-plan-details">公式、价格与数据来源 ↗</button>
+      </header>
       <section class="workspace content-panel">
         <aside class="controls">
           <div class="section-no">01 / 计算条件</div>
@@ -142,7 +129,9 @@
           </div>
         </div>
       </section>
-      <section class="notes content-panel">
+      <dialog id="plan-details-dialog" class="plan-dialog" aria-labelledby="plan-details-title">
+        <div class="plan-dialog-header"><h2 id="plan-details-title">公式、价格与数据来源</h2><button type="button" id="close-plan-details" aria-label="Close details">×</button></div>
+      <section class="notes">
         <div>
           <h3>价格参考</h3>
           <div id="price-note"></div>
@@ -154,7 +143,8 @@
             API 等价产值＝实测每卡吞吐×等效满载时长×参考 API 单价。输入、缓存命中和输出分别计价，再合计；日/月产能按同一工作负载与实测速率线性外推。产值与输入成本的差额用于部署预算估算，实际收入取决于业务用量与成交价。
           </p>
         </div>
-      </section>
+      </section><p><a href="./data/serving-plans.json">产能方案与价格依据</a></p>
+      </dialog>
     </main>
     <footer class="site-footer">
       <strong>vllm-hust</strong> ·
@@ -163,6 +153,6 @@
     <script src="./assets/site.js?v=public-audit-20261101"></script>
     <link rel="stylesheet" href="./assets/current-measurements.css?v=20261020" />
     <script src="./assets/benchmark-source.js?v=evidence-links-20261022"></script>
-    <script type="module" src="assets/serving-plan/app.mjs?v=concise-copy-20261101"></script>
+    <script type="module" src="assets/serving-plan/app.mjs?v=capacity-unified-20261115"></script>
   </body>
 </html>

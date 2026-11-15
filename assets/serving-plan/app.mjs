@@ -1,5 +1,5 @@
 import { calculate } from "./calc.mjs?v=accounted-plans-20261009";
-import { t, translate, errorText, sourceEnglish, sourceChinese } from "./i18n.mjs?v=concise-copy-20261101";
+import { t, translate, errorText, sourceEnglish, sourceChinese } from "./i18n.mjs?v=capacity-unified-20261115";
 const $ = (id) => document.getElementById(id);
 const fmt = (n, d = 2) =>
   n.toLocaleString("zh-CN", { maximumFractionDigits: d });
@@ -262,3 +262,9 @@ fetch("data/serving-plans.json?v=native-glm-20261013", { cache: "no-cache" })
     $("error").textContent = errorText(e.message);
     $("export").disabled = true;
   });
+
+const details = $("plan-details-dialog");
+$("open-plan-details").addEventListener("click", () => details.showModal());
+$("close-plan-details").addEventListener("click", () => details.close());
+const sourceDetails = document.getElementById("benchmark-source");
+if (sourceDetails) details.append(sourceDetails);

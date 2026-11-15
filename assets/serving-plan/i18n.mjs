@@ -36,6 +36,9 @@ export const errorText = message => t(message, ({
 })[message] || message.replace("请输入非负数", "enter a non-negative number"));
 
 const copy = new Map([
+  ["产能与成本", "Capacity & cost"],
+  ["公式、价格与数据来源 ↗", "Formulas, prices and sources ↗"],
+  ["公式、价格与数据来源", "Formulas, prices and sources"],
   ["Serving Plan · 服务产能与成本", "Serving Plan · Capacity & cost"],
   ["服务产能与成本", "Serving capacity & cost"],
   ["从实测推理吞吐，到每卡服务产能与 API 等价产值。成本由你定义。", "From measured throughput to per-card capacity and API-equivalent value. You define the cost."],

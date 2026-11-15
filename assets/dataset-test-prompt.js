@@ -8,18 +8,18 @@
   const scriptButton = document.getElementById('download-test-script');
   const status = document.getElementById('prompt-download-status');
   const bootstrap = {
-    repository: 'vLLM-HUST/vllm-hust-benchmark',
-    commit: '80e7efc9f7357bafb5ea502fe0838c340def5092', // pragma: allowlist secret
-    path: 'scripts/third_party_self_run/engine_bootstrap.py',
-    runner: '448362c7565597c8963c970dcfea0b235fd5fcf7', // pragma: allowlist secret
-    sha256: 'f328b57ab5929f4e6b697ca076c4b81a4613d9fadb154ed7ef24fb70f8bb8c64', // pragma: allowlist secret
-    bytes: 8716,
+    repository: 'vLLM-HUST/vllm-hust-engine',
+    commit: '1be195b12798e7a0959044e929e19fa358429cc4', // pragma: allowlist secret
+    path: 'download_and_run.py',
+    runner: '3c08084c64f44d96a8b17a376889fd2e3308bac2', // pragma: allowlist secret
+    sha256: '126abc8396bc597ea86f26087aa66d4dcd59d2199b5399d3203f06768eca5bf9', // pragma: allowlist secret
+    bytes: 9577,
   };
   const language = () => (window.vllmHustSite?.getCurrentLang()
     || localStorage.getItem('vllm-hust_lang') || navigator.language || 'en').startsWith('zh') ? 'zh' : 'en';
   const copy = {
-    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '归档 r4 一键脚本 ↓', scriptReady: '仅复跑归档 r4；不含当前参考标定、32K 和多租户完整自动验收，也不自动接入任意 MOD', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: '下载脚本固定为归档 r4，不是当前 r6 报告的完整复现入口；新增专项自动执行仍在补齐'},
-    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Archived r4 script ↓', scriptReady: 'Archived r4 only; lacks complete current reference, 32K and multi-tenant automation and arbitrary MOD integration', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Download is pinned to archived r4, not complete reproduction of the current r6 report; automatic supplements are still being integrated'},
+    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '最新版 Engine 一键脚本 ↓', scriptReady: '当前固定 r6 执行器与专项入口，版本及附件均校验 SHA256', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: '当前 r6 执行器 · 下载后自动恢复固定工具，实时显示运行日志'},
+    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Latest Engine script ↓', scriptReady: 'Current pinned r6 runner and supplement entry, with version and artifact SHA256 verification', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Current r6 runner · restores pinned tools and follows live logs'},
   };
 
   function command(guide, mode) {
@@ -48,9 +48,9 @@
       `reference_runner_commit: ${guide.execution.verified_runner_commit}`,
       `reference_runner: ${engine}/one_click.py`,
       `deployment_instructions: ${engine}/README.md`,
-      `public_bootstrap_source: https://github.com/${data.execution.public_bootstrap_repository}/blob/${data.execution.public_bootstrap_commit}/${data.execution.public_bootstrap_path}/engine_bootstrap.py`,
+      `public_bootstrap_source: https://github.com/${guide.execution.public_bootstrap_repository}/blob/${guide.execution.bootstrap_commit}/${guide.execution.public_bootstrap_path}`,
       `downloaded_script_sha256: ${bootstrap.sha256}
-      downloaded_script_scope: archived_r4_not_current_r6_acceptance`,
+engine_release: ${guide.execution.engine_release}`,
     ].join('\n');
     const scope = data.datasets.map(dataset => {
       const purpose = dataset.mode === 'inference_only'
@@ -196,7 +196,7 @@ ${identities}
 先读取上述固定版本的 README、执行器和协议。使用独立目录准备该版本，不覆盖其他工作或静默升级到最新 main。核对标准与运行指南的版本绑定、SHA256 和附件校验；加载失败或不匹配时停止，不凭记忆补写标准。每轮另记实际 B0/B1、执行提交、模型、硬件、judge 身份。协议冻结本身不是测试完成。
 
 ## 2. 先确认范围
-下载脚本为归档 r4，不是当前 r6 报告的完整复现入口。若任务是当前项目验收，先核对正式 Engine 的已审计执行提交及专项集成情况，不用这份旧脚本冒充新版；不得把仍缺的有效算力参考、32K 或多租户测量当成已自动完成。
+下载脚本固定恢复当前 r6 执行器。五数据集、有效算力参考、长上下文和多租户专项按各自执行记录入账，最终报告逐项展示结论。
 已确认：35B 模型适用；理论峰值按同工况独立参考解释；有效算力只选 MMLU200 标定；吞吐/时延或成本目标可由同一固定数据集同时满足该项全部条件，五项结果仍须披露。不要重新要求用户确认这些口径。
 默认执行完整五项测试。只有用户明确要求联调/快速检查时才选 MMLU200，并明确它不能替代五项完整验收。“全量”是项目冻结的五项范围，不是五个上游数据集的原始全集。
 ${field(guide, 'scope')}
@@ -261,7 +261,7 @@ ${identities}
 Read the pinned README, runner and protocols first. Prepare an isolated checkout; preserve unrelated work and do not silently upgrade to main. Verify version bindings, SHA256 and protocol artifacts before execution. Stop on any mismatch. Record actual B0/B1, execution commit, model, hardware and judge independently for each campaign.
 
 ## 2. Choose the scope
-The download is archived r4, not complete reproduction of the current r6 report. For current project acceptance, verify the audited Engine execution commit and supplement integration first. Do not present the old bootstrap as current or claim missing reference-compute, 32K or multi-tenant measurements ran automatically.
+The download restores the current pinned r6 runner. Record five-profile inference, compute reference, context and multi-tenant supplements separately and report each target from its actual execution evidence.
 Already confirmed: the 35B model scope; theoretical peak means an independent same-workload reference; calibrate compute on MMLU200 only; one fixed profile satisfying all conditions of a performance or cost target is sufficient, with all five results disclosed. Do not request these confirmations again.
 Run all five profiles by default. Use MMLU200 alone only when the user explicitly requests a quick integration check; it cannot replace full acceptance. Full means the project-frozen scope, not all upstream items.
 ${field(guide, 'scope')}
@@ -316,10 +316,11 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
   }
 
   function scriptMatches() {
-    return payload && payload.data.execution.public_bootstrap_repository === bootstrap.repository
-      && payload.data.execution.public_bootstrap_commit === bootstrap.commit
-      && `${payload.data.execution.public_bootstrap_path}/engine_bootstrap.py` === bootstrap.path
-      && payload.data.execution.reference_implementation_commit === bootstrap.runner
+    return payload && payload.guide.execution.public_bootstrap_repository === bootstrap.repository
+      && payload.guide.execution.bootstrap_commit === bootstrap.commit
+      && payload.guide.execution.public_bootstrap_path === bootstrap.path
+      && payload.guide.execution.bootstrap_sha256 === bootstrap.sha256
+      && payload.guide.execution.bootstrap_bytes === bootstrap.bytes
       && payload.guide.execution.verified_runner_commit === bootstrap.runner;
   }
 
