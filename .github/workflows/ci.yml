@@ -61,11 +61,11 @@ jobs:
           bash -n hooks/pre-push
           grep -q 'ln -sf "../../hooks/pre-commit"' quickstart.sh
           grep -q 'ln -sf "../../hooks/pre-push"' quickstart.sh
-      - name: Checkout pinned public visibility policy
+      - name: Checkout merged public visibility policy
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 4d3fe55491d03f431c44a04f862aa13e693ba731 # pragma: allowlist secret
+          ref: bb939e732b25af649658812a6e628ac9d987e407 # pragma: allowlist secret
           path: .publication-policy
           persist-credentials: false
           sparse-checkout: scripts/build_public_site.py
@@ -74,7 +74,7 @@ jobs:
         run: |
           python .publication-policy/scripts/build_public_site.py \
             --website . --output "$RUNNER_TEMP/public-site" \
-            --policy-revision 4d3fe55491d03f431c44a04f862aa13e693ba731
+            --policy-revision bb939e732b25af649658812a6e628ac9d987e407
 
   browser:
     runs-on: ubuntu-latest

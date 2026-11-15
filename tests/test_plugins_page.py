@@ -922,7 +922,9 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         for item in REGISTRY["components"]
         if item.get("public_surface", True) is not False
         and item.get("maintainers")
-        and item.get("canonical_repository", "").startswith("https://github.com/vLLM-HUST/")
+        and item.get("canonical_repository", "").startswith(
+            "https://github.com/vLLM-HUST/"
+        )
         and item["id"] in MOD_TAXONOMY["components"]
     }
     people_cards |= {"core-attention-boundary", "ascend-attention-boundary"}
