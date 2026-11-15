@@ -19,7 +19,7 @@
   </div></nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
   <main class="site-shell standard-main">
-    <div class="guide-topbar"><a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><button id="download-test-script" class="secondary-download" type="button" disabled>参考 Engine 一键脚本 ↓</button></div><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div>
+    <div class="guide-topbar"><a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><button id="download-test-script" class="secondary-download" type="button" disabled>归档 r4 一键脚本 ↓</button></div><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div>
     <header class="guide-hero">
       <p class="guide-eyebrow" data-guide-copy="eyebrow">执行指南 / 固定协议 v1</p>
       <h1 data-guide-copy="title">标准测试，按这四步完成</h1>
@@ -83,6 +83,7 @@
         </section>
         <section id="review" class="guide-step">
           <div class="step-heading"><span class="step-number">04</span><div><h2 data-guide-copy="review">核对结果与交付</h2><p data-guide-copy="reviewLead">先检查所选范围是否执行完整，再检查四项目标。两者分开记录。</p></div></div>
+          <section id="dataset-current-results" class="guide-note" aria-live="polite"></section>
           <div id="review-list" class="review-list"></div>
           <div class="guide-delivery"><h3 data-guide-copy="deliveryTitle">交付时带上这些证据</h3><ul id="delivery-list"></ul></div>
           <p class="guide-actions"><a href="./b0-b1.html" class="guide-button" data-guide-copy="acceptanceLink">查看 B0/B1 四项目标 →</a></p>
@@ -103,8 +104,9 @@
   </main>
   <footer class="site-footer"><span id="footer-copy">固定标准 · 执行步骤 · 可复核证据</span></footer>
   <script src="./assets/site.js?v=public-audit-20261101"></script>
-  <script src="./assets/dataset-test-prompt.js?v=judge-disclosure-20261114"></script>
-  <script src="./assets/dataset-standard-guide.js?v=single-profile-policy-20261114"></script>
+  <script src="./assets/dataset-test-prompt.js?v=dataset-delivery-20261115"></script>
+  <script src="./assets/dataset-standard-guide.js?v=dataset-delivery-20261115"></script>
+  <script src="./assets/dataset-current-results.js?v=dataset-delivery-20261115"></script>
   <script src="./assets/dataset-standard.js?v=mod-target-20261113"></script>
 </body>
 </html>
