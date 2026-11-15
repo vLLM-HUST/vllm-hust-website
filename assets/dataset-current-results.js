@@ -3,7 +3,7 @@
   'use strict';
   const root = document.getElementById('dataset-current-results');
   if (!root) return;
-  const path = 'data/five-datasets-r6-20261114/summary-public-v2.json';
+  const path = 'data/five-datasets-r6-20261114/summary-public-v3.json';
   const zh = () => (window.vllmHustSite?.getCurrentLang() || 'zh') === 'zh';
   const t = (a, b) => zh() ? a : b;
   const node = (tag, text) => {

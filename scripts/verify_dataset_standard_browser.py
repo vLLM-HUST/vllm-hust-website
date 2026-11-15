@@ -394,7 +394,7 @@ with sync_playwright() as play:
     page.close()
     for kind in ("bytes", "population", "missing-target"):
         page = browser.new_page()
-        summary = "data/five-datasets-r6-20261114/summary-public-v2.json"
+        summary = "data/five-datasets-r6-20261114/summary-public-v3.json"
         body = page.request.get(urljoin(args.url, summary)).body()
         manifest = page.request.get(
             urljoin(args.url, "data/benchmark-source-manifest.json")

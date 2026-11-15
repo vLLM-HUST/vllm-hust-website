@@ -1,6 +1,7 @@
 """Keep production data assembly separate from website data PRs."""
 
 from pathlib import Path
+import re
 
 import yaml
 
@@ -27,7 +28,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "a772bf867ac39b28065fde361b8eae3a587bce42"  # pragma: allowlist secret
+        "c9ad8e99425ae9543d5f28c9bb4c2539f88d3560"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
@@ -48,7 +49,25 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
             (ROOT / ".github/workflows" / filename).read_text(), Loader=yaml.BaseLoader
         )
         for job in source["jobs"].values():
+            source_paths = {
+                step["with"]["path"]
+                for step in job.get("steps", [])
+                if step.get("with", {}).get("repository")
+                == "vLLM-HUST/vllm-hust-benchmark"
+                and step["with"].get("ref") == benchmark_revision
+            }
+            allowed_revisions = {benchmark_revision} | {
+                f'"$(git -C {path} rev-parse HEAD)"' for path in source_paths
+            }
             for step in job.get("steps", []):
+                command = step.get("run", "")
+                if "sync_website_publication.py" in command:
+                    revisions = re.findall(r'--revision\s+("[^\"]*"|\S+)', command)
+                    assert revisions
+                    assert all(value in allowed_revisions for value in revisions), (
+                        filename,
+                        revisions,
+                    )
                 if (
                     step.get("with", {}).get("repository")
                     == "vLLM-HUST/vllm-hust-benchmark"

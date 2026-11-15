@@ -8,7 +8,7 @@ from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
 
-SUMMARY = "data/five-datasets-r6-20261114/summary-public-v2.json"
+SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
@@ -65,6 +65,18 @@ def verify(url, output):
                             for word in ("复核中", "待测", "待计算", "pending")
                         )
 
+                    supplement = root.locator("#context-tenant-supplement")
+                    expect(supplement).to_contain_text("62.89%")
+                    expect(supplement).to_contain_text("82.77%")
+                    image = supplement.locator("img")
+                    assert image.evaluate("el=>el.complete && el.naturalWidth>0")
+                    root.locator('[data-detail="supplement"]').click()
+                    extra = root.locator("dialog")
+                    expect(extra.locator("tbody tr")).to_have_count(4)
+                    expect(extra).to_contain_text("238.13")
+                    expect(extra).to_contain_text("r4")
+                    expect(extra).to_contain_text("r5")
+                    extra.locator(".dialog-close").click()
                     expect(root.locator(".metric-chart")).to_have_count(4)
                     expect(root.locator(".bar-value")).to_have_count(40)
                     expect(root.locator(".mod-tags span")).to_have_count(
@@ -170,6 +182,22 @@ def verify(url, output):
                 lambda d: d["formal_targets"]["3.4.1"]["historical_evidence"].update(
                     source_url="https://example.com"
                 ),
+                True,
+            ),
+            (
+                "inconsistent-supplement-rate",
+                SUMMARY,
+                lambda d: d["acceptance_supplement"]["comparisons"][0].__setitem__(
+                    "throughput_ratio", 100
+                ),
+                True,
+            ),
+            (
+                "incomplete-supplement-window",
+                SUMMARY,
+                lambda d: d["acceptance_supplement"]["comparisons"][0]["arms"]["B1"][
+                    "windows"
+                ].pop(),
                 True,
             ),
             ("bad-hash", SUMMARY, lambda d: d.update(execution_complete=False), False),
