@@ -109,11 +109,30 @@ def main():
                         c["id"]: c for c in payloads["ecosystem.json"]["components"]
                     }
                     for component_id in (
+                        "traceloom",
+                        "latchmoe",
+                        "tricard-clm-lifecycle",
+                        "ascend-adaptive-quantized-kv",
+                        "dla",
                         "stateaxis-automatic-prefix-cache",
                         "stateaxis-async-kv-transfer",
                         "stateaxis-pipelined-weight-loading",
+                        "cuda-mtp",
+                        "memory-tracker",
+                        "ascend-mapped-kv-offload",
+                        "scheduler-policy-lab",
                     ):
-                        expect(page.locator(f"#{component_id}")).to_have_count(0)
+                        card = page.locator(f"#{component_id}")
+                        expect(card).to_be_visible()
+                        expect(card.locator(".plugin-summary")).to_have_text(
+                            components[component_id][f"summary_{lang}"]
+                        )
+                        details = card.locator(".plugin-technical-details")
+                        details.locator("summary").click()
+                        expect(
+                            details.locator(".plugin-technical-body")
+                        ).to_be_visible()
+                        details.locator("summary").click()
                     checked = []
                     people_checked = check_people(
                         page,
