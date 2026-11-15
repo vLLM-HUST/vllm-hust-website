@@ -2,6 +2,7 @@
   'use strict';
   // Update this committed source path only after the new benchmark report is audited.
   const summaryPath = 'data/five-datasets-r6-20261114/summary-public-v3.json';
+  const supplementAnalysisSha = '0e3947af17badfa7edb244a2ca397c5367480678eeb416bb1c1f886d02c08c5f'; // pragma: allowlist secret -- fixed public evidence digest
   if (/^#(?:method-[1-4]|method-b0|metric-[1-4]|current-qualified-compute|b0-baseline|acceptance-stages|comparison)$/.test(location.hash)) {
     location.replace('./b0-b1-legacy.html'+location.hash);
     return;
@@ -47,7 +48,7 @@
     });
     const supplement=d.acceptance_supplement;
     if (supplement?.schema!=='sealed-A01-context-tenant-publication/v1' || supplement.execution_complete!==true ||
-        supplement.source_analysis_sha256!=='0e3947af17badfa7edb244a2ca397c5367480678eeb416bb1c1f886d02c08c5f' ||
+        supplement.source_analysis_sha256!==supplementAnalysisSha ||
         supplement.chart_path!=='data/context-tenant-a01-20261115/paired-overview.svg' ||
         supplement.comparisons?.length!==4 || supplement.fixed_five_datasets_rerun!==false) fail();
     const phases=['4096-formal','16384-formal','32768-formal','multi-tenant-formal'];
