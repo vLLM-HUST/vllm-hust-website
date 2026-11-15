@@ -372,3 +372,21 @@
     break-inside: avoid;
   }
 }
+
+/* Shared evaluation-page appearance. */
+body[data-page="serving-plan"]{background:#101719;color:#edf3f3;--sub-paper:#152124;--sub-panel:#101719;--sub-ink:#edf3f3;--sub-line:#75868a;--sub-muted:#b8c8cd;--sub-amber:#c99c52}
+.serving-plan.focus-main{max-width:1120px;padding-top:20px}
+.serving-plan .focus-hero{padding:4px 0 12px}
+.serving-plan .focus-hero h1{font-size:clamp(28px,3vw,40px);margin:10px 0;color:inherit}
+.serving-plan .content-panel{border:1px solid #75868a;border-radius:12px;box-shadow:none;background:transparent;color:inherit}
+.serving-plan .workspace{margin:18px 0}
+.serving-plan :is(h1,h2,h3,h4,legend,strong){color:inherit}
+.serving-plan .controls{background:rgba(115,150,155,.06);padding:22px}
+.serving-plan .results{min-width:0;padding:22px}
+.serving-plan .plan-detail-button{color:inherit;border:1px solid #75868a;background:transparent;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:14px}
+.plan-dialog{color:inherit;background:#152124;border:1px solid #75868a;border-radius:12px;width:min(780px,calc(100vw - 32px));max-height:85vh;padding:24px;overflow:auto}
+.plan-dialog::backdrop{background:#0009}.plan-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.plan-dialog-header h2{font-size:20px;margin:0}.plan-dialog-header button{background:transparent;border:0;color:inherit;font-size:28px;cursor:pointer}
+.serving-plan .plan-dialog .notes{display:block;padding:0}.plan-dialog p{line-height:1.7;overflow-wrap:anywhere}.plan-dialog a{color:#83d9db}
+@media(prefers-color-scheme:light){body[data-page="serving-plan"]{background:#f8faf9;color:#203137;--sub-paper:#f1f5f3;--sub-panel:#fff;--sub-ink:#203137;--sub-muted:#475b63}.plan-dialog{background:#f8faf9}.plan-dialog a{color:#006b79}}
+@media(max-width:700px){.serving-plan .controls,.serving-plan .results{padding:16px}.serving-plan .workspace.content-panel{grid-template-columns:1fr}.serving-plan .controls{border-right:0;border-bottom:1px solid #75868a}}

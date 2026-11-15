@@ -69,8 +69,8 @@ def check_prompt_download(page, language, target="mod"):
     expected = re.search(r"downloaded_script_sha256: ([a-f0-9]{64})", content)[1]
     assert hashlib.sha256(raw).hexdigest() == expected
     runner = re.search(r"reference_runner_commit: ([a-f0-9]{40})", content)[1]
-    assert f'COMMIT = "{runner}"' in raw.decode()
-    assert "downloaded_script_scope: archived_r4_not_current_r6_acceptance" in content
+    assert re.search(r"^COMMIT = [\"\']" + runner + r"[\"\']", raw.decode(), re.M)
+    assert "engine_release: full-answer-b1-20261113-r6" in content
     compile(raw, "downloaded-one_click.py", "exec")
 
 
@@ -128,7 +128,8 @@ with sync_playwright() as play:
                 assert "B1: 672/672" in current.inner_text()
                 assert "用户未确认" not in current.inner_text()
                 assert (
-                    "Archived r4" in page.locator("#download-test-script").inner_text()
+                    "Latest Engine"
+                    in page.locator("#download-test-script").inner_text()
                 )
                 assert page.locator("#standard-rows tr").count() == 5
                 assert (
@@ -386,7 +387,7 @@ with sync_playwright() as play:
     page.close()
     for kind in ("bytes", "population", "missing-target"):
         page = browser.new_page()
-        summary = "data/five-datasets-r6-20261114/summary-public-v1.json"
+        summary = "data/five-datasets-r6-20261114/summary-public-v2.json"
         body = page.request.get(urljoin(args.url, summary)).body()
         manifest = page.request.get(
             urljoin(args.url, "data/benchmark-source-manifest.json")
