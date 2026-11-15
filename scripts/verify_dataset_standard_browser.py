@@ -70,6 +70,7 @@ def check_prompt_download(page, language, target="mod"):
     assert hashlib.sha256(raw).hexdigest() == expected
     runner = re.search(r"reference_runner_commit: ([a-f0-9]{40})", content)[1]
     assert f'COMMIT = "{runner}"' in raw.decode()
+    assert "downloaded_script_scope: archived_r4_not_current_r6_acceptance" in content
     compile(raw, "downloaded-one_click.py", "exec")
 
 
@@ -119,6 +120,16 @@ with sync_playwright() as play:
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(url, wait_until="networkidle")
                 page.wait_for_selector("#standard-content:not([hidden])")
+                page.wait_for_selector("#dataset-current-results[data-loaded]")
+                current = page.locator("#dataset-current-results")
+                assert "full-answer-b1-20261113-r6" in current.inner_text()
+                assert current.locator("li").count() == 4
+                assert "B0: 672/672" in current.inner_text()
+                assert "B1: 672/672" in current.inner_text()
+                assert "用户未确认" not in current.inner_text()
+                assert (
+                    "Archived r4" in page.locator("#download-test-script").inner_text()
+                )
                 assert page.locator("#standard-rows tr").count() == 5
                 assert (
                     "no additional model or external judge service is required"
@@ -373,6 +384,43 @@ with sync_playwright() as play:
     assert "selected_scope: quick" in quick_content
     assert re.search(r"^selected_profiles: mmlu$", quick_content, re.M)
     page.close()
+    for kind in ("bytes", "population", "missing-target"):
+        page = browser.new_page()
+        summary = "data/five-datasets-r6-20261114/summary-public-v1.json"
+        body = page.request.get(urljoin(args.url, summary)).body()
+        manifest = page.request.get(
+            urljoin(args.url, "data/benchmark-source-manifest.json")
+        ).json()
+        if kind != "bytes":
+            value = json.loads(body)
+            if kind == "population":
+                value["datasets"][0]["arms"]["B1"]["successful"] -= 1
+            else:
+                del value["formal_targets"]["3.4.1"]
+            body = json.dumps(value).encode()
+            for entry in manifest["files"]:
+                if entry["website_path"] == summary:
+                    entry.update(
+                        sha256=hashlib.sha256(body).hexdigest(), bytes=len(body)
+                    )
+            page.route(
+                "**/data/benchmark-source-manifest.json",
+                lambda route, request, manifest=manifest: route.fulfill(json=manifest),
+            )
+        else:
+            body = b"{}"
+        page.route(
+            "**/" + summary,
+            lambda route, request, body=body: route.fulfill(
+                body=body, content_type="application/json"
+            ),
+        )
+        page.goto(urljoin(args.url, "dataset-introductions.html"))
+        page.wait_for_selector(
+            "#dataset-current-results[data-error=publication-rejected]"
+        )
+        assert not page.locator("#dataset-current-results").get_attribute("data-loaded")
+        page.close()
     browser.close()
 print(
     json.dumps(
