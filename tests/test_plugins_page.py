@@ -418,10 +418,11 @@ def test_measured_cards_link_to_their_exact_benchmark_setting() -> None:
 
 
 def test_mod_authors_can_review_the_full_test_contract_from_the_catalog() -> None:
-    assert 'id="mod-test-protocol"' in PAGE
-    assert "不同 token 与计时口径不得混比" in PAGE
-    assert "State whether output is fixed-length" in PAGE
-    assert "actual generated tokens are not a fixed token budget" in PAGE
+    assert PAGE.index('id="plugin-catalog"') < PAGE.index("data-plugin-catalog")
+    assert PAGE.index("data-plugin-catalog") < PAGE.index('id="mod-test-protocol"')
+    assert "性能测试口径" in PAGE
+    assert "Output length can be fixed or capped with early stopping" in PAGE
+    assert "实际生成 token 吞吐与固定 token 预算吞吐采用不同的分子" in PAGE
     assert (
         "2e5af5cb84b8500dfa00c5799960803db4c1d5b3/reports/"
         "reproductions/native-mtp4-gamma4-20261027"
@@ -435,7 +436,7 @@ def test_mod_authors_can_review_the_full_test_contract_from_the_catalog() -> Non
     assert "tokenizer_fingerprint" in SCRIPT
     assert "runtime_base_commits" in SCRIPT
     assert "launch_command_redacted" in SCRIPT
-    assert "旧式发布记录尚未归一化完整配置" in SCRIPT
+    assert "历史记录的配置不全" in SCRIPT
     assert 'item.id === "vspec"' in SCRIPT
     assert ".mod-test-protocol-grid" in STYLES
     assert ".plugin-test-review" in STYLES
@@ -783,10 +784,8 @@ def test_mod_style_catalog_prioritizes_compatibility_and_keeps_details() -> None
     assert 'element("details", "plugin-technical-details")' in SCRIPT
     assert 'element("summary", "", copy().details)' in SCRIPT
     assert "copy().installRun" in SCRIPT
-    assert "Start with the intervention point" in PAGE
-    assert "先定位介入阶段" in PAGE
+    assert "推理阶段与使用场景" in PAGE
     assert ".plugin-compatibility-facts" in STYLES
-    assert ".mod-catalog-guide" in STYLES
 
 
 def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
@@ -913,7 +912,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert "taxonomyProfile(project.primary).kind" in SCRIPT
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
-    assert "Only runtime and connector MODs enter performance selection" in PAGE
+    assert "Performance filters cover runtime and connector MODs" in PAGE
     assert 'data-taxonomy="./data/mod-taxonomy.json?v=catalog-b1-r6-20261116"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
@@ -1195,8 +1194,8 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=mod-review-20261110" in PAGE
-    assert "plugins-page.js?v=betterscale-card-20261114" in PAGE
+    assert "plugins.css?v=catalog-copy-20261116" in PAGE
+    assert "plugins-page.js?v=catalog-copy-20261116" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
