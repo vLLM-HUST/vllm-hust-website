@@ -14,8 +14,7 @@ State Scheduler 已撤下性能 MOD 定位。当前动作集停止，代码和�
 
 ## 保留内容与使用边界
 
-[规范源码仓库](https://github.com/Qixin-Gaoke/state-scheduler-plugin) 保留代码、实验脚本、
-冻结门槛、反例和完整证据说明；仓库访问仍受原有权限控制。原始 trace 和日志保留在 实验载体的 WPS 目录之外，备份进入 `历史`，没有作为公开下载发布。
+私有源码仓库 保留代码、实验脚本、 冻结门槛、反例和完整证据说明；仓库访问仍受原有权限控制。原始 trace 和日志保留在 实验载体的 WPS 目录之外，备份进入 `历史`，没有作为公开下载发布。
 
 [原 0.2.0 发布制品](https://github.com/vLLM-HUST/vllm-hust-website/releases/tag/state-scheduler-v0.2.0)
 继续保留，wheel、源包、归档和 SHA256SUMS 不变。它们仅包含当时的离线工具和旧共享状态组件， 不包含后续 P2 原型。78 项历史测试、安装和 ECPA 静态发现检查不等于性能验收。
