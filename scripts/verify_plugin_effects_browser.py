@@ -244,6 +244,9 @@ def main():
                     search.fill("BetterScale")
                     betterscale = page.locator("#betterscale")
                     expect(betterscale).to_be_visible()
+                    expect(betterscale.locator(".plugin-advisors")).to_contain_text(
+                        "Shuhao Zhang" if lang == "zh" else "张书豪"
+                    )
                     expect(
                         betterscale.locator(".plugin-public-effect")
                     ).to_contain_text("39.63%")
