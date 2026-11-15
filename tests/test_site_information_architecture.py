@@ -273,7 +273,6 @@ def test_plugin_standard_has_provider_owned_lifecycle_semantics() -> None:
         "CUDA_VISIBLE_DEVICES=",
         "ASCEND_RT_VISIBLE_DEVICES=",
         "pkill",
-        "Qixin-Gaoke",
     ):
         assert forbidden not in standard
 

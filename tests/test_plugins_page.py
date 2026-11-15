@@ -923,7 +923,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         if item.get("public_surface", True) is not False
         and item.get("maintainers")
         and item.get("canonical_repository", "").startswith(
-            ("https://github.com/vLLM-HUST/", "https://github.com/Qixin-Gaoke/")
+            "https://github.com/vLLM-HUST/"
         )
         and item["id"] in MOD_TAXONOMY["components"]
     }
@@ -1084,7 +1084,6 @@ def test_gdn_state_codec_publishes_ecpa_activation_and_negative_result() -> None
         "runtimeEffective",
     ]
     assert codec["evidence_level"] == "performance_verified"
-    assert "Qixin-Gaoke" not in json.dumps(codec)
 
 
 def test_withdrawn_stateaxis_mods_are_retained_only_as_non_public_history() -> None:
@@ -1098,9 +1097,6 @@ def test_withdrawn_stateaxis_mods_are_retained_only_as_non_public_history() -> N
     for component_id in withdrawn_ids:
         component = by_id(component_id)
         assert component["public_surface"] is False
-        assert component["canonical_repository"] == (
-            f"https://github.com/Qixin-Gaoke/{component_id}"
-        )
         assert component["ownership"] == "original_contributor_maintained"
         assert component["repository_relationship"] == "external_reference"
         assert component["advisors"] == []

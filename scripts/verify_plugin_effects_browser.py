@@ -127,6 +127,14 @@ def main():
                         expect(card.locator(".plugin-summary")).to_have_text(
                             components[component_id][f"summary_{lang}"]
                         )
+                        if component_id.startswith("stateaxis-"):
+                            component = components[component_id]
+                            assert component["repository_visibility"] == "private"
+                            assert "canonical_repository" not in component
+                            expect(card.locator("a.plugin-repository")).to_have_count(0)
+                            expect(card.locator(".plugin-maintainer")).to_contain_text(
+                                "张书豪"
+                            )
                         details = card.locator(".plugin-technical-details")
                         details.locator("summary").click()
                         expect(
