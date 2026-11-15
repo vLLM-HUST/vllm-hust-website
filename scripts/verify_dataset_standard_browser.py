@@ -122,6 +122,13 @@ with sync_playwright() as play:
                 page.wait_for_selector("#standard-content:not([hidden])")
                 page.wait_for_selector("#dataset-current-results[data-loaded]")
                 current = page.locator("#dataset-current-results")
+                current.locator("details").evaluate("element => element.open = true")
+                milestone = current.locator("li").first
+                assert "MMLU200/out256" in milestone.inner_text()
+                text = milestone.locator("p").first.inner_text()
+                assert text.endswith("Target met")
+                assert "未达成目标" not in text and "Target not met" not in text
+                current.locator("details").evaluate("element => element.open = false")
                 assert "full-answer-b1-20261113-r6" in current.inner_text()
                 assert current.locator("li").count() == 4
                 assert "B0: 672/672" in current.inner_text()
