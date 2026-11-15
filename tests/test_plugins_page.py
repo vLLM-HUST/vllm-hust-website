@@ -423,7 +423,7 @@ def test_mod_authors_can_review_the_full_test_contract_from_the_catalog() -> Non
     assert "State whether output is fixed-length" in PAGE
     assert "actual generated tokens are not a fixed token budget" in PAGE
     assert (
-        "126eb1929a775051927e9de27a070b6018e39e58/reports/"
+        "2e5af5cb84b8500dfa00c5799960803db4c1d5b3/reports/"
         "reproductions/native-mtp4-gamma4-20261027"
     ) in PAGE
     assert "function modTestReview(item, result)" in SCRIPT
