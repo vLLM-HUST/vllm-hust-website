@@ -68,7 +68,7 @@
     maintainers: "负责人",
     adaptationMaintainers: "国产化适配维护者",
     advisors: "指导老师",
-    advisorUnknown: "规范元数据尚未记录指导关系",
+    advisorUnknown: "暂无指导老师记录",
     externalAdvisor: "校外指导",
     externalContributor: "项目外援",
     stars: "Stars",
@@ -77,7 +77,7 @@
     publicEffect: "公开效果",
     measuredResults: "实测结果",
     retestPending: "重组后待复测",
-    retestPendingCopy: "旧记录仅作来源参考；当前仓库版本须按 vllm-hust-benchmark 规范重新验收。",
+    retestPendingCopy: "已有实测对应历史版本，当前版本待复测。",
     singleResults: "单 MOD",
     combinationResults: "组合",
     compatibilityResults: "兼容性 / 负结果",
@@ -89,8 +89,8 @@
     negative: "负向观察",
     scope: "范围",
     result: "结果",
-    doNotRepeat: "无需重复",
-    reopenRequires: "重新开启条件",
+    doNotRepeat: "已排除的复测范围",
+    reopenRequires: "复测条件",
     identity: "组件身份",
     capability: "能力域",
     phases: "作用阶段",
@@ -106,10 +106,10 @@
     followup: "负责人跟进 Issue",
     details: "兼容性与技术详情",
     testReview: "测试配置与复查",
-    normalizedReview: "已按统一字段发布，可逐项核对基线与候选配置。",
-    legacyReviewWarning: "旧式发布记录尚未归一化完整配置；只能按下列范围与原始证据复查，不得与其他 token、计时或并发口径直接比较。",
-    noReviewCell: "当前没有规范化性能测试单元；提出性能结论前请按统一协议登记配置并提交证据。",
-    reviewProtocol: "统一复查协议",
+    normalizedReview: "以下为实测的基线与候选配置。",
+    legacyReviewWarning: "历史记录的配置不全。下列结果适用于记录中的 token、计时和并发口径。",
+    noReviewCell: "暂无统一格式的性能测试配置。",
+    reviewProtocol: "性能测试口径",
     testModel: "模型",
     testEngine: "引擎",
     testHardware: "硬件",
@@ -126,8 +126,8 @@
     allScenarios: "全部场景 / 用例",
     phaseAxis: "生命周期阶段",
     scenarioTraits: "适用场景 / 用例",
-    allPhaseDescription: "生命周期阶段是所有 MOD 的主导航维度，包括离线工具、控制面、恢复与可观测组件。",
-    allScenarioDescription: "场景与用例是可选的第二维度；不要求每个 MOD 对应一种负载形态。",
+    allPhaseDescription: "按 MOD 在推理流程中的作用阶段筛选。",
+    allScenarioDescription: "场景标签表示已记录的典型用例。",
     installRun: "安装 / 启动",
     boundaries: "关键边界",
     repositories: "个组织仓库",
@@ -176,7 +176,7 @@
     maintainers: "Maintainers",
     adaptationMaintainers: "Localization maintainers",
     advisors: "Advisors",
-    advisorUnknown: "No advisor relationship is recorded in canonical metadata",
+    advisorUnknown: "Advisor not listed",
     externalAdvisor: "External advisor",
     externalContributor: "External contributor",
     stars: "Stars",
@@ -185,7 +185,7 @@
     publicEffect: "Public result",
     measuredResults: "Measured results",
     retestPending: "Fresh qualification pending",
-    retestPendingCopy: "Previous records remain source references only; the current repository version must be requalified under the vllm-hust-benchmark protocol.",
+    retestPendingCopy: "Published results cover earlier versions. The current version awaits retesting.",
     singleResults: "Single MOD",
     combinationResults: "Combinations",
     compatibilityResults: "Compatibility / negative findings",
@@ -197,8 +197,8 @@
     negative: "Negative observation",
     scope: "Scope",
     result: "Result",
-    doNotRepeat: "Do not repeat",
-    reopenRequires: "Reopen requirements",
+    doNotRepeat: "Excluded retest scope",
+    reopenRequires: "Retest criteria",
     identity: "Component identity",
     capability: "Capability area",
     phases: "Execution phases",
@@ -214,10 +214,10 @@
     followup: "Owner follow-up issue",
     details: "Compatibility & technical details",
     testReview: "Test configuration & review",
-    normalizedReview: "Published with normalized fields for a line-by-line baseline/candidate review.",
-    legacyReviewWarning: "This legacy publication does not normalize the full configuration. Review only the stated scope and raw evidence; do not compare it directly with a different token, timing, or concurrency contract.",
-    noReviewCell: "No normalized performance cell is published. Register the full configuration and evidence under the common protocol before making a performance claim.",
-    reviewProtocol: "Common review protocol",
+    normalizedReview: "Baseline and candidate settings for the reported measurements.",
+    legacyReviewWarning: "This historical result has incomplete configuration details. It applies to the recorded token, timing, and concurrency settings.",
+    noReviewCell: "No standardized performance test configuration is available.",
+    reviewProtocol: "Performance test methodology",
     testModel: "Model",
     testEngine: "Engine",
     testHardware: "Hardware",
@@ -234,8 +234,8 @@
     allScenarios: "All scenarios / use cases",
     phaseAxis: "Lifecycle phase",
     scenarioTraits: "Scenario / use-case fit",
-    allPhaseDescription: "Lifecycle phase is the primary axis for every MOD, including offline tools, control planes, recovery, and observability components.",
-    allScenarioDescription: "Scenario and use case are an optional second axis; not every MOD implies a workload shape.",
+    allPhaseDescription: "Filter by where a MOD operates in the inference pipeline.",
+    allScenarioDescription: "Scenario tags describe documented use cases.",
     installRun: "Install / run",
     boundaries: "Key boundaries",
     repositories: "organization repositories",
@@ -353,36 +353,36 @@
   );
   const phaseDescriptions = {
     offline_preparation: {
-      en: "Prepare, transform, inspect, or validate artifacts before a serving process starts.",
-      zh: "在推理服务启动前制备、转换、检查或验证制品。"
+      en: "Artifact preparation, conversion and validation before the service starts.",
+      zh: "服务启动前的制品制备、转换和检查。"
     },
     service_startup: {
-      en: "Load models and adapters, initialize workers, and reach service readiness.",
-      zh: "加载模型与适配器、初始化 worker，并使服务进入就绪状态。"
+      en: "Model and adapter loading, worker initialization, and service readiness.",
+      zh: "模型与适配器加载、worker 初始化及服务就绪。"
     },
     request_admission: {
-      en: "Admit, route, queue, throttle, or recover requests before execution.",
-      zh: "在执行前完成请求准入、路由、排队、限流或恢复。"
+      en: "Request admission, routing, queuing, throttling and recovery before execution.",
+      zh: "请求执行前的准入、路由、排队、限流和恢复。"
     },
     prefill: {
-      en: "Intervene while prompts are ingested and initial state is materialized.",
-      zh: "在提示词摄入和初始状态物化阶段介入。"
+      en: "Input processing and initial state creation during prefill.",
+      zh: "Prefill 阶段的输入处理和初始状态构建。"
     },
     decode: {
-      en: "Intervene in token generation, sampling, operators, or decode scheduling.",
-      zh: "在逐 token 生成、采样、算子或 Decode 调度阶段介入。"
+      en: "Token generation, sampling, operators and scheduling during decode.",
+      zh: "Decode 阶段的 token 生成、采样、算子和调度。"
     },
     state_lifecycle: {
-      en: "Manage KV, session, adapter, or workflow state across its lifecycle.",
-      zh: "管理 KV、会话、适配器或工作流状态的完整生命周期。"
+      en: "Lifecycle management for KV, sessions, adapters and workflow state.",
+      zh: "KV、会话、适配器和工作流状态的生命周期管理。"
     },
     service_lifecycle: {
-      en: "Operate service suspension, wake-up, scaling, control, or teardown.",
-      zh: "处理服务挂起、唤醒、伸缩、控制或销毁。"
+      en: "Service suspension, wake-up, scaling, control and shutdown.",
+      zh: "服务挂起、唤醒、伸缩、控制和关闭。"
     },
     observability: {
-      en: "Observe, profile, evaluate, or price behavior without implying a serving optimization.",
-      zh: "观测、剖析、评测或计价，不暗示它本身是推理性能优化。"
+      en: "Monitoring, profiling, evaluation and cost analysis.",
+      zh: "运行监测、性能分析、评测和成本估算。"
     }
   };
   const domainLabels = {
@@ -1929,7 +1929,6 @@ vllm-hust-ext extension check ${extensionId}`
   function renderPageLabels() {
     const zh = language() === "zh";
     const values = {
-      "plugins-eyebrow": zh ? "vLLM-HUST MOD 目录" : "vLLM-HUST MOD catalog",
       "plugins-title": zh ? "MOD 目录" : "MOD catalog",
       "plugins-fact-items": zh ? "个公开 MOD" : "public MODs",
       "plugins-fact-runtime": zh ? "个兼容性已验证" : "compatibility verified",
@@ -2001,7 +2000,7 @@ vllm-hust-ext extension check ${extensionId}`
       }
       if (!supportsModTaxonomy(taxonomy)) {
         throw new Error(language() === "zh"
-          ? "MOD 分类数据版本暂不匹配，请刷新页面后重试。"
+          ? "MOD 分类数据版本与页面不匹配，刷新后可重试。"
           : "The MOD classification data is temporarily out of date. Refresh the page and try again.");
       }
       if (resultPublication.evidence.schema_version !== "mod-test-evidence/v1"
@@ -2087,7 +2086,7 @@ vllm-hust-ext extension check ${extensionId}`
       })
       .catch((error) => {
         repositoryStatus.textContent = language() === "zh"
-          ? "仓库组合加载失败，请检查规范 registry。"
+          ? "仓库目录加载失败。"
           : "The repository portfolio could not be loaded. Check the canonical registry.";
         repositoryStatus.title = error.message;
       });
