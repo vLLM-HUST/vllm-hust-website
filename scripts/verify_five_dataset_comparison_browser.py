@@ -42,16 +42,15 @@ def verify(url, output):
                     expect(root.locator(".goal-card")).to_have_count(4)
                     for index, goal in enumerate(("3.4.1", "3.4.2", "3.4.3", "3.4.4")):
                         card = root.locator(f'[data-goal="{goal}"]')
+                        milestone = data["formal_targets"][goal]
+                        if goal == "3.4.1":
+                            milestone = milestone["historical_evidence"]
                         expected = (
-                            (
-                                "达成目标"
-                                if data["formal_targets"][goal]["accepted"]
-                                else "未达成目标"
-                            )
+                            ("达成目标" if milestone["accepted"] else "未达成目标")
                             if lang == "zh"
                             else (
                                 "Target met"
-                                if data["formal_targets"][goal]["accepted"]
+                                if milestone["accepted"]
                                 else "Target not met"
                             )
                         )
@@ -130,9 +129,11 @@ def verify(url, output):
                     dialog.locator(".dialog-close").click()
                     root.locator('[data-goal="3.4.1"]').click()
                     expect(dialog).to_contain_text("19.340383")
+                    expect(dialog).to_contain_text("MMLU200/out256")
                     expect(dialog).to_contain_text(
-                        "未达成目标" if lang == "zh" else "Target not met"
+                        "达成目标" if lang == "zh" else "Target met"
                     )
+                    assert data["formal_targets"]["3.4.1"]["measured_value"] is None
                     dialog.locator(".dialog-close").click()
                     root.locator('[data-detail="metrics"]').click()
                     expect(dialog.locator("table")).to_have_count(4)
@@ -155,6 +156,22 @@ def verify(url, output):
                     )
                     page.close()
         for label, path, transform, resign in [
+            (
+                "unsupported-historical-pass",
+                SUMMARY,
+                lambda d: d["formal_targets"]["3.4.1"]["historical_evidence"].update(
+                    measured_value=49
+                ),
+                True,
+            ),
+            (
+                "foreign-milestone-evidence",
+                SUMMARY,
+                lambda d: d["formal_targets"]["3.4.1"]["historical_evidence"].update(
+                    source_url="https://example.com"
+                ),
+                True,
+            ),
             ("bad-hash", SUMMARY, lambda d: d.update(execution_complete=False), False),
             (
                 "inconsistent-rate",

@@ -45,6 +45,7 @@
       }
       if (!close(row.changes_percent?.unit_cost_change_percent,100*(row.arms.B1.estimated_cny_per_million_output_tokens/row.arms.B0.estimated_cny_per_million_output_tokens-1))) fail();
     });
+    window.vllmHustProjectMilestones.validate(d);
     const reference=d.compute_reference_statistics;
     if (reference?.schema!=='qualified-reference-denominator/v1' || reference.scope?.max_completion_tokens!==256 || reference.calculation?.chips!==2) fail();
     for (const role of ['B0','B1']) {
@@ -72,7 +73,7 @@
 
   const profileNames = () => t(['MMLU200','HLE200','Frontier160','SWE trace','Terminal trace'],['MMLU200','HLE200','Frontier160','SWE trace','Terminal trace']);
   const attainment = (id, final = false) => {
-    const goal = final ? data.project_final_assessment.targets[id] : data.formal_targets[id];
+    const goal = final ? data.project_final_assessment.targets[id] : window.vllmHustProjectMilestones.select(data,id);
     const met = final ? goal.attainment === 'demonstrated' : goal.accepted;
     return met ? t('达成目标','Target met') : t('未达成目标','Target not met');
   };
@@ -93,11 +94,11 @@
     if (key.startsWith('goal-')) {
       const id=key.slice(5),i=required.indexOf(id),goal=data.formal_targets[id];
       let body=table(t(['阶段','要求','当前结果'],['Stage','Requirement','Current result']),[
-        [t('里程碑','Milestone'),requirements[i],attainment(id)],
+        [t('项目里程碑','Project milestone'),requirements[i],attainment(id)],
         [t('项目最终目标','Project final'),t(final[id].requirement,final[id].requirement_en),attainment(id,true)]]);
       if (id==='3.4.1') {
         const stats=data.compute_reference_statistics;
-        body+=`<p>${t('复用已核验的参考分母统计。本轮效率用同工作域的必要算量与双卡同步计时重新计算；旧59.7573%保留在历史结果中。','Reuse verified reference denominator statistics. Recompute current efficiency from necessary arithmetic and synchronized dual-card timing in the same workload domain;59.7573% remains a historical result.')}</p>
+        body+=`<p>${t('项目50%里程碑已由原固定MMLU200/out256认证工况达成。当前冻结版本另行复测效率，复用参考分母统计，重新采集分子；不把原效率百分比当成本轮新测结果。','The project50% milestone was achieved by the original certified MMLU200/out256 workload. Requalify the current frozen version separately: reuse reference denominator statistics and measure a fresh numerator, without presenting the historical efficiency as a new measurement.')}</p>
           <p class="formula">C<sub>ref</sub><sup>U</sup> = ΣF<sup>U</sup> / (k × ΣT<sub>ref</sub><sup>L</sup> × 10¹²)</p>
           <p>${t('单位TFLOP/s/卡，k=2。F上界是必要算量上界，参考耗时下界来自独立组件标定与资源依赖图。','Unit:TFLOP/s/card; k=2. F upper bounds necessary work; reference time lower bounds come from independently calibrated component/resource dependency graphs.')}</p>
           ${table(t(['原参考域','ΣF上界 / FLOPs','ΣT参考下界 / 秒','参考算力上界 / TFLOP/s/卡'],['Original domain','ΣF upper / FLOPs','ΣTref lower / s','Reference upper / TFLOP/s/card']),['B0','B1'].map(role=>{const r=stats.arms[role];return [role,r.effective_flops_interval[1],r.sum_reference_seconds_lower,Number(r.reference_tflops_per_card_upper).toFixed(8)];}))}
@@ -109,11 +110,11 @@
       if (id==='3.4.3') body+=`<p>${t('4K/16K连续C8窗口已执行。缺项：真实任务4K/16K/32K同负载曲线及尾延迟验收。行动：完成已启动的两臂专项，定位限制吞吐或尾延迟的算子，按冻结配置逐步优化。','Continuous4K/16K C8 windows completed.16K throughput/tail review and32K supplementation are tracked separately.')}</p>`;
       if (id==='3.4.4') body+=`<p>${t('成本按相同费率与设备数折算，五项降幅均达到30%；多租户利用率证据缺项，已纳入四租户专项。','Cost uses equal rates and device counts. All five cost reductions meet30%; multi-tenant utilization evidence is missing and is included in the four-tenant supplement.')}</p>`;
       const actions = {
-        '3.4.1': t('缺项：本轮必要算量与三轮双卡同步计时。目标：用固定MMLU200/out256与缓存参考分母重算效率，先达到50%，再推进90%。','Missing: current necessary-work accounting and three synchronized dual-card timings. Goal: recompute fixed MMLU200/out256 efficiency using cached denominators; reach50%, then90%.'),
+        '3.4.1': t('原验收工况已达到50%里程碑。继续完成当前冻结版本的必要算量与三轮同步计时，并推进90%最终目标。','The certified original workload already met the50% milestone. Complete current-version necessary-work accounting and three synchronized timings, then pursue the90% final target.'),
         '3.4.3': t('目标：16K相对4K吞吐同量级且P95/P99稳定；最终在≥32K保持稳定。真实任务两臂专项已启动。','Goal:16K throughput remains the same order as4K with stableP95/P99; final stability at≥32K. The real-task paired supplement is running.'),
         '3.4.4': t('最终目标缺项：多租户利用率证据。目标：单位token成本降低≥30%并维持高利用率；四租户配对已纳入专项。','Final-target gap: multi-tenant utilization evidence. Goal: unit token cost−30% with sustained high utilization; four-tenant pairing is included in the active supplement.')
       };
-      if ((!goal.accepted || final[id].attainment!=='demonstrated') && actions[id]) body+=`<p>${actions[id]}</p><p><a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/experiments/optimization-20261115/acceptance-goals-20261115-v1.json">${t('目标、差距与执行任务','Goals, gaps and execution tasks')}</a></p>`;
+      if ((!goal.accepted || final[id].attainment!=='demonstrated') && actions[id]) body+=`<p>${actions[id]}</p><p><a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/experiments/optimization-20261115/acceptance-goals-20261115-v2.json">${t('目标、差距与执行任务','Goals, gaps and execution tasks')}</a></p>`;
       return {title:`${id} ${names()[i]}`,body};
     }
     if (key==='metrics') {
@@ -136,7 +137,7 @@
     if (!data || !combination) return;
     document.getElementById('comparison-title').textContent=t('B0 / B1 实测对比','B0 / B1 measured comparison');
     document.getElementById('comparison-lead').textContent=`${data.hardware.model} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.dtype}`;
-    const goalCards=required.map((id,i)=>`<button type="button" class="goal-card" data-detail="goal-${id}" data-goal="${id}"><span>${names()[i]}</span><strong><span class="stage-label">${t('里程碑','Milestone')}</span>${attainment(id)}</strong>${id==='3.4.1' ? `<span class="reference-scope">${t('参考分母已复用','Reference denominator reused')} · ${Number(data.formal_targets[id].reference_tflops_per_card_upper).toFixed(4)} TFLOP/s/${t('卡','card')}</span>` : ''}<small>${t('项目最终目标','Project final')}: ${attainment(id,true)} <span aria-hidden="true">↗</span></small></button>`).join('');
+    const goalCards=required.map((id,i)=>`<button type="button" class="goal-card" data-detail="goal-${id}" data-goal="${id}"><span>${names()[i]}</span><strong><span class="stage-label">${t('项目里程碑','Project milestone')}</span>${attainment(id)}</strong>${id==='3.4.1' ? `<span class="reference-scope">${t('已认证工况：MMLU200/out256','Certified workload: MMLU200/out256')}</span>` : ''}<small>${t('项目最终目标','Project final')}: ${attainment(id,true)} <span aria-hidden="true">↗</span></small></button>`).join('');
     root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
       <section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${combination.B0.cann}</span></div><div><strong>B1 · r6</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${combination.B1.cann}</span></div></div><div class="mod-tags">${combination.components.map(c=>`<span>${esc(t(c.name_zh,c.name_en))}</span>`).join('')}</div><p class="frozen-settings">E24/R36 · MTP2 · FULL · TP2 · host 4 GiB/rank</p></section>
       <div class="section-heading"><h2>${t('五数据集性能','Five-profile performance')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值。','Bars normalize B0 to1; labels show measured values.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}${chart('estimated_cny_per_million_output_tokens',t('单位输出token成本 ↓','Cost per output token ↓'),t('元/百万token','CNY/million tokens'))}</div>
