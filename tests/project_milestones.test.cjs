@@ -7,7 +7,7 @@ const root = path.resolve(__dirname, '..');
 const window = {};
 vm.runInNewContext(fs.readFileSync(path.join(root, 'assets/project-milestones.js'), 'utf8'), {window});
 const api = window.vllmHustProjectMilestones;
-const source = JSON.parse(fs.readFileSync(path.join(root, 'data/five-datasets-r6-20261114/summary-public-v2.json')));
+const source = JSON.parse(fs.readFileSync(path.join(root, 'data/five-datasets-r6-20261114/summary-public-v3.json')));
 
 test('project achievement retains its certified scope without inventing current efficiency', () => {
   const data = structuredClone(source);

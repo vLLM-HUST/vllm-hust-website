@@ -9,10 +9,10 @@
   const status = document.getElementById('prompt-download-status');
   const bootstrap = {
     repository: 'vLLM-HUST/vllm-hust-engine',
-    commit: '1be195b12798e7a0959044e929e19fa358429cc4', // pragma: allowlist secret
+    commit: '4cc6ec4d5edc537c7c98656d69e8d5cdb3e81ca2', // pragma: allowlist secret
     path: 'download_and_run.py',
-    runner: '3c08084c64f44d96a8b17a376889fd2e3308bac2', // pragma: allowlist secret
-    sha256: '126abc8396bc597ea86f26087aa66d4dcd59d2199b5399d3203f06768eca5bf9', // pragma: allowlist secret
+    runner: '0ec92947fdd3311046bab7d6d6fa9000dc462e34', // pragma: allowlist secret
+    sha256: '33a09cd3ec2e6e4f14c6f8b66c06c47aca118a1a01bab7f445b3de305e0cce1f', // pragma: allowlist secret
     bytes: 9577,
   };
   const language = () => (window.vllmHustSite?.getCurrentLang()
