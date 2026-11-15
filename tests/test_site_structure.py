@@ -982,7 +982,7 @@ def test_runtime_data_consumers_revalidate_cached_snapshots() -> None:
         "dataset-validation.html": ("quality-regression-20261020",),
         "members.html": ("data-freshness-20261009",),
         "news.html": ("data-freshness-20261009",),
-        "plugins.html": ("catalog-card-20261113",),
+        "plugins.html": ("catalog-b1-r6-20261116",),
     }
     for name, cache_keys in page_cache_keys.items():
         text = (root / name).read_text(encoding="utf-8")
