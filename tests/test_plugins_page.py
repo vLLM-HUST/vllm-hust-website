@@ -1034,7 +1034,14 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
         and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
     ]
     assert workshop_mods
+    archived_effects = {"hybrid-spec", "prefill-microflow"}
+    assert {
+        item["id"] for item in workshop_mods if not item.get("public_effect_en")
+    } == archived_effects
     for item in workshop_mods:
+        if item["id"] in archived_effects:
+            assert not any(key.startswith("public_effect_") for key in item)
+            continue
         assert item["public_effect_en"]
         assert item["public_effect_zh"]
         assert item["public_effect_status"] in {
