@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 5b8cd18bddc26a3cfeb4ed1014ada32d10a633e3 # pragma: allowlist secret
+          ref: 9539ea4a265d235607c45ce7ee4a4ca6230ea3a1 # pragma: allowlist secret
           path: _benchmark
           sparse-checkout: |
             website-publication

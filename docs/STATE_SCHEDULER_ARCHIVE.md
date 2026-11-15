@@ -17,8 +17,8 @@ State Scheduler 已撤下性能 MOD 定位。当前动作集停止，代码和�
 私有源码仓库 保留代码、实验脚本、 冻结门槛、反例和完整证据说明；仓库访问仍受原有权限控制。原始 trace 和日志保留在 实验载体的 WPS 目录之外，备份进入 `历史`，没有作为公开下载发布。
 
 [原 0.2.0 发布制品](https://github.com/vLLM-HUST/vllm-hust-website/releases/tag/state-scheduler-v0.2.0)
-继续保留，wheel、源包、归档和 SHA256SUMS 不变。它们仅包含当时的离线工具和旧共享状态组件， 不包含后续 P2 原型。78 项历史测试、安装和 ECPA 静态发现检查不等于性能验收。
-不要把旧包的 M0 状态理解为仍在推进的性能承诺。
+继续提供轮子包、源码包和归档。发布包已移除私有仓库标识，校验值以更新后的 SHA256SUMS 为准。它们仅包含当时的离线工具和旧共享状态组件， 不包含后续 P2 原型。78 项历史测试、安装和
+ECPA 静态发现检查不等于性能验收。 不要把旧包的 M0 状态理解为仍在推进的性能承诺。
 
 代码和负结果归档不等于删除 MOD、删除 GitHub 仓库或更改已安装服务；本次没有执行这些操作。
 
@@ -28,6 +28,6 @@ Performance MOD positioning is withdrawn. Current action sets are stopped; code 
 are retained as Compilation Control research materials, not an active OSDI submission mainline. No
 serving speedup is qualified. P2's strict reference failed for both native/cached and native/native
 finite outputs, so cache-specific fault remains unresolved and performance AB/BA was not run.
-Reopening requires an independent justified correctness reference. The original 0.2.0 assets remain
-unchanged for historical offline inspection; they do not include the later P2 prototype. Do not
-activate as a serving optimization.
+Reopening requires an independent justified correctness reference. The 0.2.0 assets are available
+for historical offline inspection with updated checksums; they do not include the later P2
+prototype. Do not activate as a serving optimization.

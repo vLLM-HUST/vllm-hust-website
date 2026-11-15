@@ -176,7 +176,7 @@
     ];
     const throughputB0=a.successful_output_tokens/a.phase_seconds, throughputB1=b.successful_output_tokens/b.phase_seconds;
     const speed=throughputB1/throughputB0, etaB0=100*speed;
-    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/8b8e5f2f448371913615cbe25d5127b04642fd88/docs/B0_BASELINE_METRICS.md';
+    const methodSource='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/e1a47f62e0b448eb2ef9c5ccb86ebbcada4ba53b/docs/B0_BASELINE_METRICS.md';
     const baseline=`<section class="focus-result" id="b0-baseline" aria-labelledby="b0-baseline-title">
       <h2 id="b0-baseline-title">${t('补充比较：B0 相对吞吐 η_B0','Supplement: B0-relative throughput η_B0')}</h2>
       <p>${t('以 vLLM 0.18 + vLLM-Ascend 0.18 的实测吞吐为100%，比较 B1 的吞吐、时延与成本。','Measured vLLM 0.18 + vLLM-Ascend 0.18 throughput is the 100% baseline for comparing B1 throughput, latency and cost.')}</p>

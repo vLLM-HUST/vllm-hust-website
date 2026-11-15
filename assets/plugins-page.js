@@ -1533,7 +1533,7 @@ vllm-hust-ext extension check ${extensionId}`
     }
     if (item.id === "vspec") {
       const example = element("a", "plugin-public-effect-link", `${copy().mtp4Example} ↗`);
-      example.href = "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/126eb1929a775051927e9de27a070b6018e39e58/reports/reproductions/native-mtp4-gamma4-20261027";
+      example.href = "https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/2e5af5cb84b8500dfa00c5799960803db4c1d5b3/reports/reproductions/native-mtp4-gamma4-20261027";
       example.target = "_blank";
       example.rel = "noopener noreferrer";
       links.append(example);
