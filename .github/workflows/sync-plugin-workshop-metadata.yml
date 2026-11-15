@@ -43,7 +43,7 @@ jobs:
       - name: Project canonical publication data
         run: >-
           python .benchmark-source/scripts/sync_website_publication.py publish
-          --revision a772bf867ac39b28065fde361b8eae3a587bce42 --website .
+          --revision c9ad8e99425ae9543d5f28c9bb4c2539f88d3560 --website .
 
       - name: Sync Workshop metadata
         env:

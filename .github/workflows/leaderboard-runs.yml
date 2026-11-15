@@ -58,9 +58,9 @@ jobs:
       - name: Assemble and verify canonical benchmark data
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision a772bf867ac39b28065fde361b8eae3a587bce42 --website .
+            --revision c9ad8e99425ae9543d5f28c9bb4c2539f88d3560 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision a772bf867ac39b28065fde361b8eae3a587bce42 --website .
+            --revision c9ad8e99425ae9543d5f28c9bb4c2539f88d3560 --website .
       - run: node --test tests/leaderboard_runs_model.test.cjs tests/leaderboard_frontier_model.test.cjs
       - name: Install review dependencies and run Python tests
         timeout-minutes: 15

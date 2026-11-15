@@ -1,6 +1,7 @@
 """Keep production data assembly separate from website data PRs."""
 
 from pathlib import Path
+import re
 
 import yaml
 
@@ -48,7 +49,25 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
             (ROOT / ".github/workflows" / filename).read_text(), Loader=yaml.BaseLoader
         )
         for job in source["jobs"].values():
+            source_paths = {
+                step["with"]["path"]
+                for step in job.get("steps", [])
+                if step.get("with", {}).get("repository")
+                == "vLLM-HUST/vllm-hust-benchmark"
+                and step["with"].get("ref") == benchmark_revision
+            }
+            allowed_revisions = {benchmark_revision} | {
+                f'"$(git -C {path} rev-parse HEAD)"' for path in source_paths
+            }
             for step in job.get("steps", []):
+                command = step.get("run", "")
+                if "sync_website_publication.py" in command:
+                    revisions = re.findall(r'--revision\s+("[^\"]*"|\S+)', command)
+                    assert revisions
+                    assert all(value in allowed_revisions for value in revisions), (
+                        filename,
+                        revisions,
+                    )
                 if (
                     step.get("with", {}).get("repository")
                     == "vLLM-HUST/vllm-hust-benchmark"
