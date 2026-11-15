@@ -30,12 +30,13 @@
     root.append(node('p', t('五项执行完成。点击查看四项目标状态与完整图表。', 'Five-profile execution complete. View all four target statuses and charts below.')));
     const list = node('ul');
     for (const id of ['3.4.1', '3.4.2', '3.4.3', '3.4.4']) {
-      const goal = data.formal_targets[id];
+      const goal = window.vllmHustProjectMilestones.select(data,id);
       const final = data.project_final_assessment.targets[id];
       const title = t(goal.name, ({'3.4.1':'Effective compute','3.4.2':'Throughput and latency','3.4.3':'Context stability','3.4.4':'Cost and utilization'})[id]);
       const item = node('li');
       item.append(node('strong', `${id} ${title}`));
-      item.append(node('p', `${t('里程碑', 'Milestone')}: ${goal.accepted ? t('达成目标','Target met') : t('未达成目标','Target not met')}`));
+      item.append(node('p', `${t('项目里程碑', 'Project milestone')}: ${goal.accepted ? t('达成目标','Target met') : t('未达成目标','Target not met')}`));
+      if (id === '3.4.1') item.append(node('p', t('已认证工况：原固定MMLU200/out256；当前版本效率另行复测。', 'Certified scope: original fixed MMLU200/out256; current-version efficiency is measured separately.')));
       item.append(node('p', `${t('项目最终目标', 'Project-final target')}: ${t(final.requirement, final.requirement_en)} — ${final.attainment === 'demonstrated' ? t('达成目标','Target met') : t('未达成目标','Target not met')}`));
 
       list.append(item);
@@ -78,6 +79,7 @@
     for (const id of ['3.4.1','3.4.2','3.4.3','3.4.4']) {
       if (typeof value.formal_targets?.[id]?.accepted !== 'boolean' || !value.project_final_assessment?.targets?.[id]?.requirement) throw Error('Missing assessment');
     }
+    window.vllmHustProjectMilestones.validate(value);
     data = value; manifest = m; render();
   })().catch(e => { error = e; root.dataset.error = 'publication-rejected'; render(); });
 }());
