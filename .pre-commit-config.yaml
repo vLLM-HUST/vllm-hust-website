@@ -41,7 +41,8 @@ repos:
     name: ruff check
     args: [--fix]
   - id: ruff-format
-    exclude: ^downloads/swe-bench-pro/
+    # Preserve the byte-pinned Engine bootstrap; download SHA256 tests verify identity.
+    exclude: ^downloads/(swe-bench-pro/|standard-test/one_click[.]py$)
     name: ruff format
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks

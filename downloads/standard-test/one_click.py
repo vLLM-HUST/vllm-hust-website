@@ -1,4 +1,5 @@
-"""Download and verify the fixed Engine tools before third-party execution."""
+#!/usr/bin/env python3
+"""Download fixed Engine sources, then run inference with automatic live logs."""
 
 import argparse
 from datetime import datetime, timezone
@@ -17,12 +18,12 @@ import urllib.request
 import uuid
 
 REPOSITORY = "vLLM-HUST/vllm-hust-engine"
-COMMIT = "448362c7565597c8963c970dcfea0b235fd5fcf7"  # pragma: allowlist secret
-ASSET_ID = 740017947
-ASSET_BYTES = 407729
-ASSET_SHA256 = "c85e643c838efee170f7925acb8bdeeff78266b322c0f7dba92b8aaac5ae7d90"  # pragma: allowlist secret
-MANIFEST_SHA256 = "1f0b34b2221312b81ce2a91b190d694dfb3a30662f94720e38a86e45c5f960b7"  # pragma: allowlist secret
-PREFIX = "vllm-hust-engine-b1-r4"
+COMMIT = '3c08084c64f44d96a8b17a376889fd2e3308bac2'  # pragma: allowlist secret -- fixed artifact identity
+ASSET_ID = 751875930  # pragma: allowlist secret -- fixed artifact identity
+ASSET_BYTES = 591189  # pragma: allowlist secret -- fixed artifact identity
+ASSET_SHA256 = 'd27a7e2a1606a6ecf8935e48dc5c33dd276e396e4de422e93ca9a9226df40086'  # pragma: allowlist secret -- fixed artifact identity
+MANIFEST_SHA256 = '0d81110910b3b8c2a122d9b7987ed08faa948888d5fadbcdc1d2ba672ae2c33a'  # pragma: allowlist secret -- fixed artifact identity
+PREFIX = 'vllm-hust-engine'  # pragma: allowlist secret -- fixed artifact identity
 
 
 def sha(path):
@@ -175,7 +176,7 @@ def ensure(cache, env_file=None, explicit=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description=__doc__,
-        epilog="Canonical inference entrypoint: vLLM-HUST/vllm-hust-engine/one_click.py. MMLU-Pro is the frozen200 subset of source test12032; generation seed0 is not a sampling seed.",
+        epilog="Canonical inference entrypoint: vLLM-HUST/vllm-hust-engine/one_click.py. 评分说明：若选择HLE/Frontier，脚本复用同一份Qwen3.5-35B-A3B权重，在单独的固定B1阶段为两臂答案辅助评分，无需另备模型或外部裁判服务。评分增加整轮耗时，但其流量不计solver吞吐、TTFT/TPOT或单位token成本。这是同模型辅助评分，不是独立模型验证；裁判未决保留在分母并单列，不等同引擎请求失败。MMLU200使用固定答案和规则评分。 验收：一个固定数据集满足同一项目标全部条件即可；不要求五项均达标，不跨数据集拼接指标，专项要求另判。 MMLU-Pro is the frozen200 subset of source test12032; generation seed0 is not a sampling seed.",
     )
     parser.add_argument(
         "--engine-tools",
