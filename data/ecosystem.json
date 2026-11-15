@@ -19,6 +19,7 @@
       "repository_relationship": "organization_native",
       "repository_visibility": "private",
       "maturity": "experimental",
+      "canonical_repository": "https://github.com/Qixin-Gaoke/state-scheduler-plugin",
       "upstream_repository": null,
       "maintainers": ["ShuhaoZhangTony"],
       "maintainer_profiles": [{"login": "ShuhaoZhangTony", "name": "张书豪"}],
