@@ -40,7 +40,9 @@
       if (!goal.accepted) item.append(node('p', t(goal.reason, goal.reason_en || final.reason_en || 'See the sealed report for the specific missing evidence.')));
       list.append(item);
     }
-    root.append(list);
+    const details = node('details');
+    details.append(node('summary', t('查看四项目标的证据状态', 'View evidence for all four targets')), list);
+    root.append(details);
     const link = node('a', t('查看完整 B0/B1 结果与图表 →', 'View complete B0/B1 results and charts →'));
     link.href = './b0-b1.html';
     const source = node('a', t('固定结果来源 ↗', 'Pinned result source ↗'));
