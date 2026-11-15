@@ -157,7 +157,18 @@ def main():
                             ).to_contain_text("50")
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("51")
+                            ).to_contain_text("53")
+                            for component_id in (
+                                "hust-m01-correction",
+                                "hust-joint-packed",
+                            ):
+                                card = page.locator(f"#{component_id}")
+                                expect(card).to_have_count(1)
+                                expect(
+                                    card.locator(
+                                        'a[href="./data/five-datasets-r6-20261114/frozen-combination-v1.json"]'
+                                    )
+                                ).to_have_count(1)
                             expect(
                                 page.locator('[data-scenario="service_suspend_resume"]')
                             ).to_be_disabled()
