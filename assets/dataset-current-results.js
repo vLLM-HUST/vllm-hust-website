@@ -3,7 +3,7 @@
   'use strict';
   const root = document.getElementById('dataset-current-results');
   if (!root) return;
-  const path = 'data/five-datasets-r6-20261114/summary-public-v1.json';
+  const path = 'data/five-datasets-r6-20261114/summary-public-v2.json';
   const zh = () => (window.vllmHustSite?.getCurrentLang() || 'zh') === 'zh';
   const t = (a, b) => zh() ? a : b;
   const node = (tag, text) => {
@@ -27,7 +27,7 @@
       return `${role}: ${total('successful')}/${total('planned')} ${t('请求成功', 'requests successful')}, ${total('failed')} ${t('失败', 'failed')}, ${total('unreturned')} ${t('未返回', 'unreturned')}`;
     });
     root.append(node('p', counts.join('；')));
-    root.append(node('p', t('五项推理执行已完成；完整验收还需以下专项证据。下面读取与 B0/B1 页相同的封存报告，不用历史成绩补成本轮成绩。', 'Five-profile inference execution is complete; acceptance still requires the evidence below. This uses the same sealed report as the B0/B1 page and does not substitute historical results for current measurements.')));
+    root.append(node('p', t('五项执行完成。点击查看四项目标状态与完整图表。', 'Five-profile execution complete. View all four target statuses and charts below.')));
     const list = node('ul');
     for (const id of ['3.4.1', '3.4.2', '3.4.3', '3.4.4']) {
       const goal = data.formal_targets[id];
@@ -35,9 +35,9 @@
       const title = t(goal.name, ({'3.4.1':'Effective compute','3.4.2':'Throughput and latency','3.4.3':'Context stability','3.4.4':'Cost and utilization'})[id]);
       const item = node('li');
       item.append(node('strong', `${id} ${title}`));
-      item.append(node('p', `${t('里程碑', 'Milestone')}: ${t(goal.display_value, goal.display_value_en || (goal.accepted ? 'Met' : 'Evidence incomplete'))}`));
-      item.append(node('p', `${t('项目最终目标', 'Project-final target')}: ${t(final.requirement, final.requirement_en)} — ${t(final.evidence_summary, final.evidence_summary_en)}`));
-      if (!goal.accepted) item.append(node('p', t(goal.reason, goal.reason_en || final.reason_en || 'See the sealed report for the specific missing evidence.')));
+      item.append(node('p', `${t('里程碑', 'Milestone')}: ${goal.accepted ? t('达成目标','Target met') : t('未达成目标','Target not met')}`));
+      item.append(node('p', `${t('项目最终目标', 'Project-final target')}: ${t(final.requirement, final.requirement_en)} — ${final.attainment === 'demonstrated' ? t('达成目标','Target met') : t('未达成目标','Target not met')}`));
+
       list.append(item);
     }
     const details = node('details');

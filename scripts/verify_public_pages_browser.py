@@ -199,19 +199,18 @@ async def run(args):
                             assert not any(
                                 "\u4e00" <= char <= "\u9fff" for char in price_copy
                             )
-                        assert (
-                            await page.locator(
-                                ".page-hero .content-panel > p"
-                            ).last.evaluate("e=>getComputedStyle(e).color")
-                            == "rgb(199, 212, 209)"
+                        assert await page.locator(".focus-hero > p").last.evaluate(
+                            "e=>getComputedStyle(e).color"
+                        ) == (
+                            "rgb(32, 49, 55)"
+                            if theme == "light"
+                            else "rgb(237, 243, 243)"
                         )
                         await expect(
                             page.locator("#columns .value-column")
                         ).not_to_have_count(0)
                         await expect(page.locator("main h1")).to_have_text(
-                            "服务产能与成本"
-                            if lang == "zh"
-                            else "Serving capacity & cost"
+                            "产能与成本" if lang == "zh" else "Capacity & cost"
                         )
                         await page.locator("#cost").fill("1234")
                         await page.locator("#utilization").fill("60")
@@ -227,9 +226,7 @@ async def run(args):
                         ).all_text_contents()
                         await page.locator("#langToggle").click()
                         await expect(page.locator("main h1")).to_have_text(
-                            "Serving capacity & cost"
-                            if lang == "zh"
-                            else "服务产能与成本"
+                            "Capacity & cost" if lang == "zh" else "产能与成本"
                         )
                         await expect(page.locator("#cost")).to_have_value("1234")
                         await expect(page.locator("#utilization")).to_have_value("60")

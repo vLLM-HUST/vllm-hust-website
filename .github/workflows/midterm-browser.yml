@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: ab4929101627f77ca6dfc9a2c840f262ca8d2b9d # pragma: allowlist secret
+          ref: 5b8cd18bddc26a3cfeb4ed1014ada32d10a633e3 # pragma: allowlist secret
           path: _benchmark
           sparse-checkout: |
             website-publication
@@ -49,6 +49,7 @@ jobs:
           website_server_pid=$!
           trap 'kill "$website_server_pid"' EXIT
           python scripts/verify_midterm_browser.py --url "$VERIFY_URL"
+          python scripts/verify_optimization_exploration_browser.py --url "$VERIFY_URL" --output output/playwright/midterm/optimization-exploration
           python scripts/verify_results_first_browser.py --url "$VERIFY_URL"
           python scripts/verify_acceptance_completion_browser.py --url "$VERIFY_URL" --output output/playwright/midterm/joint-acceptance
       - uses: actions/upload-artifact@v4

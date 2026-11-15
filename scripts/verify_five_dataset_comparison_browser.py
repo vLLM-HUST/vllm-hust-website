@@ -1,178 +1,193 @@
-"""Verify displayed five-profile metrics and reject corrupted or inconsistent sources."""
+"""Verify paired charts, compact target states, frozen MODs and details dialogs."""
 
 import argparse
 import copy
 import hashlib
 import json
 from pathlib import Path
-import re
 
 from playwright.sync_api import expect, sync_playwright
+
+SUMMARY = "data/five-datasets-r6-20261114/summary-public-v2.json"
+COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
 def verify(url, output):
     output.mkdir(parents=True, exist_ok=True)
-    source = (
-        Path(__file__).resolve().parents[1] / "assets/five-dataset-comparison.js"
-    ).read_text()
-    summary_path = re.search(r"const summaryPath = '([^']+)'", source).group(1)
+    checks = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
         context = browser.new_context()
-        result = context.request.get(url + "/" + summary_path)
-        assert result.ok
-        data = result.json()
+        data = context.request.get(url + "/" + SUMMARY).json()
+        combo = context.request.get(url + "/" + COMBINATION).json()
         manifest = context.request.get(
             url + "/data/benchmark-source-manifest.json"
         ).json()
-        checks = []
         for lang in ("zh", "en"):
             for width in (390, 1440):
-                page = context.new_page()
-                page.set_viewport_size({"width": width, "height": 1000})
-                page.add_init_script(
-                    f"localStorage.setItem('vllm-hust_lang', '{lang}')"
-                )
-                page.goto(url + "/b0-b1.html")
-                root = page.locator("#five-dataset-comparison")
-                expect(root).to_have_attribute(
-                    "data-loaded", data["run_id"], timeout=30000
-                )
-                expect(root.locator("table")).to_have_count(6)
-                expect(root.locator(".judge-disclosure")).to_contain_text(
-                    "无需另备模型或外部裁判服务"
-                    if lang == "zh"
-                    else "no additional model or external judge service is required"
-                )
-                expect(root.locator(".judge-disclosure")).to_contain_text(
-                    "评分增加总耗时" if lang == "zh" else "Scoring adds total runtime"
-                )
-                for row in data["datasets"]:
-                    expect(root).to_contain_text(row["name"])
-                    expect(root).to_contain_text(
-                        f"{row['arms']['B1']['output_tokens_per_second']:.2f}"
+                for theme in ("light", "dark"):
+                    page = context.new_page()
+                    page.set_viewport_size(dict(width=width, height=1000))
+                    page.emulate_media(color_scheme=theme)
+                    page.add_init_script(
+                        f"localStorage.setItem('vllm-hust_lang','{lang}')"
                     )
-                goal_rows = root.locator("table").nth(0).locator("tbody tr")
-                expect(goal_rows).to_have_count(4)
-                for i, key in enumerate(("3.4.1", "3.4.2", "3.4.3", "3.4.4")):
-                    goal = data["formal_targets"][key]
-                    expected = (
-                        ("达标" if lang == "zh" else "Met")
-                        if data["formal_targets"][key]["accepted"]
-                        else ("未通过" if lang == "zh" else "Not passed")
+                    errors = []
+                    page.on("pageerror", lambda e: errors.append(str(e)))
+                    page.goto(url + "/b0-b1.html")
+                    root = page.locator("#five-dataset-comparison")
+                    expect(root).to_have_attribute(
+                        "data-loaded", data["run_id"], timeout=30000
                     )
-                    if goal.get("status") == "current_workload_reference_not_measured":
+                    expect(root.locator(".goal-card")).to_have_count(4)
+                    for index, goal in enumerate(("3.4.1", "3.4.2", "3.4.3", "3.4.4")):
+                        card = root.locator(f'[data-goal="{goal}"]')
                         expected = (
-                            "本轮未验证"
+                            (
+                                "达成目标"
+                                if data["formal_targets"][goal]["accepted"]
+                                else "未达成目标"
+                            )
                             if lang == "zh"
-                            else "Current workload unverified"
+                            else (
+                                "Target met"
+                                if data["formal_targets"][goal]["accepted"]
+                                else "Target not met"
+                            )
                         )
-                    elif (
-                        key == "3.4.1"
-                        and goal["accepted"]
-                        and goal.get("accepted_scope", "").startswith(
-                            "Existing qualified M01"
+                        assert (
+                            card.locator("strong").evaluate(
+                                "el=>el.lastChild.textContent.trim()"
+                            )
+                            == expected
                         )
+                        assert not any(
+                            word in card.inner_text()
+                            for word in ("复核中", "待测", "待计算", "pending")
+                        )
+
+                    expect(root.locator(".metric-chart")).to_have_count(4)
+                    expect(root.locator(".bar-value")).to_have_count(40)
+                    expect(root.locator(".mod-tags span")).to_have_count(
+                        len(combo["components"])
+                    )
+                    assert not page.locator("#optimization-records").evaluate(
+                        "el=>el.open"
+                    )
+                    assert not root.locator("dialog").is_visible()
+                    text = root.inner_text()
+                    for phrase in (
+                        "用户未确认",
+                        "未证明达标",
+                        "不能证明",
+                        "does not establish",
+                        "Not demonstrated",
                     ):
-                        expected = (
-                            "归档工况达标"
-                            if lang == "zh"
-                            else "Historical workload met"
+                        assert phrase not in text
+                    for key, divisor in [
+                        ("output_tokens_per_second", 1),
+                        ("mean_ttft_ms", 1000),
+                        ("mean_tpot_ms", 1),
+                        ("estimated_cny_per_million_output_tokens", 1),
+                    ]:
+                        chart = root.locator(f'[data-metric="{key}"]')
+                        widths = chart.locator(".bar-fill.b0").evaluate_all(
+                            "els=>els.map(e=>e.style.width)"
                         )
-                    expect(goal_rows.nth(i).locator("td").nth(2)).to_have_text(expected)
-                expect(root).to_contain_text("64")
-                expect(root).to_contain_text("48")
-                expect(root).to_contain_text(
-                    "任务解决率" if lang == "zh" else "no task solve rate"
-                )
-                assert page.evaluate(
-                    "document.documentElement.scrollWidth <= innerWidth + 1"
-                )
-                assert (
-                    root.locator("a")
-                    .last.get_attribute("href")
-                    .startswith(
-                        "https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/"
-                        + manifest["commit"]
+                        assert len(set(widths)) == 1, (
+                            "B0-normalized bars must share their baseline"
+                        )
+                        for row in data["datasets"]:
+                            values = chart.locator(
+                                f'[data-profile="{row["id"]}"] .bar-value'
+                            )
+                            expect(values).to_have_text(
+                                [
+                                    f"{row['arms'][role][key] / divisor:.2f}"
+                                    for role in ("B0", "B1")
+                                ]
+                            )
+                    for component in combo["components"]:
+                        expect(root.locator(".mod-tags")).to_contain_text(
+                            component["name_" + lang]
+                        )
+                    button = root.locator('[data-detail="methods"]')
+                    button.click()
+                    dialog = root.locator("dialog")
+                    expect(dialog).to_be_visible()
+                    expect(dialog).to_contain_text("(n−1)×q")
+                    expect(dialog).to_contain_text("TTFT")
+                    page.keyboard.press("Escape")
+                    expect(dialog).not_to_be_visible()
+                    expect(button).to_be_focused()
+                    root.locator('[data-detail="quality"]').click()
+                    expect(dialog.locator("tbody tr")).to_have_count(6)
+                    expect(dialog).to_contain_text("35B")
+                    dialog.locator(".dialog-close").click()
+                    root.locator('[data-detail="configuration"]').click()
+                    expect(dialog).to_contain_text(combo["engine_release"])
+                    expect(dialog.locator("tbody tr")).to_have_count(8)
+                    dialog.locator(".dialog-close").click()
+                    root.locator('[data-goal="3.4.1"]').click()
+                    expect(dialog).to_contain_text("19.340383")
+                    expect(dialog).to_contain_text(
+                        "未达成目标" if lang == "zh" else "Target not met"
                     )
-                )
-                page.screenshot(
-                    path=str(output / f"five-datasets-{lang}-{width}.png"),
-                    full_page=True,
-                )
-                checks.append(dict(language=lang, width=width, run_id=data["run_id"]))
-                page.close()
-
-        # Valid source metadata may retain a historical pass while declining
-        # current-workload acceptance; the page must display that distinction.
-        for lang in ("zh", "en"):
-            changed = copy.deepcopy(data)
-            historical = changed["formal_targets"]["3.4.1"]
-            changed["formal_targets"]["3.4.1"] = dict(
-                historical,
-                accepted=False,
-                measured_value=None,
-                status="current_workload_reference_not_measured",
-                display_value="本轮未验证；归档工况另列",
-                display_value_en="Current workload unverified; archive separate",
-                historical_evidence=historical,
-            )
-            raw = (json.dumps(changed) + "\n").encode()
-            updated = copy.deepcopy(manifest)
-            for entry in updated["files"]:
-                if entry["website_path"] == summary_path:
-                    entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
-            page = context.new_page()
-            page.add_init_script(f"localStorage.setItem('vllm-hust_lang', '{lang}')")
-            page.route(
-                "**/" + summary_path,
-                lambda route, request, raw=raw: route.fulfill(
-                    body=raw, content_type="application/json"
+                    dialog.locator(".dialog-close").click()
+                    root.locator('[data-detail="metrics"]').click()
+                    expect(dialog.locator("table")).to_have_count(4)
+                    dialog.locator(".dialog-close").click()
+                    assert page.evaluate(
+                        "document.documentElement.scrollWidth <= innerWidth+1"
+                    )
+                    assert not errors, errors
+                    page.evaluate("window.scrollTo(0,0)")
+                    page.screenshot(
+                        path=str(output / f"{lang}-{width}-{theme}.png"), full_page=True
+                    )
+                    checks.append(
+                        dict(
+                            language=lang,
+                            width=width,
+                            theme=theme,
+                            verified="40 values,8 MODs,4 goals,dialogs and keyboard",
+                        )
+                    )
+                    page.close()
+        for label, path, transform, resign in [
+            ("bad-hash", SUMMARY, lambda d: d.update(execution_complete=False), False),
+            (
+                "inconsistent-rate",
+                SUMMARY,
+                lambda d: d["datasets"][0]["arms"]["B1"].__setitem__(
+                    "output_tokens_per_second", 1
                 ),
-            )
-            page.route(
-                "**/data/benchmark-source-manifest.json",
-                lambda route, request, updated=updated: route.fulfill(json=updated),
-            )
-            page.goto(url + "/b0-b1.html")
-            root = page.locator("#five-dataset-comparison")
-            expect(root).to_have_attribute("data-loaded", data["run_id"], timeout=30000)
-            status = (
-                root.locator("table")
-                .nth(0)
-                .locator("tbody tr")
-                .nth(0)
-                .locator("td")
-                .nth(2)
-            )
-            expect(status).to_have_text(
-                "本轮未验证" if lang == "zh" else "Current workload unverified"
-            )
-            checks.append(
-                dict(
-                    language=lang, verified="historical_compute_not_current_acceptance"
-                )
-            )
-            page.close()
-
-        for label, corrupt, resign in (
-            ("bad-hash", False, False),
-            ("inconsistent-rate", True, True),
-            ("incomplete", False, True),
-        ):
-            changed = copy.deepcopy(data)
-            if corrupt:
-                changed["datasets"][0]["arms"]["B1"]["output_tokens_per_second"] *= 2
-            else:
-                changed["execution_complete"] = False
-            raw = (json.dumps(changed) + "\n").encode()
+                True,
+            ),
+            ("incomplete", SUMMARY, lambda d: d.update(execution_complete=False), True),
+            (
+                "bad-combination-hash",
+                COMBINATION,
+                lambda d: d.update(engine_release="other"),
+                False,
+            ),
+            (
+                "foreign-frozen-combination",
+                COMBINATION,
+                lambda d: d.update(engine_release="other"),
+                True,
+            ),
+        ]:
+            changed = copy.deepcopy(data if path == SUMMARY else combo)
+            transform(changed)
+            raw = json.dumps(changed).encode()
             updated = copy.deepcopy(manifest)
             for entry in updated["files"]:
-                if entry["website_path"] == summary_path:
+                if entry["website_path"] == path:
                     entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
             page = context.new_page()
             page.route(
-                "**/" + summary_path,
+                "**/" + path,
                 lambda route, request, raw=raw: route.fulfill(
                     body=raw, content_type="application/json"
                 ),
@@ -183,15 +198,16 @@ def verify(url, output):
                     lambda route, request, updated=updated: route.fulfill(json=updated),
                 )
             page.goto(url + "/b0-b1.html")
-            expect(page.locator("#five-dataset-comparison")).to_have_attribute(
+            root = page.locator("#five-dataset-comparison")
+            expect(root).to_have_attribute(
                 "data-error", "publication-rejected", timeout=30000
             )
-            assert page.locator("#five-dataset-comparison table").count() == 0
+            expect(root.locator(".metric-chart")).to_have_count(0)
             checks.append(dict(rejected=label))
             page.close()
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
-    print(f"Verified {len(checks)} five-dataset display/rejection cases")
+    print(f"Verified {len(checks)} chart/dialog/source cases")
 
 
 if __name__ == "__main__":

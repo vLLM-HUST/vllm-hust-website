@@ -101,8 +101,8 @@ test("calculator reuses the website shell rather than a standalone theme", () =>
   for (const contract of [
     'data-page="serving-plan"',
     'class="site-nav"',
-    'id="cosmic-background"',
-    'class="site-shell serving-plan"',
+    'class="focus-hero"',
+    'class="site-shell focus-main serving-plan"',
     'class="site-footer"',
     "./assets/site.css?",
     "./assets/subpages.css?",

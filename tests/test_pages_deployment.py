@@ -27,7 +27,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "ab4929101627f77ca6dfc9a2c840f262ca8d2b9d"  # pragma: allowlist secret
+        "5b8cd18bddc26a3cfeb4ed1014ada32d10a633e3"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
