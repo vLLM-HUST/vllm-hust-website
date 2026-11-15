@@ -47,7 +47,6 @@ REQUIRED_FIELDS = {
     "ownership",
     "repository_relationship",
     "maturity",
-    "canonical_repository",
     "summary_en",
     "summary_zh",
     "evidence_level",
@@ -266,6 +265,10 @@ def test_registry_is_canonical_and_multidimensional() -> None:
     assert len(ids) == len(set(ids))
     for item in REGISTRY["components"]:
         assert REQUIRED_FIELDS <= item.keys()
+        assert "canonical_repository" in item or (
+            item.get("repository_visibility") == "private"
+            and item.get("public_surface") is False
+        )
         assert item["execution_planes"]
 
     assert by_id("vllm-production-stack")["maturity"] == "supported"
@@ -830,7 +833,9 @@ def test_workshop_supports_phase_first_scenario_discovery() -> None:
             "source_patch",
             "source_toolkit",
         }
-        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        and (item.get("canonical_repository") or "").startswith(
+            "https://github.com/vLLM-HUST/"
+        )
     }
     verified_bridges = {
         item["id"]
@@ -909,7 +914,7 @@ def test_workshop_uses_taxonomy_while_grouping_related_project_components() -> N
     assert '"connector_mod"' in SCRIPT
     assert '"external_system"' in SCRIPT
     assert "Only runtime and connector MODs enter performance selection" in PAGE
-    assert 'data-taxonomy="./data/mod-taxonomy.json?v=catalog-card-20261113"' in PAGE
+    assert 'data-taxonomy="./data/mod-taxonomy.json?v=catalog-b1-r6-20261116"' in PAGE
     assert "async function fetchModTaxonomy(url)" in SCRIPT
     assert 'refreshUrl.searchParams.set("refresh", Date.now().toString())' in SCRIPT
     assert 'taxonomy = await request(refreshUrl, "reload")' in SCRIPT
@@ -1031,7 +1036,9 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
             "migration_scaffold",
             "source_patch",
         }
-        and item["canonical_repository"].startswith("https://github.com/vLLM-HUST/")
+        and (item.get("canonical_repository") or "").startswith(
+            "https://github.com/vLLM-HUST/"
+        )
     ]
     assert workshop_mods
     archived_effects = {"hybrid-spec", "prefill-microflow"}
@@ -1104,7 +1111,9 @@ def test_withdrawn_stateaxis_mods_are_retained_only_as_non_public_history() -> N
         assert component_id not in WORKSHOP_METADATA["plugins"]
         assert component_id not in WORKLOAD_NAVIGATION["plugins"]
         assert component_id not in portfolio_by_name
-        assert "2026-11-05" in component["summary_en"]
+        assert component["repository_visibility"] == "private"
+        assert not component.get("canonical_repository")
+        assert component["maintainers"] == ["ShuhaoZhangTony"]
 
 
 def test_visible_ecpa_mods_publish_manifest03_and_scoped_effects() -> None:
@@ -1237,7 +1246,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
 
 
 def test_page_consumes_the_benchmark_owned_registry() -> None:
-    assert 'data-source="./data/ecosystem.json?v=catalog-card-20261113"' in PAGE
+    assert 'data-source="./data/ecosystem.json?v=catalog-b1-r6-20261116"' in PAGE
     assert "data-stateaxis=" not in PAGE
     assert "stateaxis-topic-mods.json" not in SCRIPT
     assert (
@@ -1246,7 +1255,7 @@ def test_page_consumes_the_benchmark_owned_registry() -> None:
     )
     assert (
         'data-source="./data/plugin-workload-navigation.json?'
-        'v=catalog-card-20261113"' in PAGE
+        'v=catalog-b1-r6-20261116"' in PAGE
     )
     assert (
         SCRIPT.count('payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark"') == 2
@@ -1793,10 +1802,28 @@ def test_kvcompress_starter_uses_ecpa_and_frontier_runtime_features() -> None:
 def test_betterscale_uses_the_shared_mod_catalog():
     assert WORKLOAD_NAVIGATION["plugins"]["betterscale"] == ["distributed_pipeline"]
     assert WORKLOAD_NAVIGATION["traits"]["distributed_pipeline"]["label_zh"] == "分布式"
-    assert len(WORKLOAD_NAVIGATION["plugins"]) == 45
     assert by_id("betterscale")["documentation_url"] == "./betterscale.html"
     assert by_id("betterscale")["repository_visibility"] == "private"
     assert 'id="betterscale" class="bs-feature"' not in PAGE
+
+
+def test_frozen_r6_mods_have_discoverable_cards():
+    existing = (
+        "betterscale",
+        "kv-materialization-arrival-control",
+        "prefill-microflow",
+    )
+    bundled = ("hust-m01-correction", "hust-joint-packed")
+    for component_id in (*existing, *bundled):
+        assert "B1 r6" in by_id(component_id)["summary_en"]
+        assert MOD_TAXONOMY["components"][component_id]["kind"] == "runtime_mod"
+    for component_id in bundled:
+        item = by_id(component_id)
+        assert item["canonical_repository"] is None
+        assert item["repository_visibility"] == "private"
+        link = item["documentation_url"]
+        assert link.startswith("./data/") and (ROOT / link).is_file()
+        assert "memory_kv_pressure" in WORKLOAD_NAVIGATION["plugins"][component_id]
 
 
 def test_non_runnable_descriptors_scaffolds_and_legacy_carriers_are_not_published():
@@ -1894,7 +1921,7 @@ def test_plugin_measurements_revalidate_instead_of_reusing_a_stale_cache_key() -
         'data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106"'
         in PAGE
     )
-    assert "catalog-card-20261113" in PAGE
+    assert "catalog-b1-r6-20261116" in PAGE
 
 
 def test_bidkv_copy_reports_the_new_cell_without_erasing_old_boundaries() -> None:

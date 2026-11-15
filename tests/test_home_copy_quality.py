@@ -89,7 +89,7 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
     mod_count = len(mod_projects)
     assert "instance-controller" in mod_projects
     assert "kv-controller" in mod_projects
-    assert mod_count == 48
+    assert mod_count == 50
     scenario_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
