@@ -885,10 +885,8 @@ def test_workshop_supports_phase_first_scenario_discovery() -> None:
     } == expected_phases
     assert all(profile["phases"] for profile in visible_profiles.values())
 
-    assert "按介入阶段或场景找 MOD" in PAGE
-    assert "你想介入推理生命周期的哪个阶段？" in PAGE
-    assert "按生命周期阶段、场景和用例筛选" in PAGE
-    assert "open each MOD for its configuration and measured results" in PAGE
+    assert "推理阶段与使用场景" in PAGE
+    assert "Inference stages and use cases" in PAGE
     assert "Catalog matching is not a performance guarantee." not in PAGE
     assert "data-phase-filters" in PAGE
     assert "data-phase-description" in PAGE
@@ -1419,9 +1417,8 @@ def test_repository_portfolio_is_separate_and_complete() -> None:
     assert archived_bidkv["successor"] == "vLLM-HUST/vllm-hust-bidkv"
     assert archived_bidkv["completion_evidence"]["source_commit_short"] == "5ee80256"
     assert archived_bidkv["completion_evidence"]["release_published"] is False
-    assert "Active repositories and completed archives, in one place." in PAGE
-    assert "已完成归档" in PAGE
-    assert "即使尚未封装为 MOD" in PAGE
+    assert "Repository directory" in PAGE
+    assert "已完成归档的条目附后继维护仓库链接" in PAGE
     assert (
         'data-source="./data/repository-portfolio.json?v=repository-portfolio-v16-foundation-repositories"'
         in PAGE

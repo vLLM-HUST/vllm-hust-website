@@ -46,8 +46,11 @@ def test_results_are_rendered_inside_corresponding_mod_cards():
     assert "function modEvidenceSummary(item)" in script
     assert "function modEvidenceDetails(item)" in script
     assert 'item.evidence_level === "retest_pending"' in script
-    assert "Previous records remain source references only" in script
-    assert "旧记录仅作来源参考" in script
+    assert (
+        "Published results cover earlier versions. The current version awaits retesting."
+        in script
+    )
+    assert "已有实测对应历史版本，当前版本待复测。" in script
     assert "indexModResults();" in script
     assert "row.do_not_repeat" in script and "row.reopen_requires" in script
     assert ".replace(/gennova(?:-hust)?[a-z0-9-]*/gi" in script
