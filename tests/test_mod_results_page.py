@@ -19,9 +19,10 @@ def test_mod_result_publication_is_complete_and_bound_to_catalog():
     Draft7Validator(evidence_schema).validate(evidence)
     Draft7Validator(binding_schema).validate(bindings)
 
-    assert len(evidence["integration_records"]) == 55
-    assert len(evidence["combination_effects"]) == 29
-    assert len(evidence["negative_results"]) == 90
+    assert evidence["scope"]["website_report"] is False
+    assert evidence["integration_records"] == []
+    assert evidence["combination_effects"] == []
+    assert evidence["negative_results"] == []
     for key in ("integration_records", "combination_effects", "negative_results"):
         assert set(bindings[key]) == {row["id"] for row in evidence[key]}
 
