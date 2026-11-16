@@ -75,7 +75,7 @@ def verify(url, output):
                     expect(extra.locator("tbody tr")).to_have_count(4)
                     expect(extra).to_contain_text("238.13")
                     expect(extra).to_contain_text("r4")
-                    expect(extra).to_contain_text("r5")
+                    expect(extra).to_contain_text("20261116-r6")
                     extra.locator(".dialog-close").click()
                     expect(root.locator(".metric-chart")).to_have_count(4)
                     expect(root.locator(".bar-value")).to_have_count(40)

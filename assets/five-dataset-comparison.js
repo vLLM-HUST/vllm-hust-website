@@ -147,7 +147,7 @@
         <p>${t('B1输出吞吐随输入变长为238.13→142.54→80.82 token/s。稳定性结论限于已测输入档、C8和300秒窗口，按原大纲定性要求判断。四租户结果限于C24共享服务；成本按同费率折算。','B1 output throughput decreases238.13→142.54→80.82 token/s as input length grows. Stability follows the original qualitative outline within the tested bands,C8 and300s windows. Four-tenant results cover a shared C24 service; cost uses equal rates.')}</p>
         <p><a href="${esc(a.analysis_path)}">${t('全部窗口、利用率和局部回归','All windows, utilization and individual regressions')}</a> · <a href="${esc(a.artifacts.paired.url)}">${t('源码、分析与复算包','Source, analysis and recomputation bundle')}</a></p>
         <p>${['B0','B1'].map(role=>`<a href="${esc(a.artifacts.raw_arms[role].url)}">${role} ${t('原始流与日志','raw streams and logs')}</a>`).join(' · ')}</p>
-        <p>${t('实际专项工具r4；最新下载器为r5，增加后续原生参考采集的逐请求缓存隔离。该专项不评分任务质量或租户安全隔离。','Actual A01 tools:r4. Latest downloader:r5, adding per-request cache isolation for future native-reference captures. A01 measures inference performance; task quality and tenant isolation are separate.')}</p>`};
+        <p>${t('实际专项使用工具r4；最新工具为20261116-r6，包含逐请求缓存隔离、原生RPC与worker身份修复。该专项不评分任务质量或租户安全隔离。','Actual A01 tools:r4. Latest tools:20261116-r6, with per-request cache isolation, native RPC and worker-identity fixes. A01 measures inference performance; task quality and tenant isolation are separate.')}</p>`};
     }
     if (key==='metrics') {
       const metric=(field,divisor=1)=>table(t(['数据集','B0','B1','变化'],['Dataset','B0','B1','Change']),data.datasets.map((r,i)=>[profileNames()[i],n(r.arms.B0[field]/divisor),n(r.arms.B1[field]/divisor),n(field==='estimated_cny_per_million_output_tokens'?r.changes_percent.unit_cost_change_percent:r.changes_percent[field])+'%']));
