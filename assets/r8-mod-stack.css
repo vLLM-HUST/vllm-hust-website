@@ -4,3 +4,4 @@
 .r8-mod-chip strong { padding: 2px 5px; border-radius: 4px; background: #d5eee0; color: #205b42; font-size: .72rem; }
 .r8-mod-chip:hover { border-color: #268867; }
 .r8-catalog-stack { margin-block: 24px; padding: 20px; border: 1px solid #bad2c5; border-radius: 10px; }
+.r8-catalog-stack h2 { color: #17372d; }
