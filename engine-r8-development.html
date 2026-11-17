@@ -48,7 +48,9 @@
         <h2 id="engine-first-context">4K / 16K · r8 versus r6</h2>
 <div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="group" aria-label="Both matched context pair directions"><article><h3>4K</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-forward">Forward pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.68639081197118%;background:#268867;border-radius:3px"></span></span><strong>TPS +12.11%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -0.04% · P95 -18.39%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-reverse">Reverse pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.18312170662988%;background:#268867;border-radius:3px"></span></span><strong>TPS +11.48%</strong></div><p style="margin:10px 0 0;font-weight:700">TTFT +11.38% · P95 +20.23%</p></div></article><article><h3>16K</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-forward">Forward pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.91640143342369%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.90%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -21.54% · P95 -26.54%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-reverse">Reverse pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.34932940749582%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.19%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -11.50% · P95 -25.96%</p></div></article></div>
         <p id="engine-chart-caption" class="engine-note">Both pair directions are retained, showing throughput and first-token latency tradeoffs.</p>
-      </section><details id="optimization-records" class="engine-section"><summary>优化实验记录 / Optimization trials</summary><div id="optimization-exploration" role="region" aria-busy="true"></div></details></main>  <script>
+      </section><details id="optimization-records" class="engine-section"><summary>优化实验记录 / Optimization trials</summary><div id="optimization-exploration" role="region" aria-busy="true"></div></details></main>
+  <footer class="engine-footer site-footer"><span id="footer-copy">Historical development measurements and original evidence.</span></footer>
+  <script>
     window.vllmHustPageDict = {
   "en": {
     "engine-kicker": "Ascend serving stack",
@@ -93,7 +95,8 @@
     "engine-r4-link": "r4 original archive ↗",
     "engine-footer-home": "← vLLM-HUST runtime stack",
     "engine-footer-repo": "Engine repository ↗",
-    "footer-copy": "vLLM-HUST Engine releases and reproducible tests.",
+    "title": "r8 Development Evidence | vLLM-HUST",
+    "footer-copy": "Historical development measurements and original evidence.",
     "engine-4K-forward": "Forward pair",
     "engine-4K-reverse": "Reverse pair",
     "engine-16K-forward": "Forward pair",
@@ -178,7 +181,8 @@
     "engine-r4-link": "r4 冻结原件 ↗",
     "engine-footer-home": "← vLLM-HUST 运行时栈",
     "engine-footer-repo": "Engine 仓库 ↗",
-    "footer-copy": "vLLM-HUST Engine 版本与可复现测试。",
+    "title": "r8 开发对照 | vLLM-HUST",
+    "footer-copy": "历史开发对照与原始证据。",
     "engine-4K-forward": "正向配对",
     "engine-4K-reverse": "反向配对",
     "engine-16K-forward": "正向配对",
