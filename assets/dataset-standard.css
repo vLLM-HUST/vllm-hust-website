@@ -29,6 +29,7 @@ body:is([data-page="dataset-standard"], [data-page="dataset-entrypoints"]) :focu
 .prompt-download button.secondary-download:hover { background: #edf6f4; }
 .prompt-download button:disabled { background: #e8eeee; color: #526569; border-color: #b6c5c4; cursor: wait; }
 #prompt-download-status { color: var(--guide-muted); font-size: 11px; }
+.engine-download-description { max-width: 480px; margin: 0; color: var(--guide-muted); font-size: 12px; line-height: 1.6; text-align: right; }
 .entry-main .guide-topbar { align-items: center; margin-bottom: 16px; }
 .entry-main .guide-topbar h1 { margin-bottom: 0; }
 .guide-hero { max-width: 940px; padding-bottom: 24px; }
