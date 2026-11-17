@@ -348,7 +348,7 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
     if (description) description.textContent = c.description;
     scriptButton.disabled = !scriptMatches() || downloadingScript;
     scriptButton.title = !payload ? c.loading : scriptMatches() ? c.scriptReady : c.scriptMismatch;
-    status.textContent = payload ? c.hint : c.loading;
+    status.textContent = !payload ? c.loading : scriptMatches() ? c.hint : c.scriptMismatch;
   }
   button.addEventListener('click', () => {
     if (!payload) return;
