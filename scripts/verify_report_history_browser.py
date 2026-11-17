@@ -26,12 +26,10 @@ def main():
                 )
                 page.goto(args.url + "/b0-b1.html")
                 expect(page.locator("#five-dataset-comparison")).to_have_attribute(
-                    "data-loaded", "five-datasets-r6-matched-20261114-r3"
+                    "data-loaded", "r8-continuous-20261117"
                 )
                 expect(page.locator("#comparison")).to_have_count(0)
-                page.locator(
-                    '#report-history-links a[href="./report-history.html"]'
-                ).click()
+                page.locator("#release-history-link").click()
                 root = page.locator("#report-history")
                 expect(root).to_have_attribute("data-loaded", data["schema"])
                 expect(root.locator(".report-history-entry")).to_have_count(
