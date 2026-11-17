@@ -240,3 +240,22 @@ body[data-page="engine"] :focus-visible {
         color: var(--ink);
     }
 }
+
+
+/* Primary results stay visible; configuration and evidence expand on demand. */
+.engine-hero { padding-block: 38px; }
+.engine-hero h1 { font-size: clamp(2.3rem, 5vw, 4rem); }
+.engine-hero-grid { gap: 28px; }
+.engine-hero .engine-note, .engine-mod-chips { color: #c5d8cf; }
+.engine-mod-chips { margin: 12px 0 0; font-size: .85rem; }
+.engine-detail-grid { display: grid; gap: 12px; margin-bottom: 36px; }
+.engine-fold { border: 1px solid var(--engine-line); border-radius: 10px; background: var(--engine-panel); }
+.engine-fold > summary { cursor: pointer; padding: 16px 20px; font-weight: 700; }
+.engine-fold > .engine-section { padding: 8px 20px 24px; }
+.engine-fold h2 { font-size: 1.35rem; }
+.engine-fold .engine-release { border-top: 0; gap: 24px; }
+.engine-fold .engine-cards { grid-template-columns: 1fr; }
+.engine-fold[open] > summary { border-bottom: 1px solid var(--engine-line); margin-bottom: 16px; }
+.engine-section details > summary { cursor: pointer; }
+#results { padding-block: 28px; }
+#results h2 { font-size: clamp(1.5rem, 3vw, 2rem); }

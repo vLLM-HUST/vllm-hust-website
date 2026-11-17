@@ -64,12 +64,14 @@ def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     for name in ("publications", "community", "resources"):
         assert f"id: '{name}'" in groups
     assert "id: 'engine'" not in groups
-    assert "navLink('', './index.html#stack', 'navEngine')" in SITE_JS
+    assert "navLink('engine', './engine.html', 'navEngine')" in SITE_JS
+    assert (ROOT / "engine.html").is_file()
     for old in ("leaderboard-runs.html", "dataset-validation.html"):
         assert old not in performance
     for section in ("products", "projects", "stack"):
         href = "./index.html" if section == "products" else f"./index.html#{section}"
-        assert href in SITE_JS
+        if section != "stack":
+            assert href in SITE_JS
         assert f'id="{section}"' in HOME
     assert "navLink('plugins', './plugins.html', 'navPlugins')" in SITE_JS
     for name in (

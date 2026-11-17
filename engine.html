@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
   <title>vLLM-HUST Engine | r8 candidate · r6 default</title>
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
-  <link rel="stylesheet" href="./assets/engine.css" />
+  <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
 </head>
 <body data-page="engine">
   <nav class="site-nav">
@@ -38,30 +38,47 @@
         <div>
           <p id="engine-kicker" class="engine-kicker">Ascend serving stack</p>
           <h1 id="engine-title">vLLM-HUST Engine</h1>
-          <p id="engine-lede" class="engine-lede">Frozen runtime, reproducible tests and measured releases. Default: r6. New candidate: r8.</p>
+          <p id="engine-lede" class="engine-lede">Default r6 · Candidate r8. Downloads and measured comparisons.</p>
           <div class="engine-actions">
             <a id="engine-hero-benchmark" class="engine-button engine-button-primary" href="./b0-b1.html">B0 / B1 results ↗</a>
-            <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">Explore r8 candidate ↗</a>
+            <a id="engine-hero-download" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8.py">Try r8 runner ↗</a>
+            <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">r8 Release ↗</a>
           </div>
+          <p id="engine-short-status" class="engine-note">Default upgrade: NOT MET · r6 remains default.</p>
         </div>
         <aside class="engine-profile" aria-label="B1 r8 candidate">
           <div class="engine-profile-top"><strong>B1 r8</strong><time datetime="2026-11-17">2026-11-17</time></div>
           <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
-          <div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>Async copy · E36/R54 · Short prefill tails</strong></div>
+          <div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>H2D async copy · E36/R54 · Tail256</strong></div>
           <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
+          <p class="engine-mod-chips">BetterScale · Microflow · KV materialization · MTP2 · FULL</p>
         </aside>
       </div>
     </section>
     <div class="engine-shell">
-      <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
+      <section class="engine-section" id="results" aria-labelledby="engine-task-title">
+        <h2 id="engine-task-title">r6 → r8 · MMLU200</h2>
+        <div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))"><article><h3 id="engine-task-forward">Forward · PASS</h3><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-output_tokens_per_second">Output throughput (tok/s)</span><strong style="color:#268867">+37.94%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.496799%;background:#8b9d94;border-radius:3px"></span></span><strong>1066.4</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1471.0</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-mean_ttft_ms">Mean TTFT (s)</span><strong style="color:#268867">-36.40%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>247.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:63.600937%;background:#268867;border-radius:3px"></span></span><strong>157.7</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-mean_tpot_ms">Mean TPOT (ms)</span><strong style="color:#b9771d">+1.80%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:98.230563%;background:#8b9d94;border-radius:3px"></span></span><strong>20.90</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#b9771d;border-radius:3px"></span></span><strong>21.28</strong></div></div></article><article><h3 id="engine-task-reverse">Reverse · NOT MET</h3><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-output_tokens_per_second">Output throughput (tok/s)</span><strong style="color:#268867">+38.12%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.398231%;background:#8b9d94;border-radius:3px"></span></span><strong>1055.5</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1457.9</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-mean_ttft_ms">Mean TTFT (s)</span><strong style="color:#268867">-39.20%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>262.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:60.800611%;background:#268867;border-radius:3px"></span></span><strong>159.9</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-mean_tpot_ms">Mean TPOT (ms)</span><strong style="color:#af3029">+2.28%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:97.766684%;background:#8b9d94;border-radius:3px"></span></span><strong>20.81</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#af3029;border-radius:3px"></span></span><strong>21.28</strong></div></div></article></div>
+
+        <details><summary><span id="engine-task-method">Quality, formulas and original evidence</span></summary>
+        <p id="engine-task-caption" class="engine-note">All four services completed: 800 successful responses to the same 200 fixed questions. Correct: 145 → 147/200 forward, 148 → 146/200 reverse. Truncated: 21 → 20 and 20 → 20.</p>
+          <p id="engine-task-method-copy">The same 200 questions are submitted together at an infinite request rate, with the original 8192-token answer budget, EOS, seed 0 and 194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all 200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus 1.</p>
+          <p id="engine-task-gates">Original screens: throughput ≥ +10%; mean TPOT ≤ +2%; mean TTFT and every P95/P99 ≤ +5%; correct ≥ 144/200; truncated ≤ 22; all 200 responses complete.</p>
+          <a id="engine-task-source" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/c9fdc0ee00810f9f814855048973df12257b7bc0/experiments/optimization-20261115/C15-r7-tail-combination-model-20261117-r1">Pinned complete review, all original archives and plots ↗</a>
+        </details>
+      </section>
+<div class="engine-detail-grid"><details class="engine-fold"><summary><span id="engine-config-summary">Frozen MODs and resource budgets</span></summary>      <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
         <h2 id="engine-stack-title">What is frozen in r8</h2>
         <div class="engine-cards">
           <article><h3 id="engine-base-title">Inherited serving stack</h3><p id="engine-base-copy">CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.</p></article>
-          <article><h3 id="engine-mod-title">Three combined changes</h3><p id="engine-mod-copy">Guarded native asynchronous progress copy; execution/resident capacity E36/R54; priority for existing eligible prefill tails of 1–256 tokens.</p></article>
+          <article><h3 id="engine-mod-title">Three combined changes</h3><p id="engine-mod-copy">Guarded asynchronous H2D progress copy; E36/R54; priority for existing eligible 1–256-token prefill tails.</p></article>
           <article><h3 id="engine-worker-title">Fixed resource budget</h3><p id="engine-worker-copy">Host State 4 GiB/rank, device KV 20 GiB/rank, prefill budget 4096 tokens. The 10 runtime overlay files match the current C15 candidate byte for byte.</p></article>
         </div>
-      </section>
-      <section class="engine-section engine-release" id="release" aria-labelledby="engine-release-title">
+      </section></details><details class="engine-fold"><summary><span id="engine-context-summary">4K / 16K comparisons</span></summary>      <section class="engine-section" aria-labelledby="engine-first-context">
+        <h2 id="engine-first-context">Complete matched context comparisons · r8 candidate versus r6</h2>
+<div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="group" aria-label="Both matched context pair directions"><article><h3>4K · 1/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.68639081197118%;background:#268867;border-radius:3px"></span></span><strong>TPS +12.11%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -0.04% · P95 -18.39%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-reverse">Reverse · NOT MET</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.18312170662988%;background:#268867;border-radius:3px"></span></span><strong>TPS +11.48%</strong></div><p style="margin:10px 0 0;font-weight:700">TTFT +11.38% · P95 +20.23%</p></div></article><article><h3>16K · 2/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.91640143342369%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.90%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -21.54% · P95 -26.54%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-reverse">Reverse · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.34932940749582%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.19%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -11.50% · P95 -25.96%</p></div></article></div>
+        <p id="engine-chart-caption" class="engine-note">Both original pair directions are shown separately. Throughput and TTFT changes coexist; the original release screen checks every latency metric.</p>
+      </section></details><details class="engine-fold"><summary><span id="engine-download-summary">Downloads, checksums and release checks</span></summary>      <section class="engine-section engine-release" id="release" aria-labelledby="engine-release-title">
         <div>
           <p id="engine-release-kicker" class="engine-kicker">2026-11-17 · Candidate release</p><h2 id="engine-release-title">Download B1 r8</h2><p id="engine-release-copy">One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.</p>
           <div class="engine-actions">
@@ -80,27 +97,11 @@
           <h3 id="engine-status-title">Release progress</h3>
           <dl><dt id="engine-status-run">Matched 4K / 16K comparison</dt><dd id="engine-status-run-value">4K: 1/2 pairs passed. 16K: 2/2 pairs passed. All four services and 2,477 formal requests completed.</dd><dt id="engine-status-hash">Download verification</dt><dd id="engine-status-hash-value">SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.</dd><dt id="engine-status-startup">Default promotion · NOT MET</dt><dd id="engine-status-startup-value">Reverse 4K mean/P95 TTFT exceeded +5%; reverse MMLU200 mean TPOT +2.28% exceeded +2%. All original services are complete; r6 remains the default.</dd></dl>
         </div>
-      </section>
-      <section class="engine-section" aria-labelledby="engine-first-context">
-        <h2 id="engine-first-context">Complete matched context comparisons · r8 candidate versus r6</h2>
-<div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="group" aria-label="Both matched context pair directions"><article><h3>4K · 1/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.68639081197118%;background:#268867;border-radius:3px"></span></span><strong>TPS +12.11%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -0.04% · P95 -18.39%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-reverse">Reverse · NOT MET</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.18312170662988%;background:#268867;border-radius:3px"></span></span><strong>TPS +11.48%</strong></div><p style="margin:10px 0 0;font-weight:700">TTFT +11.38% · P95 +20.23%</p></div></article><article><h3>16K · 2/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.91640143342369%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.90%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -21.54% · P95 -26.54%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-reverse">Reverse · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.34932940749582%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.19%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -11.50% · P95 -25.96%</p></div></article></div>
-        <p id="engine-chart-caption" class="engine-note">Both original pair directions are shown separately. Throughput and TTFT changes coexist; the original release screen checks every latency metric.</p>
-      </section>
-      <section class="engine-section" aria-labelledby="engine-task-title">
-        <h2 id="engine-task-title">Complete MMLU200 · 1/2 pairs passed</h2>
-        <div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))"><article><h3 id="engine-task-forward">Forward · PASS</h3><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-output_tokens_per_second">Output throughput (tok/s)</span><strong style="color:#268867">+37.94%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.496799%;background:#8b9d94;border-radius:3px"></span></span><strong>1066.4</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1471.0</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-mean_ttft_ms">Mean TTFT (s)</span><strong style="color:#268867">-36.40%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>247.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:63.600937%;background:#268867;border-radius:3px"></span></span><strong>157.7</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-mean_tpot_ms">Mean TPOT (ms)</span><strong style="color:#b9771d">+1.80%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:98.230563%;background:#8b9d94;border-radius:3px"></span></span><strong>20.90</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#b9771d;border-radius:3px"></span></span><strong>21.28</strong></div></div></article><article><h3 id="engine-task-reverse">Reverse · NOT MET</h3><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-output_tokens_per_second">Output throughput (tok/s)</span><strong style="color:#268867">+38.12%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.398231%;background:#8b9d94;border-radius:3px"></span></span><strong>1055.5</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1457.9</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-mean_ttft_ms">Mean TTFT (s)</span><strong style="color:#268867">-39.20%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>262.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:60.800611%;background:#268867;border-radius:3px"></span></span><strong>159.9</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-mean_tpot_ms">Mean TPOT (ms)</span><strong style="color:#af3029">+2.28%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:97.766684%;background:#8b9d94;border-radius:3px"></span></span><strong>20.81</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#af3029;border-radius:3px"></span></span><strong>21.28</strong></div></div></article></div>
-        <p id="engine-task-caption" class="engine-note">All four services completed: 800 successful responses to the same 200 fixed questions. Correct: 145 → 147/200 forward, 148 → 146/200 reverse. Truncated: 21 → 20 and 20 → 20.</p>
-        <details><summary><span id="engine-task-method">Protocol, calculations and original evidence</span></summary>
-          <p id="engine-task-method-copy">The same 200 questions are submitted together at an infinite request rate, with the original 8192-token answer budget, EOS, seed 0 and 194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all 200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus 1.</p>
-          <p id="engine-task-gates">Original screens: throughput ≥ +10%; mean TPOT ≤ +2%; mean TTFT and every P95/P99 ≤ +5%; correct ≥ 144/200; truncated ≤ 22; all 200 responses complete.</p>
-          <a id="engine-task-source" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/c9fdc0ee00810f9f814855048973df12257b7bc0/experiments/optimization-20261115/C15-r7-tail-combination-model-20261117-r1">Pinned complete review, all original archives and plots ↗</a>
-        </details>
-      </section>
-      <section class="engine-section" aria-labelledby="engine-history-title">
+      </section></details><details class="engine-fold"><summary><span id="engine-archive-summary">Default version and dated reports</span></summary>      <section class="engine-section" aria-labelledby="engine-history-title">
         <h2 id="engine-history-title">Default release and archives</h2><p id="engine-current-copy">r6 is the current default. Its fixed-five-profile run and dated B0/B1 reports remain in the results page.</p>
         <div class="engine-actions"><a id="engine-current-link" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/engines/b1-r6.json">Default r6 manifest ↗</a><a id="engine-history-link" class="engine-button" href="./report-history.html">Reports by date ↗</a></div>
         <details style="margin-top:24px"><summary>B1 r4 · 2026-10-30</summary><p id="engine-r4-copy">The 2026-10-30 r4 originals and all later candidate outcomes remain available.</p><a id="engine-r4-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261030-r4">r4 original archive ↗</a></details>
-      </section>
+      </section></details></div>
     </div>
   </main>
 
@@ -116,9 +117,9 @@
     window.vllmHustPageDict = {
   "en": {
     "engine-kicker": "Ascend serving stack",
-    "engine-lede": "Frozen runtime, reproducible tests and measured releases. Default: r6. New candidate: r8.",
+    "engine-lede": "Default r6 · Candidate r8. Downloads and measured comparisons.",
     "engine-hero-benchmark": "B0 / B1 results ↗",
-    "engine-hero-release": "Explore r8 candidate ↗",
+    "engine-hero-release": "r8 Release ↗",
     "engine-model-label": "Model",
     "engine-runtime-label": "Combination",
     "engine-hardware-label": "Hardware",
@@ -126,7 +127,7 @@
     "engine-base-title": "Inherited serving stack",
     "engine-base-copy": "CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.",
     "engine-mod-title": "Three combined changes",
-    "engine-mod-copy": "Guarded native asynchronous progress copy; execution/resident capacity E36/R54; priority for existing eligible prefill tails of 1–256 tokens.",
+    "engine-mod-copy": "Guarded asynchronous H2D progress copy; E36/R54; priority for existing eligible 1–256-token prefill tails.",
     "engine-worker-title": "Fixed resource budget",
     "engine-worker-copy": "Host State 4 GiB/rank, device KV 20 GiB/rank, prefill budget 4096 tokens. The 10 runtime overlay files match the current C15 candidate byte for byte.",
     "engine-release-kicker": "2026-11-17 · Candidate release",
@@ -162,9 +163,9 @@
     "engine-4K-reverse": "Reverse · NOT MET",
     "engine-16K-forward": "Forward · PASS",
     "engine-16K-reverse": "Reverse · PASS",
-    "engine-task-title": "Complete MMLU200 · 1/2 pairs passed",
+    "engine-task-title": "r6 → r8 · MMLU200",
     "engine-task-caption": "All four services completed: 800 successful responses to the same 200 fixed questions. Correct: 145 → 147/200 forward, 148 → 146/200 reverse. Truncated: 21 → 20 and 20 → 20.",
-    "engine-task-method": "Protocol, calculations and original evidence",
+    "engine-task-method": "Quality, formulas and original evidence",
     "engine-task-method-copy": "The same 200 questions are submitted together at an infinite request rate, with the original 8192-token answer budget, EOS, seed 0 and 194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all 200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus 1.",
     "engine-task-gates": "Original screens: throughput ≥ +10%; mean TPOT ≤ +2%; mean TTFT and every P95/P99 ≤ +5%; correct ≥ 144/200; truncated ≤ 22; all 200 responses complete.",
     "engine-task-source": "Pinned complete review, all original archives and plots ↗",
@@ -175,13 +176,19 @@
     "engine-task-reverse": "Reverse · NOT MET",
     "engine-task-reverse-output_tokens_per_second": "Output throughput (tok/s)",
     "engine-task-reverse-mean_ttft_ms": "Mean TTFT (s)",
-    "engine-task-reverse-mean_tpot_ms": "Mean TPOT (ms)"
+    "engine-task-reverse-mean_tpot_ms": "Mean TPOT (ms)",
+    "engine-hero-download": "Try r8 runner ↗",
+    "engine-short-status": "Default upgrade: NOT MET · r6 remains default.",
+    "engine-config-summary": "Frozen MODs and resource budgets",
+    "engine-context-summary": "4K / 16K comparisons",
+    "engine-download-summary": "Downloads, checksums and release checks",
+    "engine-archive-summary": "Default version and dated reports"
   },
   "zh": {
     "engine-kicker": "Ascend 推理服务栈",
-    "engine-lede": "冻结运行时、一键复现与实测版本。当前默认 r6，新发布候选 r8。",
+    "engine-lede": "默认 r6 · 候选 r8。下载、测试与版本对照。",
     "engine-hero-benchmark": "B0 / B1 对比结果 ↗",
-    "engine-hero-release": "查看 r8 候选发布 ↗",
+    "engine-hero-release": "r8 Release ↗",
     "engine-model-label": "模型",
     "engine-runtime-label": "本版组合",
     "engine-hardware-label": "硬件",
@@ -189,7 +196,7 @@
     "engine-base-title": "继承的服务栈",
     "engine-base-copy": "CorrectedWorker、BetterScale、Microflow、KV materialization、MTP2 与 FULL 图。保留逐请求 KV 重算和按对象、dtype 合并锁页分配。",
     "engine-mod-title": "本轮组合的三项变化",
-    "engine-mod-copy": "原生 guarded 异步进度复制；执行/驻留容量 E36/R54；优先处理已进入执行环、满足原条件的 1–256 token prefill 尾段。",
+    "engine-mod-copy": "受保护的 H2D 异步进度复制；E36/R54；优先处理符合原条件的 1–256 token prefill 尾段。",
     "engine-worker-title": "固定资源预算",
     "engine-worker-copy": "主机 State 4 GiB/rank，设备 KV 20 GiB/rank，prefill 预算 4096 token。10 个运行时覆盖文件与当前 C15 实测候选逐字节一致。",
     "engine-release-kicker": "2026-11-17 · 候选发布",
@@ -225,9 +232,9 @@
     "engine-4K-reverse": "反向 · 未通过",
     "engine-16K-forward": "正向 · 通过",
     "engine-16K-reverse": "反向 · 通过",
-    "engine-task-title": "完整 MMLU200 · 两对中1对通过",
+    "engine-task-title": "r6 → r8 · MMLU200",
     "engine-task-caption": "四服务全部完成：相同固定200题共800次回答均成功。正向正确145→147/200，反向148→146/200；截断分别21→20、20→20。",
-    "engine-task-method": "测试方式、计算与原始证据",
+    "engine-task-method": "正确率、计算公式与原件",
     "engine-task-method-copy": "相同200题一次提交，保留原8192 token回答预算、EOS、seed0及共同194条不计分预热。吞吐为全部生成token数除以整批墙钟时长；平均TTFT包含全部200条请求的排队时间；逐请求TPOT为首token之后的耗时除以输出token数减1。",
     "engine-task-gates": "原筛选：吞吐≥+10%；平均TPOT≤+2%；平均TTFT及各P95/P99≤+5%；正确≥144/200；截断≤22；完整返回200条。",
     "engine-task-source": "固定完整报告、全部原始归档与图表 ↗",
@@ -238,10 +245,26 @@
     "engine-task-reverse": "反向 · 未通过",
     "engine-task-reverse-output_tokens_per_second": "输出吞吐（tok/s）",
     "engine-task-reverse-mean_ttft_ms": "平均TTFT（秒）",
-    "engine-task-reverse-mean_tpot_ms": "平均TPOT（毫秒）"
+    "engine-task-reverse-mean_tpot_ms": "平均TPOT（毫秒）",
+    "engine-hero-download": "下载 r8 试用脚本 ↗",
+    "engine-short-status": "默认升级：未通过 · 继续使用 r6。",
+    "engine-config-summary": "冻结 MOD 与资源配置",
+    "engine-context-summary": "4K / 16K 对照图",
+    "engine-download-summary": "下载、校验与发布门槛",
+    "engine-archive-summary": "默认版本与历史报告"
   }
 };
+    function revealEngineAnchor() {
+      const target = document.getElementById(location.hash.slice(1));
+      if (!target) return;
+      for (let ancestor = target.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+      }
+      target.scrollIntoView();
+    }
+    window.addEventListener('hashchange', revealEngineAnchor);
+    window.addEventListener('load', revealEngineAnchor);
   </script>
-  <script src="./assets/site.js?v=public-audit-20261101"></script>
+  <script src="./assets/site.js?v=engine-navigation-20261117"></script>
 </body>
 </html>

@@ -67,9 +67,7 @@ def main():
                                 page.locator('.site-nav [data-nav-group="engine"]')
                             ).to_have_count(0)
                             expect(
-                                page.locator(
-                                    '.nav-links > a[href="./index.html#stack"]'
-                                )
+                                page.locator('.nav-links > a[href="./engine.html"]')
                             ).to_have_count(1)
                             expect(
                                 page.locator(".site-nav .brand-link")
@@ -401,9 +399,10 @@ def main():
                                 wait_until="networkidle",
                             )
                             assert page.locator(f"#{section_id}").is_visible()
-                            expect(
-                                page.locator('.nav-links [aria-current="location"]')
-                            ).to_have_attribute("href", f"./index.html#{section_id}")
+                            if section_id == "projects":
+                                expect(
+                                    page.locator('.nav-links [aria-current="location"]')
+                                ).to_have_attribute("href", "./index.html#projects")
                             if section_id == "stack":
                                 expect(page.locator("#stack-title")).to_contain_text(
                                     "vLLM-HUST"
