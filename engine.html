@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="vLLM-HUST Engine versions for Ascend. Explore the B1 r4 serving stack, its public benchmark evidence, and the archived release." />
+  <meta name="description" content="vLLM-HUST Engine versions for Ascend. Download the r8 candidate and its reproducible evaluation tools; explore the default r6 and dated release evidence." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/engine.html" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
-  <title>vLLM-HUST Engine | B1 r4</title>
+  <title>vLLM-HUST Engine | r8 candidate · r6 default</title>
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/engine.css" />
 </head>
@@ -36,75 +36,66 @@
     <section class="engine-hero" aria-labelledby="engine-title">
       <div class="engine-shell engine-hero-grid">
         <div>
-          <p class="engine-kicker" id="engine-kicker">Ascend serving stack</p>
+          <p id="engine-kicker" class="engine-kicker">Ascend serving stack</p>
           <h1 id="engine-title">vLLM-HUST Engine</h1>
-          <p class="engine-lede" id="engine-lede">A versioned inference stack for Ascend. Each release pins the vLLM and Ascend bases, MODs, worker and serving configuration to a measured run.</p>
+          <p id="engine-lede" class="engine-lede">Frozen runtime, reproducible tests and measured releases. Default: r6. New candidate: r8.</p>
           <div class="engine-actions">
-            <a class="engine-button engine-button-primary" id="engine-hero-benchmark" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/8228e5d8c1fb329ad544069594b7a6454ef07300/reports/full-answer-joint-20261030/README.md">Read the public benchmark ↗</a>
-            <a class="engine-button" id="engine-hero-release" href="#release">Explore B1 r4</a>
+            <a id="engine-hero-benchmark" class="engine-button engine-button-primary" href="./b0-b1.html">B0 / B1 results ↗</a>
+            <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">Explore r8 candidate ↗</a>
           </div>
         </div>
-
-        <aside class="engine-profile" aria-label="B1 r4">
-          <div class="engine-profile-top">
-            <strong>B1 r4</strong>
-            <time datetime="2026-10-30">2026-10-30</time>
-          </div>
+        <aside class="engine-profile" aria-label="B1 r8 candidate">
+          <div class="engine-profile-top"><strong>B1 r8</strong><time datetime="2026-11-17">2026-11-17</time></div>
           <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
-          <div class="engine-layer"><span id="engine-runtime-label">Runtime</span><strong>vLLM-HUST + vLLM-Ascend-HUST</strong></div>
+          <div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>Async copy · E36/R54 · Short prefill tails</strong></div>
           <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
         </aside>
       </div>
     </section>
-
     <div class="engine-shell">
       <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
-        <p class="engine-kicker">B1 r4</p>
-        <h2 id="engine-stack-title">Pinned composition</h2>
+        <h2 id="engine-stack-title">What is frozen in r8</h2>
         <div class="engine-cards">
-          <article>
-            <h3 id="engine-base-title">Runtime bases</h3>
-            <p id="engine-base-copy">vLLM-HUST provides the serving core. vLLM-Ascend-HUST supplies the Ascend backend, running with CANN.</p>
-          </article>
-          <article>
-            <h3 id="engine-mod-title">Serving optimizations</h3>
-            <p id="engine-mod-copy">Microflow, request-scoped KV recomputation, MTP2 and FULL graph mode run alongside the scheduling configuration.</p>
-          </article>
-          <article>
-            <h3 id="engine-worker-title">Worker and host state</h3>
-            <p id="engine-worker-copy">The frozen archive includes CorrectedWorker and the host-state implementation that groups pinned allocations by dtype within each state object.</p>
-          </article>
+          <article><h3 id="engine-base-title">Inherited serving stack</h3><p id="engine-base-copy">CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.</p></article>
+          <article><h3 id="engine-mod-title">Three combined changes</h3><p id="engine-mod-copy">Guarded native asynchronous progress copy; execution/resident capacity E36/R54; priority for existing eligible prefill tails of 1–256 tokens.</p></article>
+          <article><h3 id="engine-worker-title">Fixed resource budget</h3><p id="engine-worker-copy">Host State 4 GiB/rank, device KV 20 GiB/rank, prefill budget 4096 tokens. The 10 runtime overlay files match the current C15 candidate byte for byte.</p></article>
         </div>
       </section>
-
       <section class="engine-section engine-release" id="release" aria-labelledby="engine-release-title">
         <div>
-          <p class="engine-kicker" id="engine-release-kicker">First release</p>
-          <h2 id="engine-release-title">B1 r4 archive</h2>
-          <p id="engine-release-copy">The release contains the original frozen archive, the configuration from the measured run, recovered runtime and MOD snapshots, and a SHA256 manifest.</p>
+          <p id="engine-release-kicker" class="engine-kicker">2026-11-17 · Candidate release</p><h2 id="engine-release-title">Download B1 r8</h2><p id="engine-release-copy">One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.</p>
           <div class="engine-actions">
-            <a class="engine-button engine-button-primary" id="engine-release-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261030-r4">Open private Release ↗</a>
-            <a class="engine-button" id="engine-profile-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/engines/b1-r4.json">Pinned manifest ↗</a>
+            <a id="engine-release-link" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8.py">Download one-click runner ↗</a>
+            <a id="engine-profile-link" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">Release and checksums ↗</a>
           </div>
-          <p class="engine-note" id="engine-access">Both GitHub links require access to the private Engine repository.</p>
+          <p id="engine-access" class="engine-note">Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.</p>
+          <details><summary><span id="engine-details">Source, MODs and acceptance details</span></summary><ul>
+            <li><a id="engine-source-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/c6059a6d3d1cf7ea16340d79cccf7bb1a13fa661/engines/b1-r8.json">Pinned combination</a></li>
+            <li><a id="engine-mod-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/c6059a6d3d1cf7ea16340d79cccf7bb1a13fa661/mods/active-stack-r8.json">Complete MOD stack</a></li>
+            <li><a id="engine-evidence-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/main/experiments/optimization-20261115/C15-r7-tail-combination-model-20261117-r1">C15 plan and stage evidence</a></li>
+            <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/main/experiments/optimization-20261115/C15-first-matched-context-screen-20261117-r1">All first-pair metrics and plots</a></li>
+          </ul></details>
         </div>
         <div class="engine-status">
-          <h3 id="engine-status-title">Qualification status</h3>
-          <dl>
-            <dt id="engine-status-run">Original benchmark</dt>
-            <dd id="engine-status-run-value">MMLU-Pro fixed 200-question run on two Ascend 910B2 cards</dd>
-            <dt id="engine-status-hash">Release attachments</dt>
-            <dd id="engine-status-hash-value">All four SHA256 checks matched after download</dd>
-            <dt id="engine-status-startup">Independent deployment and NPU startup</dt>
-            <dd id="engine-status-startup-value">Pending qualification</dd>
-          </dl>
+          <h3 id="engine-status-title">Release progress</h3>
+          <dl><dt id="engine-status-run">Matched 4K / 16K comparison</dt><dd id="engine-status-run-value">First pair passed the original throughput and latency screens.</dd><dt id="engine-status-hash">Download verification</dt><dd id="engine-status-hash-value">SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.</dd><dt id="engine-status-startup">Complete release acceptance</dt><dd id="engine-status-startup-value">Reverse comparison and full MMLU200 ABBA are running in C15. Default r6 changes after the frozen release screens pass.</dd></dl>
         </div>
+      </section>
+      <section class="engine-section" aria-labelledby="engine-first-context">
+        <h2 id="engine-first-context">First matched context pair · r8 candidate versus r6</h2>
+<div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="img" aria-label="First matched context pair throughput relative to r6 equals100:4K112.11;16K104.90"><article><h3>4K · +12.11%</h3><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r6</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:80%;height:100%;border-radius:3px;background:#8ba799"></span></span><strong style="text-align:right">100</strong></div><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r8</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:89.6863908%;height:100%;border-radius:3px;background:#268867"></span></span><strong style="text-align:right">112.11</strong></div></article><article><h3>16K · +4.90%</h3><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r6</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:80%;height:100%;border-radius:3px;background:#8ba799"></span></span><strong style="text-align:right">100</strong></div><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r8</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:83.9164014%;height:100%;border-radius:3px;background:#268867"></span></span><strong style="text-align:right">104.90</strong></div></article></div>
+        <p id="engine-chart-caption" class="engine-note">Output throughput, relative to r6 = 100. Full metrics and every planned trial are linked below.</p>
+      </section>
+      <section class="engine-section" aria-labelledby="engine-history-title">
+        <h2 id="engine-history-title">Default release and archives</h2><p id="engine-current-copy">r6 is the current default. Its fixed-five-profile run and dated B0/B1 reports remain in the results page.</p>
+        <div class="engine-actions"><a id="engine-current-link" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/engines/b1-r6.json">Default r6 manifest ↗</a><a id="engine-history-link" class="engine-button" href="./report-history.html">Reports by date ↗</a></div>
+        <details style="margin-top:24px"><summary>B1 r4 · 2026-10-30</summary><p id="engine-r4-copy">The 2026-10-30 r4 originals and all later candidate outcomes remain available.</p><a id="engine-r4-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261030-r4">r4 original archive ↗</a></details>
       </section>
     </div>
   </main>
 
   <footer class="engine-footer site-footer">
-    <span id="footer-copy">vLLM-HUST Engine releases and deployment scope.</span>
+    <span id="footer-copy">vLLM-HUST Engine releases and reproducible tests.</span>
     <div class="engine-shell engine-footer-inner">
       <a id="engine-footer-home" href="./index.html#stack">← vLLM-HUST runtime stack</a>
       <a id="engine-footer-repo" href="https://github.com/vLLM-HUST/vllm-hust-engine">Private repository ↗</a>
@@ -113,72 +104,99 @@
 
   <script>
     window.vllmHustPageDict = {
-      en: {
-        'footer-copy': 'vLLM-HUST Engine releases and deployment scope.',
-        'engine-kicker': 'Ascend serving stack',
-        'engine-lede': 'A versioned inference stack for Ascend. Each release pins the vLLM and Ascend bases, MODs, worker and serving configuration to a measured run.',
-        'engine-hero-benchmark': 'Read the public benchmark ↗',
-        'engine-hero-release': 'Explore B1 r4',
-        'engine-model-label': 'Model',
-        'engine-runtime-label': 'Runtime',
-        'engine-hardware-label': 'Hardware',
-        'engine-stack-title': 'Pinned composition',
-        'engine-base-title': 'Runtime bases',
-        'engine-base-copy': 'vLLM-HUST provides the serving core. vLLM-Ascend-HUST supplies the Ascend backend, running with CANN.',
-        'engine-mod-title': 'Serving optimizations',
-        'engine-mod-copy': 'Microflow, request-scoped KV recomputation, MTP2 and FULL graph mode run alongside the scheduling configuration.',
-        'engine-worker-title': 'Worker and host state',
-        'engine-worker-copy': 'The frozen archive includes CorrectedWorker and the host-state implementation that groups pinned allocations by dtype within each state object.',
-        'engine-release-kicker': 'First release',
-        'engine-release-title': 'B1 r4 archive',
-        'engine-release-copy': 'The release contains the original frozen archive, the configuration from the measured run, recovered runtime and MOD snapshots, and a SHA256 manifest.',
-        'engine-release-link': 'Open private Release ↗',
-        'engine-profile-link': 'Pinned manifest ↗',
-        'engine-access': 'Both GitHub links require access to the private Engine repository.',
-        'engine-status-title': 'Qualification status',
-        'engine-status-run': 'Original benchmark',
-        'engine-status-run-value': 'MMLU-Pro fixed 200-question run on two Ascend 910B2 cards',
-        'engine-status-hash': 'Release attachments',
-        'engine-status-hash-value': 'All four SHA256 checks matched after download',
-        'engine-status-startup': 'Independent deployment and NPU startup',
-        'engine-status-startup-value': 'Pending qualification',
-        'engine-footer-home': '← vLLM-HUST runtime stack',
-        'engine-footer-repo': 'Private repository ↗'
-      },
-      zh: {
-        'footer-copy': 'vLLM-HUST Engine 版本与部署范围。',
-        'engine-kicker': 'Ascend 推理服务栈',
-        'engine-lede': '面向 Ascend 的版本化推理引擎。每个版本固定 vLLM 和 Ascend 基座、MOD、Worker 和实际服务参数，并关联对应的实测记录。',
-        'engine-hero-benchmark': '查看公开实测报告 ↗',
-        'engine-hero-release': '查看 B1 r4',
-        'engine-model-label': '模型',
-        'engine-runtime-label': '运行时',
-        'engine-hardware-label': '硬件',
-        'engine-stack-title': '固定组合',
-        'engine-base-title': '运行时基座',
-        'engine-base-copy': 'vLLM-HUST 提供推理服务核心，vLLM-Ascend-HUST 提供 Ascend 后端，通过 CANN 运行。',
-        'engine-mod-title': '服务优化',
-        'engine-mod-copy': '实测组合将调度配置与 Microflow、逐请求 KV 重算、MTP2 和 FULL 图模式一起启用。',
-        'engine-worker-title': 'Worker 与主机状态',
-        'engine-worker-copy': '冻结原包包含 CorrectedWorker 和 packed-host 实现。锁页分配在同一状态对象内按 dtype 合并。',
-        'engine-release-kicker': '首个版本',
-        'engine-release-title': 'B1 r4 归档',
-        'engine-release-copy': 'Release 保存冻结原包、同轮实际运行配置、恢复的运行时及 MOD 快照，以及 SHA256 校验清单。',
-        'engine-release-link': '打开私有 Release ↗',
-        'engine-profile-link': '固定组合清单 ↗',
-        'engine-access': '两个 GitHub 入口均需私有 Engine 仓库访问权限。',
-        'engine-status-title': '验收状态',
-        'engine-status-run': '原始实测',
-        'engine-status-run-value': '已在双卡 Ascend 910B2 上完成 MMLU-Pro 固定 200 题实测',
-        'engine-status-hash': 'Release 附件',
-        'engine-status-hash-value': '四个附件下载后 SHA256 均一致',
-        'engine-status-startup': '独立部署和 NPU 启动',
-        'engine-status-startup-value': '待验收',
-        'engine-footer-home': '← vLLM-HUST 运行时栈',
-        'engine-footer-repo': '私有仓库 ↗'
-      }
-    };
+  "en": {
+    "engine-kicker": "Ascend serving stack",
+    "engine-lede": "Frozen runtime, reproducible tests and measured releases. Default: r6. New candidate: r8.",
+    "engine-hero-benchmark": "B0 / B1 results ↗",
+    "engine-hero-release": "Explore r8 candidate ↗",
+    "engine-model-label": "Model",
+    "engine-runtime-label": "Combination",
+    "engine-hardware-label": "Hardware",
+    "engine-stack-title": "What is frozen in r8",
+    "engine-base-title": "Inherited serving stack",
+    "engine-base-copy": "CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.",
+    "engine-mod-title": "Three combined changes",
+    "engine-mod-copy": "Guarded native asynchronous progress copy; execution/resident capacity E36/R54; priority for existing eligible prefill tails of 1–256 tokens.",
+    "engine-worker-title": "Fixed resource budget",
+    "engine-worker-copy": "Host State 4 GiB/rank, device KV 20 GiB/rank, prefill budget 4096 tokens. The 10 runtime overlay files match the current C15 candidate byte for byte.",
+    "engine-release-kicker": "2026-11-17 · Candidate release",
+    "engine-release-title": "Download B1 r8",
+    "engine-release-copy": "One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.",
+    "engine-release-link": "Download one-click runner ↗",
+    "engine-profile-link": "Release and checksums ↗",
+    "engine-access": "Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.",
+    "engine-status-title": "Release progress",
+    "engine-status-run": "Matched 4K / 16K comparison",
+    "engine-status-run-value": "First pair passed the original throughput and latency screens.",
+    "engine-status-hash": "Download verification",
+    "engine-status-hash-value": "SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.",
+    "engine-status-startup": "Complete release acceptance",
+    "engine-status-startup-value": "Reverse comparison and full MMLU200 ABBA are running in C15. Default r6 changes after the frozen release screens pass.",
+    "engine-first-context": "First matched context pair · r8 candidate versus r6",
+    "engine-chart-caption": "Output throughput, relative to r6 = 100. Full metrics and every planned trial are linked below.",
+    "engine-details": "Source, MODs and acceptance details",
+    "engine-source-link": "Pinned combination",
+    "engine-mod-link": "Complete MOD stack",
+    "engine-evidence-link": "C15 plan and stage evidence",
+    "engine-metrics-link": "All first-pair metrics and plots",
+    "engine-history-title": "Default release and archives",
+    "engine-current-copy": "r6 is the current default. Its fixed-five-profile run and dated B0/B1 reports remain in the results page.",
+    "engine-r4-copy": "The 2026-10-30 r4 originals and all later candidate outcomes remain available.",
+    "engine-current-link": "Default r6 manifest ↗",
+    "engine-history-link": "Reports by date ↗",
+    "engine-r4-link": "r4 original archive ↗",
+    "engine-footer-home": "← vLLM-HUST runtime stack",
+    "engine-footer-repo": "Engine repository ↗",
+    "footer-copy": "vLLM-HUST Engine releases and reproducible tests."
+  },
+  "zh": {
+    "engine-kicker": "Ascend 推理服务栈",
+    "engine-lede": "冻结运行时、一键复现与实测版本。当前默认 r6，新发布候选 r8。",
+    "engine-hero-benchmark": "B0 / B1 对比结果 ↗",
+    "engine-hero-release": "查看 r8 候选发布 ↗",
+    "engine-model-label": "模型",
+    "engine-runtime-label": "本版组合",
+    "engine-hardware-label": "硬件",
+    "engine-stack-title": "r8 固定了哪些优化",
+    "engine-base-title": "继承的服务栈",
+    "engine-base-copy": "CorrectedWorker、BetterScale、Microflow、KV materialization、MTP2 与 FULL 图。保留逐请求 KV 重算和按对象、dtype 合并锁页分配。",
+    "engine-mod-title": "本轮组合的三项变化",
+    "engine-mod-copy": "原生 guarded 异步进度复制；执行/驻留容量 E36/R54；优先处理已进入执行环、满足原条件的 1–256 token prefill 尾段。",
+    "engine-worker-title": "固定资源预算",
+    "engine-worker-copy": "主机 State 4 GiB/rank，设备 KV 20 GiB/rank，prefill 预算 4096 token。10 个运行时覆盖文件与当前 C15 实测候选逐字节一致。",
+    "engine-release-kicker": "2026-11-17 · 候选发布",
+    "engine-release-title": "下载 B1 r8",
+    "engine-release-copy": "单文件入口恢复固定工具与运行时源码，完成推理、评分和出图，并实时跟随日志。私有 GitHub 凭据从 .env 或环境变量读取。",
+    "engine-release-link": "下载单文件一键入口 ↗",
+    "engine-profile-link": "Release 与校验信息 ↗",
+    "engine-access": "快速测试：MMLU200。全量测试：固定五项。均保留原完整回答预算与评分规则。",
+    "engine-status-title": "发布进度",
+    "engine-status-run": "同轮 4K / 16K 对照",
+    "engine-status-run-value": "首组吞吐与时延原筛选均通过。",
+    "engine-status-hash": "下载包验证",
+    "engine-status-hash-value": "附件重新下载 SHA256 一致；独立解包后 75 项工具检查、6 项单文件入口检查通过。",
+    "engine-status-startup": "完整发布验收",
+    "engine-status-startup-value": "C15 正在执行反向对照及完整 MMLU200 ABBA；原冻结发布筛选通过后切换默认 r6。",
+    "engine-first-context": "首组同轮上下文对照 · r8 候选对比 r6",
+    "engine-chart-caption": "输出吞吐，相对 r6 = 100。全部时延指标与计划轮次见下方原始记录。",
+    "engine-details": "源码、MOD 与验收详情",
+    "engine-source-link": "固定组合清单",
+    "engine-mod-link": "完整 MOD 组合",
+    "engine-evidence-link": "C15 计划与逐阶段原件",
+    "engine-metrics-link": "首组全部指标与图表",
+    "engine-history-title": "默认版本与历史归档",
+    "engine-current-copy": "r6 是当前默认版本。其固定五项执行与对应日期的 B0/B1 报告保留在结果页。",
+    "engine-r4-copy": "2026-10-30 的 r4 冻结原件及后续候选结果均保留。",
+    "engine-current-link": "默认 r6 清单 ↗",
+    "engine-history-link": "按日期查看报告 ↗",
+    "engine-r4-link": "r4 冻结原件 ↗",
+    "engine-footer-home": "← vLLM-HUST 运行时栈",
+    "engine-footer-repo": "Engine 仓库 ↗",
+    "footer-copy": "vLLM-HUST Engine 版本与可复现测试。"
+  }
+};
   </script>
   <script src="./assets/site.js?v=public-audit-20261101"></script>
 </body>
 </html>
+
