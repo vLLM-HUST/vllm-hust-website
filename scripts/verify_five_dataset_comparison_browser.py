@@ -100,6 +100,7 @@ def verify(url, output):
                         assert page.evaluate(
                             "document.documentElement.scrollWidth <= innerWidth+1"
                         )
+                        page.evaluate("window.scrollTo(0,0)")
                         page.screenshot(
                             path=str(output / f"{release}-{lang}-{width}-{theme}.png"),
                             full_page=True,
