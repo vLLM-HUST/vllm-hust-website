@@ -51,7 +51,7 @@ def verify(url, output):
                         ("r3", [], []),
                         ("r4", ["B0", "r4"], ["495.84", "944.47"]),
                         ("r5", [], []),
-                        ("r7", ["r6", "r7"], ["346.51", "385.30"]),
+                        ("r7", ["B0", "r7"], ["126.72", "385.30"]),
                     ]:
                         root.locator("#comparison-release-select").select_option(
                             release
@@ -65,6 +65,9 @@ def verify(url, output):
                         expect(root.locator("#r8-current-continuous")).to_have_count(0)
                         expect(root.locator(".goal-card")).to_have_count(0)
                         if controls:
+                            expect(root).to_have_attribute(
+                                "data-baseline-id", "original018-cann8.5.1"
+                            )
                             chart = root.locator(
                                 '[data-metric="output_tokens_per_second"]'
                             )
@@ -110,6 +113,9 @@ def verify(url, output):
                     expect(page.locator("#comparison-title")).to_contain_text("r6")
                     expect(root).to_have_attribute(
                         "data-loaded", data["run_id"], timeout=30000
+                    )
+                    expect(root).to_have_attribute(
+                        "data-baseline-id", "original018-cann8.5.1"
                     )
                     expect(root.locator(".goal-card")).to_have_count(4)
                     for index, goal in enumerate(("3.4.1", "3.4.2", "3.4.3", "3.4.4")):
@@ -365,6 +371,16 @@ def verify(url, output):
             (
                 "release-history-wrong-arm",
                 lambda d: d["entries"][0]["measurements"][0].update(candidate="r7"),
+                True,
+            ),
+            (
+                "release-history-B1-used-as-baseline",
+                lambda d: d["entries"][3]["measurements"][0].update(control="r6"),
+                True,
+            ),
+            (
+                "release-history-foreign-B0",
+                lambda d: d["baseline"].update(vllm="0.28.1"),
                 True,
             ),
             (
