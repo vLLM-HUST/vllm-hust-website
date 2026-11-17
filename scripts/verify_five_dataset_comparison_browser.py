@@ -36,6 +36,11 @@ def verify(url, output):
                     page.on("pageerror", lambda e: errors.append(str(e)))
                     page.goto(url + "/b0-b1.html")
                     root = page.locator("#five-dataset-comparison")
+                    expect(root).to_have_attribute("data-release", "r8", timeout=30000)
+                    expect(root.locator(".goal-card")).to_have_count(0)
+                    expect(root.locator("#r8-current-continuous")).to_be_visible()
+                    expect(root.locator("#report-history-links")).to_have_count(0)
+                    root.locator("#comparison-release-select").select_option("r6")
                     expect(root).to_have_attribute(
                         "data-loaded", data["run_id"], timeout=30000
                     )
@@ -82,9 +87,10 @@ def verify(url, output):
                     expect(root.locator(".mod-tags span")).to_have_count(
                         len(combo["components"])
                     )
-                    assert not page.locator("#optimization-records").evaluate(
-                        "el=>el.open"
-                    )
+                    expect(page.locator("#optimization-records")).to_have_count(0)
+                    expect(
+                        root.locator('a[href="./engine-r8-development.html"]')
+                    ).to_be_visible()
                     assert not root.locator("dialog").is_visible()
                     text = root.inner_text()
                     for phrase in (
@@ -242,7 +248,7 @@ def verify(url, output):
                     "**/data/benchmark-source-manifest.json",
                     lambda route, request, updated=updated: route.fulfill(json=updated),
                 )
-            page.goto(url + "/b0-b1.html")
+            page.goto(url + "/b0-b1.html?release=r6")
             root = page.locator("#five-dataset-comparison")
             expect(root).to_have_attribute(
                 "data-error", "publication-rejected", timeout=30000
@@ -250,6 +256,24 @@ def verify(url, output):
             expect(root.locator(".metric-chart")).to_have_count(0)
             checks.append(dict(rejected=label))
             page.close()
+        page = context.new_page()
+        page.route(
+            "**/data/r8-continuous-20261117/summary-v1.json",
+            lambda route: route.fulfill(json={"corrupted": True}),
+        )
+        page.goto(url + "/b0-b1.html")
+        root = page.locator("#five-dataset-comparison")
+        expect(root).to_have_attribute(
+            "data-error", "publication-rejected", timeout=30000
+        )
+        expect(root.locator("#r8-current-continuous")).to_have_count(0)
+        root.locator("#comparison-release-select").select_option("r6")
+        expect(root).to_have_attribute("data-release", "r6", timeout=30000)
+        expect(root.locator(".goal-card")).to_have_count(4)
+        page.close()
+        checks.append(
+            dict(rejected="corrupt-r8-publication", historical_release_selectable=True)
+        )
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
     print(f"Verified {len(checks)} chart/dialog/source cases")

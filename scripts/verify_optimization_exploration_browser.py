@@ -23,6 +23,11 @@ def verify(url, output):
         manifest = context.request.get(
             url + "/data/benchmark-source-manifest.json"
         ).json()
+        formal = context.new_page()
+        formal.goto(url + "/b0-b1.html?release=r6")
+        expect(formal.locator("#five-dataset-comparison")).to_have_attribute(
+            "data-loaded", "five-datasets-r6-matched-20261114-r3", timeout=30000
+        )
         for lang in ("zh", "en"):
             for width in (390, 1440):
                 page = context.new_page()
@@ -30,7 +35,7 @@ def verify(url, output):
                 page.add_init_script(
                     f"localStorage.setItem('vllm-hust_lang', '{lang}')"
                 )
-                page.goto(url + "/b0-b1.html")
+                page.goto(url + "/engine-r8-development.html")
                 page.locator("#optimization-records > summary").click()
                 root = page.locator("#optimization-exploration")
                 expect(root).to_have_attribute(
@@ -69,7 +74,7 @@ def verify(url, output):
                 assert root.locator("img").evaluate_all(
                     "els => els.every(e => e.complete && e.naturalWidth > 0)"
                 )
-                expect(page.locator("#five-dataset-comparison")).to_have_attribute(
+                expect(formal.locator("#five-dataset-comparison")).to_have_attribute(
                     "data-loaded", "five-datasets-r6-matched-20261114-r3", timeout=30000
                 )
                 page.locator("#langToggle").click()
@@ -113,12 +118,12 @@ def verify(url, output):
                     "**/data/benchmark-source-manifest.json",
                     lambda route: route.fulfill(json=updated),
                 )
-            page.goto(url + "/b0-b1.html")
+            page.goto(url + "/engine-r8-development.html")
             expect(page.locator("#optimization-exploration")).to_have_attribute(
                 "data-error", "publication-rejected", timeout=30000
             )
             assert page.locator("#optimization-exploration table").count() == 0
-            expect(page.locator("#five-dataset-comparison")).to_have_attribute(
+            expect(formal.locator("#five-dataset-comparison")).to_have_attribute(
                 "data-loaded", "five-datasets-r6-matched-20261114-r3", timeout=30000
             )
             checks.append(

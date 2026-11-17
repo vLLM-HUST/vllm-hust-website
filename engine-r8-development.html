@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Historical C15 r6-to-r8 development measurements, original paired outcomes and reproducible evidence." />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/engine-r8-development.html" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <title>r8 Development Evidence | vLLM-HUST</title>
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
+  <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
+  <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
+</head>
+<body data-page="engine">
+  <nav class="site-nav">
+    <div class="site-shell site-nav-inner">
+      <a class="brand-link" href="./index.html">
+        <span class="brand-mark">V</span>
+        <span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span>
+      </a>
+      <div class="nav-links">
+        <a id="nav-home" class="nav-link" data-nav-page="home" href="./index.html">Home</a>
+        <a id="nav-plugins" class="nav-link nav-plugin-link" data-nav-page="plugins" href="./plugins.html">MOD catalog</a>
+        <a id="nav-leaderboard" class="nav-link" data-nav-page="leaderboard" href="./leaderboard-runs.html">Benchmarks</a>
+        <a id="nav-achievements" class="nav-link" data-nav-page="achievements" href="./achievements.html">Achievements</a>
+        <a id="nav-news" class="nav-link" data-nav-page="news" href="./news.html">News</a>
+        <a id="nav-contributors" class="nav-link" data-nav-page="contributors" href="./contributors.html">Contributors</a>
+        <a id="nav-conferences" class="nav-link" data-nav-page="conferences" href="./conferences.html">Conferences</a>
+        <a id="nav-courses" class="nav-link" data-nav-page="courses" href="./courses.html">Courses</a>
+        <a id="nav-issues" class="nav-link" data-nav-page="issues" href="./issues.html">Issues</a>
+      </div>
+    </div>
+  </nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+
+  <main class="engine-shell"><header class="engine-section"><p class="engine-kicker">2026-11-17 · C15</p><h1 id="history-title">r8 development evidence · r6 → r8</h1><p id="history-copy">Historical paired development measurements. B0/r8 release results are on the current comparison page.</p><div class="engine-actions"><a id="history-current" class="engine-button" href="./b0-b1.html?release=r8">Current B0/r8 comparison ↗</a><a id="history-r6" class="engine-button" href="./b0-b1.html?release=r6">B0/r6 full report ↗</a></div></header>      <section class="engine-section" id="results" aria-labelledby="engine-task-title">
+        <h2 id="engine-task-title">r6 → r8 · MMLU200</h2>
+        <div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))"><article><h3 id="engine-task-forward">Forward pair</h3><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-output_tokens_per_second">Output throughput (tok/s)</span><strong style="color:#268867">+37.94%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.496799%;background:#8b9d94;border-radius:3px"></span></span><strong>1066.4</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1471.0</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-mean_ttft_ms">Mean TTFT (s)</span><strong style="color:#268867">-36.40%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>247.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:63.600937%;background:#268867;border-radius:3px"></span></span><strong>157.7</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-forward-mean_tpot_ms">Mean TPOT (ms)</span><strong style="color:#b9771d">+1.80%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:98.230563%;background:#8b9d94;border-radius:3px"></span></span><strong>20.90</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#b9771d;border-radius:3px"></span></span><strong>21.28</strong></div></div></article><article><h3 id="engine-task-reverse">Reverse pair</h3><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-output_tokens_per_second">Output throughput (tok/s)</span><strong style="color:#268867">+38.12%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.398231%;background:#8b9d94;border-radius:3px"></span></span><strong>1055.5</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1457.9</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-mean_ttft_ms">Mean TTFT (s)</span><strong style="color:#268867">-39.20%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>262.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:60.800611%;background:#268867;border-radius:3px"></span></span><strong>159.9</strong></div></div><div style="padding:16px 0;border-top:1px solid var(--engine-line)"><div style="display:flex;justify-content:space-between;gap:12px"><span id="engine-task-reverse-mean_tpot_ms">Mean TPOT (ms)</span><strong style="color:#af3029">+2.28%</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r6</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:97.766684%;background:#8b9d94;border-radius:3px"></span></span><strong>20.81</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:10px"><span>r8</span><span style="display:block;height:10px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#af3029;border-radius:3px"></span></span><strong>21.28</strong></div></div></article></div>
+
+        <details><summary><span id="engine-task-method">Quality, formulas and original evidence</span></summary>
+        <p id="engine-task-caption" class="engine-note">All four services completed: 800 successful responses to the same 200 fixed questions. Correct: 145 → 147/200 forward, 148 → 146/200 reverse. Truncated: 21 → 20 and 20 → 20.</p>
+          <p id="engine-task-method-copy">The same 200 questions are submitted together at an infinite request rate, with the original 8192-token answer budget, EOS, seed 0 and 194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all 200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus 1.</p>
+          <p id="engine-task-gates">Historical C15 internal screens: throughput ≥ +10%; mean TPOT ≤ +2%; mean TTFT and each P95/P99 ≤ +5%; correct ≥144/200; truncated ≤22; all200 responses complete. Original outcomes remain unchanged; these internal screens are separate from project acceptance targets.</p>
+          <a id="engine-task-source" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/c9fdc0ee00810f9f814855048973df12257b7bc0/experiments/optimization-20261115/C15-r7-tail-combination-model-20261117-r1">Pinned complete review, all original archives and plots ↗</a>
+        </details>
+      </section><section class="engine-section" aria-labelledby="engine-first-context">
+        <h2 id="engine-first-context">4K / 16K · r8 versus r6</h2>
+<div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="group" aria-label="Both matched context pair directions"><article><h3>4K</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-forward">Forward pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.68639081197118%;background:#268867;border-radius:3px"></span></span><strong>TPS +12.11%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -0.04% · P95 -18.39%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-reverse">Reverse pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.18312170662988%;background:#268867;border-radius:3px"></span></span><strong>TPS +11.48%</strong></div><p style="margin:10px 0 0;font-weight:700">TTFT +11.38% · P95 +20.23%</p></div></article><article><h3>16K</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-forward">Forward pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.91640143342369%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.90%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -21.54% · P95 -26.54%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-reverse">Reverse pair</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.34932940749582%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.19%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -11.50% · P95 -25.96%</p></div></article></div>
+        <p id="engine-chart-caption" class="engine-note">Both pair directions are retained, showing throughput and first-token latency tradeoffs.</p>
+      </section><details id="optimization-records" class="engine-section"><summary>优化实验记录 / Optimization trials</summary><div id="optimization-exploration" role="region" aria-busy="true"></div></details></main>  <script>
+    window.vllmHustPageDict = {
+  "en": {
+    "engine-kicker": "Ascend serving stack",
+    "engine-lede": "Frozen r8 is available for reproduction, MOD development and further optimization.",
+    "engine-hero-benchmark": "B0 / B1 results ↗",
+    "engine-hero-release": "r8 sources and artifacts ↗",
+    "engine-model-label": "Model",
+    "engine-runtime-label": "Combination",
+    "engine-hardware-label": "Hardware",
+    "engine-stack-title": "What is frozen in r8",
+    "engine-base-title": "Inherited serving stack",
+    "engine-base-copy": "CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.",
+    "engine-mod-title": "Three combined changes",
+    "engine-mod-copy": "Guarded asynchronous H2D progress copy; E36/R54; priority for existing eligible 1–256-token prefill tails.",
+    "engine-worker-title": "Fixed resource budget",
+    "engine-worker-copy": "Host State 4 GiB/rank, device KV 20 GiB/rank, prefill budget 4096 tokens. The 10 runtime overlay files match the current C15 candidate byte for byte.",
+    "engine-release-kicker": "2026-11-17 · Frozen release",
+    "engine-release-title": "Download B1 r8",
+    "engine-release-copy": "One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.",
+    "engine-release-link": "Download one-click runner ↗",
+    "engine-profile-link": "Release and checksums ↗",
+    "engine-access": "Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.",
+    "engine-status-title": "Measurements and tradeoffs",
+    "engine-status-run": "Matched 4K / 16K comparison",
+    "engine-status-run-value": "All four services and 2,477 formal requests completed. 4K throughput +11.48% to +12.11%; 16K +4.19% to +4.90%.",
+    "engine-status-hash": "Download verification",
+    "engine-status-hash-value": "SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.",
+    "engine-status-startup": "Latency changes relative to r6",
+    "engine-status-startup-value": "Reverse 4K mean/P95 TTFT +78/+225 ms; reverse MMLU mean TPOT +0.48 ms/token. Original C15 5%/2% internal screens remain in the evidence; project targets use the outlined B0 comparison.",
+    "engine-first-context": "4K / 16K · r8 versus r6",
+    "engine-chart-caption": "Both pair directions are retained, showing throughput and first-token latency tradeoffs.",
+    "engine-details": "Source, MODs and acceptance details",
+    "engine-source-link": "Pinned combination",
+    "engine-mod-link": "Complete MOD stack",
+    "engine-evidence-link": "C15 plan and stage evidence",
+    "engine-metrics-link": "All four services, plots and CPU replay",
+    "engine-history-title": "Default release and archives",
+    "engine-current-copy": "Throughput 3.06× / 2.68×; mean TTFT −52.8% / −48.4%, TPOT −68.5% / −65.4%. Zero failed requests.",
+    "engine-r4-copy": "The 2026-10-30 r4 originals and all later candidate outcomes remain available.",
+    "engine-current-link": "Default r6 manifest ↗",
+    "engine-history-link": "Reports by date ↗",
+    "engine-r4-link": "r4 original archive ↗",
+    "engine-footer-home": "← vLLM-HUST runtime stack",
+    "engine-footer-repo": "Engine repository ↗",
+    "footer-copy": "vLLM-HUST Engine releases and reproducible tests.",
+    "engine-4K-forward": "Forward pair",
+    "engine-4K-reverse": "Reverse pair",
+    "engine-16K-forward": "Forward pair",
+    "engine-16K-reverse": "Reverse pair",
+    "engine-task-title": "r6 → r8 · MMLU200",
+    "engine-task-caption": "All four services completed: 800 successful responses to the same 200 fixed questions. Correct: 145 → 147/200 forward, 148 → 146/200 reverse. Truncated: 21 → 20 and 20 → 20.",
+    "engine-task-method": "Quality, formulas and original evidence",
+    "engine-task-method-copy": "The same 200 questions are submitted together at an infinite request rate, with the original 8192-token answer budget, EOS, seed 0 and 194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all 200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus 1.",
+    "engine-task-gates": "Historical C15 internal screens: throughput ≥ +10%; mean TPOT ≤ +2%; mean TTFT and each P95/P99 ≤ +5%; correct ≥144/200; truncated ≤22; all200 responses complete. Original outcomes remain unchanged; these internal screens are separate from project acceptance targets.",
+    "engine-task-source": "Pinned complete review, all original archives and plots ↗",
+    "engine-task-forward": "Forward pair",
+    "engine-task-forward-output_tokens_per_second": "Output throughput (tok/s)",
+    "engine-task-forward-mean_ttft_ms": "Mean TTFT (s)",
+    "engine-task-forward-mean_tpot_ms": "Mean TPOT (ms)",
+    "engine-task-reverse": "Reverse pair",
+    "engine-task-reverse-output_tokens_per_second": "Output throughput (tok/s)",
+    "engine-task-reverse-mean_ttft_ms": "Mean TTFT (s)",
+    "engine-task-reverse-mean_tpot_ms": "Mean TPOT (ms)",
+    "engine-hero-download": "Download r8 runner ↗",
+    "engine-short-status": "Fixed starting point: r8 · E36/R54 · async H2D · Tail256",
+    "engine-config-summary": "Frozen MODs and resource budgets",
+    "engine-context-summary": "4K / 16K comparisons",
+    "engine-download-summary": "Downloads, checksums and reproduction",
+    "engine-archive-summary": "Default version and dated reports",
+    "engine-try-title": "Build on frozen r8",
+    "engine-try-copy": "Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.",
+    "engine-try-scope": "The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.",
+    "engine-mod-badge-link": "10 MODs · r8 included ↗",
+    "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
+    "engine-current-title": "B0 → r8 · current 4K / 16K continuous load",
+    "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The full five-profile comparison is running.",
+    "engine-current-method": "Method, original data and CPU replay",
+    "engine-current-method-copy": "Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.",
+    "engine-current-raw": "Original streams and portable CPU replay ↗",
+    "engine-current-stats": "Statistics and tail latency ↗",
+    "engine-current-manifest": "Current release manifest ↗",
+    "history-title": "r8 development evidence · r6 → r8",
+    "history-copy": "Historical paired development measurements. B0/r8 release results are on the current comparison page.",
+    "history-current": "Current B0/r8 comparison ↗",
+    "history-r6": "B0/r6 full report ↗"
+  },
+  "zh": {
+    "engine-kicker": "Ascend 推理服务栈",
+    "engine-lede": "r8 已冻结发布，可直接复现、开发 MOD 与继续优化。",
+    "engine-hero-benchmark": "B0 / B1 对比结果 ↗",
+    "engine-hero-release": "r8 源码与原件 ↗",
+    "engine-model-label": "模型",
+    "engine-runtime-label": "本版组合",
+    "engine-hardware-label": "硬件",
+    "engine-stack-title": "r8 固定了哪些优化",
+    "engine-base-title": "继承的服务栈",
+    "engine-base-copy": "CorrectedWorker、BetterScale、Microflow、KV materialization、MTP2 与 FULL 图。保留逐请求 KV 重算和按对象、dtype 合并锁页分配。",
+    "engine-mod-title": "本轮组合的三项变化",
+    "engine-mod-copy": "受保护的 H2D 异步进度复制；E36/R54；优先处理符合原条件的 1–256 token prefill 尾段。",
+    "engine-worker-title": "固定资源预算",
+    "engine-worker-copy": "主机 State 4 GiB/rank，设备 KV 20 GiB/rank，prefill 预算 4096 token。10 个运行时覆盖文件与当前 C15 实测候选逐字节一致。",
+    "engine-release-kicker": "2026-11-17 · 冻结版本",
+    "engine-release-title": "下载 B1 r8",
+    "engine-release-copy": "单文件入口恢复固定工具与运行时源码，完成推理、评分和出图，并实时跟随日志。私有 GitHub 凭据从 .env 或环境变量读取。",
+    "engine-release-link": "下载单文件一键入口 ↗",
+    "engine-profile-link": "Release 与校验信息 ↗",
+    "engine-access": "快速测试：MMLU200。全量测试：固定五项。均保留原完整回答预算与评分规则。",
+    "engine-status-title": "实测与性能取舍",
+    "engine-status-run": "同轮 4K / 16K 对照",
+    "engine-status-run-value": "四服务、2477个正式请求完成。4K吞吐提升11.48%–12.11%；16K提升4.19%–4.90%。",
+    "engine-status-hash": "下载包验证",
+    "engine-status-hash-value": "附件重新下载 SHA256 一致；独立解包后 75 项工具检查、6 项单文件入口检查通过。",
+    "engine-status-startup": "相对 r6 的时延变化",
+    "engine-status-startup-value": "反向4K平均/P95 TTFT增加78/225毫秒；反向MMLU平均TPOT增加0.48毫秒/token。C15原5%/2%筛选结果保留在原件中，项目达标按大纲与B0配对判断。",
+    "engine-first-context": "4K / 16K · r8 对比 r6",
+    "engine-chart-caption": "两对结果完整保留，吞吐与首字时延的取舍分别展示。",
+    "engine-details": "源码、MOD 与验收详情",
+    "engine-source-link": "固定组合清单",
+    "engine-mod-link": "完整 MOD 组合",
+    "engine-evidence-link": "C15 计划与逐阶段原件",
+    "engine-metrics-link": "全部四服务、图表与CPU复算",
+    "engine-history-title": "默认版本与历史归档",
+    "engine-current-copy": "吞吐 3.06× / 2.68×；平均 TTFT 降低52.8% / 48.4%，TPOT降低68.5% / 65.4%。请求失败0。",
+    "engine-r4-copy": "2026-10-30 的 r4 冻结原件及后续候选结果均保留。",
+    "engine-current-link": "默认 r6 清单 ↗",
+    "engine-history-link": "按日期查看报告 ↗",
+    "engine-r4-link": "r4 冻结原件 ↗",
+    "engine-footer-home": "← vLLM-HUST 运行时栈",
+    "engine-footer-repo": "Engine 仓库 ↗",
+    "footer-copy": "vLLM-HUST Engine 版本与可复现测试。",
+    "engine-4K-forward": "正向配对",
+    "engine-4K-reverse": "反向配对",
+    "engine-16K-forward": "正向配对",
+    "engine-16K-reverse": "反向配对",
+    "engine-task-title": "r6 → r8 · MMLU200",
+    "engine-task-caption": "四服务全部完成：相同固定200题共800次回答均成功。正向正确145→147/200，反向148→146/200；截断分别21→20、20→20。",
+    "engine-task-method": "正确率、计算公式与原件",
+    "engine-task-method-copy": "相同200题一次提交，保留原8192 token回答预算、EOS、seed0及共同194条不计分预热。吞吐为全部生成token数除以整批墙钟时长；平均TTFT包含全部200条请求的排队时间；逐请求TPOT为首token之后的耗时除以输出token数减1。",
+    "engine-task-gates": "历史C15内部筛选：吞吐≥+10%；平均TPOT≤+2%；平均TTFT及各P95/P99≤+5%；正确≥144/200；截断≤22；完整返回200条。原结论不改写；这些内部筛选线不作为项目大纲验收门槛。",
+    "engine-task-source": "固定完整报告、全部原始归档与图表 ↗",
+    "engine-task-forward": "正向配对",
+    "engine-task-forward-output_tokens_per_second": "输出吞吐（tok/s）",
+    "engine-task-forward-mean_ttft_ms": "平均TTFT（秒）",
+    "engine-task-forward-mean_tpot_ms": "平均TPOT（毫秒）",
+    "engine-task-reverse": "反向配对",
+    "engine-task-reverse-output_tokens_per_second": "输出吞吐（tok/s）",
+    "engine-task-reverse-mean_ttft_ms": "平均TTFT（秒）",
+    "engine-task-reverse-mean_tpot_ms": "平均TPOT（毫秒）",
+    "engine-hero-download": "下载 r8 一键脚本 ↗",
+    "engine-short-status": "固定起点：r8 · E36/R54 · 异步 H2D · Tail256",
+    "engine-config-summary": "冻结 MOD 与资源配置",
+    "engine-context-summary": "4K / 16K 对照图",
+    "engine-download-summary": "下载、校验与复现详情",
+    "engine-archive-summary": "默认版本与历史报告",
+    "engine-try-title": "基于 r8 继续优化",
+    "engine-try-copy": "下载脚本，填写固定B1 Python与设备号即可运行。新增优化单独做成MOD，保留固定r8对照和原始结果。",
+    "engine-try-scope": "默认跑固定五项；快速测试追加 --datasets mmlu。启动后自动跟随日志。",
+    "engine-mod-badge-link": "10项MOD · r8已包含 ↗",
+    "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
+    "engine-current-title": "B0 → r8 · 新一轮 4K / 16K 连续负载",
+    "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项完整对照正在执行。",
+    "engine-current-method": "计算方式、原件与离线复算",
+    "engine-current-method-copy": "两臂相同输入配方与71条非计分预热，TP2、并发8、输出256 token。每个正式阶段提交300秒，再等待全部完成；吞吐计入排空耗时。TPOT=(结束时间−首token时间)/(输出token−1)。两rank在测量前封住Torch Dynamo与Triton编译入口。数据集质量与参考算力效率分别验收。",
+    "engine-current-raw": "原始流与独立CPU复算 ↗",
+    "engine-current-stats": "统计及尾时延 ↗",
+    "engine-current-manifest": "当前发布清单 ↗",
+    "history-title": "r8 开发对照 · r6 → r8",
+    "history-copy": "这里保留历史开发配对。新一轮B0/r8发布实测见当前对比页。",
+    "history-current": "当前B0/r8对比 ↗",
+    "history-r6": "B0/r6完整报告 ↗"
+  }
+};
+    function revealEngineAnchor() {
+      const target = document.getElementById(location.hash.slice(1));
+      if (!target) return;
+      for (let ancestor = target.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+      }
+      target.scrollIntoView();
+    }
+    window.addEventListener('hashchange', revealEngineAnchor);
+    window.addEventListener('load', revealEngineAnchor);
+  </script>
+  <script src="./assets/site.js?v=engine-navigation-20261117"></script>
+<script src="./assets/optimization-exploration.js?v=20261115-v1"></script></body>
+</html>
