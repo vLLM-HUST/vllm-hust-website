@@ -7,6 +7,7 @@
   const button = document.getElementById('download-test-prompt');
   const scriptButton = document.getElementById('download-test-script');
   const status = document.getElementById('prompt-download-status');
+  const description = document.getElementById('engine-download-description');
   const bootstrap = {
     repository: 'vLLM-HUST/vllm-hust-engine',
     commit: 'e3c3e2bc3f896e40a5577c1181adb7df6c3c61a4', // pragma: allowlist secret
@@ -14,12 +15,14 @@
     runner: 'ceeff236d26e1922bc09448322defb7dcbf12b2d', // pragma: allowlist secret
     sha256: '395194f8ace873dc84d9fc18fd1d5143aefe1ca08f55bcd4ee99ae25fad96d3b', // pragma: allowlist secret
     bytes: 9577,
+    engineRelease: 'full-answer-b1-20261113-r6',
+    toolsRelease: 'acceptance-tools-20261116-r7',
   };
   const language = () => (window.vllmHustSite?.getCurrentLang()
     || localStorage.getItem('vllm-hust_lang') || navigator.language || 'en').startsWith('zh') ? 'zh' : 'en';
   const copy = {
-    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: '最新版 Engine 一键脚本 ↓', scriptReady: '当前固定 r6 执行器与专项入口，版本及附件均校验 SHA256', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已生成 one_click.py 下载；请按指南配置本机参数', scriptFailed: '脚本下载或校验失败，请重试', hint: '当前 r6 执行器 · 下载后自动恢复固定工具，实时显示运行日志'},
-    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'Latest Engine script ↓', scriptReady: 'Current pinned r6 runner and supplement entry, with version and artifact SHA256 verification', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'one_click.py download generated; configure local parameters using the guide', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Current r6 runner · restores pinned tools and follows live logs'},
+    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: 'r6 Engine 一键脚本 ↓', scriptReady: '固定引擎 r6 · 执行工具 r7；脚本与附件均校验 SHA256', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已下载 one_click.py（引擎 r6 / 工具 r7）；按指南命令运行', scriptFailed: '脚本下载或校验失败，请重试', hint: '脚本与运行指南已校验', description: '当前默认引擎 r6 · 执行工具 r7。保存为 one_click.py，按指南命令运行；终端自动显示实时日志。'},
+    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'r6 Engine test script ↓', scriptReady: 'Frozen engine r6 · execution tools r7; script and artifacts verified by SHA256', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'Downloaded one_click.py (engine r6 / tools r7); run the guide command', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Script and run guide verified', description: 'Default engine r6 · execution tools r7. Save as one_click.py and run the guide command; live logs follow automatically.'},
   };
 
   function command(guide, mode) {
@@ -321,7 +324,9 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
       && payload.guide.execution.public_bootstrap_path === bootstrap.path
       && payload.guide.execution.bootstrap_sha256 === bootstrap.sha256
       && payload.guide.execution.bootstrap_bytes === bootstrap.bytes
-      && payload.guide.execution.verified_runner_commit === bootstrap.runner;
+      && payload.guide.execution.verified_runner_commit === bootstrap.runner
+      && payload.guide.execution.engine_release === bootstrap.engineRelease
+      && payload.guide.execution.tools_release === bootstrap.toolsRelease;
   }
 
   function saveDownload(blob, filename) {
@@ -340,6 +345,7 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
     button.title = payload ? c.ready : c.loading;
     button.disabled = !payload;
     scriptButton.textContent = c.script;
+    if (description) description.textContent = c.description;
     scriptButton.disabled = !scriptMatches() || downloadingScript;
     scriptButton.title = !payload ? c.loading : scriptMatches() ? c.scriptReady : c.scriptMismatch;
     status.textContent = payload ? c.hint : c.loading;
