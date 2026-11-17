@@ -12,6 +12,40 @@ SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
+def assert_release_control_readable(page, root):
+    contrast = root.locator("#comparison-release-select").evaluate(
+        """select => {
+          const luminance = rgb => {
+            const channels = rgb.match(/[0-9.]+/g).slice(0,3).map(Number)
+              .map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
+            return .2126*channels[0]+.7152*channels[1]+.0722*channels[2];
+          };
+          return [select,...select.options].map(el=>{
+            const css=getComputedStyle(el),a=luminance(css.color),b=luminance(css.backgroundColor);
+            return {ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),background:css.backgroundColor};
+          });
+        }"""
+    )
+    assert all(c["ratio"] >= 4.5 for c in contrast), contrast
+    assert all(c["background"] != "rgba(0, 0, 0, 0)" for c in contrast), contrast
+    select = root.locator("#comparison-release-select")
+    select.focus()
+    assert select.evaluate("el=>getComputedStyle(el).outlineStyle") != "none"
+    expect(select).to_be_focused()
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+1")
+
+
+def dashboard_layout(root):
+    return root.evaluate(
+        """el=>({summary:el.querySelector('.goal-grid').children.length,
+          frozen:el.querySelectorAll('.frozen-profile').length,
+          runtimes:el.querySelector('.runtime-pair').children.length,
+          charts:el.querySelectorAll('.metric-grid>.metric-chart').length,
+          columns:getComputedStyle(el.querySelector('.metric-grid')).gridTemplateColumns,
+          dialogs:el.querySelectorAll('.comparison-dialog').length})"""
+    )
+
+
 def verify(url, output):
     output.mkdir(parents=True, exist_ok=True)
     checks = []
@@ -23,27 +57,82 @@ def verify(url, output):
         manifest = context.request.get(
             url + "/data/benchmark-source-manifest.json"
         ).json()
+        r8 = context.request.get(
+            url + "/data/r8-continuous-20261117/summary-v1.json"
+        ).json()
         for lang in ("zh", "en"):
             for width in (390, 1440):
                 for theme in ("light", "dark"):
                     page = context.new_page()
-                    page.set_viewport_size(dict(width=width, height=1000))
+                    page.set_viewport_size({"width": width, "height": 1000})
                     page.emulate_media(color_scheme=theme)
                     page.add_init_script(
                         f"localStorage.setItem('vllm-hust_lang','{lang}')"
                     )
                     errors = []
-                    page.on("pageerror", lambda e: errors.append(str(e)))
+                    page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
                     page.goto(url + "/b0-b1.html")
                     root = page.locator("#five-dataset-comparison")
                     expect(root).to_have_attribute("data-release", "r8", timeout=30000)
                     expect(root.locator(".goal-card")).to_have_count(0)
                     expect(root.locator("#r8-current-continuous")).to_be_visible()
                     expect(root.locator("#report-history-links")).to_have_count(0)
+                    expect(root.locator(".metric-chart")).to_have_count(4)
+                    expect(root.locator(".bar-value")).to_have_count(16)
+                    expect(root.locator(".mod-tags span")).to_have_count(10)
+                    assert_release_control_readable(page, root)
+                    r8_layout = dashboard_layout(root)
+                    for key, divisor in [
+                        ("output_tokens_per_second", 1),
+                        ("mean_ttft_ms", 1000),
+                        ("mean_tpot_ms", 1),
+                        ("relative_cost_per_token", 1),
+                    ]:
+                        for phase in ("4096-formal", "16384-formal"):
+                            values = root.locator(
+                                f'[data-metric="{key}"] [data-profile="{phase}"] .bar-value'
+                            )
+                            expected = []
+                            for role in ("B0", "B1"):
+                                value = (
+                                    r8["groups"]["B0"][phase][
+                                        "output_tokens_per_second"
+                                    ]
+                                    / r8["groups"][role][phase][
+                                        "output_tokens_per_second"
+                                    ]
+                                    if key == "relative_cost_per_token"
+                                    else r8["groups"][role][phase][key] / divisor
+                                )
+                                expected.append(f"{value:.2f}")
+                            expect(values).to_have_text(expected)
+                    for key in ("metrics", "configuration", "methods", "evidence"):
+                        button = root.locator(f'[data-detail="{key}"]')
+                        button.click()
+                        dialog = root.locator("dialog")
+                        expect(dialog).to_be_visible()
+                        if key == "metrics":
+                            expect(dialog.locator("table")).to_have_count(4)
+                        elif key == "configuration":
+                            expect(dialog).to_contain_text("E36/R54")
+                        elif key == "evidence":
+                            assert dialog.locator("img").evaluate(
+                                "async el=>{await el.decode();return el.naturalWidth>0}"
+                            )
+                        page.keyboard.press("Escape")
+                        expect(dialog).not_to_be_visible()
+                        expect(button).to_be_focused()
+                    page.evaluate("window.scrollTo(0,0)")
+                    page.screenshot(
+                        path=str(output / f"r8-{lang}-{width}-{theme}.png"),
+                        full_page=True,
+                    )
                     root.locator("#comparison-release-select").select_option("r6")
                     expect(root).to_have_attribute(
                         "data-loaded", data["run_id"], timeout=30000
                     )
+                    assert dashboard_layout(root) == r8_layout
+                    assert_release_control_readable(page, root)
                     expect(root.locator(".goal-card")).to_have_count(4)
                     for index, goal in enumerate(("3.4.1", "3.4.2", "3.4.3", "3.4.4")):
                         card = root.locator(f'[data-goal="{goal}"]')
@@ -165,12 +254,12 @@ def verify(url, output):
                         path=str(output / f"{lang}-{width}-{theme}.png"), full_page=True
                     )
                     checks.append(
-                        dict(
-                            language=lang,
-                            width=width,
-                            theme=theme,
-                            verified="40 values,8 MODs,4 goals,dialogs and keyboard",
-                        )
+                        {
+                            "language": lang,
+                            "width": width,
+                            "theme": theme,
+                            "verified": "matching release layouts,16 r8 and40 r6 values,MODs,contrast,dialogs and keyboard",
+                        }
                     )
                     page.close()
         for label, path, transform, resign in [
@@ -254,7 +343,7 @@ def verify(url, output):
                 "data-error", "publication-rejected", timeout=30000
             )
             expect(root.locator(".metric-chart")).to_have_count(0)
-            checks.append(dict(rejected=label))
+            checks.append({"rejected": label})
             page.close()
         page = context.new_page()
         page.route(
@@ -272,7 +361,10 @@ def verify(url, output):
         expect(root.locator(".goal-card")).to_have_count(4)
         page.close()
         checks.append(
-            dict(rejected="corrupt-r8-publication", historical_release_selectable=True)
+            {
+                "rejected": "corrupt-r8-publication",
+                "historical_release_selectable": True,
+            }
         )
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")

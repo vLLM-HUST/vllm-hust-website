@@ -99,14 +99,14 @@
     const met = final ? goal.attainment === 'demonstrated' : goal.accepted;
     return met ? t('达成目标','Target met') : t('未达成目标','Target not met');
   };
-  function chart(key, title, unit, divisor = 1) {
-    const maximum = Math.max(1,...data.datasets.map(d=>d.arms.B1[key]/d.arms.B0[key]));
-    return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">B0</span><span class="legend-b1">B1</span></div>${data.datasets.map((row,i)=>{
+  function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames()) {
+    const maximum = Math.max(1,...rows.map(d=>d.arms.B1[key]/d.arms.B0[key]));
+    return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">B0</span><span class="legend-b1">B1</span></div>${rows.map((row,i)=>{
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
-      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${profileNames()[i]}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
+      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${labels[i]}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
         const value=row.arms[role][key]/divisor;
-        return `<div class="bar-line" aria-label="${esc(`${profileNames()[i]} ${role} ${n(value)} ${unit}`)}"><span class="bar-role">${role}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
+        return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${role} ${n(value)} ${unit}`)}"><span class="bar-role">${role}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
       }).join('')}</div>`;
     }).join('')}</article>`;
   }
@@ -178,22 +178,30 @@
     document.getElementById('comparison-lead').textContent=`${data.hardware.model} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.dtype}`;
     const goalCards=required.map((id,i)=>`<button type="button" class="goal-card" data-detail="goal-${id}" data-goal="${id}"><span>${names()[i]}</span><strong><span class="stage-label">${t('项目里程碑','Project milestone')}</span>${attainment(id)}</strong>${id==='3.4.1' ? `<span class="reference-scope">${t('已认证工况：MMLU200/out256','Certified workload: MMLU200/out256')}</span>` : ''}<small>${t('项目最终目标','Project final')}: ${attainment(id,true)} <span aria-hidden="true">↗</span></small></button>`).join('');
     root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta release-navigation"><span>${t('本页：B0 对比默认 B1 r6 · 固定五数据集','This report: B0 vs default B1 r6 · five fixed profiles')}</span><a href="./engine.html#r8-current-results">${t('r8 已冻结：下载、MOD 与实测图','Frozen r8: download, MODs and measurements')} ↗</a></div><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
-      <section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${combination.B0.cann}</span></div><div><strong>B1 · r6</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${combination.B1.cann}</span></div></div><div class="mod-tags">${combination.components.map(c=>`<span>${esc(t(c.name_zh,c.name_en))}</span>`).join('')}</div><p class="frozen-settings">E24/R36 · MTP2 · FULL · TP2 · host 4 GiB/rank</p></section>
+      ${frozenProfile('r6',{B0:combination.B0.cann,B1:combination.B1.cann},combination.components.map(c=>t(c.name_zh,c.name_en)),'E24/R36 · MTP2 · FULL · TP2 · host 4 GiB/rank')}
       <div class="section-heading"><h2>${t('五数据集性能','Five-profile performance')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值。','Bars normalize B0 to1; labels show measured values.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}${chart('estimated_cny_per_million_output_tokens',t('单位输出token成本 ↓','Cost per output token ↓'),t('元/百万token','CNY/million tokens'))}</div>
       ${supplementView()}
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>
-      <dialog id="comparison-detail-dialog" class="comparison-dialog"><div class="dialog-header"><h2 id="comparison-dialog-title"></h2><button type="button" class="dialog-close" aria-label="${t('关闭详情','Close details')}">×</button></div><div id="comparison-dialog-body"></div></dialog></section>`;
+      ${detailDialog()}</section>`;
+    bindDetails(detailContent);
+    root.dataset.loaded=data.run_id;root.setAttribute('aria-busy','false');
+  }
+  function detailDialog() {
+    return `<dialog id="comparison-detail-dialog" class="comparison-dialog" aria-labelledby="comparison-dialog-title"><div class="dialog-header"><h2 id="comparison-dialog-title"></h2><button type="button" class="dialog-close" aria-label="${t('关闭详情','Close details')}">×</button></div><div id="comparison-dialog-body"></div></dialog>`;
+  }
+  function bindDetails(content) {
     const dialog=root.querySelector('dialog');
-    dialog.setAttribute('aria-labelledby','comparison-dialog-title');
     root.querySelectorAll('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
-      const value=detailContent(button.dataset.detail);
+      const value=content(button.dataset.detail);
       root.querySelector('#comparison-dialog-title').textContent=value.title;
       root.querySelector('#comparison-dialog-body').innerHTML=value.body;
       dialog.showModal();
     }));
     root.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
     dialog.addEventListener('click',event=>{if(event.target===dialog && event.clientX>=dialog.getBoundingClientRect().right)dialog.close();});
-    root.dataset.loaded=data.run_id;root.setAttribute('aria-busy','false');
+  }
+  function frozenProfile(release, cann, mods, settings) {
+    return `<section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${esc(cann.B0)}</span></div><div><strong>B1 · ${esc(release)}</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${esc(cann.B1)}</span></div></div><div class="mod-tags">${mods.map(c=>`<span>${esc(c)}</span>`).join('')}</div><p class="frozen-settings">${esc(settings)}</p></section>`;
   }
 
   async function loadR6() {
@@ -225,7 +233,7 @@
   let currentR8 = null;
   const currentR8Sha = 'c81cd8078a1c9ea61af84cb31c2b59c99fa94876ae1cfaa3a5a12180f9408c61'; // pragma: allowlist secret -- fixed public evidence digest
   function releaseMenu() {
-    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('Release版本','Release version')}</label><select id="comparison-release-select" style="font:inherit;max-width:100%;padding:8px 12px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit"><option value="r8" ${selectedRelease==='r8'?'selected':''}>r8 · ${t('最新实测','Latest measurements')}</option><option value="r6" ${selectedRelease==='r6'?'selected':''}>r6 · ${t('固定五项完整报告','Completed five-profile report')}</option></select><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
+    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('Release版本','Release version')}</label><select id="comparison-release-select"><option value="r8" ${selectedRelease==='r8'?'selected':''}>r8 · ${t('最新实测','Latest measurements')}</option><option value="r6" ${selectedRelease==='r6'?'selected':''}>r6 · ${t('固定五项完整报告','Completed five-profile report')}</option></select><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
   }
   function bindMenu() {
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
@@ -234,20 +242,35 @@
       showRelease();
     });
   }
+  const r8Mods = ['Extension Manager','BetterScale','Microflow','KV materialization','M01 correction','Packed host state','Sealed serving warmup','Guarded progress async','Capacity tuning','Short prefill tail'];
+  function r8Rows() {
+    return ['4096-formal','16384-formal'].map(phase=>{
+      const arms=Object.fromEntries(['B0','B1'].map(role=>[role,{...currentR8.groups[role][phase],relative_cost_per_token:currentR8.groups.B0[phase].output_tokens_per_second/currentR8.groups[role][phase].output_tokens_per_second}]));
+      const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
+      return {id:phase,arms,changes_percent};
+    });
+  }
+  function r8Details(key) {
+    if(key==='configuration')return {title:t('冻结配置','Frozen configuration'),body:`<p>B1 r8 · CorrectedWorker · E36/R54 · MTP2 · FULL · TP2 · async H2D · Tail256 · host 4 GiB/rank · KV 20 GiB/rank</p><div class="mod-tags">${r8Mods.map(name=>`<span>${name}</span>`).join('')}</div><p><a href="./engine.html#r8-mods">${t('MOD组合、版本与下载','MOD stack, versions and download')} ↗</a></p>`};
+    if(key==='metrics')return {title:t('完整数值','Complete metrics'),body:['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map((field,i)=>`<h3>${[t('吞吐 · token/s','Throughput · token/s'),'TTFT · s','TPOT · ms',t('同费率成本 · B0 = 1','Equal-rate cost · B0 = 1')][i]}</h3>${table(t(['场景','B0','B1','变化'],['Context','B0','B1','Change']),r8Rows().map((row,j)=>[['4K','16K'][j],n(row.arms.B0[field]/(i===1?1000:1)),n(row.arms.B1[field]/(i===1?1000:1)),n(row.changes_percent[field])+'%']))}`).join('')};
+    if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<dl class="method-list"><dt>${t('配对条件','Pairing')}</dt><dd>${t('两臂相同71条预热与输入配方；并发8、输出256 token，每阶段提交300秒再排空；预热不计时。','Same 71 warmups and input recipe; concurrency 8, 256 output tokens, each phase submits for 300s then drains. Warmup is unscored.')}</dd><dt>${t('吞吐','Throughput')}</dt><dd>${t('完成输出token数 ÷ 包含排空的阶段耗时。','Completed output tokens / phase wall time including drain.')}</dd><dt>TTFT</dt><dd>${t('首内容token时刻 − 请求提交时刻，包含排队与prefill。','First content-token time − submission time, including queueing and prefill.')}</dd><dt>TPOT</dt><dd>${t('(响应完成时刻 − 首内容token时刻) ÷ (输出token数 − 1)，逐请求等权平均。','(Completion time − first content-token time) / (output tokens − 1), averaged equally across requests.')}</dd><dt>${t('同费率成本','Equal-rate cost')}</dt><dd>${t('设备费率与卡数相同：单位token成本比 = B0吞吐 / B1吞吐。图中B0 = 1。','With equal device rates and counts: unit token cost ratio = B0 throughput / B1 throughput. B0 = 1 in the chart.')}</dd></dl>`};
+    return {title:t('原始证据','Original evidence'),body:`<p>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。固定五项配对结果另行发布。','C8 closed loop · 871 measured requests, zero failures · one run per arm. Five-profile paired results are published separately.')}</p><p><a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="${esc(currentR8.evidence.raw.url)}">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p><figure class="comparison-source-plot"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" alt="${t('B0与r8连续负载原始对照图','Original B0 and r8 continuous-load chart')}"></a></figure>`};
+  }
   function renderR8() {
-    document.getElementById('comparison-title').textContent=t('B0 / B1 r8 实测对比','B0 / B1 r8 measured comparison');
-    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · 2 × Ascend 910B2 · BF16';
-    const rows=['4096-formal','16384-formal'].map((phase,i)=>{
-      const c=currentR8.comparisons[phase];
-      return `<tr><td>${['4K','16K'][i]}</td><td>${c.throughput_ratio.toFixed(2)}×</td><td>−${c.ttft_reduction_percent.toFixed(1)}%</td><td>−${c.tpot_reduction_percent.toFixed(1)}%</td></tr>`;
-    }).join('');
-    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<section class="frozen-profile" id="r8-current-continuous" style="scroll-margin-top:96px"><h2>${t('4K / 16K 连续负载','4K / 16K continuous load')}</h2><p>${t('本轮已完成连续负载对照；固定五项配对测试继续运行。','This run completed the continuous-load comparison; the five-profile paired test is running.')}</p><div class="table-wrap"><table><thead><tr><th>${t('场景','Context')}</th><th>${t('吞吐','Throughput')}</th><th>TTFT</th><th>TPOT</th></tr></thead><tbody>${rows}</tbody></table></div><figure style="margin:16px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="${t('打开完整对照图','Open full-size comparison chart')}"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="${t('B0与r8连续负载实测图','Measured B0 and r8 continuous load')}"></a><figcaption>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。','C8 closed loop · 871 measured requests, zero failures · one run per arm.')}</figcaption></figure><details><summary>${t('版本、计算方式与原件','Versions, formulas and originals')}</summary><p>B0 vLLM0.18 / Ascend0.18 / CANN8.5.1 → B1 r8 vLLM0.28.1 / Ascend0.25.1rc2 / CANN9.1.0</p><p>E36/R54 · MTP2 · FULL · async H2D · Tail256 · State4GiB/rank · KV20GiB/rank</p><p>${t('两臂相同71条预热与输入配方；并发8、输出256 token，每阶段提交300秒再排空。吞吐=完成token/包含排空的阶段耗时；TTFT包含实测prefill；TPOT=(结束−首token)/(输出token−1)，预热不计时。','Same71 warmups and input recipe; concurrency8, 256 output tokens, each phase submits for300s then drains. Throughput=completed tokens/phase time including drain; TTFT includes measured prefill; TPOT=(end−first token)/(output tokens−1). Warmup is unscored.')}</p><p><a href="./engine.html#r8-current-results">${t('冻结组合与10项MOD','Frozen stack and10 MODs')} ↗</a> · <a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p></details></section></section>`;
-    bindMenu();root.dataset.loaded='r8-continuous-20261117';root.dataset.release='r8';root.setAttribute('aria-busy','false');
+    document.getElementById('comparison-title').textContent=t('B0 / B1 实测对比','B0 / B1 measured comparison');
+    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
+    const rows=r8Rows(),labels=['4K','16K'];
+    const highlights=[[t('4K吞吐','4K throughput'),n(currentR8.comparisons['4096-formal'].throughput_ratio)+'×',t('相对B0','vs B0')],[t('16K吞吐','16K throughput'),n(currentR8.comparisons['16384-formal'].throughput_ratio)+'×',t('相对B0','vs B0')],['4K · TTFT','−'+n(currentR8.comparisons['4096-formal'].ttft_reduction_percent)+'%',t('首token时延降低','Lower time to first token')],['4K · TPOT','−'+n(currentR8.comparisons['4096-formal'].tpot_reduction_percent)+'%',t('逐token时延降低','Lower time per output token')]];
+    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<div class="comparison-meta"><span>r8 · ${t('4K / 16K连续负载 · C8 · 正式871请求，失败0','4K / 16K continuous load · C8 · 871 measured requests, zero failures')}</span></div><div class="goal-grid">${highlights.map(([label,value,note])=>`<article class="result-card"><span>${label}</span><strong>${value}</strong><small>${note}</small></article>`).join('')}</div>
+      ${frozenProfile('r8',{B0:'8.5.1',B1:'9.1.0'},r8Mods,'E36/R54 · MTP2 · FULL · TP2 · host 4 GiB/rank · KV 20 GiB/rank')}
+      <section id="r8-current-continuous"><div class="section-heading"><h2>${t('连续负载性能','Continuous-load performance')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值；成本按同费率折算。','Bars normalize B0 to 1; labels show measured values. Cost uses equal device rates.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,labels)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,labels)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,labels)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'B0 = 1',1,rows,labels)}</div></section>
+      <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    bindMenu();bindDetails(r8Details);root.dataset.loaded='r8-continuous-20261117';root.dataset.release='r8';root.setAttribute('aria-busy','false');
   }
   function render() {
     if(selectedRelease==='r8') {if(currentR8)renderR8();return;}
     if(!data||!combination)return;
-    renderR6();root.insertAdjacentHTML('afterbegin',releaseMenu());bindMenu();root.dataset.release='r6';
+    renderR6();root.querySelector('.comparison-dashboard').insertAdjacentHTML('afterbegin',releaseMenu());bindMenu();root.dataset.release='r6';
   }
   async function loadR8() {
     const response=await fetch('./data/r8-continuous-20261117/summary-v1.json',{cache:'no-cache'});
