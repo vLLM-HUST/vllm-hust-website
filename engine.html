@@ -9,6 +9,7 @@
   <title>vLLM-HUST Engine | Frozen r8</title>
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
+  <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
 </head>
 <body data-page="engine">
   <nav class="site-nav">
@@ -41,7 +42,7 @@
           <p id="engine-lede" class="engine-lede">Frozen r8 is available for reproduction, MOD development and further optimization.</p>
           <div class="engine-actions">
             <a id="engine-hero-benchmark" class="engine-button" href="./b0-b1.html">B0 / B1 results ↗</a>
-            <a id="engine-hero-download" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8.py">Download r8 runner ↗</a>
+            <a id="engine-hero-download" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full.py">Download r8 runner ↗</a>
             <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">r8 sources and artifacts ↗</a>
           </div>
           <p id="engine-short-status" class="engine-note">Fixed starting point: r8 · E36/R54 · async H2D · Tail256</p>
@@ -51,7 +52,7 @@
           <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
           <div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>H2D async copy · E36/R54 · Tail256</strong></div>
           <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
-          <p class="engine-mod-chips">BetterScale · Microflow · KV materialization · MTP2 · FULL</p>
+          <p class="engine-mod-chips"><a id="engine-mod-badge-link" href="#r8-mods" style="color:inherit">10 MODs · r8 included ↗</a></p>
         </aside>
       </div>
     </section>
@@ -59,7 +60,7 @@
       <section class="engine-section" id="try-r8" aria-labelledby="engine-try-title">
         <h2 id="engine-try-title">Build on frozen r8</h2>
         <p id="engine-try-copy">Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.</p>
-        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>python3 download-and-run-r8.py \
+        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>python3 download-and-run-r8-full.py \
   --b1-python /absolute/path/to/fixed-b1-sdk/bin/python \
   --physical-devices 0,1 --out ./runs/r8-full-five</code></pre>
         <p id="engine-try-scope" class="engine-note">The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.</p>
@@ -77,6 +78,8 @@
       </section>
 <div class="engine-detail-grid"><details class="engine-fold"><summary><span id="engine-config-summary">Frozen MODs and resource budgets</span></summary>      <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
         <h2 id="engine-stack-title">What is frozen in r8</h2>
+        <p id="engine-mod-badge-copy">Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.</p>
+        <div id="r8-mods" class="r8-mod-list"><a class="r8-mod-chip" data-r8-mod-id="extension-manager" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/extension-manager/README.md"><span>Extension Manager</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="betterscale" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/betterscale/README.md"><span>BetterScale</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="microflow" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/microflow/README.md"><span>Microflow</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="kv-materialization" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/kv-materialization/README.md"><span>KV materialization</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="m01-correction" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/m01-correction/README.md"><span>M01 correction</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="packed-host" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/packed-host/README.md"><span>Packed host state</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="sealed-serving-warmup" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/sealed-serving-warmup/README.md"><span>Sealed serving warmup</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="guarded-progress-async" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/guarded-progress-async/README.md"><span>Guarded progress async</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="capacity-tuning" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/capacity-tuning/README.md"><span>Capacity tuning</span><strong>r8</strong></a><a class="r8-mod-chip" data-r8-mod-id="short-prefill-tail" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/short-prefill-tail/README.md"><span>Short prefill tail</span><strong>r8</strong></a></div>
         <div class="engine-cards">
           <article><h3 id="engine-base-title">Inherited serving stack</h3><p id="engine-base-copy">CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.</p></article>
           <article><h3 id="engine-mod-title">Three combined changes</h3><p id="engine-mod-copy">Guarded asynchronous H2D progress copy; E36/R54; priority for existing eligible 1–256-token prefill tails.</p></article>
@@ -90,13 +93,13 @@
         <div>
           <p id="engine-release-kicker" class="engine-kicker">2026-11-17 · Frozen release</p><h2 id="engine-release-title">Download B1 r8</h2><p id="engine-release-copy">One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.</p>
           <div class="engine-actions">
-            <a id="engine-release-link" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8.py">Download one-click runner ↗</a>
+            <a id="engine-release-link" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full.py">Download one-click runner ↗</a>
             <a id="engine-profile-link" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">Release and checksums ↗</a>
           </div>
           <p id="engine-access" class="engine-note">Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.</p>
           <details><summary><span id="engine-details">Source, MODs and acceptance details</span></summary><ul>
-            <li><a id="engine-source-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/c6059a6d3d1cf7ea16340d79cccf7bb1a13fa661/engines/b1-r8.json">Pinned combination</a></li>
-            <li><a id="engine-mod-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/c6059a6d3d1cf7ea16340d79cccf7bb1a13fa661/mods/active-stack-r8.json">Complete MOD stack</a></li>
+            <li><a id="engine-source-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/engines/b1-r8.json">Pinned combination</a></li>
+            <li><a id="engine-mod-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/active-stack-r8.json">Complete MOD stack</a></li>
             <li><a id="engine-evidence-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/main/experiments/optimization-20261115/C15-r7-tail-combination-model-20261117-r1">C15 plan and stage evidence</a></li>
             <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/d239e28439451a2c03ffe3722b52f821d313a57b/experiments/optimization-20261115/C15-complete-matched-context-20261117-r1">All four services, plots and CPU replay</a></li>
           </ul></details>
@@ -193,7 +196,9 @@
     "engine-archive-summary": "Default version and dated reports",
     "engine-try-title": "Build on frozen r8",
     "engine-try-copy": "Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.",
-    "engine-try-scope": "The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically."
+    "engine-try-scope": "The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.",
+    "engine-mod-badge-link": "10 MODs · r8 included ↗",
+    "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim."
   },
   "zh": {
     "engine-kicker": "Ascend 推理服务栈",
@@ -265,7 +270,9 @@
     "engine-archive-summary": "默认版本与历史报告",
     "engine-try-title": "基于 r8 继续优化",
     "engine-try-copy": "下载脚本，填写固定B1 Python与设备号即可运行。新增优化单独做成MOD，保留固定r8对照和原始结果。",
-    "engine-try-scope": "默认跑固定五项；快速测试追加 --datasets mmlu。启动后自动跟随日志。"
+    "engine-try-scope": "默认跑固定五项；快速测试追加 --datasets mmlu。启动后自动跟随日志。",
+    "engine-mod-badge-link": "10项MOD · r8已包含 ↗",
+    "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。"
   }
 };
     function revealEngineAnchor() {
