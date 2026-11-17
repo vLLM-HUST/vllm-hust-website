@@ -65,7 +65,7 @@
       const start = node('a', value({zh: '开始 MOD 测试 →', en: 'Start with the target MOD →'}));
       start.href = `./dataset-standard.html?scope=${mode.id}`; start.className = 'mode-start-link'; card.append(start);
       const reference = node('details'); reference.className = 'entry-reference-command';
-      reference.append(node('summary', value({zh: '最新版 Engine 命令', en: 'Latest Engine command'})), command);
+      reference.append(node('summary', value({zh: '参考 Engine r6 命令（工具 r7）', en: 'Reference engine r6 command (tools r7)'})), command);
       const copyButton = node('button', labels.copy); copyButton.type = 'button'; copyButton.className = 'entry-copy-command';
       const feedback = node('span'); feedback.className = 'entry-copy-feedback'; feedback.setAttribute('role', 'status');
       copyButton.setAttribute('aria-label', `${labels.copy} · ${field(mode, 'title')}`);
