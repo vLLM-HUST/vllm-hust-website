@@ -172,12 +172,12 @@
       <div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vsB0')}</span><strong>${n(a.comparisons[1].throughput_ratio)}×</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant.cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant.B0_utilization.mean_percent)} → ${n(tenant.B1_utilization.mean_percent)}%</strong></div></div>
       <figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与四租户配对图，可横向滚动','Context and tenant paired chart; scroll horizontally')}"><img src="${esc(a.chart_path)}" alt="${t('两臂上下文吞吐、尾时延和四租户利用率实测图','Measured paired context throughput, tail latency and four-tenant utilization')}" width="1426" height="1022"></div><figcaption>${t('输入变长时输出吞吐下降；五窗口稳定性与局部回归见详情。','Output throughput decreases with longer inputs; see details for five-window stability and individual regressions.')}</figcaption></figure></section>`;
   }
-  function render() {
+  function renderR6() {
     if (!data || !combination) return;
     document.getElementById('comparison-title').textContent=t('B0 / B1 实测对比','B0 / B1 measured comparison');
     document.getElementById('comparison-lead').textContent=`${data.hardware.model} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.dtype}`;
     const goalCards=required.map((id,i)=>`<button type="button" class="goal-card" data-detail="goal-${id}" data-goal="${id}"><span>${names()[i]}</span><strong><span class="stage-label">${t('项目里程碑','Project milestone')}</span>${attainment(id)}</strong>${id==='3.4.1' ? `<span class="reference-scope">${t('已认证工况：MMLU200/out256','Certified workload: MMLU200/out256')}</span>` : ''}<small>${t('项目最终目标','Project final')}: ${attainment(id,true)} <span aria-hidden="true">↗</span></small></button>`).join('');
-    root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta release-navigation"><span>${t('本页：B0 对比默认 B1 r6 · 固定五数据集','This report: B0 vs default B1 r6 · five fixed profiles')}</span><a href="./engine.html#results">${t('r8 已冻结：下载、MOD 与实测图','Frozen r8: download, MODs and measurements')} ↗</a></div><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
+    root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta release-navigation"><span>${t('本页：B0 对比默认 B1 r6 · 固定五数据集','This report: B0 vs default B1 r6 · five fixed profiles')}</span><a href="./engine.html#r8-current-results">${t('r8 已冻结：下载、MOD 与实测图','Frozen r8: download, MODs and measurements')} ↗</a></div><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
       <section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${combination.B0.cann}</span></div><div><strong>B1 · r6</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${combination.B1.cann}</span></div></div><div class="mod-tags">${combination.components.map(c=>`<span>${esc(t(c.name_zh,c.name_en))}</span>`).join('')}</div><p class="frozen-settings">E24/R36 · MTP2 · FULL · TP2 · host 4 GiB/rank</p></section>
       <div class="section-heading"><h2>${t('五数据集性能','Five-profile performance')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值。','Bars normalize B0 to1; labels show measured values.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}${chart('estimated_cny_per_million_output_tokens',t('单位输出token成本 ↓','Cost per output token ↓'),t('元/百万token','CNY/million tokens'))}</div>
       ${supplementView()}
@@ -196,7 +196,7 @@
     root.dataset.loaded=data.run_id;root.setAttribute('aria-busy','false');
   }
 
-  async function load() {
+  async function loadR6() {
     const response = await fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'});
     if (!response.ok) throw Error('Unavailable publication manifest');
     const m = await response.json();
@@ -219,13 +219,57 @@
     if(comboHash!==entry[0].sha256 || comboRaw.byteLength!==entry[0].bytes)throw Error('Frozen combination checksum mismatch');
     const combo=JSON.parse(new TextDecoder().decode(comboRaw));
     if(combo.schema!=='vllm-hust-frozen-combination/v1' || combo.run_id!==value.run_id || combo.engine_release!==value.runtime.engine_release || combo.components?.length!==8 || combo.worker!==value.runtime.actual_worker || combo.settings?.max_num_seqs!==24 || combo.settings.resident_seats!==36)throw Error('Frozen combination differs from measured profile');
-    data=value;manifest=m;combination=combo;render();
+    data=value;manifest=m;combination=combo;
+  }
+  let selectedRelease = new URL(location.href).searchParams.get('release') === 'r6' ? 'r6' : 'r8';
+  let currentR8 = null;
+  const currentR8Sha = 'c81cd8078a1c9ea61af84cb31c2b59c99fa94876ae1cfaa3a5a12180f9408c61'; // pragma: allowlist secret -- fixed public evidence digest
+  function releaseMenu() {
+    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('Release版本','Release version')}</label><select id="comparison-release-select" style="font:inherit;max-width:100%;padding:8px 12px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit"><option value="r8" ${selectedRelease==='r8'?'selected':''}>r8 · ${t('最新实测','Latest measurements')}</option><option value="r6" ${selectedRelease==='r6'?'selected':''}>r6 · ${t('固定五项完整报告','Completed five-profile report')}</option></select><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
+  }
+  function bindMenu() {
+    root.querySelector('#comparison-release-select').addEventListener('change',event=>{
+      selectedRelease=event.target.value;
+      const url=new URL(location.href);url.searchParams.set('release',selectedRelease);history.replaceState(null,'',url);
+      showRelease();
+    });
+  }
+  function renderR8() {
+    document.getElementById('comparison-title').textContent=t('B0 / B1 r8 实测对比','B0 / B1 r8 measured comparison');
+    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · 2 × Ascend 910B2 · BF16';
+    const rows=['4096-formal','16384-formal'].map((phase,i)=>{
+      const c=currentR8.comparisons[phase];
+      return `<tr><td>${['4K','16K'][i]}</td><td>${c.throughput_ratio.toFixed(2)}×</td><td>−${c.ttft_reduction_percent.toFixed(1)}%</td><td>−${c.tpot_reduction_percent.toFixed(1)}%</td></tr>`;
+    }).join('');
+    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<section class="frozen-profile" id="r8-current-continuous" style="scroll-margin-top:96px"><h2>${t('4K / 16K 连续负载','4K / 16K continuous load')}</h2><p>${t('本轮已完成连续负载对照；固定五项配对测试继续运行。','This run completed the continuous-load comparison; the five-profile paired test is running.')}</p><div class="table-wrap"><table><thead><tr><th>${t('场景','Context')}</th><th>${t('吞吐','Throughput')}</th><th>TTFT</th><th>TPOT</th></tr></thead><tbody>${rows}</tbody></table></div><figure style="margin:16px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="${t('打开完整对照图','Open full-size comparison chart')}"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="${t('B0与r8连续负载实测图','Measured B0 and r8 continuous load')}"></a><figcaption>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。','C8 closed loop · 871 measured requests, zero failures · one run per arm.')}</figcaption></figure><details><summary>${t('版本、计算方式与原件','Versions, formulas and originals')}</summary><p>B0 vLLM0.18 / Ascend0.18 / CANN8.5.1 → B1 r8 vLLM0.28.1 / Ascend0.25.1rc2 / CANN9.1.0</p><p>E36/R54 · MTP2 · FULL · async H2D · Tail256 · State4GiB/rank · KV20GiB/rank</p><p>${t('两臂相同71条预热与输入配方；并发8、输出256 token，每阶段提交300秒再排空。吞吐=完成token/包含排空的阶段耗时；TTFT包含实测prefill；TPOT=(结束−首token)/(输出token−1)，预热不计时。','Same71 warmups and input recipe; concurrency8, 256 output tokens, each phase submits for300s then drains. Throughput=completed tokens/phase time including drain; TTFT includes measured prefill; TPOT=(end−first token)/(output tokens−1). Warmup is unscored.')}</p><p><a href="./engine.html#r8-current-results">${t('冻结组合与10项MOD','Frozen stack and10 MODs')} ↗</a> · <a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p></details></section></section>`;
+    bindMenu();root.dataset.loaded='r8-continuous-20261117';root.dataset.release='r8';root.setAttribute('aria-busy','false');
+  }
+  function render() {
+    if(selectedRelease==='r8') {if(currentR8)renderR8();return;}
+    if(!data||!combination)return;
+    renderR6();root.insertAdjacentHTML('afterbegin',releaseMenu());bindMenu();root.dataset.release='r6';
+  }
+  async function loadR8() {
+    const response=await fetch('./data/r8-continuous-20261117/summary-v1.json',{cache:'no-cache'});
+    if(!response.ok)throw Error('r8 publication unavailable');
+    const raw=await response.arrayBuffer();
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(hash!==currentR8Sha)throw Error('r8 publication checksum mismatch');
+    const value=JSON.parse(new TextDecoder().decode(raw));
+    if(value.schema!=='r8-first-current-continuous-pair/v1'||value.formal_requests!==871||value.failures!==0||value.candidate!=='B1 r8'||value.independent_runs_per_arm!==1)throw Error('r8 publication scope mismatch');
+    currentR8=value;
+  }
+  async function showRelease() {
+    root.setAttribute('aria-busy','true');delete root.dataset.error;
+    try {
+      if(selectedRelease==='r8'&&!currentR8)await loadR8();
+      else if(selectedRelease==='r6'&&!data)await loadR6();
+      render();
+    } catch(error) {
+      console.error('Release publication rejected',error);root.dataset.error='publication-rejected';root.setAttribute('aria-busy','false');
+      root.innerHTML=releaseMenu()+`<p>${t('当前版本结果加载或校验失败。','Selected release results unavailable or verification failed.')}</p>`;bindMenu();
+    }
   }
   window.addEventListener('vllm-hust:langchange',render);
-  load().catch(error=>{
-    console.error('Five-profile publication rejected',error);
-    root.dataset.error = 'publication-rejected';
-    root.setAttribute('aria-busy','false');
-    root.textContent=t('五数据集结果加载或校验失败，请查看发布源。','Five-dataset results unavailable or verification failed; check the publication source.');
-  });
+  showRelease();
 })();

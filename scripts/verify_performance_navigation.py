@@ -170,12 +170,12 @@ def main():
                                     page.locator("#five-dataset-comparison")
                                 ).to_have_attribute(
                                     "data-loaded",
-                                    "five-datasets-r6-matched-20261114-r3",
+                                    "r8-continuous-20261117",
                                 )
                                 expect(page.locator("#comparison")).to_have_count(0)
                                 expect(
                                     page.locator(
-                                        '#report-history-links a[href="./report-history.html"]'
+                                        '#release-history-link[href="./report-history.html"]'
                                     )
                                 ).to_be_visible()
                                 page.goto(
@@ -369,7 +369,7 @@ def main():
                                     page.locator("#five-dataset-comparison")
                                 ).to_have_attribute(
                                     "data-loaded",
-                                    "five-datasets-r6-matched-20261114-r3",
+                                    "r8-continuous-20261117",
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
