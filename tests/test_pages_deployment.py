@@ -106,4 +106,3 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     assert deploy["needs"] == "build"
     assert deploy["permissions"] == {"pages": "write", "id-token": "write"}
     assert deploy["environment"]["name"] == "github-pages"
-
