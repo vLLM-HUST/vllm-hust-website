@@ -42,7 +42,7 @@
           <p id="engine-lede" class="engine-lede">Frozen r8 is available for reproduction, MOD development and further optimization.</p>
           <div class="engine-actions">
             <a id="engine-hero-benchmark" class="engine-button" href="./b0-b1.html">B0 / B1 results ↗</a>
-            <a id="engine-hero-download" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v2.py">Download r8 runner ↗</a>
+            <a id="engine-hero-download" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v3.py">Download r8 runner ↗</a>
             <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">r8 sources and artifacts ↗</a>
           </div>
           <p id="engine-short-status" class="engine-note">Fixed starting point: r8 · E36/R54 · async H2D · Tail256</p>
@@ -60,7 +60,7 @@
       <section class="engine-section" id="try-r8" aria-labelledby="engine-try-title">
         <h2 id="engine-try-title">Build on frozen r8</h2>
         <p id="engine-try-copy">Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.</p>
-        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>python3 download-and-run-r8-full-v2.py \
+        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>python3 download-and-run-r8-full-v3.py \
   --b1-python /absolute/path/to/fixed-b1-sdk/bin/python \
   --physical-devices 0,1 --out ./runs/r8-full-five</code></pre>
         <p id="engine-try-scope" class="engine-note">The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.</p>
@@ -71,7 +71,7 @@
         <figure style="margin:20px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="Open full-size comparison chart"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K"></a><figcaption id="engine-current-caption" class="engine-note">C8 closed loop · 871 measured requests · one run per arm. The full five-profile comparison is running.</figcaption></figure>
         <details><summary id="engine-current-method">Method, original data and CPU replay</summary>
           <p id="engine-current-method-copy">Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.</p>
-          <p><a id="engine-current-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">Original streams and portable CPU replay ↗</a> · <a id="engine-current-stats" href="./data/r8-continuous-20261117/summary-v1.json">Statistics and tail latency ↗</a> · <a id="engine-current-manifest" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v2.json">Current release manifest ↗</a></p>
+          <p><a id="engine-current-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">Original streams and portable CPU replay ↗</a> · <a id="engine-current-stats" href="./data/r8-continuous-20261117/summary-v1.json">Statistics and tail latency ↗</a> · <a id="engine-current-manifest" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json">Current release manifest ↗</a></p>
         </details>
       </section>
 
@@ -88,15 +88,15 @@
         <div>
           <p id="engine-release-kicker" class="engine-kicker">2026-11-17 · Frozen release</p><h2 id="engine-release-title">Download B1 r8</h2><p id="engine-release-copy">One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.</p>
           <div class="engine-actions">
-            <a id="engine-release-link" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v2.py">Download one-click runner ↗</a>
+            <a id="engine-release-link" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v3.py">Download one-click runner ↗</a>
             <a id="engine-profile-link" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">Release and checksums ↗</a>
           </div>
           <p id="engine-access" class="engine-note">Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.</p>
           <details><summary><span id="engine-details">Source, MODs and acceptance details</span></summary><ul>
-            <li><a id="engine-source-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/engines/b1-r8.json">Pinned combination</a></li>
-            <li><a id="engine-mod-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/active-stack-r8.json">Complete MOD stack</a></li>
+            <li><a id="engine-source-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/bd5448c9f266cc0301c3d4cef2a10b9ab98f7205/engines/b1-r8.json">Pinned combination</a></li>
+            <li><a id="engine-mod-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/bd5448c9f266cc0301c3d4cef2a10b9ab98f7205/mods/active-stack-r8.json">Complete MOD stack</a></li>
             <li><a id="engine-evidence-link" href="./engine-r8-development.html">Historical development evidence</a></li>
-            <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v2.json">Current release manifest</a></li>
+            <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json">Current release manifest</a></li>
           </ul></details>
         </div>
       </section></details><details class="engine-fold"><summary><span id="engine-archive-summary">Historical reports</span></summary><p><a id="engine-development-history" href="./engine-r8-development.html">r6 → r8 development pairs ↗</a> · <a id="engine-r6-history" href="./b0-b1.html?release=r6">B0/r6 full report ↗</a> · <a id="engine-history-link" href="./report-history.html">Reports by date ↗</a></p></details></div>
