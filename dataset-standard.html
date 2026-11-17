@@ -10,7 +10,7 @@
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/dataset-standard.html">
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
   <link rel="stylesheet" href="./assets/site.css?v=public-audit-20261101">
-  <link rel="stylesheet" href="./assets/dataset-standard.css?v=mod-target-20261113">
+  <link rel="stylesheet" href="./assets/dataset-standard.css?v=r6-tools-r7-download-20261117">
 </head>
 <body data-page="dataset-standard">
   <nav class="site-nav"><div class="site-shell site-nav-inner">
@@ -19,7 +19,7 @@
   </div></nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
   <main class="site-shell standard-main">
-    <div class="guide-topbar"><a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><button id="download-test-script" class="secondary-download" type="button" disabled>最新版 Engine 一键脚本 ↓</button></div><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div>
+    <div class="guide-topbar"><a class="guide-back" href="./dataset-introductions.html" data-guide-copy="back">← 返回测试数据集</a><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><button id="download-test-script" class="secondary-download" type="button" disabled>r6 Engine 一键脚本 ↓</button></div><p id="engine-download-description" class="engine-download-description">当前默认引擎 r6 · 执行工具 r7。保存为 one_click.py，按指南命令运行；终端自动显示实时日志。</p><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div>
     <header class="guide-hero">
       <p class="guide-eyebrow" data-guide-copy="eyebrow">执行指南 / 固定协议 v1</p>
       <h1 data-guide-copy="title">标准测试，按这四步完成</h1>
@@ -42,7 +42,7 @@
       <div class="guide-body">
         <section id="choose-scope" class="guide-step">
           <div class="step-heading"><span class="step-number">01</span><div><h2 data-guide-copy="choose">选择测试范围</h2><p data-guide-copy="chooseLead">联调选快速；正式完整测试选五项。两种模式都需要 B0 / B1。</p></div></div>
-          <fieldset class="test-targets"><legend data-guide-copy="targetTitle">先选择要测什么</legend><label><input type="radio" name="test-target" value="mod" checked><span><strong data-guide-copy="modTarget">评估待测 MOD</strong><small data-guide-copy="modTargetNote">默认：同一基础引擎，关闭 / 启用目标 MOD</small></span></label><label><input type="radio" name="test-target" value="reference-engine"><span><strong data-guide-copy="engineTarget">复跑参考 Engine</strong><small data-guide-copy="engineTargetNote">可选：已冻结的 vLLM-HUST Engine 组合</small></span></label></fieldset>
+          <fieldset class="test-targets"><legend data-guide-copy="targetTitle">先选择要测什么</legend><label><input type="radio" name="test-target" value="mod" checked><span><strong data-guide-copy="modTarget">评估待测 MOD</strong><small data-guide-copy="modTargetNote">默认：同一基础引擎，关闭 / 启用目标 MOD</small></span></label><label><input type="radio" name="test-target" value="reference-engine"><span><strong data-guide-copy="engineTarget">复跑参考 Engine</strong><small data-guide-copy="engineTargetNote">参考 Engine r6 · 执行工具 r7</small></span></label></fieldset>
           <p class="guide-boundary" data-guide-copy="armDefinitions">本页 MOD 对比默认 B0 = 同一基础配置关闭目标 MOD，B1 = 启用待测 MOD。每轮冻结实际版本与开关，不把 B1 固定为某个 Engine。</p>
           <div id="test-modes"><div id="test-mode-cards" class="test-mode-cards" role="radiogroup" aria-label="测试范围"></div></div>
           <p id="test-mode-scope" class="guide-note"></p>
@@ -50,13 +50,13 @@
           <details class="guide-details" id="dataset-scope"><summary data-guide-copy="scopeTable">查看五项任务数与请求数</summary><div class="scroll"><table><caption data-guide-copy="tableCaption">每臂 = B0 或 B1；每臂都使用同一份冻结清单。</caption><thead><tr><th data-guide-copy="dataset">数据集</th><th data-guide-copy="tasks">固定任务 / 源任务</th><th data-guide-copy="requests">每臂请求</th><th data-guide-copy="purpose">测什么</th></tr></thead><tbody id="standard-rows"></tbody></table></div></details>
         </section>
         <section id="prepare" class="guide-step">
-          <div class="step-heading"><span class="step-number">02</span><div><h2 data-guide-copy="prepare">准备运行环境</h2><p data-guide-copy="prepareLead">以下命令用于 vLLM-HUST Engine。先确认条件，再启动测试。</p></div></div>
+          <div class="step-heading"><span class="step-number">02</span><div><h2 data-guide-copy="prepare">准备运行环境</h2><p data-guide-copy="prepareLead">以下步骤复跑固定 r6 引擎组合，使用执行工具 r7。先确认条件，再启动测试。</p></div></div>
           <ul class="guide-checklist" id="preparation-list"></ul>
           <p class="guide-note" data-guide-copy="otherEngines">其他引擎沿用同一冻结数据范围，使用各自执行器；模型或 tokenizer 改变时，trace 必须另立 profile。</p>
           <p id="reference-engine-links" class="guide-actions"><a id="engine-instructions" class="guide-text-link" data-guide-copy="engineDocs">打开固定版本的部署与运行说明 ↗</a><a id="runner-source" data-guide-copy="runnerSource">查看执行器源码 ↗</a></p>
         </section>
         <section id="run" class="guide-step">
-          <div class="step-heading"><span class="step-number">03</span><div><h2 data-guide-copy="run">执行配对测试</h2><p data-guide-copy="runLead">使用 Engine 入口，或下载顶部的一键脚本，在 one_click.py 所在目录运行。先填写本机路径和卡号；输出目录必须全新。</p></div></div>
+          <div class="step-heading"><span class="step-number">03</span><div><h2 data-guide-copy="run">执行配对测试</h2><p data-guide-copy="runLead">将顶部脚本保存为 one_click.py，在所在目录运行下方命令。填写本机路径、卡号和全新输出目录；终端自动显示日志。</p></div></div>
           <div id="mod-run">
             <form id="mod-parameters" class="run-parameters">
               <label><span data-guide-copy="modRepo">MOD 仓库或本地路径</span><input name="mod_repository" placeholder="https://github.com/example-org/candidate-mod" autocomplete="off" spellcheck="false"></label>
@@ -104,9 +104,9 @@
   </main>
   <footer class="site-footer"><span id="footer-copy">固定标准 · 执行步骤 · 可复核证据</span></footer>
   <script src="./assets/site.js?v=public-audit-20261101"></script>
-  <script src="./assets/dataset-test-prompt.js?v=current-r6-entry-20261115"></script>
-  <script src="./assets/dataset-standard-guide.js?v=current-r6-entry-20261115"></script>
-  <script src="./assets/project-milestones.js?v=20261115-v1"></script><script src="./assets/dataset-current-results.js?v=current-r6-entry-20261115"></script>
+  <script src="./assets/dataset-test-prompt.js?v=r6-tools-r7-download-20261117"></script>
+  <script src="./assets/dataset-standard-guide.js?v=r6-tools-r7-download-20261117"></script>
+  <script src="./assets/project-milestones.js?v=20261115-v1"></script><script src="./assets/dataset-current-results.js?v=r6-tools-r7-download-20261117"></script>
   <script src="./assets/dataset-standard.js?v=mod-target-20261113"></script>
 </body>
 </html>
