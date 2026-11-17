@@ -73,18 +73,18 @@
             <li><a id="engine-source-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/c6059a6d3d1cf7ea16340d79cccf7bb1a13fa661/engines/b1-r8.json">Pinned combination</a></li>
             <li><a id="engine-mod-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/c6059a6d3d1cf7ea16340d79cccf7bb1a13fa661/mods/active-stack-r8.json">Complete MOD stack</a></li>
             <li><a id="engine-evidence-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/main/experiments/optimization-20261115/C15-r7-tail-combination-model-20261117-r1">C15 plan and stage evidence</a></li>
-            <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/main/experiments/optimization-20261115/C15-first-matched-context-screen-20261117-r1">All first-pair metrics and plots</a></li>
+            <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/d239e28439451a2c03ffe3722b52f821d313a57b/experiments/optimization-20261115/C15-complete-matched-context-20261117-r1">All four services, plots and CPU replay</a></li>
           </ul></details>
         </div>
         <div class="engine-status">
           <h3 id="engine-status-title">Release progress</h3>
-          <dl><dt id="engine-status-run">Matched 4K / 16K comparison</dt><dd id="engine-status-run-value">First pair passed the original throughput and latency screens.</dd><dt id="engine-status-hash">Download verification</dt><dd id="engine-status-hash-value">SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.</dd><dt id="engine-status-startup">Complete release acceptance</dt><dd id="engine-status-startup-value">Reverse comparison and full MMLU200 ABBA are running in C15. Default r6 changes after the frozen release screens pass.</dd></dl>
+          <dl><dt id="engine-status-run">Matched 4K / 16K comparison</dt><dd id="engine-status-run-value">4K: 1/2 pairs passed. 16K: 2/2 pairs passed. All four services and 2,477 formal requests completed.</dd><dt id="engine-status-hash">Download verification</dt><dd id="engine-status-hash-value">SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.</dd><dt id="engine-status-startup">Complete release acceptance</dt><dd id="engine-status-startup-value">Reverse 4K mean TTFT +11.38% and P95 +20.23% exceeded the original +5% limit. Full MMLU200 acceptance continues; default r6 is retained.</dd></dl>
         </div>
       </section>
       <section class="engine-section" aria-labelledby="engine-first-context">
-        <h2 id="engine-first-context">First matched context pair · r8 candidate versus r6</h2>
-<div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="img" aria-label="First matched context pair throughput relative to r6 equals100:4K112.11;16K104.90"><article><h3>4K · +12.11%</h3><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r6</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:80%;height:100%;border-radius:3px;background:#8ba799"></span></span><strong style="text-align:right">100</strong></div><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r8</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:89.6863908%;height:100%;border-radius:3px;background:#268867"></span></span><strong style="text-align:right">112.11</strong></div></article><article><h3>16K · +4.90%</h3><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r6</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:80%;height:100%;border-radius:3px;background:#8ba799"></span></span><strong style="text-align:right">100</strong></div><div style="display:grid;grid-template-columns:2rem 1fr 4rem;align-items:center;gap:10px;margin-top:14px"><span>r8</span><span style="display:block;background:var(--engine-line);height:18px;border-radius:3px"><span style="display:block;width:83.9164014%;height:100%;border-radius:3px;background:#268867"></span></span><strong style="text-align:right">104.90</strong></div></article></div>
-        <p id="engine-chart-caption" class="engine-note">Output throughput, relative to r6 = 100. Full metrics and every planned trial are linked below.</p>
+        <h2 id="engine-first-context">Complete matched context comparisons · r8 candidate versus r6</h2>
+<div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="group" aria-label="Both matched context pair directions"><article><h3>4K · 1/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.68639081197118%;background:#268867;border-radius:3px"></span></span><strong>TPS +12.11%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -0.04% · P95 -18.39%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-reverse">Reverse · NOT MET</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.18312170662988%;background:#268867;border-radius:3px"></span></span><strong>TPS +11.48%</strong></div><p style="margin:10px 0 0;font-weight:700">TTFT +11.38% · P95 +20.23%</p></div></article><article><h3>16K · 2/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.91640143342369%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.90%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -21.54% · P95 -26.54%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-reverse">Reverse · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.34932940749582%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.19%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -11.50% · P95 -25.96%</p></div></article></div>
+        <p id="engine-chart-caption" class="engine-note">Both original pair directions are shown separately. Throughput and TTFT changes coexist; the original release screen checks every latency metric.</p>
       </section>
       <section class="engine-section" aria-labelledby="engine-history-title">
         <h2 id="engine-history-title">Default release and archives</h2><p id="engine-current-copy">r6 is the current default. Its fixed-five-profile run and dated B0/B1 reports remain in the results page.</p>
@@ -127,18 +127,18 @@
     "engine-access": "Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.",
     "engine-status-title": "Release progress",
     "engine-status-run": "Matched 4K / 16K comparison",
-    "engine-status-run-value": "First pair passed the original throughput and latency screens.",
+    "engine-status-run-value": "4K: 1/2 pairs passed. 16K: 2/2 pairs passed. All four services and 2,477 formal requests completed.",
     "engine-status-hash": "Download verification",
     "engine-status-hash-value": "SHA256 readback passed; 75 extracted tools checks and 6 standalone runner checks passed.",
     "engine-status-startup": "Complete release acceptance",
-    "engine-status-startup-value": "Reverse comparison and full MMLU200 ABBA are running in C15. Default r6 changes after the frozen release screens pass.",
-    "engine-first-context": "First matched context pair · r8 candidate versus r6",
-    "engine-chart-caption": "Output throughput, relative to r6 = 100. Full metrics and every planned trial are linked below.",
+    "engine-status-startup-value": "Reverse 4K mean TTFT +11.38% and P95 +20.23% exceeded the original +5% limit. Full MMLU200 acceptance continues; default r6 is retained.",
+    "engine-first-context": "Complete matched context comparisons · r8 candidate versus r6",
+    "engine-chart-caption": "Both original pair directions are shown separately. Throughput and TTFT changes coexist; the original release screen checks every latency metric.",
     "engine-details": "Source, MODs and acceptance details",
     "engine-source-link": "Pinned combination",
     "engine-mod-link": "Complete MOD stack",
     "engine-evidence-link": "C15 plan and stage evidence",
-    "engine-metrics-link": "All first-pair metrics and plots",
+    "engine-metrics-link": "All four services, plots and CPU replay",
     "engine-history-title": "Default release and archives",
     "engine-current-copy": "r6 is the current default. Its fixed-five-profile run and dated B0/B1 reports remain in the results page.",
     "engine-r4-copy": "The 2026-10-30 r4 originals and all later candidate outcomes remain available.",
@@ -147,7 +147,11 @@
     "engine-r4-link": "r4 original archive ↗",
     "engine-footer-home": "← vLLM-HUST runtime stack",
     "engine-footer-repo": "Engine repository ↗",
-    "footer-copy": "vLLM-HUST Engine releases and reproducible tests."
+    "footer-copy": "vLLM-HUST Engine releases and reproducible tests.",
+    "engine-4K-forward": "Forward · PASS",
+    "engine-4K-reverse": "Reverse · NOT MET",
+    "engine-16K-forward": "Forward · PASS",
+    "engine-16K-reverse": "Reverse · PASS"
   },
   "zh": {
     "engine-kicker": "Ascend 推理服务栈",
@@ -172,18 +176,18 @@
     "engine-access": "快速测试：MMLU200。全量测试：固定五项。均保留原完整回答预算与评分规则。",
     "engine-status-title": "发布进度",
     "engine-status-run": "同轮 4K / 16K 对照",
-    "engine-status-run-value": "首组吞吐与时延原筛选均通过。",
+    "engine-status-run-value": "4K两对中1对通过，16K两对通过。四服务、2477个正式请求均已完成。",
     "engine-status-hash": "下载包验证",
     "engine-status-hash-value": "附件重新下载 SHA256 一致；独立解包后 75 项工具检查、6 项单文件入口检查通过。",
     "engine-status-startup": "完整发布验收",
-    "engine-status-startup-value": "C15 正在执行反向对照及完整 MMLU200 ABBA；原冻结发布筛选通过后切换默认 r6。",
-    "engine-first-context": "首组同轮上下文对照 · r8 候选对比 r6",
-    "engine-chart-caption": "输出吞吐，相对 r6 = 100。全部时延指标与计划轮次见下方原始记录。",
+    "engine-status-startup-value": "反向4K平均TTFT+11.38%、P95+20.23%，超过原+5%上限。完整MMLU200验收继续，默认保留r6。",
+    "engine-first-context": "完整同轮上下文对照 · r8候选对比r6",
+    "engine-chart-caption": "原两对结果分别展示。吞吐收益与TTFT变化同时保留；发布筛选逐项检查原时延指标。",
     "engine-details": "源码、MOD 与验收详情",
     "engine-source-link": "固定组合清单",
     "engine-mod-link": "完整 MOD 组合",
     "engine-evidence-link": "C15 计划与逐阶段原件",
-    "engine-metrics-link": "首组全部指标与图表",
+    "engine-metrics-link": "全部四服务、图表与CPU复算",
     "engine-history-title": "默认版本与历史归档",
     "engine-current-copy": "r6 是当前默认版本。其固定五项执行与对应日期的 B0/B1 报告保留在结果页。",
     "engine-r4-copy": "2026-10-30 的 r4 冻结原件及后续候选结果均保留。",
@@ -192,7 +196,11 @@
     "engine-r4-link": "r4 冻结原件 ↗",
     "engine-footer-home": "← vLLM-HUST 运行时栈",
     "engine-footer-repo": "Engine 仓库 ↗",
-    "footer-copy": "vLLM-HUST Engine 版本与可复现测试。"
+    "footer-copy": "vLLM-HUST Engine 版本与可复现测试。",
+    "engine-4K-forward": "正向 · 通过",
+    "engine-4K-reverse": "反向 · 未通过",
+    "engine-16K-forward": "正向 · 通过",
+    "engine-16K-reverse": "反向 · 通过"
   }
 };
   </script>
