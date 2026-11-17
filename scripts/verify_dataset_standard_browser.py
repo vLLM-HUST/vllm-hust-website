@@ -138,8 +138,14 @@ with sync_playwright() as play:
                     "r6 Engine test script"
                     in page.locator("#download-test-script").inner_text()
                 )
-                assert "engine r6" in page.locator("#engine-download-description").inner_text()
-                assert "tools r7" in page.locator("#engine-download-description").inner_text()
+                assert (
+                    "engine r6"
+                    in page.locator("#engine-download-description").inner_text()
+                )
+                assert (
+                    "tools r7"
+                    in page.locator("#engine-download-description").inner_text()
+                )
                 assert page.locator("#standard-rows tr").count() == 5
                 assert (
                     "no additional model or external judge service is required"
