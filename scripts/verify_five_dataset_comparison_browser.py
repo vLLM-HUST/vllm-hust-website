@@ -9,6 +9,7 @@ from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
 SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
+HISTORY = "data/engine-release-history-v1.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
@@ -20,6 +21,7 @@ def verify(url, output):
         context = browser.new_context()
         data = context.request.get(url + "/" + SUMMARY).json()
         combo = context.request.get(url + "/" + COMBINATION).json()
+        catalog = context.request.get(url + "/" + HISTORY).json()
         manifest = context.request.get(
             url + "/data/benchmark-source-manifest.json"
         ).json()
@@ -40,7 +42,71 @@ def verify(url, output):
                     expect(root.locator(".goal-card")).to_have_count(0)
                     expect(root.locator("#r8-current-continuous")).to_be_visible()
                     expect(root.locator("#report-history-links")).to_have_count(0)
+                    expect(
+                        root.locator("#comparison-release-select option")
+                    ).to_have_count(8)
+                    for release, controls, values in [
+                        ("r1", [], []),
+                        ("r2", [], []),
+                        ("r3", [], []),
+                        ("r4", ["B0", "r4"], ["495.84", "944.47"]),
+                        ("r5", [], []),
+                        ("r7", ["r6", "r7"], ["346.51", "385.30"]),
+                    ]:
+                        root.locator("#comparison-release-select").select_option(
+                            release
+                        )
+                        expect(root).to_have_attribute(
+                            "data-release", release, timeout=30000
+                        )
+                        expect(page.locator("#comparison-title")).to_contain_text(
+                            release
+                        )
+                        expect(root.locator("#r8-current-continuous")).to_have_count(0)
+                        expect(root.locator(".goal-card")).to_have_count(0)
+                        if controls:
+                            chart = root.locator(
+                                '[data-metric="output_tokens_per_second"]'
+                            )
+                            expect(chart.locator(".bar-role").nth(0)).to_have_text(
+                                controls[0]
+                            )
+                            expect(chart.locator(".bar-role").nth(1)).to_have_text(
+                                controls[1]
+                            )
+                            expect(chart.locator(".bar-value").nth(0)).to_have_text(
+                                values[0]
+                            )
+                            expect(chart.locator(".bar-value").nth(1)).to_have_text(
+                                values[1]
+                            )
+                        else:
+                            expect(root.locator(".metric-chart")).to_have_count(0)
+                            if release == "r5":
+                                expect(root).to_contain_text(
+                                    "ready" if lang == "zh" else "readiness"
+                                )
+                        if release in ("r1", "r2", "r3"):
+                            root.locator("details summary").click()
+                            expect(root.locator("details")).to_contain_text(
+                                "continuous-b1-packed-" + release
+                            )
+                        if release == "r7":
+                            expect(root.locator(".historical-quality")).to_contain_text(
+                                "138/200"
+                            )
+                            root.locator("details summary").click()
+                            expect(root.locator("details")).to_contain_text("8742.65")
+                        assert page.evaluate(
+                            "document.documentElement.scrollWidth <= innerWidth+1"
+                        )
+                        page.screenshot(
+                            path=str(output / f"{release}-{lang}-{width}-{theme}.png"),
+                            full_page=True,
+                        )
                     root.locator("#comparison-release-select").select_option("r6")
+                    expect(root).to_have_attribute("data-release", "r6", timeout=30000)
+                    expect(page.locator("#comparison-title")).to_contain_text("r6")
                     expect(root).to_have_attribute(
                         "data-loaded", data["run_id"], timeout=30000
                     )
@@ -173,6 +239,39 @@ def verify(url, output):
                         )
                     )
                     page.close()
+        for release in ("r1", "r2", "r3", "r4", "r5", "r7"):
+            page = context.new_page()
+            page.goto(url + "/b0-b1.html?release=" + release)
+            root = page.locator("#five-dataset-comparison")
+            expect(root).to_have_attribute("data-release", release, timeout=30000)
+            expect(root.locator("#comparison-release-select")).to_have_value(release)
+            initial_title = page.locator("#comparison-title").inner_text()
+            page.locator("#langToggle").click()
+            expect(root).to_have_attribute("data-release", release)
+            expect(page.locator("#comparison-title")).not_to_have_text(initial_title)
+            expect(root.locator("#comparison-release-select")).to_have_value(release)
+            page.close()
+            checks.append(dict(direct_release=release, language_switch=True))
+        page = context.new_page()
+        page.add_init_script("""{
+            const original = window.fetch.bind(window);
+            window.fetch = (path, ...args) => String(path).includes('summary-public-v3.json')
+                ? new Promise((resolve, reject) => setTimeout(() => reject(Error('Delayed old request failure')), 200))
+                : original(path, ...args);
+        }""")
+        page.goto(url + "/b0-b1.html")
+        root = page.locator("#five-dataset-comparison")
+        expect(root).to_have_attribute("data-release", "r8", timeout=30000)
+        page.evaluate("""async () => {
+            const choose = id => {const menu=document.querySelector('#comparison-release-select');menu.value=id;menu.dispatchEvent(new Event('change'));};
+            choose('r6');await new Promise(resolve=>setTimeout(resolve,20));choose('r4');
+        }""")
+        expect(root).to_have_attribute("data-release", "r4", timeout=30000)
+        page.wait_for_timeout(300)
+        expect(root).to_have_attribute("data-release", "r4")
+        assert root.get_attribute("data-error") is None
+        page.close()
+        checks.append(dict(rapid_switch="r8-r6-r4", stale_failure_ignored=True))
         for label, path, transform, resign in [
             (
                 "unsupported-historical-pass",
@@ -249,6 +348,52 @@ def verify(url, output):
                     lambda route, request, updated=updated: route.fulfill(json=updated),
                 )
             page.goto(url + "/b0-b1.html?release=r6")
+            root = page.locator("#five-dataset-comparison")
+            expect(root).to_have_attribute(
+                "data-error", "publication-rejected", timeout=30000
+            )
+            expect(root.locator(".metric-chart")).to_have_count(0)
+            checks.append(dict(rejected=label))
+            page.close()
+        for label, transform, resign in [
+            (
+                "release-history-bad-hash",
+                lambda d: d.update(default_release="r4"),
+                False,
+            ),
+            (
+                "release-history-wrong-arm",
+                lambda d: d["entries"][0]["measurements"][0].update(candidate="r7"),
+                True,
+            ),
+            (
+                "release-history-fabricated-r5",
+                lambda d: d["entries"][1]["measurements"].append(
+                    d["entries"][0]["measurements"][0]
+                ),
+                True,
+            ),
+        ]:
+            changed = copy.deepcopy(catalog)
+            transform(changed)
+            raw = json.dumps(changed).encode()
+            updated = copy.deepcopy(manifest)
+            for entry in updated["files"]:
+                if entry["website_path"] == HISTORY:
+                    entry.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+            page = context.new_page()
+            page.route(
+                "**/" + HISTORY,
+                lambda route, request, raw=raw: route.fulfill(
+                    body=raw, content_type="application/json"
+                ),
+            )
+            if resign:
+                page.route(
+                    "**/data/benchmark-source-manifest.json",
+                    lambda route, request, updated=updated: route.fulfill(json=updated),
+                )
+            page.goto(url + "/b0-b1.html?release=r4")
             root = page.locator("#five-dataset-comparison")
             expect(root).to_have_attribute(
                 "data-error", "publication-rejected", timeout=30000

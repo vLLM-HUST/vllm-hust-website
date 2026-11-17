@@ -174,7 +174,7 @@
   }
   function renderR6() {
     if (!data || !combination) return;
-    document.getElementById('comparison-title').textContent=t('B0 / B1 实测对比','B0 / B1 measured comparison');
+    document.getElementById('comparison-title').textContent=t('B0 / B1 r6 · 固定五项对比','B0 / B1 r6 · Five-profile comparison');
     document.getElementById('comparison-lead').textContent=`${data.hardware.model} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.dtype}`;
     const goalCards=required.map((id,i)=>`<button type="button" class="goal-card" data-detail="goal-${id}" data-goal="${id}"><span>${names()[i]}</span><strong><span class="stage-label">${t('项目里程碑','Project milestone')}</span>${attainment(id)}</strong>${id==='3.4.1' ? `<span class="reference-scope">${t('已认证工况：MMLU200/out256','Certified workload: MMLU200/out256')}</span>` : ''}<small>${t('项目最终目标','Project final')}: ${attainment(id,true)} <span aria-hidden="true">↗</span></small></button>`).join('');
     root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta release-navigation"><span>${t('本页：B0 对比默认 B1 r6 · 固定五数据集','This report: B0 vs default B1 r6 · five fixed profiles')}</span><a href="./engine.html#r8-current-results">${t('r8 已冻结：下载、MOD 与实测图','Frozen r8: download, MODs and measurements')} ↗</a></div><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
@@ -221,11 +221,60 @@
     if(combo.schema!=='vllm-hust-frozen-combination/v1' || combo.run_id!==value.run_id || combo.engine_release!==value.runtime.engine_release || combo.components?.length!==8 || combo.worker!==value.runtime.actual_worker || combo.settings?.max_num_seqs!==24 || combo.settings.resident_seats!==36)throw Error('Frozen combination differs from measured profile');
     data=value;manifest=m;combination=combo;
   }
-  let selectedRelease = new URL(location.href).searchParams.get('release') === 'r6' ? 'r6' : 'r8';
+  const releaseIds = ['r8','r7','r6','r5','r4'];
+  const attemptIds = ['r3','r2','r1'];
+  const selectableIds = [...releaseIds,...attemptIds];
+  const requestedRelease = new URL(location.href).searchParams.get('release');
+  let selectedRelease = selectableIds.includes(requestedRelease) ? requestedRelease : 'r8';
+  let releaseCatalog = null;
+  let catalogRequest = null;
+  let releaseRequest = 0;
+  const historyPath = 'data/engine-release-history-v1.json';
+  async function loadReleaseCatalog() {
+    if (releaseCatalog) return;
+    if (catalogRequest) return catalogRequest;
+    catalogRequest = (async () => {
+      const response = await fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'});
+      if (!response.ok) throw Error('Release manifest unavailable');
+      const publication = await response.json();
+      if (publication.repository !== 'vLLM-HUST/vllm-hust-benchmark' || publication.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(publication.commit)) throw Error('Invalid release catalog publisher');
+      const entries = publication.files.filter(row=>row.website_path===historyPath);
+      if (entries.length!==1) throw Error('Ambiguous release catalog source');
+      const result = await fetch('./'+historyPath,{cache:'no-cache'});
+      if (!result.ok) throw Error('Release catalog unavailable');
+      const raw = await result.arrayBuffer();
+      const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+      if (digest!==entries[0].sha256 || raw.byteLength!==entries[0].bytes) throw Error('Release catalog checksum mismatch');
+      const value = JSON.parse(new TextDecoder().decode(raw));
+      if (value.schema!=='vllm-hust-engine-release-history/v1' || value.default_release!=='r8' || JSON.stringify(value.order)!==JSON.stringify(releaseIds) || value.entries?.length!==5) throw Error('Invalid release catalog scope');
+      for (const id of releaseIds) {
+        const matches = value.entries.filter(row=>row.id===id);
+        if(matches.length!==1) throw Error('Ambiguous release identity');
+        const entry=matches[0];
+        if (!entry.release.endsWith('-'+id) || !entry.mods?.length || !entry.profile?.url || !Array.isArray(entry.measurements)) throw Error('Incomplete release identity');
+        for (const measurement of entry.measurements) {
+          if (measurement.candidate!==id || measurement.arms?.length!==2 || measurement.arms[0].role!==measurement.control || measurement.arms[1].role!==id) throw Error('Release measurement identity mismatch');
+          for (const arm of measurement.arms) {
+            if (![arm.output_tokens_per_second,arm.mean_ttft_ms,arm.mean_tpot_ms,arm.output_tokens,arm.duration_seconds,arm.requests].every(v=>Number.isFinite(v)&&v>0) || !Number.isInteger(arm.failed) || arm.failed<0 || !close(arm.output_tokens/arm.duration_seconds,arm.output_tokens_per_second)) throw Error('Inconsistent release measurement');
+          }
+        }
+      }
+      if(value.entries.find(row=>row.id==='r5').measurements.length) throw Error('r5 has no formal inference');
+      if (JSON.stringify(value.attempt_order)!==JSON.stringify(attemptIds) || value.attempts?.length!==3) throw Error('Invalid early-attempt catalog');
+      for (const id of attemptIds) {
+        const matches=value.attempts.filter(row=>row.id===id);
+        if (matches.length!==1 || matches[0].kind!=='pre-freeze-attempt' || matches[0].status!=='failed' || matches[0].measurements?.length!==0 || !matches[0].source?.url) throw Error('Invalid early-attempt identity');
+      }
+      releaseCatalog=value;
+    })();
+    try { await catalogRequest; } finally { catalogRequest=null; }
+  }
+  function releaseEntry() { return releaseCatalog?.entries.find(entry=>entry.id===selectedRelease); }
+
   let currentR8 = null;
   const currentR8Sha = 'c81cd8078a1c9ea61af84cb31c2b59c99fa94876ae1cfaa3a5a12180f9408c61'; // pragma: allowlist secret -- fixed public evidence digest
   function releaseMenu() {
-    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('Release版本','Release version')}</label><select id="comparison-release-select" style="font:inherit;max-width:100%;padding:8px 12px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit"><option value="r8" ${selectedRelease==='r8'?'selected':''}>r8 · ${t('最新实测','Latest measurements')}</option><option value="r6" ${selectedRelease==='r6'?'selected':''}>r6 · ${t('固定五项完整报告','Completed five-profile report')}</option></select><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
+    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label><select id="comparison-release-select" style="font:inherit;max-width:100%;padding:8px 12px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit"><optgroup label="${t('冻结版本','Frozen releases')}">${releaseIds.map(id=>{const entry=releaseCatalog?.entries.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${attemptIds.map(id=>{const entry=releaseCatalog?.attempts.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup></select><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
   }
   function bindMenu() {
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
@@ -233,6 +282,33 @@
       const url=new URL(location.href);url.searchParams.set('release',selectedRelease);history.replaceState(null,'',url);
       showRelease();
     });
+  }
+  function renderAttempt() {
+    const entry=releaseCatalog.attempts.find(row=>row.id===selectedRelease);
+    document.getElementById('comparison-title').textContent=t(`${entry.id} · 冻结前尝试`,`${entry.id} · Pre-freeze attempt`);
+    document.getElementById('comparison-lead').textContent=t('2026-10-30 · packed-host 实验历史','2026-10-30 · packed-host experiment history');
+    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<section class="frozen-profile historical-attempt" data-history-attempt="${entry.id}"><h2>${esc(t(entry.label_zh,entry.label_en))}</h2><p>${esc(t(entry.reason_zh,entry.reason_en))}</p><details><summary>${t('运行身份与原始记录','Run identity and original records')}</summary><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号。','r1–r3 identify attempts in the experiment batch preceding frozen r4.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><p style="overflow-wrap:anywhere">SHA256 · ${esc(entry.source.sha256)}</p></details></section></section>`;
+    bindMenu();root.dataset.release=entry.id;root.dataset.loaded='engine-release-attempt-'+entry.id;root.setAttribute('aria-busy','false');
+  }
+  function renderHistorical() {
+    const entry=releaseEntry();
+    const pairing=entry.measurements.length?`${entry.measurements[0].control==='B0'?'B0':'B1 '+entry.measurements[0].control} → B1 ${entry.id}`:`B1 ${entry.id}`;
+    document.getElementById('comparison-title').textContent=t(`${pairing} · 历史记录`,`${pairing} · Historical record`);
+    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · 2 × Ascend 910B2 · BF16';
+    const measures=entry.measurements;
+    const chart=(key,title,unit,divisor=1)=>`<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header>${measures.map(row=>{
+      const maximum=Math.max(...row.arms.map(arm=>arm[key]));
+      const change=100*(row.arms[1][key]/row.arms[0][key]-1);
+      const good=key==='output_tokens_per_second'?change>=0:change<=0;
+      return `<div class="chart-row" data-profile="${esc(row.id)}"><div class="chart-row-heading"><strong>${esc(row.label)}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${row.arms.map((arm,i)=>`<div class="bar-line" aria-label="${esc(`${row.label} ${arm.role} ${n(arm[key]/divisor)} ${unit}`)}"><span class="bar-role">${esc(arm.role)}</span><span class="bar-track"><span class="bar-fill ${i?'b1':'b0'}" style="width:${100*arm[key]/maximum}%"></span></span><span class="bar-value">${n(arm[key]/divisor)}</span></div>`).join('')}</div>`;
+    }).join('')}</article>`;
+    const quality=entry.quality;
+    const qualityView=quality?`<p class="historical-quality">MMLU200 · ${quality.correct}/${quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${quality.historical_screen_minimum}/${quality.requests} · ${quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';
+    const valueRows=measures.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),`${arm.requests} / ${arm.failed}`]));
+    const qualityRows=measures.flatMap(row=>row.arms.filter(arm=>Number.isInteger(arm.correct)).map(arm=>[row.label,arm.role,`${arm.correct}/${arm.requests}`,arm.truncated]));
+    const tailRows=measures.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
+    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<section class="frozen-profile historical-release" data-history-release="${entry.id}"><h2>${esc(t(entry.scope_zh,entry.scope_en))}</h2><div class="mod-tags" aria-label="${t('本版本MOD组合','MODs in this release')}">${entry.mods.map(mod=>`<span>${esc(mod)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p>${qualityView}${measures.length?`<div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}</div>`:''}<details><summary>${t('测试范围、完整数值与原件','Scope, complete metrics and originals')}</summary><p>${esc(t(entry.method_zh,entry.method_en))}</p>${valueRows.length?table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','请求 / 失败'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','Requests / failures']),valueRows):''}${qualityRows.length?table(t(['场景','版本','正确','长度终止'],['Scenario','Version','Correct','Length stops']),qualityRows):''}${tailRows.length?table(['C8','Version','P95 TTFT / ms','P99 TTFT / ms'],tailRows):''}<p>${t('吞吐=完成输出token/包含排空的批次耗时；TTFT与TPOT为逐请求均值，历史预热协议保持原样。','Throughput=output tokens/batch time including drain; TTFT and TPOT are request means, with each original warmup protocol retained.')}</p><p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}</p></details></section></section>`;
+    bindMenu();root.dataset.release=entry.id;root.dataset.loaded='engine-release-history-'+entry.id;root.setAttribute('aria-busy','false');
   }
   function renderR8() {
     document.getElementById('comparison-title').textContent=t('B0 / B1 r8 实测对比','B0 / B1 r8 measured comparison');
@@ -245,7 +321,9 @@
     bindMenu();root.dataset.loaded='r8-continuous-20261117';root.dataset.release='r8';root.setAttribute('aria-busy','false');
   }
   function render() {
+    if(attemptIds.includes(selectedRelease)) {if(releaseCatalog)renderAttempt();return;}
     if(selectedRelease==='r8') {if(currentR8)renderR8();return;}
+    if(['r4','r5','r7'].includes(selectedRelease)) {if(releaseCatalog)renderHistorical();return;}
     if(!data||!combination)return;
     renderR6();root.insertAdjacentHTML('afterbegin',releaseMenu());bindMenu();root.dataset.release='r6';
   }
@@ -260,12 +338,18 @@
     currentR8=value;
   }
   async function showRelease() {
+    const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
+      await loadReleaseCatalog();
+      if(request!==releaseRequest)return;
       if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();
+      if(request!==releaseRequest)return;
       render();
     } catch(error) {
+      if(request!==releaseRequest)return;
+      delete root.dataset.loaded;delete root.dataset.release;
       console.error('Release publication rejected',error);root.dataset.error='publication-rejected';root.setAttribute('aria-busy','false');
       root.innerHTML=releaseMenu()+`<p>${t('当前版本结果加载或校验失败。','Selected release results unavailable or verification failed.')}</p>`;bindMenu();
     }
