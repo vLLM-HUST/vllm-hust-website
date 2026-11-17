@@ -67,9 +67,7 @@ def main():
                                 page.locator('.site-nav [data-nav-group="engine"]')
                             ).to_have_count(0)
                             expect(
-                                page.locator(
-                                    '.nav-links > a[href="./engine.html"]'
-                                )
+                                page.locator('.nav-links > a[href="./engine.html"]')
                             ).to_have_count(1)
                             expect(
                                 page.locator(".site-nav .brand-link")
