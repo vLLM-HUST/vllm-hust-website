@@ -28,7 +28,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
     benchmark_revision = (
-        "3a78ba1179727920766cd617f6e1268e8b9878f2"  # pragma: allowlist secret
+        "15b9269499d720be1920598ab68282eb8e99daf8"  # pragma: allowlist secret
     )
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = (
@@ -106,3 +106,4 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     assert deploy["needs"] == "build"
     assert deploy["permissions"] == {"pages": "write", "id-token": "write"}
     assert deploy["environment"]["name"] == "github-pages"
+
