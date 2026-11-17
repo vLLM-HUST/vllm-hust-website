@@ -86,6 +86,17 @@
 <div class="engine-cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))" role="group" aria-label="Both matched context pair directions"><article><h3>4K · 1/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.68639081197118%;background:#268867;border-radius:3px"></span></span><strong>TPS +12.11%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -0.04% · P95 -18.39%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-4K-reverse">Reverse · NOT MET</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:89.18312170662988%;background:#268867;border-radius:3px"></span></span><strong>TPS +11.48%</strong></div><p style="margin:10px 0 0;font-weight:700">TTFT +11.38% · P95 +20.23%</p></div></article><article><h3>16K · 2/2</h3><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-forward">Forward · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.91640143342369%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.90%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -21.54% · P95 -26.54%</p></div><div style="padding:14px 0;border-top:1px solid var(--engine-line)"><strong id="engine-16K-reverse">Reverse · PASS</strong><div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px;align-items:center"><span style="background:var(--engine-line);height:14px;border-radius:3px"><span style="display:block;height:100%;width:83.34932940749582%;background:#268867;border-radius:3px"></span></span><strong>TPS +4.19%</strong></div><p style="margin:10px 0 0;font-weight:400">TTFT -11.50% · P95 -25.96%</p></div></article></div>
         <p id="engine-chart-caption" class="engine-note">Both original pair directions are shown separately. Throughput and TTFT changes coexist; the original release screen checks every latency metric.</p>
       </section>
+      <section class="engine-section" aria-labelledby="engine-task-title">
+        <h2 id="engine-task-title">Complete MMLU200 · first matched pair</h2>
+        <p id="engine-task-pass" class="engine-kicker">First pair · PASS</p>
+        <div class="engine-cards"><article><h3 id="engine-task-throughput">Output throughput (tok/s)</h3><p style="font-size:2rem;line-height:1.1;font-weight:800;margin:12px 0;color:#268867">+37.94%</p><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:14px"><span>r6</span><span style="display:block;height:12px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:72.496799%;background:#8b9d94;border-radius:3px"></span></span><strong>1066.4</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:14px"><span>r8</span><span style="display:block;height:12px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#268867;border-radius:3px"></span></span><strong>1471.0</strong></div></article><article><h3 id="engine-task-ttft">Mean TTFT (s)</h3><p style="font-size:2rem;line-height:1.1;font-weight:800;margin:12px 0;color:#268867">-36.40%</p><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:14px"><span>r6</span><span style="display:block;height:12px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#8b9d94;border-radius:3px"></span></span><strong>247.9</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:14px"><span>r8</span><span style="display:block;height:12px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:63.600937%;background:#268867;border-radius:3px"></span></span><strong>157.7</strong></div></article><article><h3 id="engine-task-tpot">Mean TPOT (ms)</h3><p style="font-size:2rem;line-height:1.1;font-weight:800;margin:12px 0;color:#b9771d">+1.80%</p><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:14px"><span>r6</span><span style="display:block;height:12px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:98.230563%;background:#8b9d94;border-radius:3px"></span></span><strong>20.90</strong></div><div style="display:grid;grid-template-columns:25px 1fr auto;gap:10px;align-items:center;margin-top:14px"><span>r8</span><span style="display:block;height:12px;background:var(--engine-line);border-radius:3px"><span style="display:block;height:100%;width:100.000000%;background:#b9771d;border-radius:3px"></span></span><strong>21.28</strong></div></article></div>
+        <p id="engine-task-caption" class="engine-note">First pair passed all original task screens. Correct:145→147/200; truncated:21→20; successful:200/200 in each arm. The reverse pair continues.</p>
+        <details><summary><span id="engine-task-method">Protocol, calculations and original evidence</span></summary>
+          <p id="engine-task-method-copy">The same200 questions are submitted together at an infinite request rate, with the original8192-token answer budget, EOS,seed0 and194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus1.</p>
+          <p id="engine-task-gates">Original screens:throughput≥+10%;mean TPOT≤+2%;mean TTFT and every P95/P99≤+5%;correct≥144/200;truncated≤22;all200 responses complete.</p>
+          <a id="engine-task-source" href="https://github.com/vLLM-HUST/vllm-hust-engine/tree/37a6b605505802d2f3cc76accc4d1ecbe539ec58/experiments/optimization-20261115/C15-first-matched-task-20261117-r1">Pinned first-pair metrics and both raw archives ↗</a>
+        </details>
+      </section>
       <section class="engine-section" aria-labelledby="engine-history-title">
         <h2 id="engine-history-title">Default release and archives</h2><p id="engine-current-copy">r6 is the current default. Its fixed-five-profile run and dated B0/B1 reports remain in the results page.</p>
         <div class="engine-actions"><a id="engine-current-link" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/engines/b1-r6.json">Default r6 manifest ↗</a><a id="engine-history-link" class="engine-button" href="./report-history.html">Reports by date ↗</a></div>
@@ -151,7 +162,17 @@
     "engine-4K-forward": "Forward · PASS",
     "engine-4K-reverse": "Reverse · NOT MET",
     "engine-16K-forward": "Forward · PASS",
-    "engine-16K-reverse": "Reverse · PASS"
+    "engine-16K-reverse": "Reverse · PASS",
+    "engine-task-title": "Complete MMLU200 · first matched pair",
+    "engine-task-throughput": "Output throughput (tok/s)",
+    "engine-task-ttft": "Mean TTFT (s)",
+    "engine-task-tpot": "Mean TPOT (ms)",
+    "engine-task-caption": "First pair passed all original task screens. Correct:145→147/200; truncated:21→20; successful:200/200 in each arm. The reverse pair continues.",
+    "engine-task-method": "Protocol, calculations and original evidence",
+    "engine-task-method-copy": "The same200 questions are submitted together at an infinite request rate, with the original8192-token answer budget, EOS,seed0 and194 common unscored warmups. Throughput is all generated tokens divided by the full cohort wall time. Mean TTFT includes queueing for all200 requests; TPOT uses each response’s time after its first token divided by completion tokens minus1.",
+    "engine-task-gates": "Original screens:throughput≥+10%;mean TPOT≤+2%;mean TTFT and every P95/P99≤+5%;correct≥144/200;truncated≤22;all200 responses complete.",
+    "engine-task-source": "Pinned first-pair metrics and both raw archives ↗",
+    "engine-task-pass": "First pair · PASS"
   },
   "zh": {
     "engine-kicker": "Ascend 推理服务栈",
@@ -200,7 +221,17 @@
     "engine-4K-forward": "正向 · 通过",
     "engine-4K-reverse": "反向 · 未通过",
     "engine-16K-forward": "正向 · 通过",
-    "engine-16K-reverse": "反向 · 通过"
+    "engine-16K-reverse": "反向 · 通过",
+    "engine-task-title": "完整 MMLU200 · 首对对照",
+    "engine-task-throughput": "输出吞吐（tok/s）",
+    "engine-task-ttft": "平均 TTFT（秒）",
+    "engine-task-tpot": "平均 TPOT（毫秒）",
+    "engine-task-caption": "首对通过原有全部任务筛选。正确数145→147/200，截断21→20，两臂均200条成功。反向配对继续。",
+    "engine-task-method": "测试方式、计算与原始证据",
+    "engine-task-method-copy": "相同200题一次提交，保留原8192 token回答预算、EOS、seed0及共同194条不计分预热。吞吐为全部生成token数除以整批墙钟时长；平均TTFT包含全部200条请求的排队时间；逐请求TPOT为首token之后的耗时除以输出token数减1。",
+    "engine-task-gates": "原筛选：吞吐≥+10%；平均TPOT≤+2%；平均TTFT及各P95/P99≤+5%；正确≥144/200；截断≤22；完整返回200条。",
+    "engine-task-source": "固定版本首对指标与两臂原始归档 ↗",
+    "engine-task-pass": "首对 · 通过"
   }
 };
   </script>
