@@ -254,6 +254,16 @@
     "engine-archive-summary": "默认版本与历史报告"
   }
 };
+    function revealEngineAnchor() {
+      const target = document.getElementById(location.hash.slice(1));
+      if (!target) return;
+      for (let ancestor = target.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+      }
+      target.scrollIntoView();
+    }
+    window.addEventListener('hashchange', revealEngineAnchor);
+    window.addEventListener('load', revealEngineAnchor);
   </script>
   <script src="./assets/site.js?v=engine-navigation-20261117"></script>
 </body>
