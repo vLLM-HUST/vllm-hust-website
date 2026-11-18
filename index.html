@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
-  <link rel="stylesheet" href="./assets/home.css?v=0.3.7-public-pages-20261024" />
+  <link rel="stylesheet" href="./assets/home.css?v=0.3.7-public-pages-20261024-research-card-20261118" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -127,6 +127,31 @@
             <li><span>04</span><strong id="product-mate-feature-4">Research flows</strong></li>
           </ul>
         </article>
+
+        <article class="product-card product-card-research" id="product-research" data-code="03" aria-labelledby="product-research-name">
+          <div class="product-card-topline"><span>03 / TRACK + UNDERSTAND</span><span id="product-research-type" class="product-type">研究工具</span></div>
+          <h3 id="product-research-name">推理研究日报</h3>
+          <p id="product-research-positioning" class="product-positioning">基于 SAGE 构建，提供每日研报与专题综述。</p>
+          <div class="product-visual research-visual" aria-hidden="true">
+            <div class="research-sheet research-sheet-daily">
+              <span class="research-sheet-kicker">DAILY REPORT</span>
+              <strong id="product-research-visual-daily">每日研报</strong>
+              <span class="research-line research-line-accent"></span><span class="research-line"></span><span class="research-line research-line-short"></span>
+            </div>
+            <div class="research-sheet research-sheet-topic">
+              <span class="research-sheet-kicker">TOPIC REVIEW</span>
+              <strong id="product-research-visual-topic">专题综述</strong>
+              <span class="research-line research-line-accent"></span><span class="research-line research-line-short"></span><span class="research-line"></span>
+            </div>
+          </div>
+          <ul class="product-features">
+            <li><span>01</span><strong id="product-research-feature-1">每日更新</strong></li>
+            <li><span>02</span><strong id="product-research-feature-2">推理全景</strong></li>
+            <li><span>03</span><strong id="product-research-feature-3">专题综述</strong></li>
+            <li><span>04</span><strong id="product-research-feature-4">证据追溯</strong></li>
+          </ul>
+          <a class="product-cta" href="https://lab.sage.org.ai/auto-research-report-website/" target="_blank" rel="noopener noreferrer"><span id="product-research-cta-copy">进入研究总览</span><span aria-hidden="true">↗</span></a>
+        </article>
       </div>
     </section>
 
@@ -234,6 +259,16 @@
   <script>
     window.vllmHustPageDict = {
       en: {
+        "product-research-name": "Inference Research Reports",
+        "product-research-type": "Research tool",
+        "product-research-positioning": "Built with SAGE, offering daily reports and topic reviews.",
+        "product-research-visual-topic": "Topic review",
+        "product-research-visual-daily": "Daily report",
+        "product-research-feature-1": "Daily updates",
+        "product-research-feature-2": "Inference map",
+        "product-research-feature-3": "Topic reviews",
+        "product-research-feature-4": "Source evidence",
+        "product-research-cta-copy": "Explore research",
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
         'home-kicker': 'Public MODs across the inference lifecycle, with scope and evidence explicit.',
@@ -288,6 +323,16 @@
         'footer-copy': 'Inference for domestic compute.'
       },
       zh: {
+        "product-research-name": "推理研究日报",
+        "product-research-type": "研究工具",
+        "product-research-positioning": "基于 SAGE 构建，提供每日研报与专题综述。",
+        "product-research-visual-topic": "专题综述",
+        "product-research-visual-daily": "每日研报",
+        "product-research-feature-1": "每日更新",
+        "product-research-feature-2": "推理全景",
+        "product-research-feature-3": "专题综述",
+        "product-research-feature-4": "证据追溯",
+        "product-research-cta-copy": "进入研究总览",
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
         'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '覆盖推理全生命周期的公开 MOD，范围与证据边界明确。',
         'home-lede': '按阶段、场景、平台和成熟度探索；启用证据与性能证据分开呈现。',

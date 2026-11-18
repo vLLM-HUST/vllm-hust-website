@@ -497,3 +497,19 @@ body[data-page="home"] .lang-toggle {
 }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Research report card; existing product layout remains unchanged. */
+.product-card-research { --product-accent: #9aafff; scroll-margin-top: 100px; background: color-mix(in srgb, var(--product-surface) 95%, var(--product-accent) 5%); }
+.product-card-research .research-sheet { position: absolute; box-sizing: border-box; top: 22px; width: 40%; max-width: 190px; height: 116px; padding: 15px 14px 12px; border: 1px solid color-mix(in srgb, var(--product-accent) 40%, var(--product-border)); background: var(--product-surface); color: var(--product-copy); box-shadow: 0 5px 14px rgba(0, 0, 0, .09); }
+.product-card-research .research-sheet::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: color-mix(in srgb, var(--product-accent) 78%, var(--product-surface)); }
+.product-card-research .research-sheet::after { content: ""; position: absolute; top: 0; right: 0; width: 13px; height: 13px; background: color-mix(in srgb, var(--product-accent) 18%, var(--product-surface)); clip-path: polygon(0 0, 100% 100%, 0 100%); }
+.product-card-research .research-sheet-daily { left: 9%; transform: rotate(-2deg); }
+.product-card-research .research-sheet-topic { left: 52%; transform: rotate(2deg); }
+.product-card-research .research-sheet strong { display: block; margin-top: 6px; color: var(--product-text); font-size: 14px; line-height: 1.2; }
+.product-card-research .research-sheet-kicker { display: block; color: var(--product-accent); font: 8px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em; }
+.product-card-research .research-line { display: block; height: 2px; margin-top: 8px; background: color-mix(in srgb, var(--product-border) 80%, var(--product-surface)); }
+.product-card-research .research-line-accent { width: 86%; background: color-mix(in srgb, var(--product-accent) 35%, var(--product-border)); }
+.product-card-research .research-line-short { width: 66%; }
+@media (prefers-color-scheme: light) {
+  .product-card-research { --product-accent: #425bc9; }
+}
