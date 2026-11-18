@@ -2,10 +2,36 @@
 
 from pathlib import Path
 import re
+import runpy
+import tomllib
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_pin_update_keeps_data_and_visibility_policy_independent():
+    helper = runpy.run_path(str(ROOT / "scripts/update_benchmark_publication.py"))
+    pins = {"publication_revision": "a" * 40, "visibility_policy_revision": "b" * 40}
+    for name in helper["WORKFLOWS"]:
+        text = (ROOT / ".github/workflows" / name).read_text()
+        updated = helper["render"](text, pins)
+        workflow = yaml.load(updated, Loader=yaml.BaseLoader)
+        for job in workflow["jobs"].values():
+            for step in job.get("steps", []):
+                checkout = step.get("with", {})
+                if checkout.get("repository") == "vLLM-HUST/vllm-hust-benchmark":
+                    policy = checkout.get("path") in {
+                        "publication-policy",
+                        ".publication-policy",
+                    }
+                    expected = pins[
+                        "visibility_policy_revision"
+                        if policy
+                        else "publication_revision"
+                    ]
+                    assert checkout["ref"] == expected, (name, checkout)
+        assert helper["render"](updated, pins) == updated
 
 
 def test_deployment_uses_only_merged_sources_and_validated_artifact():
@@ -27,13 +53,10 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # MOD catalog and Workshop statistics use the reviewed canonical snapshot.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
-    benchmark_revision = (
-        "fba8140d027426dc66074ce381929f97b30eceec"  # pragma: allowlist secret
-    )
+    pins = tomllib.loads((ROOT / ".github/benchmark-publication.toml").read_text())
+    benchmark_revision = pins["publication_revision"]
     assert checkouts[1]["with"]["ref"] == benchmark_revision
-    policy_revision = (
-        "fba8140d027426dc66074ce381929f97b30eceec"  # pragma: allowlist secret
-    )
+    policy_revision = pins["visibility_policy_revision"]
     assert checkouts[2]["with"]["ref"] == policy_revision
     assert checkouts[2]["with"]["repository"] == "vLLM-HUST/vllm-hust-benchmark"
     assert checkouts[2]["with"]["sparse-checkout"] == "scripts/build_public_site.py"
