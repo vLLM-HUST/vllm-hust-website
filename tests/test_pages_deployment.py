@@ -164,3 +164,22 @@ def test_source_eligibility_precedes_execution_and_provenance_is_uploaded():
         if s.get("uses", "").startswith("actions/upload-pages-artifact@")
     )
     assert projection < provenance < upload
+
+
+def test_each_ci_job_verifies_sources_before_running_publication_code():
+    workflow = yaml.load(
+        (ROOT / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader
+    )
+    for job in workflow["jobs"].values():
+        steps = job["steps"]
+        guard = next(
+            i
+            for i, step in enumerate(steps)
+            if "verify_release_sources.py --benchmark-only" in step.get("run", "")
+        )
+        publisher = next(
+            i
+            for i, step in enumerate(steps)
+            if "sync_website_publication.py publish" in step.get("run", "")
+        )
+        assert guard < publisher
