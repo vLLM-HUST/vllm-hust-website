@@ -66,7 +66,7 @@
         <details><summary id="engine-install-details">Dependencies, verification and uninstall</summary>
           <p id="engine-install-deps">Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. These vendor dependencies must already be prepared; --no-deps preserves them. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
           <p id="engine-install-sdk-note">The manifest explicitly pins Engine 2026.11.17.8.post2 and all three runtime wheels. --no-deps avoids re-resolving conflicting upstream NumPy requirements; it does not install Torch, Triton-Ascend or CANN. pip checks all four artifact hashes. No separate installer, private source access or native recompilation is needed. The frozen r8 runtime and MODs are unchanged. Installation does not start a model.</p>
-          <p><a id="engine-install-source" href="https://vllm-hust.sage.org.ai/wheels/r8.txt">Pinned installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.17.8.post2/">PyPI</a></p>
+          <p><a id="engine-install-source" href="https://vllm-hust.sage.org.ai/wheels/r8.txt">Pinned installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/">PyPI</a></p>
           <pre style="max-width:100%;overflow-x:auto"><code>python -m pip uninstall vllm vllm-ascend vllm-hust-runtime</code></pre>
         </details>
       </section>
