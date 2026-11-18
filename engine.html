@@ -10,6 +10,11 @@
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
   <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
+  <style>
+    .sr1-metrics { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+    .sr1-metrics th, .sr1-metrics td { padding:.7rem .5rem; text-align:left; border-bottom:1px solid var(--engine-line); }
+    .sr1-metrics thead th { color:var(--engine-muted); }
+  </style>
 </head>
 <body data-page="engine">
   <nav class="site-nav">
@@ -44,6 +49,7 @@
             <a id="engine-hero-benchmark" class="engine-button" href="./b0-b1.html">B0 / B1 results ↗</a>
             <a id="engine-hero-download" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v3.py">Download r8 runner ↗</a>
             <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">r8 sources and artifacts ↗</a>
+            <a id="sr1-shortcut" class="engine-button" href="#sr1-evaluation">B1-sr1 experiment ↗</a>
           </div>
           <p id="engine-short-status" class="engine-note">Fixed starting point: r8 · E36/R54 · async H2D · Tail256</p>
         </div>
@@ -73,6 +79,27 @@
           <p id="engine-current-method-copy">Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.</p>
           <p><a id="engine-current-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">Original streams and portable CPU replay ↗</a> · <a id="engine-current-stats" href="./data/r8-continuous-20261117/summary-v1.json">Statistics and tail latency ↗</a> · <a id="engine-current-manifest" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json">Current release manifest ↗</a></p>
         </details>
+      </section>
+
+      <section class="engine-section" id="sr1-evaluation" style="scroll-margin-top:96px" aria-labelledby="sr1-title">
+        <h2 id="sr1-title">B1-sr1 experimental results</h2>
+        <p id="sr1-status">Same-card results showed a throughput and latency regression. B1-r8 remains the frozen engine.</p>
+        <p id="sr1-method">One paired run per workload on the same two Ascend 910B2 cards, with Qwen3.5-35B-A3B BF16 and TP2 at E36/R54.</p>
+        <div style="overflow-x:auto">
+          <table class="sr1-metrics">
+            <thead><tr><th scope="col" id="sr1-workload">Workload</th><th scope="col" id="sr1-throughput">Output tok/s · r8 → sr1</th><th scope="col" id="sr1-tail">End-to-end P95/P99 (s) · r8 → sr1</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">4K C8</th><td>386.69 → 95.68 (-75.26%)</td><td>5.83 / 6.31 → 23.07 / 23.42</td></tr>
+<tr><th scope="row">16K C8</th><td>159.69 → 69.36 (-56.56%)</td><td>14.19 / 15.38 → 32.90 / 35.02</td></tr>
+<tr><th scope="row">MMLU-Pro 200</th><td>1,499.31 → 131.86 (-91.21%)</td><td>438.11 / 465.07 → 5,128.76 / 5,365.80</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="sr1-quality">MMLU-Pro 200 accuracy was 75.0% → 75.5% (150 → 151 correct). All 200 requests per arm succeeded. The tails include queueing from submitting all requests together.</p>
+        <p id="sr1-kv">Effective target KV capacity was 1,447,936 → 847,872 tokens (−41.44%). C8 peak device memory across both cards was 121,614 → 128,185 MiB.</p>
+        <p id="sr1-preflight">Cross-page C1, mixed-length C8, host State restore and HLE image preflights passed.</p>
+        <p id="sr1-coverage">Snapshot dated 2026-11-18 UTC. HLE, FrontierScience, SWE-bench-Pro and Terminal-Bench 2.1 have no completed pair in this snapshot.</p>
+        <p><a id="sr1-data" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/reports/b1-sr1-20261118">Public metrics and per-request measurements ↗</a> · <a id="sr1-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/b1-sr1-evidence-20261118">Raw evidence (private) ↗</a></p>
       </section>
 
 <div class="engine-detail-grid"><details class="engine-fold"><summary><span id="engine-config-summary">Frozen MODs and resource budgets</span></summary>      <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
@@ -114,6 +141,19 @@
   <script>
     window.vllmHustPageDict = {
   "en": {
+    "sr1-title": "B1-sr1 experimental results",
+    "sr1-shortcut": "B1-sr1 experiment ↗",
+    "sr1-status": "Same-card results showed a throughput and latency regression. B1-r8 remains the frozen engine.",
+    "sr1-method": "One paired run per workload on the same two Ascend 910B2 cards, with Qwen3.5-35B-A3B BF16 and TP2 at E36/R54.",
+    "sr1-workload": "Workload",
+    "sr1-throughput": "Output tok/s · r8 → sr1",
+    "sr1-tail": "End-to-end P95/P99 (s) · r8 → sr1",
+    "sr1-quality": "MMLU-Pro 200 accuracy was 75.0% → 75.5% (150 → 151 correct). All 200 requests per arm succeeded. The tails include queueing from submitting all requests together.",
+    "sr1-kv": "Effective target KV capacity was 1,447,936 → 847,872 tokens (−41.44%). C8 peak device memory across both cards was 121,614 → 128,185 MiB.",
+    "sr1-preflight": "Cross-page C1, mixed-length C8, host State restore and HLE image preflights passed.",
+    "sr1-coverage": "Snapshot dated 2026-11-18 UTC. HLE, FrontierScience, SWE-bench-Pro and Terminal-Bench 2.1 have no completed pair in this snapshot.",
+    "sr1-data": "Public metrics and per-request measurements ↗",
+    "sr1-raw": "Raw evidence (private) ↗",
     "engine-kicker": "Ascend serving stack",
     "engine-lede": "Frozen r8 is available for reproduction, MOD development and further optimization.",
     "engine-hero-benchmark": "B0 / B1 results ↗",
@@ -197,6 +237,19 @@
     "engine-r6-history": "B0/r6 full report ↗"
   },
   "zh": {
+    "sr1-title": "B1-sr1 实验结果",
+    "sr1-shortcut": "查看 B1-sr1 实验 ↗",
+    "sr1-status": "同卡实测显示吞吐和尾延迟回退，B1-r8 仍为冻结版本。",
+    "sr1-method": "每个工作负载各做一对，使用同一对 Ascend 910B2、Qwen3.5-35B-A3B BF16、TP2、E36/R54。",
+    "sr1-workload": "工作负载",
+    "sr1-throughput": "输出 token/s · r8 → sr1",
+    "sr1-tail": "端到端 P95/P99（秒）· r8 → sr1",
+    "sr1-quality": "MMLU-Pro 200 正确率为 75.0% → 75.5%（答对 150 → 151 题）。两臂各 200 条请求全部成功。尾延迟含一次提交全部请求的排队时间。",
+    "sr1-kv": "目标 KV 有效容量为 1,447,936 → 847,872 token（−41.44%）。C8 双卡同次采样显存峰值为 121,614 → 128,185 MiB。",
+    "sr1-preflight": "跨页 C1、混合长度 C8、宿主 State 恢复和 HLE 图像预检均通过。",
+    "sr1-coverage": "快照日期为 2026-11-18 UTC。HLE、FrontierScience、SWE-bench-Pro 和 Terminal-Bench 2.1 在这份快照中暂无完整配对。",
+    "sr1-data": "公开汇总和逐请求指标 ↗",
+    "sr1-raw": "原始证据（私有）↗",
     "engine-kicker": "Ascend 推理服务栈",
     "engine-lede": "r8 已冻结发布，可直接复现、开发 MOD 与继续优化。",
     "engine-hero-benchmark": "B0 / B1 对比结果 ↗",
