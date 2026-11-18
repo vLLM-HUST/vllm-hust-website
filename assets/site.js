@@ -65,9 +65,9 @@
             navIssues: '议题',
             navProducts: '产品',
             navEngine: '引擎',
-            navRequestThrottling: 'Request Throttling Controller',
-            navControlPlane: 'Control Plane',
-            navContinuum: 'Continuum',
+            navRequestThrottling: '请求限流组件',
+            navControlPlane: '服务控制',
+            navContinuum: '长期记忆',
             navProjects: '项目',
             navPlugins: 'MOD 目录',
             navPublications: '论文与新闻',
@@ -268,7 +268,6 @@
                 ['home', './index.html', 'navHome'],
                 ['engine', './engine.html', 'navEngine'],
                 ['control-plane', './control-plane.html', 'navControlPlane'],
-                ['controlplane', './controlplane/', 'navRequestThrottling'],
                 ['continuum', './continuum.html', 'navContinuum'],
             ],
         },
@@ -434,8 +433,10 @@
         const pathname = normalizePath(window.location.pathname);
         document.querySelectorAll('.nav-links a, .benchmark-tabs a').forEach((link) => {
             const target = new URL(link.href, window.location.href);
+            const productParent = currentPage === 'controlplane'
+                && link.dataset.navPage === 'control-plane';
             const current = target.origin === window.location.origin
-                && normalizePath(target.pathname) === pathname
+                && (normalizePath(target.pathname) === pathname || productParent)
                 && (!target.hash || target.hash === window.location.hash);
             link.classList.toggle('active', current);
             if (current) link.setAttribute('aria-current', target.hash ? 'location' : 'page');

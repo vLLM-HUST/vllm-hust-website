@@ -9,11 +9,9 @@ from playwright.sync_api import expect, sync_playwright
 
 def verify_navigation(page, width):
     product = page.locator('[data-nav-group="products"]')
-    link = product.locator('[data-nav-page="controlplane"]')
+    link = product.locator('[data-nav-page="control-plane"]')
     expect(link).to_have_attribute("aria-current", "page")
-    expect(product.locator('[data-nav-page="control-plane"]')).not_to_have_attribute(
-        "aria-current", "page"
-    )
+    expect(product.locator('[data-nav-page="controlplane"]')).to_have_count(0)
     page.wait_for_function(
         """() => {
             const nav = document.querySelector('.site-nav').getBoundingClientRect();
@@ -67,6 +65,20 @@ def verify(args):
                 for language in ("en", "zh"):
                     if page.locator("html").get_attribute("lang") != language:
                         page.locator("#langToggle").click()
+                    product_links = page.locator('[data-nav-group="products"] a')
+                    expect(product_links).to_have_text(
+                        ["首页", "引擎", "服务控制", "长期记忆"]
+                        if language == "zh"
+                        else ["Home", "Engine", "Control Plane", "Continuum"]
+                    )
+                    expect(page.locator("#control-title")).to_have_text(
+                        "请求限流控制器"
+                        if language == "zh"
+                        else "Request Throttling Controller"
+                    )
+                    expect(page.locator("#control-product-link")).to_have_attribute(
+                        "href", "./control-plane.html"
+                    )
                     for identity in options:
                         page.locator("#control-release").select_option(identity)
                         expect(root).to_have_attribute("data-loaded", identity)
@@ -109,7 +121,7 @@ def verify(args):
                         )
                 assert not errors, errors
                 links = page.locator('.nav-links a[href*="controlplane"]').all()
-                assert len(links) == 1
+                assert len(links) == 0
                 receipts.append(
                     {
                         "width": width,

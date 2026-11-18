@@ -491,12 +491,9 @@ def main():
                             "MOD"
                             in page.locator('[data-copy="stackMods"]').inner_text()
                         )
-                        assert (
-                            page.locator(
-                                '.stack-links a[href="./engine.html"] strong'
-                            ).inner_text()
-                            == "Engine"
-                        )
+                        assert page.locator(
+                            '.stack-links a[href="./engine.html"] strong'
+                        ).inner_text() == ("引擎" if language == "zh" else "Engine")
                         assert page.evaluate(
                             "document.documentElement.scrollWidth <= innerWidth"
                         ), (slug, width, theme, language)
@@ -592,6 +589,27 @@ def main():
                                 ).count()
                                 == 1
                             )
+                        expect(menu.locator("a")).to_have_text(
+                            ["首页", "引擎", "服务控制", "长期记忆"]
+                            if language == "zh"
+                            else ["Home", "Engine", "Control Plane", "Continuum"]
+                        )
+                        if slug == "control-plane":
+                            expect(
+                                page.locator(
+                                    '.product-actions a[href="./controlplane/"]'
+                                )
+                            ).to_have_text(
+                                "请求限流组件"
+                                if language == "zh"
+                                else "Request Throttling Controller"
+                            )
+                        page.screenshot(
+                            path=str(
+                                args.output
+                                / f"menu-{slug}-{width}-{theme}-{language}.png"
+                            )
+                        )
                         expect(menu.locator('[aria-current="page"]')).to_have_count(1)
                         page.keyboard.press("Escape")
                         if (

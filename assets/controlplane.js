@@ -1,27 +1,27 @@
 (() => {
   'use strict';
   const zh = {
-    'control-kicker':'面向多轮程序的推理服务','control-owner':'负责人：毛言粲',
+    'control-kicker':'服务控制组件','control-title':'请求限流控制器','control-component-name':'请求限流控制器','control-product-link':'服务控制产品 ↗','control-owner':'负责人：毛言粲',
     'control-lede':'在请求到达引擎前协调多轮程序。在资源竞争时保留有用的程序状态，减少重复 prefill。',
     'control-result-link':'实测结果 ↓','control-deploy-link':'部署方式 ↓','control-repo-link':'源码与开发 ↗',
-    'control-path-title':'请求路径','control-client':'客户端','control-program':'多轮程序','control-controller':'限流层','control-engine':'模型服务',
+    'control-path-title':'请求路径','control-client':'客户端','control-program':'多轮程序','control-controller':'调度组件','control-engine':'模型服务',
     'control-path-note':'独立运行的 CPU 服务。引擎执行上限和状态容量仍是明确的资源约束。',
     'control-how-title':'按程序进展协调请求',
     'control-release-title':'决定请求放行','control-release-copy':'结合程序身份与引擎状态，决定等待中的请求何时执行。',
     'control-wait-title':'管理等待','control-wait-copy':'让部分程序暂时等待，其他程序继续运行。端到端结果包含限流层里的等待时间。',
     'control-cache-title':'保留有用状态','control-cache-copy':'协调程序续轮、结束释放与引擎状态管理。对照两组都必须开启跨轮缓存复用。',
     'control-results-title':'实测结果','control-results-intro':'在同一个优化引擎上，对比直连与加入原版 ThunderAgent 调度的结果。引擎自身 B0/B1 收益单独报告。',
-    'control-deploy-title':'控制面与模型分别启动','control-deploy-copy':'先用引擎入口启动模型并预热；再以 RIDE local 启动独立的 Request Throttling Controller CPU 服务，指定模型地址；最后把带程序身份的请求发送到限流层。',
+    'control-deploy-title':'限流组件与模型分别启动','control-deploy-copy':'先用引擎入口启动模型并预热；再以 RIDE local 启动独立的 Request Throttling Controller CPU 服务，指定模型地址；最后把带程序身份的请求发送到限流层。',
     'control-model-step':'1. 模型服务','control-model-copy':'固定引擎版本、模型、设备编号与缓存设置，为目标负载配置任务状态和 KV 容量。','control-engine-link':'引擎版本与启动入口 ↗',
-    'control-service-step':'2. 控制面','control-service-copy':'Controller 与引擎分别管理生命周期。本次实测使用 RIDE local，无需以 Ray 接入为前提。','control-guide-link':'部署指南 ↗',
+    'control-service-step':'2. 限流组件','control-service-copy':'Controller 与引擎分别管理生命周期。本次实测使用 RIDE local，无需以 Ray 接入为前提。','control-guide-link':'部署指南 ↗',
     'control-benchmark-step':'3. 匹配实验','control-benchmark-copy':'两组使用同一冻结输入和引擎配置，完整保留输出量、质量、等待时间与失败。','control-protocol-link':'实验规范 ↗',
-    'control-build-title':'基于控制面继续开发','control-build-copy':'沿现有接口开发调度策略；在相同负载下与原版 Controller 对比，同时保留收益与退化。',
+    'control-build-title':'基于限流组件继续开发','control-build-copy':'沿现有接口开发调度策略；在相同负载下与原版 Controller 对比，同时保留收益与退化。',
     'control-development-link':'仓库与接口 ↗','control-track-link':'实验跟踪与开放问题 ↗','control-engine-results-link':'引擎 B0/B1 结果 ↗',
     'footer-copy':'vLLM-HUST · 请求调度与可复现实测。'
   };
   const en = Object.fromEntries(Object.keys(zh).map(id => [id, document.getElementById(id)?.textContent || '']));
   en.title = 'Request Throttling Controller | vLLM-HUST';
-  zh.title = 'Request Throttling Controller 控制面 | vLLM-HUST';
+  zh.title = '请求限流组件 · 服务控制 | vLLM-HUST';
   window.vllmHustPageDict = {en, zh};
   let publication, selected, data;
   const root = document.getElementById('control-results');
