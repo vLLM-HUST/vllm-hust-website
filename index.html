@@ -80,78 +80,18 @@
 
     <nav class="execution-scope" aria-label="Homepage sections">
       <a id="scope-datasets" data-code="00" href="./dataset-introductions.html">Download & evaluate</a>
-      <a id="scope-products" data-code="01" href="#products">Products &amp; apps</a>
-      <a id="scope-engine" data-code="02" href="#stack">Engine</a>
+      <a id="scope-products" data-code="01" href="#products">Products</a>
+      <a id="scope-engine" data-code="02" href="#stack">MOD integration</a>
       <a id="scope-projects" data-code="03" href="#projects">Projects</a>
       <a id="scope-ecosystem" data-code="04" href="#ecosystem">Ecosystem</a>
     </nav>
 
     <section class="execution-section execution-products" id="products" aria-labelledby="products-title">
-      <div class="execution-section-head">
-        <div><p id="products-eyebrow" class="execution-eyebrow">Products &amp; applications</p><h2 id="products-title">From inference operations to agent applications.</h2></div>
-        <p id="products-summary">Workstation manages inference; Sage Mate supports AI chat; Research Reports offers daily reports and topic reviews.</p>
-      </div>
-      <div class="product-grid">
-        <article class="product-card product-card-workstation" data-code="01" aria-labelledby="product-workstation-name">
-          <div class="product-card-topline"><span>01 / INFER + OBSERVE</span><span id="product-workstation-type" class="product-type">Inference operations</span></div>
-          <h3 id="product-workstation-name">vLLM-HUST Workstation</h3>
-          <p id="product-workstation-positioning" class="product-positioning">One workspace to serve models, observe performance, and operate the Ascend inference stack.</p>
-          <a id="product-workstation-cta" class="product-cta" data-product-id="workstation"><span id="product-workstation-cta-copy">Open Workstation</span><span aria-hidden="true">↗</span></a>
-          <div class="product-visual workstation-visual" aria-hidden="true">
-            <div class="workstation-console-head"><span>ENGINE / LIVE</span><i></i></div>
-            <div class="workstation-pipeline"><span>MODEL</span><b></b><span>ENGINE</span><b></b><span>ASCEND</span></div>
-            <div class="workstation-metrics"><span><strong>OPENAI</strong><small>API</small></span><span><strong>LIVE</strong><small>METRICS</small></span><span><strong>ASCEND</strong><small>BACKEND</small></span></div>
-          </div>
-          <ul class="product-features">
-            <li><span>01</span><strong id="product-workstation-feature-1">OpenAI-compatible API</strong></li>
-            <li><span>02</span><strong id="product-workstation-feature-2">Models &amp; chat</strong></li>
-            <li><span>03</span><strong id="product-workstation-feature-3">Live metrics</strong></li>
-            <li><span>04</span><strong id="product-workstation-feature-4">Ascend stack</strong></li>
-          </ul>
-        </article>
-
-        <article class="product-card product-card-mate" data-code="02" aria-labelledby="product-mate-name">
-          <div class="product-card-topline"><span>02 / KNOW + ENGAGE</span><span id="product-mate-type" class="product-type">SAGE application</span></div>
-          <h3 id="product-mate-name">Sage Mate</h3>
-          <p id="product-mate-positioning" class="product-positioning">A cited AI twin built with SAGE that calls vLLM-HUST for model execution.</p>
-          <a id="product-mate-cta" class="product-cta" data-product-id="sage-mate"><span id="product-mate-cta-copy">Talk to Sage Mate</span><span aria-hidden="true">↗</span></a>
-          <div class="product-visual mate-visual" aria-hidden="true">
-            <span class="mate-node mate-node-profile">PROFILE</span><span class="mate-node mate-node-research">RESEARCH</span>
-            <span class="mate-core"><b>S</b><small>PERSONAL TWIN</small></span>
-            <span class="mate-node mate-node-courses">COURSES</span><span class="mate-node mate-node-cited">CITED / 04</span>
-          </div>
-          <ul class="product-features">
-            <li><span>01</span><strong id="product-mate-feature-1">Knowledge Q&amp;A</strong></li>
-            <li><span>02</span><strong id="product-mate-feature-2">Personal corpus</strong></li>
-            <li><span>03</span><strong id="product-mate-feature-3">Cited support</strong></li>
-            <li><span>04</span><strong id="product-mate-feature-4">Research flows</strong></li>
-          </ul>
-        </article>
-
-        <article class="product-card product-card-research" id="product-research" data-code="03" aria-labelledby="product-research-name">
-          <div class="product-card-topline"><span>03 / TRACK + UNDERSTAND</span><span id="product-research-type" class="product-type">研究工具</span></div>
-          <h3 id="product-research-name">推理研究日报</h3>
-          <p id="product-research-positioning" class="product-positioning">基于 SAGE 构建，提供每日研报与专题综述。</p>
-          <div class="product-visual research-visual" aria-hidden="true">
-            <div class="research-sheet research-sheet-daily">
-              <span class="research-sheet-kicker">DAILY REPORT</span>
-              <strong id="product-research-visual-daily">每日研报</strong>
-              <span class="research-line research-line-accent"></span><span class="research-line"></span><span class="research-line research-line-short"></span>
-            </div>
-            <div class="research-sheet research-sheet-topic">
-              <span class="research-sheet-kicker">TOPIC REVIEW</span>
-              <strong id="product-research-visual-topic">专题综述</strong>
-              <span class="research-line research-line-accent"></span><span class="research-line research-line-short"></span><span class="research-line"></span>
-            </div>
-          </div>
-          <ul class="product-features">
-            <li><span>01</span><strong id="product-research-feature-1">每日更新</strong></li>
-            <li><span>02</span><strong id="product-research-feature-2">推理全景</strong></li>
-            <li><span>03</span><strong id="product-research-feature-3">专题综述</strong></li>
-            <li><span>04</span><strong id="product-research-feature-4">证据追溯</strong></li>
-          </ul>
-          <a class="product-cta" href="https://lab.sage.org.ai/auto-research-report-website/" target="_blank" rel="noopener noreferrer"><span id="product-research-cta-copy">进入研究总览</span><span aria-hidden="true">↗</span></a>
-        </article>
+      <div class="execution-section-head"><div><p id="products-eyebrow" class="execution-eyebrow">Open-source products</p><h2 id="products-title">Inference. Control. Memory.</h2></div><p id="products-summary">Engine runs inference, Control Plane coordinates services, and Continuum retains memory. All three support MOD extensions.</p></div>
+      <div class="core-product-grid">
+        <article class="core-product core-product-engine"><span class="core-product-kicker">FROZEN INFERENCE</span><h3>Engine</h3><p id="core-engine-role" class="core-product-role">Inference engine</p><p id="core-engine-description">Frozen, reproducible optimization bundles for model inference.</p><p id="core-engine-owner" class="core-product-owner">Lead: Shuhao Zhang</p><a class="core-product-link" href="./engine.html"><span id="core-engine-cta">Explore engine releases ↗</span></a></article>
+        <article class="core-product core-product-control"><span class="core-product-kicker">SERVING CONTROL</span><h3>Control Plane</h3><p id="core-control-role" class="core-product-role">Serving control plane</p><p id="core-control-description">A shared serving entry for requests, routing and engine instances.</p><p id="core-control-owner" class="core-product-owner">Lead: Yancan Mao</p><a class="core-product-link" href="./control-plane.html"><span id="core-control-cta">Explore the control plane ↗</span></a></article>
+        <article class="core-product core-product-memory"><span class="core-product-kicker">PERSISTENT MEMORY</span><h3>Continuum</h3><p id="core-memory-role" class="core-product-role">Long-term memory · Planned</p><p id="core-memory-description">Connect knowledge across sessions, task experience and work progress.</p><p id="core-memory-owner" class="core-product-owner">Interim lead: Shuhao Zhang · Recruiting a lead</p><a class="core-product-link" href="./continuum.html"><span id="core-memory-cta">Explore the memory system ↗</span></a></article>
       </div>
     </section>
 
@@ -239,7 +179,7 @@
     <section class="execution-section execution-ecosystem" id="ecosystem">
       <div class="execution-section-head">
         <div><p id="ecosystem-eyebrow" class="execution-eyebrow">Collaborative ecosystem</p><h2 id="ecosystem-title">Clear roles. Shared progress.</h2></div>
-        <p id="ecosystem-summary">SAGE is the shared flagship product; each organization retains a clear technical boundary.</p>
+        <p><span id="ecosystem-summary">SAGE is the shared flagship product; each organization retains a clear technical boundary.</span> <a id="ecosystem-details-link" href="./ecosystem-archive.html">Explore ecosystem applications ↗</a></p>
       </div>
       <div class="execution-architecture">
         <a href="https://lab.sage.org.ai/"><span>00</span><strong>IntelliStream</strong><small id="ecosystem-intellistream">Cross-layer research incubator</small></a>
@@ -259,16 +199,19 @@
   <script>
     window.vllmHustPageDict = {
       en: {
-        "product-research-name": "Inference Research Reports",
-        "product-research-type": "Research tool",
-        "product-research-positioning": "Built with SAGE, offering daily reports and topic reviews.",
-        "product-research-visual-topic": "Topic review",
-        "product-research-visual-daily": "Daily report",
-        "product-research-feature-1": "Daily updates",
-        "product-research-feature-2": "Inference map",
-        "product-research-feature-3": "Topic reviews",
-        "product-research-feature-4": "Source evidence",
-        "product-research-cta-copy": "Explore research",
+        'ecosystem-details-link': 'Explore ecosystem applications ↗',
+        "core-engine-role": "Inference engine",
+        "core-engine-description": "Frozen, reproducible optimization bundles for model inference.",
+        "core-engine-owner": "Lead: Shuhao Zhang",
+        "core-engine-cta": "Explore engine releases ↗",
+        "core-control-role": "Serving control plane",
+        "core-control-description": "A shared serving entry for requests, routing and engine instances.",
+        "core-control-owner": "Lead: Yancan Mao",
+        "core-control-cta": "Explore the control plane ↗",
+        "core-memory-role": "Long-term memory · Planned",
+        "core-memory-description": "Connect knowledge across sessions, task experience and work progress.",
+        "core-memory-owner": "Interim lead: Shuhao Zhang · Recruiting a lead",
+        "core-memory-cta": "Explore the memory system ↗",
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
         'home-kicker': 'Public MODs across the inference lifecycle, with scope and evidence explicit.',
@@ -276,17 +219,9 @@
         'home-primary-cta': 'Explore the MOD catalog →', 'home-github-cta': 'Open GitHub ↗',
         'home-fact-1-label': 'Portfolio', 'home-fact-2-label': 'Coverage', 'home-fact-3-label': 'Evidence',
         'home-fact-1-value': 'Public MOD catalog', 'home-fact-2-value': '8 phases · 16 scenarios', 'home-fact-3-value': 'activation evidence ≠ performance evidence',
-        'scope-products': 'Products & apps', 'scope-engine': 'Engine', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
-        'products-eyebrow': 'Products & applications', 'products-title': 'From inference operations to agent applications.',
-        'products-summary': 'Workstation manages inference; Sage Mate supports AI chat; Research Reports offers daily reports and topic reviews.',
-        'product-workstation-type': 'Inference operations', 'product-workstation-positioning': 'One workspace to serve models, observe performance, and operate the Ascend inference stack.',
-        'product-workstation-feature-1': 'OpenAI-compatible API', 'product-workstation-feature-2': 'Models & chat',
-        'product-workstation-feature-3': 'Live metrics', 'product-workstation-feature-4': 'Ascend stack',
-        'product-workstation-cta-copy': 'Open Workstation',
-        'product-mate-type': 'SAGE application', 'product-mate-positioning': 'A cited AI twin built with SAGE that calls vLLM-HUST for model execution.',
-        'product-mate-feature-1': 'Knowledge Q&A', 'product-mate-feature-2': 'Personal corpus',
-        'product-mate-feature-3': 'Cited support', 'product-mate-feature-4': 'Research flows',
-        'product-mate-cta-copy': 'Talk to Sage Mate',
+        'scope-products': 'Products', 'scope-engine': 'MOD integration', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
+        'products-eyebrow': 'Open-source products', 'products-title': 'Inference. Control. Memory.',
+        'products-summary': 'Engine runs inference, Control Plane coordinates services, and Continuum retains memory. All three support MOD extensions.',
         'stack-eyebrow': 'MOD optimization · Engine integration', 'stack-title': 'vLLM-HUST: engine support for MOD optimizations.',
         'stack-summary': 'Our focus is optimization through MOD plugins. Some MODs also need changes to vLLM or its Ascend backend.',
         'stack-detail': 'These engine-level changes are maintained in vLLM-HUST and vLLM-Ascend-HUST.',
@@ -323,33 +258,28 @@
         'footer-copy': 'Inference for domestic compute.'
       },
       zh: {
-        "product-research-name": "推理研究日报",
-        "product-research-type": "研究工具",
-        "product-research-positioning": "基于 SAGE 构建，提供每日研报与专题综述。",
-        "product-research-visual-topic": "专题综述",
-        "product-research-visual-daily": "每日研报",
-        "product-research-feature-1": "每日更新",
-        "product-research-feature-2": "推理全景",
-        "product-research-feature-3": "专题综述",
-        "product-research-feature-4": "证据追溯",
-        "product-research-cta-copy": "进入研究总览",
+        'ecosystem-details-link': '查看生态应用 ↗',
+        "core-engine-role": "推理引擎",
+        "core-engine-description": "冻结可复现的优化组合，执行模型推理。",
+        "core-engine-owner": "负责人：张书豪",
+        "core-engine-cta": "查看冻结版本 ↗",
+        "core-control-role": "服务控制面",
+        "core-control-description": "统一服务入口，管理请求、路由与引擎实例。",
+        "core-control-owner": "负责人：毛言粲",
+        "core-control-cta": "了解服务控制 ↗",
+        "core-memory-role": "长期记忆 · 规划中",
+        "core-memory-description": "连接跨会话知识、任务经历与工作进度。",
+        "core-memory-owner": "暂任负责人：张书豪 · 招募负责人",
+        "core-memory-cta": "了解记忆系统 ↗",
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
         'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '覆盖推理全生命周期的公开 MOD，范围与证据边界明确。',
         'home-lede': '按阶段、场景、平台和成熟度探索；启用证据与性能证据分开呈现。',
         'home-primary-cta': '查看 MOD 目录 →', 'home-github-cta': '打开 GitHub ↗',
         'home-fact-1-label': '项目组合', 'home-fact-2-label': '覆盖范围', 'home-fact-3-label': '公开证据',
         'home-fact-1-value': '公开 MOD 目录', 'home-fact-2-value': '8 个阶段 · 16 类场景', 'home-fact-3-value': '启用证据 ≠ 性能证据',
-        'scope-products': '产品与应用', 'scope-engine': '引擎', 'scope-projects': '项目', 'scope-ecosystem': '生态',
-        'products-eyebrow': '产品与应用', 'products-title': '从推理运维到智能体应用。',
-        'products-summary': 'Workstation 运维推理栈；Sage Mate 提供智能交互；推理研究日报提供每日研报与专题综述。',
-        'product-workstation-type': '推理运营工作台', 'product-workstation-positioning': '一个工作台完成模型服务、性能观测与昇腾推理栈操作。',
-        'product-workstation-feature-1': 'OpenAI-compatible API', 'product-workstation-feature-2': '模型与对话',
-        'product-workstation-feature-3': '实时推理指标', 'product-workstation-feature-4': 'Ascend 推理栈',
-        'product-workstation-cta-copy': '打开 Workstation',
-        'product-mate-type': 'SAGE 应用', 'product-mate-positioning': '基于 SAGE 构建，并调用 vLLM-HUST 执行模型推理。',
-        'product-mate-feature-1': '知识问答', 'product-mate-feature-2': '个人知识库',
-        'product-mate-feature-3': '引用依据', 'product-mate-feature-4': '研究工作流',
-        'product-mate-cta-copy': '体验 Sage Mate',
+        'scope-products': '开源产品', 'scope-engine': 'MOD 集成', 'scope-projects': '项目', 'scope-ecosystem': '生态',
+        'products-eyebrow': '开源产品', 'products-title': '推理、控制与记忆。',
+        'products-summary': 'Engine 执行推理，Control Plane 协调服务，Continuum 保存记忆；三者均可扩展 MOD。',
         'stack-eyebrow': 'MOD 插件优化 · 引擎适配', 'stack-title': 'vLLM-HUST：为 MOD 优化提供引擎支持。',
         'stack-summary': '我们的重点是各类 MOD 插件优化。部分 MOD 还需要修改 vLLM 或昇腾后端。',
         'stack-detail': '这些引擎侧改动集中维护在 vLLM-HUST 和 vLLM-Ascend-HUST 中。',
@@ -390,7 +320,6 @@
   <script src="./assets/site.js?v=public-audit-20261101"></script>
   <script src="./assets/ecosystem-catalog.js?v=catalog-audit-20261105"></script>
   <script src="./assets/home-catalog.js?v=public-audit-20261101"></script>
-  <script src="./assets/product-catalog.js?v=0.3.7"></script>
   <script src="./assets/home-disclosure.js?v=0.3.7"></script>
 </body>
 </html>

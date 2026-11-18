@@ -127,6 +127,30 @@
             <li><span>04</span><strong id="product-mate-feature-4">Research flows</strong></li>
           </ul>
         </article>
+        <article class="product-card product-card-research" id="product-research" data-code="03" aria-labelledby="product-research-name">
+          <div class="product-card-topline"><span>03 / TRACK + UNDERSTAND</span><span id="product-research-type" class="product-type">研究工具</span></div>
+          <h3 id="product-research-name">推理研究日报</h3>
+          <p id="product-research-positioning" class="product-positioning">基于 SAGE 构建，提供每日研报与专题综述。</p>
+          <div class="product-visual research-visual" aria-hidden="true">
+            <div class="research-sheet research-sheet-daily">
+              <span class="research-sheet-kicker">DAILY REPORT</span>
+              <strong id="product-research-visual-daily">每日研报</strong>
+              <span class="research-line research-line-accent"></span><span class="research-line"></span><span class="research-line research-line-short"></span>
+            </div>
+            <div class="research-sheet research-sheet-topic">
+              <span class="research-sheet-kicker">TOPIC REVIEW</span>
+              <strong id="product-research-visual-topic">专题综述</strong>
+              <span class="research-line research-line-accent"></span><span class="research-line research-line-short"></span><span class="research-line"></span>
+            </div>
+          </div>
+          <ul class="product-features">
+            <li><span>01</span><strong id="product-research-feature-1">每日更新</strong></li>
+            <li><span>02</span><strong id="product-research-feature-2">推理全景</strong></li>
+            <li><span>03</span><strong id="product-research-feature-3">专题综述</strong></li>
+            <li><span>04</span><strong id="product-research-feature-4">证据追溯</strong></li>
+          </ul>
+          <a class="product-cta" href="https://lab.sage.org.ai/auto-research-report-website/" target="_blank" rel="noopener noreferrer"><span id="product-research-cta-copy">进入研究总览</span><span aria-hidden="true">↗</span></a>
+        </article>
       </div>
     </section>
 
@@ -233,6 +257,16 @@
   <script>
     window.vllmHustPageDict = {
       en: {
+        "product-research-name": "Inference Research Reports",
+        "product-research-type": "Research tool",
+        "product-research-positioning": "Built with SAGE, offering daily reports and topic reviews.",
+        "product-research-visual-topic": "Topic review",
+        "product-research-visual-daily": "Daily report",
+        "product-research-feature-1": "Daily updates",
+        "product-research-feature-2": "Inference map",
+        "product-research-feature-3": "Topic reviews",
+        "product-research-feature-4": "Source evidence",
+        "product-research-cta-copy": "Explore research",
         title: 'vLLM-HUST | Inference Engine for Domestic Compute',
         'home-eyebrow': 'Domestic compute · inference engine / 03',
         'home-kicker': 'Public MODs across the inference lifecycle, with scope and evidence explicit.',
@@ -242,7 +276,7 @@
         'home-fact-1-value': 'Public MOD catalog', 'home-fact-2-value': '8 phases · 16 scenarios', 'home-fact-3-value': 'activation evidence ≠ performance evidence',
         'scope-products': 'Products & apps', 'scope-engine': 'Engine', 'scope-projects': 'Projects', 'scope-ecosystem': 'Ecosystem',
         'products-eyebrow': 'Products & applications', 'products-title': 'From inference operations to agent applications.',
-        'products-summary': 'Workstation operates vLLM-HUST. Sage Mate is an application built with SAGE and backed by vLLM-HUST.',
+        'products-summary': 'Workstation manages inference; Sage Mate supports AI chat; Research Reports offers daily reports and topic reviews.',
         'product-workstation-type': 'Inference operations', 'product-workstation-positioning': 'One workspace to serve models, observe performance, and operate the Ascend inference stack.',
         'product-workstation-feature-1': 'OpenAI-compatible API', 'product-workstation-feature-2': 'Models & chat',
         'product-workstation-feature-3': 'Live metrics', 'product-workstation-feature-4': 'Ascend stack',
@@ -286,6 +320,16 @@
         'footer-copy': 'Inference for domestic compute.'
       },
       zh: {
+        "product-research-name": "推理研究日报",
+        "product-research-type": "研究工具",
+        "product-research-positioning": "基于 SAGE 构建，提供每日研报与专题综述。",
+        "product-research-visual-topic": "专题综述",
+        "product-research-visual-daily": "每日研报",
+        "product-research-feature-1": "每日更新",
+        "product-research-feature-2": "推理全景",
+        "product-research-feature-3": "专题综述",
+        "product-research-feature-4": "证据追溯",
+        "product-research-cta-copy": "进入研究总览",
         title: 'vLLM-HUST | 面向国产算力的大模型推理引擎',
         'home-eyebrow': '面向国产算力 · 大模型推理引擎 / 03', 'home-kicker': '覆盖推理全生命周期的公开 MOD，范围与证据边界明确。',
         'home-lede': '按阶段、场景、平台和成熟度探索；启用证据与性能证据分开呈现。',
@@ -294,7 +338,7 @@
         'home-fact-1-value': '公开 MOD 目录', 'home-fact-2-value': '8 个阶段 · 16 类场景', 'home-fact-3-value': '启用证据 ≠ 性能证据',
         'scope-products': '产品与应用', 'scope-engine': '引擎', 'scope-projects': '项目', 'scope-ecosystem': '生态',
         'products-eyebrow': '产品与应用', 'products-title': '从推理运维到智能体应用。',
-        'products-summary': 'Workstation 运维推理栈；Sage Mate 基于 SAGE，调用 vLLM-HUST。',
+        'products-summary': 'Workstation 运维推理栈；Sage Mate 提供智能交互；推理研究日报提供每日研报与专题综述。',
         'product-workstation-type': '推理运营工作台', 'product-workstation-positioning': '一个工作台完成模型服务、性能观测与昇腾推理栈操作。',
         'product-workstation-feature-1': 'OpenAI-compatible API', 'product-workstation-feature-2': '模型与对话',
         'product-workstation-feature-3': '实时推理指标', 'product-workstation-feature-4': 'Ascend 推理栈',
