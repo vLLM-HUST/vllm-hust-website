@@ -4,6 +4,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -72,11 +73,19 @@ def assert_controller_progress(page, root, publication, lang):
     expect(button).to_be_focused()
 
 
+def context_supplement(catalog):
+    return next(row for row in catalog["entries"] if row["id"] == "r8")[
+        "context_tenant_supplement"
+    ]
+
+
 def verify(url, output):
     output.mkdir(parents=True, exist_ok=True)
     checks = []
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(
+            executable_path=os.environ.get("VLLMHUST_BROWSER_EXECUTABLE")
+        )
         context = browser.new_context()
         controller = context.request.get(
             url + "/data/controller-experiment-progress-v1.json"
@@ -108,7 +117,15 @@ def verify(url, output):
                     expect(root.locator("#r8-current-continuous")).to_be_visible()
                     expect(root.locator("#report-history-links")).to_have_count(0)
                     expect(root.locator(".metric-chart")).to_have_count(4)
-                    expect(root.locator(".bar-value")).to_have_count(56)
+                    expect(root.locator(".bar-value")).to_have_count(
+                        56
+                        + 8
+                        * len(
+                            next(
+                                row for row in catalog["entries"] if row["id"] == "r8"
+                            )["context_tenant_supplement"]["comparisons"]
+                        )
+                    )
                     expect(root.locator(".mod-tags span")).to_have_count(10)
                     assert_release_control_readable(page, root)
                     assert_controller_progress(page, root, controller, lang)
@@ -183,6 +200,51 @@ def verify(url, output):
                                 for arm in row["arms"]
                             ]
                             expect(values).to_have_text(expected)
+                    extra = published_r8["context_tenant_supplement"]
+                    supplement = root.locator("#context-tenant-supplement")
+                    expect(supplement).to_have_attribute("data-source-release", "r8")
+                    for row in extra["comparisons"]:
+                        for key, divisor in [
+                            ("output_tokens_per_second", 1),
+                            ("mean_ttft_ms", 1000),
+                            ("mean_tpot_ms", 1),
+                            ("relative_cost_per_token", 1),
+                        ]:
+                            bars = root.locator(
+                                f'[data-metric="{key}"] [data-profile="real-context-{row["phase"]}"] .bar-value'
+                            )
+                            values = []
+                            for role in ("B0", "B1"):
+                                metrics = row[role]["metrics"]
+                                value = (
+                                    row["B0"]["metrics"]["output_tokens_per_second"]
+                                    / metrics["output_tokens_per_second"]
+                                    if key == "relative_cost_per_token"
+                                    else (
+                                        metrics["ttft_ms"]["mean"]
+                                        if key == "mean_ttft_ms"
+                                        else metrics["tpot_ms"]["mean"]
+                                        if key == "mean_tpot_ms"
+                                        else metrics[key]
+                                    )
+                                    / divisor
+                                )
+                                values.append(f"{value:.2f}")
+                            expect(bars).to_have_text(values)
+                    image = supplement.locator("img")
+                    image.scroll_into_view_if_needed()
+                    assert image.evaluate(
+                        "async el=>{await el.decode();return el.naturalWidth>0}"
+                    )
+                    supplement.locator('[data-detail="supplement"]').click()
+                    dialog = root.locator("dialog")
+                    expect(dialog.locator("table")).to_have_count(2)
+                    for row in extra["comparisons"]:
+                        expect(dialog).to_contain_text(
+                            f"{row['B0']['metrics']['requests']} / {row['B1']['metrics']['requests']}"
+                        )
+                    expect(dialog).to_contain_text(extra["raw_asset"]["sha256"])
+                    page.keyboard.press("Escape")
                     for key in ("metrics", "configuration", "methods", "evidence"):
                         button = root.locator(f'[data-detail="{key}"]')
                         button.click()
@@ -593,6 +655,69 @@ def verify(url, output):
             checks.append({"rejected": label})
             page.close()
         for label, transform, resign in [
+            (
+                "context-foreign-release",
+                lambda d: context_supplement(d).update(engine_release="foreign"),
+                True,
+            ),
+            (
+                "context-fabricated-efficiency",
+                lambda d: context_supplement(d).update(efficiency_percent=99),
+                True,
+            ),
+            (
+                "context-failed-request",
+                lambda d: context_supplement(d)["comparisons"][0]["B1"][
+                    "metrics"
+                ].update(failed=1),
+                True,
+            ),
+            (
+                "context-bad-throughput",
+                lambda d: context_supplement(d)["comparisons"][0].update(
+                    throughput_ratio=100
+                ),
+                True,
+            ),
+            (
+                "context-missing-window",
+                lambda d: context_supplement(d)["comparisons"][0]["B1"][
+                    "windows"
+                ].pop(),
+                True,
+            ),
+            (
+                "context-failed-window",
+                lambda d: context_supplement(d)["comparisons"][0]["B1"]["windows"][0][
+                    "metrics"
+                ].update(failed=1),
+                True,
+            ),
+            (
+                "context-tenant-count",
+                lambda d: next(
+                    iter(
+                        context_supplement(d)["comparisons"][-1]["B1"][
+                            "per_tenant"
+                        ].values()
+                    )
+                ).update(requests=1),
+                True,
+            ),
+            (
+                "context-invalid-utilization",
+                lambda d: context_supplement(d)["comparisons"][0]["B1"][
+                    "utilization"
+                ].update(mean_percent=101),
+                True,
+            ),
+            (
+                "context-foreign-chart",
+                lambda d: context_supplement(d)["chart"].update(
+                    path="https://example.com/foreign.svg"
+                ),
+                True,
+            ),
             (
                 "release-history-bad-hash",
                 lambda d: d.update(default_release="r4"),

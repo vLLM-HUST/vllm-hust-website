@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 18257625f75799577b81d8e2e71e1eae7904985b # pragma: allowlist secret
+          ref: 10a14c03bb8f34789cde9c24b252a3cccfc195f8 # pragma: allowlist secret
           path: _benchmark
           sparse-checkout: |
             website-publication
@@ -57,3 +57,4 @@ jobs:
         with:
           name: midterm-browser-evidence
           path: output/playwright/midterm/
+
