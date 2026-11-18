@@ -141,6 +141,9 @@ def verify_home_product_navigation(browser, args, rows):
             for language in ("en", "zh"):
                 if page.locator("html").get_attribute("lang") != language:
                     page.locator("#langToggle").click()
+                expect(page.locator("#ecosystem-details-link")).to_have_attribute(
+                    "href", "./ecosystem-archive.html"
+                )
                 expect(page.locator(".core-product h3")).to_have_text(
                     ["Engine", "Control Plane", "Continuum"]
                 )
