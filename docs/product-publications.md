@@ -84,6 +84,9 @@ Compression 为 TKDE 2024。Adaptive Sampling 保留 PACMMOD 2024 / SIGMOD 2025 
 | TraV: An Interactive Exploration System for Massive Trajectory Data                                                | 2019 | 轨迹可视探索应用。                                         |
 | To Co-run, or Not to Co-run: A Performance Study on Integrated Architectures                                       | 2015 | engine                                                     |
 
+代码链接中的 MorphStream 与 CStream 已按 GitHub 仓库 ID 核对迁移至 DataSysResearch，分别保持 ID 274399395 和
+444991113，均为公开仓库。
+
 ## 后续更新
 
 先核对个人主页新提交、题录、核准年份、接收状态与实际 PDF 路径，再更新三个产品页的 `PRODUCT PUBLICATIONS`
