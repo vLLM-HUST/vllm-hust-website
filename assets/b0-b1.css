@@ -94,12 +94,22 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 #context-tenant-supplement{margin-top:32px;min-width:0} .supplement-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0}.supplement-highlights>div{display:flex;flex-direction:column;gap:10px;border:1px solid #819498;border-radius:12px;padding:18px}.supplement-highlights span{font-size:13px}.supplement-highlights strong{font-size:24px;font-variant-numeric:tabular-nums}.supplement-plot{max-width:100%;overflow:auto;border-radius:12px;background:white}.supplement-plot img{display:block;width:100%;min-width:800px;height:auto}#context-tenant-supplement figure{margin:20px 0}#context-tenant-supplement figcaption{font-size:13px;line-height:1.7;margin-top:10px}@media(max-width:600px){.supplement-highlights{grid-template-columns:1fr}.supplement-highlights>div{padding:14px}.supplement-highlights strong{font-size:22px}}
 
 /* Native select popups need explicit foregrounds and opaque backgrounds. */
-.release-selector select,.release-selector option { color:#203137;background:#fff;color-scheme:light; }
+.release-selector select,.release-selector option,.release-selector optgroup { color:#203137;background:#fff;color-scheme:light; }
 .release-selector select { font:inherit;min-width:0;max-width:100%;padding:8px 12px;border:1px solid #63777e;border-radius:8px;cursor:pointer; }
 .release-selector select:focus-visible { outline:3px solid #006b79;outline-offset:3px; }
 .comparison-source-plot { margin:20px 0; }.comparison-source-plot img { display:block;width:100%;height:auto; }
 #r8-current-continuous { scroll-margin-top:110px; }
 @media(prefers-color-scheme:dark) {
- .release-selector select,.release-selector option { color:#edf3f3;background:#102026;color-scheme:dark; }
+ .release-selector select,.release-selector option,.release-selector optgroup { color:#edf3f3;background:#102026;color-scheme:dark; }
  .release-selector select { border-color:#819498; }.release-selector select:focus-visible { outline-color:#83d9db; }
 }
+
+/* Every release retains the same five-profile and four-metric structure. */
+.dataset-coverage { margin:24px 0; }
+.dataset-coverage-grid { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px; }
+.dataset-coverage-grid article { border:1px solid #819498;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0; }
+.dataset-coverage-grid strong { font-size:14px; }.dataset-coverage-grid span,.missing-metric { font-size:12px;line-height:1.6; }
+.metric-missing .chart-row-heading { align-items:baseline; }.metric-missing .missing-metric { margin:0; }
+@media(max-width:900px) { .dataset-coverage-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:600px) { .dataset-coverage-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.dataset-coverage-grid article { padding:12px; } }
+.supplement-plot.missing-plot { background:transparent;border:1px dashed #819498;padding:24px;font-size:13px;line-height:1.7; }

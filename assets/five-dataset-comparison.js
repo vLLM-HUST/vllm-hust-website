@@ -93,15 +93,16 @@
   }
 
 
-  const profileNames = () => t(['MMLU200','HLE200','Frontier160','SWE trace','Terminal trace'],['MMLU200','HLE200','Frontier160','SWE trace','Terminal trace']);
+  const profileNames = () => t(['MMLU200','HLE200','Frontier160','SWE trace64','Terminal trace48'],['MMLU200','HLE200','Frontier160','SWE trace64','Terminal trace48']);
   const attainment = (id, final = false) => {
     const goal = final ? data.project_final_assessment.targets[id] : window.vllmHustProjectMilestones.select(data,id);
     const met = final ? goal.attainment === 'demonstrated' : goal.accepted;
     return met ? t('达成目标','Target met') : t('未达成目标','Target not met');
   };
   function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames()) {
-    const maximum = Math.max(1,...rows.map(d=>d.arms.B1[key]/d.arms.B0[key]));
+    const maximum = Math.max(1,...rows.filter(row=>row.arms?.B0&&row.arms?.B1).map(d=>d.arms.B1[key]/d.arms.B0[key]));
     return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">B0</span><span class="legend-b1">B1</span></div>${rows.map((row,i)=>{
+      if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
       return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${labels[i]}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
@@ -174,12 +175,12 @@
   }
   function renderR6() {
     if (!data || !combination) return;
-    document.getElementById('comparison-title').textContent=t('B0 / B1 r6 · 固定五项对比','B0 / B1 r6 · Five-profile comparison');
+    document.getElementById('comparison-title').textContent=t('B0 / B1 r6 实测对比','B0 / B1 r6 measured comparison');
     document.getElementById('comparison-lead').textContent=`${data.hardware.model} · ${data.hardware.accelerator} × ${data.hardware.cards} · ${data.hardware.dtype}`;
     const goalCards=required.map((id,i)=>`<button type="button" class="goal-card" data-detail="goal-${id}" data-goal="${id}"><span>${names()[i]}</span><strong><span class="stage-label">${t('项目里程碑','Project milestone')}</span>${attainment(id)}</strong>${id==='3.4.1' ? `<span class="reference-scope">${t('已认证工况：MMLU200/out256','Certified workload: MMLU200/out256')}</span>` : ''}<small>${t('项目最终目标','Project final')}: ${attainment(id,true)} <span aria-hidden="true">↗</span></small></button>`).join('');
-    root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta release-navigation"><span>${t('本页：B0 对比默认 B1 r6 · 固定五数据集','This report: B0 vs default B1 r6 · five fixed profiles')}</span><a href="./engine.html#r8-current-results">${t('r8 已冻结：下载、MOD 与实测图','Frozen r8: download, MODs and measurements')} ↗</a></div><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
+    root.innerHTML=`<section class="comparison-dashboard"><div class="comparison-meta" id="report-history-links"><span>${esc(data.report_date)} · ${t(`固定五项 · 两臂各${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)}请求完成`, `Five fixed profiles ·${data.datasets.reduce((n,r)=>n+r.arms.B0.successful,0)}/${data.datasets.reduce((n,r)=>n+r.arms.B0.planned,0)} requests per arm`)}</span><a href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div><div class="goal-grid">${goalCards}</div>
       ${frozenProfile('r6',{B0:combination.B0.cann,B1:combination.B1.cann},combination.components.map(c=>t(c.name_zh,c.name_en)),'E24/R36 · MTP2 · FULL · TP2 · host 4 GiB/rank')}
-      <div class="section-heading"><h2>${t('五数据集性能','Five-profile performance')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值。','Bars normalize B0 to1; labels show measured values.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}${chart('estimated_cny_per_million_output_tokens',t('单位输出token成本 ↓','Cost per output token ↓'),t('元/百万token','CNY/million tokens'))}</div>
+      <div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值。','Bars normalize B0 to1; labels show measured values.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}${chart('estimated_cny_per_million_output_tokens',t('单位输出token成本 ↓','Cost per output token ↓'),t('元/百万token','CNY/million tokens'))}</div>
       ${supplementView()}
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>
       ${detailDialog()}</section>`;
@@ -270,11 +271,11 @@
     if(combo.schema!=='vllm-hust-frozen-combination/v1' || combo.run_id!==value.run_id || combo.engine_release!==value.runtime.engine_release || combo.components?.length!==8 || combo.worker!==value.runtime.actual_worker || combo.settings?.max_num_seqs!==24 || combo.settings.resident_seats!==36)throw Error('Frozen combination differs from measured profile');
     data=value;manifest=m;combination=combo;
   }
-  const releaseIds = ['r8','r7','r6','r5','r4'];
-  const attemptIds = ['r3','r2','r1'];
-  const selectableIds = [...releaseIds,...attemptIds];
+  let releaseIds = ['r8','r7','r6','r5','r4'];
+  let attemptIds = ['r3','r2','r1'];
+  let selectableIds = [...releaseIds,...attemptIds];
   const requestedRelease = new URL(location.href).searchParams.get('release');
-  let selectedRelease = selectableIds.includes(requestedRelease) ? requestedRelease : 'r8';
+  let selectedRelease = /^r[1-9][0-9]*$/.test(requestedRelease||'') ? requestedRelease : null;
   let releaseCatalog = null;
   let catalogRequest = null;
   let releaseRequest = 0;
@@ -295,10 +296,10 @@
       const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
       if (digest!==entries[0].sha256 || raw.byteLength!==entries[0].bytes) throw Error('Release catalog checksum mismatch');
       const value = JSON.parse(new TextDecoder().decode(raw));
-      if (value.schema!=='vllm-hust-engine-release-history/v1' || value.default_release!=='r8' || JSON.stringify(value.order)!==JSON.stringify(releaseIds) || value.entries?.length!==5) throw Error('Invalid release catalog scope');
+      if (value.schema!=='vllm-hust-engine-release-history/v1' || !Array.isArray(value.order) || !value.order.length || value.order.some(id=>!/^r[1-9][0-9]*$/.test(id)) || new Set(value.order).size!==value.order.length || !value.order.includes(value.default_release) || value.entries?.length!==value.order.length) throw Error('Invalid release catalog scope');
       const baseline=value.baseline;
       if (baseline?.id!=='original018-cann8.5.1' || baseline.vllm!=='0.18.0' || baseline.vllm_ascend!=='0.18.0' || baseline.cann!=='8.5.1' || baseline.sdk_source_map_sha256!=='a357ad8cf1ff6f8797fb2d6476e71a0deef5ee0899a55ea32ed65f07fe7773bc' || baseline.image_digest!=='sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa') throw Error('Unexpected fixed B0 identity'); // pragma: allowlist secret -- fixed public B0 image and SDK digests
-      for (const id of releaseIds) {
+      for (const id of value.order) {
         const matches = value.entries.filter(row=>row.id===id);
         if(matches.length!==1) throw Error('Ambiguous release identity');
         const entry=matches[0];
@@ -311,11 +312,13 @@
         }
       }
       if(value.entries.find(row=>row.id==='r5').measurements.length) throw Error('r5 has no formal inference');
-      if (JSON.stringify(value.attempt_order)!==JSON.stringify(attemptIds) || value.attempts?.length!==3) throw Error('Invalid early-attempt catalog');
-      for (const id of attemptIds) {
+      if (!Array.isArray(value.attempt_order) || new Set(value.attempt_order).size!==value.attempt_order.length || value.attempt_order.some(id=>!/^r[1-9][0-9]*$/.test(id)||value.order.includes(id)) || value.attempts?.length!==value.attempt_order.length) throw Error('Invalid early-attempt catalog');
+      for (const id of value.attempt_order) {
         const matches=value.attempts.filter(row=>row.id===id);
         if (matches.length!==1 || matches[0].kind!=='pre-freeze-attempt' || matches[0].status!=='failed' || matches[0].measurements?.length!==0 || !matches[0].source?.url) throw Error('Invalid early-attempt identity');
       }
+      releaseIds=[...value.order];attemptIds=[...value.attempt_order];selectableIds=[...releaseIds,...attemptIds];
+      if(!selectableIds.includes(selectedRelease))selectedRelease=value.default_release;
       releaseCatalog=value;
     })();
     try { await catalogRequest; } finally { catalogRequest=null; }
@@ -334,35 +337,70 @@
       showRelease();
     });
   }
-  function renderAttempt() {
-    const entry=releaseCatalog.attempts.find(row=>row.id===selectedRelease);
-    document.getElementById('comparison-title').textContent=t(`${entry.id} · 冻结前尝试`,`${entry.id} · Pre-freeze attempt`);
-    document.getElementById('comparison-lead').textContent=t('2026-10-30 · packed-host 实验历史','2026-10-30 · packed-host experiment history');
-    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<section class="frozen-profile historical-attempt" data-history-attempt="${entry.id}"><h2>${esc(t(entry.label_zh,entry.label_en))}</h2><p>${esc(t(entry.reason_zh,entry.reason_en))}</p><details><summary>${t('运行身份与原始记录','Run identity and original records')}</summary><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号。','r1–r3 identify attempts in the experiment batch preceding frozen r4.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><p style="overflow-wrap:anywhere">SHA256 · ${esc(entry.source.sha256)}</p></details></section></section>`;
-    bindMenu();delete root.dataset.baselineId;root.dataset.release=entry.id;root.dataset.loaded='engine-release-attempt-'+entry.id;root.setAttribute('aria-busy','false');
+  const fixedProfiles = [['mmlu','MMLU200'],['hle','HLE200'],['frontier','Frontier160'],['swe','SWE trace64'],['terminal','Terminal trace48']];
+  function standardRows(rows, reason) {
+    const used=new Set();
+    const fixed=fixedProfiles.map(([id,label])=>{
+      const row=rows.find(row=>row.id===id||row.id===id+'200'||row.id===id+'160'||row.id===id+'-trace');
+      if(row){used.add(row);return {...row,id,label};}
+      return {id,label,missingReason:reason||t('本版未发布该项配对数据','No published pair for this profile')};
+    });
+    return [...fixed,...rows.filter(row=>!used.has(row))];
   }
-  function renderHistorical() {
-    const entry=releaseEntry();
-    const pairing=entry.measurements.length?`B0 → B1 ${entry.id}`:`B1 ${entry.id}`;
-    document.getElementById('comparison-title').textContent=t(`${pairing} · 历史记录`,`${pairing} · Historical record`);
-    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · 2 × Ascend 910B2 · BF16';
-    const measures=entry.measurements;
-    const chart=(key,title,unit,divisor=1)=>`<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header>${measures.map(row=>{
-      const maximum=Math.max(...row.arms.map(arm=>arm[key]));
-      const change=100*(row.arms[1][key]/row.arms[0][key]-1);
-      const good=key==='output_tokens_per_second'?change>=0:change<=0;
-      return `<div class="chart-row" data-profile="${esc(row.id)}"><div class="chart-row-heading"><strong>${esc(row.label)}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${row.arms.map((arm,i)=>`<div class="bar-line" aria-label="${esc(`${row.label} ${arm.role} ${n(arm[key]/divisor)} ${unit}`)}"><span class="bar-role">${esc(arm.role)}</span><span class="bar-track"><span class="bar-fill ${i?'b1':'b0'}" style="width:${100*arm[key]/maximum}%"></span></span><span class="bar-value">${n(arm[key]/divisor)}</span></div>`).join('')}</div>`;
-    }).join('')}</article>`;
+  function coverageView(rows, qualityOnly=false) {
+    return `<section class="dataset-coverage" aria-labelledby="dataset-coverage-title"><div class="section-heading"><h2 id="dataset-coverage-title">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
+      const row=rows.find(row=>row.id===id),available=!!row?.arms;
+      const status=available?t('已发布配对','Published pair'):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
+      return `<article data-dataset="${id}" data-available="${available}"><strong>${label}</strong><span>${status}</span></article>`;
+    }).join('')}</div></section>`;
+  }
+  function versionRows(entry) {
+    const rows=entry.measurements.map(row=>{
+      const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
+      const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
+      return {id:row.id,label:row.label,arms,changes_percent};
+    });
+    if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'});
+    return rows;
+  }
+  function versionDetails(entry, rows, key, attempt) {
+    const title={configuration:t('冻结配置与MOD','Configuration and MODs'),methods:t('计算公式与比较方式','Formulas and comparison'),metrics:t('完整数值','Complete metrics'),quality:t('质量与评分明细','Quality and grading'),evidence:t('原始证据','Original evidence'),supplement:t('上下文与四租户补测','Context and four-tenant supplement')}[key];
+    if(attempt)return {title,body:`<p>${esc(t(entry.reason_zh,entry.reason_en))}</p><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号；本次未形成完整配对报告。','r1–r3 identify attempts preceding frozen r4; this attempt did not produce a complete paired report.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><code>${esc(entry.source.sha256)}</code>`};
+    if(key==='supplement')return {title,body:`<p>${t('本版已发布的连续负载仅在图中列出实测档位。尚缺32K及四租户的完整补测数据；不从其他版本迁入成绩。','Published continuous-load measurements cover the plotted context bands. Complete 32K and four-tenant supplement data are missing for this version; scores are not transferred from another version.')}</p>`};
+    if(key==='configuration')return {title,body:`<p>${esc(entry.release)}</p><div class="mod-tags">${entry.mods.map(name=>`<span>${esc(name)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p><a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>`};
+    if(key==='methods')return entry.id==='r8'?r8Details('methods'):{title,body:`<p>${esc(t(entry.method_zh||'方法见本版原件',entry.method_en||'See this version’s originals for its protocol'))}</p><dl class="method-list"><dt>${t('吞吐','Throughput')}</dt><dd>${t('完成输出token / 包含排空的批次秒数','Output tokens / batch seconds including drain')}</dd><dt>TTFT / TPOT</dt><dd>${t('逐请求均值；历史预热和输出预算保持原样。','Request means; original warmup and output budgets retained.')}</dd><dt>${t('同费率成本','Equal-rate cost')}</dt><dd>${t('相同费率与卡数下，单位token成本比 = B0吞吐 / B1吞吐；B0 = 1。','At equal rates and device counts, unit token cost ratio = B0 throughput / B1 throughput; B0 = 1.')}</dd></dl>`};
+    if(key==='metrics'&&!rows.some(row=>row.arms))return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p>`};
+    if(key==='metrics')return {title,body:['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map((field,i)=>`<h3>${[t('吞吐 · token/s','Throughput · token/s'),'TTFT · s','TPOT · ms',t('同费率成本 · B0 = 1','Equal-rate cost · B0 = 1')][i]}</h3>${table(t(['场景','B0','B1','变化'],['Scenario','B0','B1','Change']),rows.map(row=>[row.label,row.arms?n(row.arms.B0[field]/(i===1?1000:1)):'—',row.arms?n(row.arms.B1[field]/(i===1?1000:1)):'—',row.arms?n(row.changes_percent[field])+'%':'—']))}`).join('')};
+    if(key==='quality'){
+      const quality=entry.quality;
+      const qualityView=quality?`<p class="historical-quality">MMLU200 · ${quality.correct}/${quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${quality.historical_screen_minimum}/${quality.requests} · ${quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';
+      const qualityRows=rows.filter(row=>row.arms).flatMap(row=>['B0','B1'].filter(role=>Number.isInteger(row.arms[role].correct)).map(role=>[row.label,role==='B1'?entry.id:role,`${row.arms[role].correct}/${row.arms[role].requests}`,row.arms[role].truncated]));
+      return {title,body:qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止'],['Scenario','Version','Correct','Length stops']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
+    }
     const development=entry.development_measurements||[];
     const developmentRows=development.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms)]));
-    const developmentView=developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:'';
-    const quality=entry.quality;
-    const qualityView=quality?`<p class="historical-quality">MMLU200 · ${quality.correct}/${quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${quality.historical_screen_minimum}/${quality.requests} · ${quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';
-    const valueRows=measures.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),`${arm.requests} / ${arm.failed}`]));
-    const qualityRows=measures.flatMap(row=>row.arms.filter(arm=>Number.isInteger(arm.correct)).map(arm=>[row.label,arm.role,`${arm.correct}/${arm.requests}`,arm.truncated]));
-    const tailRows=measures.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
-    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<section class="frozen-profile historical-release" data-history-release="${entry.id}"><h2>${esc(t(entry.scope_zh,entry.scope_en))}</h2><div class="mod-tags" aria-label="${t('本版本MOD组合','MODs in this release')}">${entry.mods.map(mod=>`<span>${esc(mod)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p>${qualityView}${measures.length?`<div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s')}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms')}</div>`:''}<details><summary>${t('测试范围、完整数值与原件','Scope, complete metrics and originals')}</summary><p>${esc(t(entry.method_zh,entry.method_en))}</p>${valueRows.length?table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','请求 / 失败'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','Requests / failures']),valueRows):''}${qualityRows.length?table(t(['场景','版本','正确','长度终止'],['Scenario','Version','Correct','Length stops']),qualityRows):''}${tailRows.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tailRows):''}${developmentView}<p>${t('吞吐=完成输出token/包含排空的批次耗时；TTFT与TPOT为逐请求均值，历史预热协议保持原样。','Throughput=output tokens/batch time including drain; TTFT and TPOT are request means, with each original warmup protocol retained.')}</p><p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}</p></details></section></section>`;
-    bindMenu();root.dataset.baselineId=releaseCatalog.baseline.id;root.dataset.release=entry.id;root.dataset.loaded='engine-release-history-'+entry.id;root.setAttribute('aria-busy','false');
+    const tails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
+    return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
+  }
+  function renderVersion() {
+    const attempt=attemptIds.includes(selectedRelease);
+    const entry=attempt?releaseCatalog.attempts.find(row=>row.id===selectedRelease):releaseEntry();
+    const reason=attempt?t(entry.reason_zh,entry.reason_en):entry.id==='r5'?t(entry.scope_zh,entry.scope_en):'';
+    const missingNote=attempt||entry.id==='r5'?t('运行未完成，无配对数据','Run incomplete; no paired data'):'';
+    const rows=standardRows(attempt?[]:versionRows(entry),missingNote),available=rows.filter(row=>row.arms);
+    const throughput=available.length?Math.max(...available.map(row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second)):null;
+    const context=available.find(row=>/^16384/.test(row.id));
+    const values=['—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(1-1/throughput))+'%':'—'];
+    const notes=[t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?t('已发布场景最高吞吐比','Highest published throughput ratio'):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t('16K相对B0吞吐','16K throughput vs B0'):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
+    document.getElementById('comparison-title').textContent=t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
+    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
+    const settings=attempt?t('本次尝试未形成冻结配置','This attempt did not produce a frozen configuration'):`E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · TP2 · host ${entry.settings.state_gib_per_rank} GiB/rank · KV ${entry.settings.kv_gib_per_rank} GiB/rank`;
+    const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:entry.mods,settings);
+    const scope=attempt?reason:entry.id==='r8'?t('C8 · 正式871请求，失败0 · 按已发布场景展示','C8 · 871 measured requests, zero failures · published scenarios'):t(entry.scope_zh,entry.scope_en);
+    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值；— 表示缺少本版配对数据。','Bars normalize B0 to 1; labels show measured values. — indicates missing version-specific paired data.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label))}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label))}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label))}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'B0 = 1',1,rows,rows.map(row=>row.label))}</div></section><section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot missing-plot">${t('本版未发布完整的上下文与四租户补测图。','This version has no published complete context and four-tenant supplement chart.')}</div></section><div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    if(!attempt&&!['r4','r5','r7','r8'].includes(entry.id))root.querySelector('.runtime-pair>div:last-child span').textContent=t('运行时身份见配置详情','See configuration details for runtime identity');
+    if(attempt){const config=root.querySelector('.frozen-profile');config.querySelector('h2').textContent=t('本次运行配置','Run configuration');config.querySelector('.runtime-pair>div:last-child span').textContent=t('冻结前尝试，运行时身份见原件','Pre-freeze attempt; see originals for runtime identity');config.querySelector('.mod-tags').textContent=t('未形成冻结MOD组合','No frozen MOD stack');config.dataset.historyAttempt=entry.id;delete root.dataset.baselineId;}else{root.querySelector('.frozen-profile').dataset.historyRelease=entry.id;root.dataset.baselineId=releaseCatalog.baseline.id;}
+    bindMenu();bindDetails(key=>versionDetails(entry,rows,key,attempt));root.dataset.release=entry.id;root.dataset.loaded=entry.id==='r8'?'r8-continuous-20261117':attempt?'engine-release-attempt-'+entry.id:'engine-release-history-'+entry.id;root.dataset.layout='release-dashboard-v1';root.setAttribute('aria-busy','false');
   }
   const r8Mods = ['Extension Manager','BetterScale','Microflow','KV materialization','M01 correction','Packed host state','Sealed serving warmup','Guarded progress async','Capacity tuning','Short prefill tail'];
   function r8Rows() {
@@ -378,23 +416,13 @@
     if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<dl class="method-list"><dt>${t('配对条件','Pairing')}</dt><dd>${t('两臂相同71条预热与输入配方；并发8、输出256 token，每阶段提交300秒再排空；预热不计时。','Same 71 warmups and input recipe; concurrency 8, 256 output tokens, each phase submits for 300s then drains. Warmup is unscored.')}</dd><dt>${t('吞吐','Throughput')}</dt><dd>${t('完成输出token数 ÷ 包含排空的阶段耗时。','Completed output tokens / phase wall time including drain.')}</dd><dt>TTFT</dt><dd>${t('首内容token时刻 − 请求提交时刻，包含排队与prefill。','First content-token time − submission time, including queueing and prefill.')}</dd><dt>TPOT</dt><dd>${t('(响应完成时刻 − 首内容token时刻) ÷ (输出token数 − 1)，逐请求等权平均。','(Completion time − first content-token time) / (output tokens − 1), averaged equally across requests.')}</dd><dt>${t('同费率成本','Equal-rate cost')}</dt><dd>${t('设备费率与卡数相同：单位token成本比 = B0吞吐 / B1吞吐。图中B0 = 1。','With equal device rates and counts: unit token cost ratio = B0 throughput / B1 throughput. B0 = 1 in the chart.')}</dd></dl>`};
     return {title:t('原始证据','Original evidence'),body:`<p>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。固定五项配对结果另行发布。','C8 closed loop · 871 measured requests, zero failures · one run per arm. Five-profile paired results are published separately.')}</p><p><a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="${esc(currentR8.evidence.raw.url)}">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p><figure class="comparison-source-plot"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" alt="${t('B0与r8连续负载原始对照图','Original B0 and r8 continuous-load chart')}"></a></figure>`};
   }
-  function renderR8() {
-    document.getElementById('comparison-title').textContent=t('B0 / B1 r8 实测对比','B0 / B1 r8 measured comparison');
-    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
-    const rows=r8Rows(),labels=['4K','16K'];
-    const highlights=[[t('4K吞吐','4K throughput'),n(currentR8.comparisons['4096-formal'].throughput_ratio)+'×',t('相对B0','vs B0')],[t('16K吞吐','16K throughput'),n(currentR8.comparisons['16384-formal'].throughput_ratio)+'×',t('相对B0','vs B0')],['4K · TTFT','−'+n(currentR8.comparisons['4096-formal'].ttft_reduction_percent)+'%',t('首token时延降低','Lower time to first token')],['4K · TPOT','−'+n(currentR8.comparisons['4096-formal'].tpot_reduction_percent)+'%',t('逐token时延降低','Lower time per output token')]];
-    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<div class="comparison-meta"><span>r8 · ${t('4K / 16K连续负载 · C8 · 正式871请求，失败0','4K / 16K continuous load · C8 · 871 measured requests, zero failures')}</span></div><div class="goal-grid">${highlights.map(([label,value,note])=>`<article class="result-card"><span>${label}</span><strong>${value}</strong><small>${note}</small></article>`).join('')}</div>
-      ${frozenProfile('r8',{B0:'8.5.1',B1:'9.1.0'},r8Mods,'E36/R54 · MTP2 · FULL · TP2 · host 4 GiB/rank · KV 20 GiB/rank')}
-      <section id="r8-current-continuous"><div class="section-heading"><h2>${t('连续负载性能','Continuous-load performance')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值；成本按同费率折算。','Bars normalize B0 to 1; labels show measured values. Cost uses equal device rates.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,labels)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,labels)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,labels)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'B0 = 1',1,rows,labels)}</div></section>
-      <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
-    bindMenu();bindDetails(r8Details);root.dataset.baselineId=releaseCatalog.baseline.id;root.dataset.loaded='r8-continuous-20261117';root.dataset.release='r8';root.setAttribute('aria-busy','false');
-  }
   function render() {
-    if(attemptIds.includes(selectedRelease)) {if(releaseCatalog)renderAttempt();return;}
-    if(selectedRelease==='r8') {if(currentR8)renderR8();return;}
-    if(['r4','r5','r7'].includes(selectedRelease)) {if(releaseCatalog)renderHistorical();return;}
+    if(!releaseCatalog)return;
+    if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}
     if(!data||!combination)return;
-    renderR6();root.querySelector('.comparison-dashboard').insertAdjacentHTML('afterbegin',releaseMenu());bindMenu();root.dataset.baselineId=releaseCatalog.baseline.id;root.dataset.release='r6';
+    renderR6();root.querySelector('.comparison-dashboard').insertAdjacentHTML('afterbegin',releaseMenu());
+    root.querySelector('.frozen-profile').insertAdjacentHTML('afterend',coverageView(data.datasets));
+    bindMenu();root.dataset.baselineId=releaseCatalog.baseline.id;root.dataset.release='r6';root.dataset.layout='release-dashboard-v1';
   }
   async function loadR8() {
     const response=await fetch('./data/r8-continuous-20261117/summary-v1.json',{cache:'no-cache'});
