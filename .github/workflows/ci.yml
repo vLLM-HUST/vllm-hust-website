@@ -43,6 +43,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/assemble_dataset_entrypoints.py
+      - name: Verify benchmark publication and policy are merged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/verify_release_sources.py --benchmark-only
       - name: Run unit tests
         run: |
           python scripts/update_benchmark_publication.py --check
