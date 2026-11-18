@@ -191,9 +191,17 @@ def verify_product_layout(page, product, width, theme, language):
     ):
         for node in page.locator(selector).all():
             assert node.evaluate(CONTRAST) >= 4.5, (product, selector)
+    if language == "en" and product in ("control-plane", "continuum"):
+        expect(page.locator(".product-tagline")).to_have_text(
+            "The right compute. For every request."
+            if product == "control-plane"
+            else "Pick up where you left off.",
+            use_inner_text=True,
+        )
     if product == "continuum":
         expect(page.locator(".product-intro .product-eyebrow")).to_have_text(
-            "智能体工作环境" if language == "zh" else "AGENT WORKSPACE"
+            "智能体工作环境" if language == "zh" else "AGENT WORKSPACE",
+            use_inner_text=True,
         )
         expect(page.locator(".memory-stack > div")).to_have_count(4)
         expect(page.locator('[data-copy="memoryC"]')).to_contain_text(

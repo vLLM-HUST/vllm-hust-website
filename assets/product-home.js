@@ -102,7 +102,7 @@
     "en": {
       "owner": "Lead: Yancan Mao (毛言粲)",
       "status": "Gateway & scheduler implemented",
-      "titleLine1": "The right compute.",
+      "titleLine1": "The right compute. ",
       "titleLine2": "For every request.",
       "lead": "One service entry point to coordinate models, engines and inference requests.",
       "diagramLabel": "Service architecture",
@@ -229,7 +229,7 @@
     "en": {
       "owner": "Interim lead: Shuhao Zhang (张书豪) · recruiting a lead",
       "status": "Architecture planning",
-      "titleLine1": "Pick up where",
+      "titleLine1": "Pick up where ",
       "titleLine2": "you left off.",
       "lead": "A persistent workspace for agents: context and memory, files and artifacts, sandboxes and task recovery.",
       "diagramLabel": "One task. A complete workspace.",
