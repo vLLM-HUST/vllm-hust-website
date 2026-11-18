@@ -17,7 +17,8 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
+wheels/*
+!wheels/r8.html
 *.egg-info/
 .installed.cfg
 *.egg
@@ -81,3 +82,4 @@ assets/data/dataset-entrypoints-source.json
 # Canonical Terminal acceptance is assembled from the benchmark repository.
 /assets/data/terminal-arm64-acceptance-v1.json
 /assets/data/terminal-arm64-acceptance-source.json
+

@@ -65,27 +65,46 @@ async def verify(args):
                                 "#engine-install-command"
                             ).inner_text()
                             assert (
-                                "pip install vllm-hust-engine==2026.11.17.8" in command
-                            )
-                            assert (
-                                "python install-engine-r8.py --out ./r8-install"
+                                "pip install vllm-hust-engine==2026.11.17.8.post1"
                                 in command
                             )
-                            expected = re.search(r"'[a-f0-9]{64}'", command).group()[
-                                1:-1
-                            ]
-                            installer = root / "downloads/install-engine-r8.py"
                             assert (
-                                hashlib.sha256(installer.read_bytes()).hexdigest()
-                                == expected
+                                "--find-links https://vllm-hust.sage.org.ai/wheels/r8.html"
+                                in command
                             )
+                            assert (
+                                "curl " not in command
+                                and "install-engine-r8.py" not in command
+                            )
+                            index = root / "wheels/r8.html"
                             download = await page.request.get(
-                                f"{args.url.rstrip('/')}/downloads/install-engine-r8.py"
+                                f"{args.url.rstrip('/')}/wheels/r8.html"
                             )
                             assert download.status == 200
-                            assert (
-                                hashlib.sha256(await download.body()).hexdigest()
-                                == expected
+                            assert await download.body() == index.read_bytes()
+                            wheel_links = re.findall(
+                                r'href="([^\"]+)"', index.read_text()
+                            )
+                            assert len(wheel_links) == 3
+                            for link in wheel_links:
+                                assert link.startswith(
+                                    "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r8-v1/"
+                                )
+                                assert re.search(
+                                    r"-cp312-cp312-linux_aarch64\.whl#sha256=[a-f0-9]{64}$",
+                                    link,
+                                )
+                            assert any(
+                                "vllm-0.28.1.post1.dev143" in link
+                                for link in wheel_links
+                            )
+                            assert any(
+                                "vllm_ascend-0.25.1rc2.dev125" in link
+                                for link in wheel_links
+                            )
+                            assert any(
+                                "vllm_hust_runtime-2026.11.17.8+r8.3f7eacc1" in link
+                                for link in wheel_links
                             )
                             assert not await page.locator(
                                 "#engine-install-details"

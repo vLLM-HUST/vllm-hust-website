@@ -60,16 +60,14 @@
     <div class="engine-shell">
       <section class="engine-section" id="install-runtime" style="scroll-margin-top:96px" aria-labelledby="engine-install-title">
         <h2 id="engine-install-title">Install and replace the official packages</h2>
-        <p id="engine-install-copy">Run in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The installer verifies the frozen sources and replaces both official distributions using pip.</p>
-        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">python -m pip install vllm-hust-engine==2026.11.17.8 &amp;&amp; \
-curl -fL https://vllm-hust.sage.org.ai/downloads/install-engine-r8.py -o install-engine-r8.py &amp;&amp; \
-printf '%s  %s\n' '904f5f8f670be3b9cd4bbffc6eaf7e2b9f88e53806e7079857ed148bd1e185fa' install-engine-r8.py | sha256sum -c - &amp;&amp; \<!-- pragma: allowlist secret: public installer SHA256 -->
-python install-engine-r8.py --out ./r8-install</code></pre>
+        <p id="engine-install-copy">Run one command in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. pip automatically installs the frozen r8 packages and replaces vllm and vllm-ascend.</p>
+        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">python -m pip install vllm-hust-engine==2026.11.17.8.post1 \
+  --find-links https://vllm-hust.sage.org.ai/wheels/r8.html</code></pre>
         <p id="engine-install-scope" class="engine-note">Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.</p>
         <details><summary id="engine-install-details">Dependencies, verification and uninstall</summary>
-          <p id="engine-install-deps">Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. The installer checks requirements before replacement. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
-          <p id="engine-install-sdk-note">The pip command installs the full SDK; the following installer makes the replacement. It creates local wheels without recompiling native code or downloading private sources. --build-only creates wheels without installing. Receipts and pip logs are saved under --out. Installation does not start a model.</p>
-          <p><a id="engine-install-source" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/scripts/install_frozen_runtime.py">Installer source ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.17.8/">PyPI</a></p>
+          <p id="engine-install-deps">Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. pip resolves the frozen wheel requirements. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
+          <p id="engine-install-sdk-note">The command installs the full SDK and the same-name runtime wheels through normal pip dependencies. No separate installer, private source access or native recompilation is needed. post1 changes installation packaging only; the frozen r8 runtime and MODs are unchanged. Installation does not start a model.</p>
+          <p><a id="engine-install-source" href="https://vllm-hust.sage.org.ai/wheels/r8.html">Frozen wheel source ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.17.8.post1/">PyPI</a></p>
           <pre style="max-width:100%;overflow-x:auto"><code>python -m pip uninstall vllm vllm-ascend vllm-hust-runtime</code></pre>
         </details>
       </section>
@@ -131,12 +129,12 @@ python install-engine-r8.py --out ./r8-install</code></pre>
     window.vllmHustPageDict = {
   "en": {
     "engine-install-title": "Install and replace the official packages",
-    "engine-install-copy": "Run in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The installer verifies the frozen sources and replaces both official distributions using pip.",
+    "engine-install-copy": "Run one command in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. pip automatically installs the frozen r8 packages and replaces vllm and vllm-ascend.",
     "engine-install-scope": "Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.",
     "engine-install-details": "Dependencies, verification and uninstall",
-    "engine-install-deps": "Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. The installer checks requirements before replacement. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.",
-    "engine-install-sdk-note": "The pip command installs the full SDK; the following installer makes the replacement. It creates local wheels without recompiling native code or downloading private sources. --build-only creates wheels without installing. Receipts and pip logs are saved under --out. Installation does not start a model.",
-    "engine-install-source": "Installer source ↗",
+    "engine-install-deps": "Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. pip resolves the frozen wheel requirements. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.",
+    "engine-install-sdk-note": "The command installs the full SDK and the same-name runtime wheels through normal pip dependencies. No separate installer, private source access or native recompilation is needed. post1 changes installation packaging only; the frozen r8 runtime and MODs are unchanged. Installation does not start a model.",
+    "engine-install-source": "Frozen wheel source ↗",
     "sr1-shortcut": "SR experiment details ↗",
     "engine-kicker": "Ascend serving stack",
     "engine-owner": "Lead: Shuhao Zhang (张书豪)",
@@ -223,12 +221,12 @@ python install-engine-r8.py --out ./r8-install</code></pre>
   },
   "zh": {
     "engine-install-title": "安装并替换官方包",
-    "engine-install-copy": "在目标 CPython 3.12 / Linux aarch64 虚拟环境中执行，需 CANN 9.1.0。安装器核验冻结源码后，由 pip 替换 vllm、vllm-ascend 两个官方包。",
+    "engine-install-copy": "在目标 CPython 3.12 / Linux aarch64 虚拟环境中执行一条命令，需 CANN 9.1.0。pip 自动安装冻结 r8 并替换 vllm、vllm-ascend 两个官方包。",
     "engine-install-scope": "保留 import vllm、import vllm_ascend 和 vllm 命令。Qwen35 的整套 MOD 组合使用下方冻结 r8 入口启用。",
     "engine-install-details": "依赖、校验与卸载详情",
-    "engine-install-deps": "固定依赖：Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0、Transformers 5.14.1、tokenizers 0.22.2。替换前会检查依赖。已验证的模型与硬件范围：Qwen3.5-35B-A3B BF16、双 Ascend 910B2、TP2。",
-    "engine-install-sdk-note": "pip 命令安装完整 SDK；后续安装器才完成替换。本地生成 wheel，不重编 native 代码、不下载私有源码。--build-only 只构建不安装；--out 保存校验回执和 pip 日志。安装阶段不启动模型。",
-    "engine-install-source": "安装器源码 ↗",
+    "engine-install-deps": "固定依赖：Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0、Transformers 5.14.1、tokenizers 0.22.2。pip 按冻结 wheel 元数据解析依赖。已验证的模型与硬件范围：Qwen3.5-35B-A3B BF16、双 Ascend 910B2、TP2。",
+    "engine-install-sdk-note": "一条命令通过正常 pip 依赖安装完整 SDK 和同名运行时 wheel，无需另跑安装器、访问私有源码或重编 native。post1 仅修订安装打包，冻结 r8 运行时与 MOD 不变。安装阶段不启动模型。",
+    "engine-install-source": "冻结 wheel 源 ↗",
     "sr1-shortcut": "SR 系列实验详情 ↗",
     "engine-kicker": "Ascend 推理服务栈",
     "engine-owner": "负责人：张书豪",
@@ -328,3 +326,4 @@ python install-engine-r8.py --out ./r8-install</code></pre>
   <script src="./assets/site.js?v=engine-navigation-20261117"></script>
 </body>
 </html>
+
