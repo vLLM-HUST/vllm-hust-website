@@ -220,28 +220,103 @@ def verify_product_layout(page, product, width, theme, language):
 
 
 def verify_product_deep_links(browser, args):
-    """A shared collapsed library must still support saved and repeated links."""
-    context = browser.new_context(viewport={"width": 390, "height": 1000})
-    page = context.new_page()
-    for slug in ("engine", "control-plane", "continuum"):
-        url = urljoin(args.url.rstrip("/") + "/", f"{slug}.html")
-        page.goto(url)
-        paper = page.locator(".publication-item").first.get_attribute("id")
-        page.goto(url + "#" + paper)
-        page.reload(wait_until="networkidle")
-        expect(page.locator(".publication-library")).to_have_attribute("open", "")
-        expect(page.locator("#" + paper)).to_be_visible()
-        page.goto(url + "#publications")
-        expect(page.locator(".publication-library")).to_have_attribute("open", "")
-        page.locator(".publication-library > summary").click()
-        expect(page.locator(".publication-library")).not_to_have_attribute("open", "")
-        page.locator(".publications-shortcut").click()
-        expect(page.locator(".publication-library")).to_have_attribute("open", "")
-        if slug == "engine":
-            for anchor in ("#r8-mods", "#release", "#r8-current-results"):
-                page.goto(url + anchor)
-                expect(page.locator(anchor)).to_be_visible()
-    context.close()
+    """Saved links, history and new windows preserve native navigation semantics."""
+    rows = []
+    for width in (390, 1440):
+        context = browser.new_context(viewport={"width": width, "height": 1000})
+        page = context.new_page()
+        errors = []
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        for slug in ("engine", "control-plane", "continuum"):
+            url = urljoin(args.url.rstrip("/") + "/", f"{slug}.html")
+            page.goto(url)
+            paper = page.locator(".publication-item").first.get_attribute("id")
+            page.goto(url + "#" + paper)
+            page.reload(wait_until="networkidle")
+            library = page.locator(".publication-library")
+            expect(library).to_have_attribute("open", "")
+            expect(page.locator("#" + paper)).to_be_visible()
+            page.goto(url + "#publications")
+            expect(library).to_have_attribute("open", "")
+            close_publication_library(page)
+            shortcut = page.locator(".publications-shortcut")
+            shortcut.focus()
+            page.keyboard.press("Enter")
+            expect(library).to_have_attribute("open", "")
+
+            # Back/forward must reopen a saved target even after unknown, empty
+            # or malformed fragments, which have no DOM target of their own.
+            for fragment in ("#absent-product-section", "#", "#%E0%A4%A"):
+                close_publication_library(page)
+                page.evaluate("fragment => { location.hash = fragment; }", fragment)
+                expect(page).to_have_url(url + fragment)
+                page.go_back()
+                expect(page).to_have_url(url + "#publications")
+                expect(library).to_have_attribute("open", "")
+                page.go_forward()
+                expect(page).to_have_url(url + fragment)
+                page.go_back()
+                expect(library).to_have_attribute("open", "")
+
+            # A real new window loads its own target; the source remains closed.
+            for attribute in (
+                {"target": "_blank"},
+                {"href": "?view=linked#publications", "target": "_blank"},
+            ):
+                page.goto(url, wait_until="networkidle")
+                page.goto(url + "#publications")
+                expect(library).to_have_attribute("open", "")
+                close_publication_library(page)
+                shortcut.evaluate(
+                    "(a, attrs) => { for (const [key,value] of Object.entries(attrs)) a.setAttribute(key,value); }",
+                    attribute,
+                )
+                with page.expect_popup() as opened:
+                    shortcut.click()
+                popup = opened.value
+                popup.wait_for_load_state("networkidle")
+                expect(popup.locator(".publication-library")).to_have_attribute(
+                    "open", ""
+                )
+                expect(library).not_to_have_attribute("open", "")
+                expect(page).to_have_url(url + "#publications")
+                popup.close()
+
+            # Native download and canceled clicks must not reveal page details.
+            page.goto(url, wait_until="networkidle")
+            page.goto(url + "#publications")
+            expect(library).to_have_attribute("open", "")
+            close_publication_library(page)
+            shortcut.evaluate("a => a.download = 'product.html'")
+            with page.expect_download() as downloaded:
+                shortcut.click()
+            assert downloaded.value.suggested_filename == "product.html"
+            expect(library).not_to_have_attribute("open", "")
+            expect(page).to_have_url(url + "#publications")
+            shortcut.evaluate(
+                "a => { a.removeAttribute('download'); a.addEventListener('click', e => e.preventDefault(), {once:true}); }"
+            )
+            shortcut.click()
+            expect(library).not_to_have_attribute("open", "")
+            expect(page).to_have_url(url + "#publications")
+            if slug == "engine":
+                for anchor in ("#r8-mods", "#release", "#r8-current-results"):
+                    page.goto(url + anchor)
+                    expect(page.locator(anchor)).to_be_visible()
+            assert not errors, (slug, width, errors)
+            rows.append(
+                dict(
+                    page=slug,
+                    width=width,
+                    history=True,
+                    new_window=True,
+                    download=True,
+                    canceled_click=True,
+                    passed=True,
+                )
+            )
+        context.close()
+    return rows
 
 
 RESEARCH_URL = "https://lab.sage.org.ai/auto-research-report-website/"
@@ -862,9 +937,9 @@ def main():
                         )
                     )
                 context.close()
-        verify_product_deep_links(browser, args)
+        deep_links = verify_product_deep_links(browser, args)
         browser.close()
-    receipt = dict(passed=True, views=rows, model_requests=0)
+    receipt = dict(passed=True, views=rows, deep_links=deep_links, model_requests=0)
     (args.output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(dict(passed=True, views=len(rows), model_requests=0)))
 
