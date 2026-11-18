@@ -61,6 +61,7 @@ def check_product_views(page, taxonomy):
             )
             expect(page.locator(".plugin-controls")).to_be_visible()
             expect(page.locator("[data-layer=retired]")).to_be_disabled()
+            expect(page.locator("[data-layer=retired]")).to_be_hidden()
             assert page.locator("[data-layer=control_plane]").is_enabled() == (
                 product == "control-plane"
             )

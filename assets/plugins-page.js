@@ -436,7 +436,7 @@
       engine: ['Engine', zh ? '执行优化 · KV · 图与算子' : 'Execution · KV · graphs & kernels', './engine.html'],
       'control-plane': ['Control Plane', zh ? '路由 · 准入 · 生命周期策略' : 'Routing · admission · lifecycle policies', './control-plane.html'],
       continuum: ['Continuum', zh ? '记忆写入 · 检索 · 任务恢复' : 'Memory capture · retrieval · task recovery', './continuum.html'],
-      archive: [zh ? '历史归档' : 'Archives', zh ? '保留历史组件与原始记录' : 'Historical components and original records', './report-history.html']
+      archive: [zh ? '历史归档' : 'Archives', zh ? '保留历史组件与原始记录' : 'Historical components and original records', null]
     };
     return rows[id];
   }
@@ -880,6 +880,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       button.type = "button";
       button.dataset.layer = type;
       button.disabled = type !== 'extensions' && !registry.components.some(item => matchesProduct(item) && taxonomyProfile(item).kind === type);
+      button.hidden = button.disabled;
       button.setAttribute("aria-pressed", String(selectedType === type));
       button.addEventListener("click", () => {
         selectedType = type;
@@ -1983,8 +1984,13 @@ vllm-hust-ext extension check ${extensionId}`
       const header = element('header', 'mod-product-results-heading');
       const heading = element('div', '');
       heading.append(element('h2', '', name), element('p', '', description));
-      const link = element('a', '', language() === 'zh' ? '查看主页 ↗' : 'Product home ↗'); link.href = href;
-      header.append(heading, link); section.append(header); target = section;
+      header.append(heading);
+      if (href) {
+        const link = element('a', '', language() === 'zh' ? '查看主页 ↗' : 'Product home ↗');
+        link.href = href;
+        header.append(link);
+      }
+      section.append(header); target = section;
       groups.forEach(([kind, title]) => {
         appendGroup(title, visible.filter((project) => project.kind === kind && productView(project.primary) === product), kind);
       });
