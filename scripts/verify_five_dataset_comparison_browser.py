@@ -57,7 +57,9 @@ def assert_controller_progress(page, root, publication, lang):
     dialog = root.locator("dialog")
     expect(dialog).to_be_visible()
     expect(dialog).to_contain_text(publication["engine_release"])
-    expect(dialog).to_contain_text(f'{publication["result"]["time_reduction_percent"]:.2f}%')
+    expect(dialog).to_contain_text(
+        f"{publication['result']['time_reduction_percent']:.2f}%"
+    )
     expect(dialog.locator("table")).to_have_count(2)
     for row in publication["profiles"]:
         expect(dialog).to_contain_text(row["label_zh" if lang == "zh" else "label_en"])
@@ -76,7 +78,9 @@ def verify(url, output):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         context = browser.new_context()
-        controller = context.request.get(url + "/data/controller-experiment-progress-v1.json").json()
+        controller = context.request.get(
+            url + "/data/controller-experiment-progress-v1.json"
+        ).json()
         data = context.request.get(url + "/" + SUMMARY).json()
         combo = context.request.get(url + "/" + COMBINATION).json()
         catalog = context.request.get(url + "/" + HISTORY).json()

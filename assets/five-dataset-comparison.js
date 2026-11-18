@@ -198,12 +198,12 @@
     ];
     const source = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${controllerProgressCommit}/${d.report_path}`;
     return {title:t('限流层实验结果与更新记录', 'Request Throttling Controller results and changelog'),body:`
-      <p>${esc(d.updated)} · ${esc(d.model)} · ${esc(d.platform)}</p><p>${esc(d.engine_release)} · max_num_seqs=${d.max_num_seqs} · state_resident_seats=${d.state_resident_seats}</p>
-      <p>${t('SWE-smith 三轮回放：整批耗时缩短 ', 'SWE-smith three-turn replay: batch time reduced by ')}<strong>${n(r.time_reduction_percent)}%</strong></p>
+      <p><a href="./controlplane/">${t('查看第八版控制面完整结果','View the r8 control-plane results')} ↗</a></p><p>${t('以下为第六版历史配对，不代表第八版。','The following is the historical r6 pair, not r8.')}</p><p>${esc(d.updated)} · ${esc(d.model)} · ${esc(d.platform)}</p><p>${esc(d.engine_release)} · max_num_seqs=${d.max_num_seqs} · state_resident_seats=${d.state_resident_seats}</p>
+      <p>${t('SWE-smith 三轮长度/等待微基准：整批耗时缩短 ', 'SWE-smith three-turn length/wait microbenchmark: batch time reduced by ')}<strong>${n(r.time_reduction_percent)}%</strong></p>
       ${table(t(['指标','直连 B1','B1 加原版 ThunderAgent'], ['Metric','B1 direct','B1 with original ThunderAgent']), metrics)}
       <p>${t('112 个任务同时到达，每组 336 次请求全部成功。两组各自冷启动和预热，执行上限 24、任务状态驻留数 80；KV 缓存占用峰值均为 99.83%。', '112 simultaneous tasks, all 336 requests successful in each arm. Both arms cold-started and warmed up independently, with execution limit 24 and 80 resident states; peak KV usage was 99.83% in both arms.')}</p>
       <p>${t('每组一次顺序配对。续轮继承各自实际输出，336 次请求中 170 次输入 token 序列一致。任务解决率尚未测量；独立重复待验证。', 'One ordered run per arm. Continuations inherit each arm’s generated outputs; 170 of 336 prompt token sequences match. Task solve rate and independent repetitions remain unmeasured.')}</p>
-      ${table(t(['数据集','B0/B1 引擎结果','本轮限流层对照'], ['Dataset','B0/B1 engine results','This controller comparison']), rows)}
+      <p>${t('56份长度与工具等待模板，各两个独立合成token-ID实例；续轮继承真实输出，不是原始题目文本或完整Agent任务。','56 length/tool-wait templates with two independent synthetic token-ID instances each. Continuations inherit real outputs; this is not original task text or complete Agent execution.')}</p>${table(t(['数据集','B0/B1 引擎结果','历史限流层配对覆盖'], ['Dataset','B0/B1 engine results','Historical controller-pair coverage']), rows)}
       <details><summary>${t('更新记录', 'Changelog')}</summary><ul>${d.changelog.map(row=>`<li><strong>${esc(row.date)}</strong> ${esc(t(row.zh,row.en))}</li>`).join('')}</ul></details>
       <p><a href="${esc(source)}">${t('实验配置、原始指标与复算', 'Configuration, recorded metrics and recomputation')} ↗</a> · <a href="./b0-b1-legacy.html#method-2">${t('历史对照', 'Historical comparison')} ↗</a></p>`};
   }

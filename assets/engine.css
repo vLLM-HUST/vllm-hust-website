@@ -1,4 +1,4 @@
-body[data-page="engine"] {
+:is(body[data-page="engine"], body[data-page="controlplane"]) {
     color-scheme: light dark;
     --engine-bg: #f6f8f6;
     --engine-panel: #fff;
@@ -155,8 +155,8 @@ body[data-page="engine"] {
 
 .engine-section { padding-block: clamp(36px, 6vw, 66px); }
 
-body[data-page="engine"] .engine-section h2,
-body[data-page="engine"] .engine-section h3 { color: var(--engine-ink); }
+:is(body[data-page="engine"], body[data-page="controlplane"]) .engine-section h2,
+:is(body[data-page="engine"], body[data-page="controlplane"]) .engine-section h3 { color: var(--engine-ink); }
 
 .engine-section h2 {
     margin: 0 0 20px;
@@ -212,7 +212,7 @@ body[data-page="engine"] .engine-section h3 { color: var(--engine-ink); }
 
 .engine-footer { font-size: 0.875rem; }
 
-body[data-page="engine"] :focus-visible {
+:is(body[data-page="engine"], body[data-page="controlplane"]) :focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 4px;
 }
@@ -226,7 +226,7 @@ body[data-page="engine"] :focus-visible {
 }
 
 @media (prefers-color-scheme: dark) {
-    body[data-page="engine"] {
+    :is(body[data-page="engine"], body[data-page="controlplane"]) {
         --engine-bg: #111b17;
         --engine-panel: #1b2923;
         --engine-ink: #eef5f0;
@@ -235,7 +235,7 @@ body[data-page="engine"] :focus-visible {
         --engine-accent: #a7ddc3;
     }
 
-    body[data-page="engine"] .site-nav {
+    :is(body[data-page="engine"], body[data-page="controlplane"]) .site-nav {
         color-scheme: light;
         color: var(--ink);
     }
