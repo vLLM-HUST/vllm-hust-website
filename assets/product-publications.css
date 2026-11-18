@@ -1,0 +1,50 @@
+/* Shared scholarly bibliography for all three product homes. */
+.product-publications .lang-zh, .publications-shortcut .lang-zh { display: none; }
+html[lang^="zh"] .product-publications .lang-en, html[lang^="zh"] .publications-shortcut .lang-en { display: none; }
+html[lang^="zh"] .product-publications .lang-zh, html[lang^="zh"] .publications-shortcut .lang-zh { display: inline; }
+.product-publications {
+  --pub-ink: var(--product-ink, var(--engine-ink, #162f30));
+  --pub-muted: var(--product-muted, var(--engine-muted, #536965));
+  --pub-line: var(--product-line, var(--engine-line, #d4ded8));
+  --pub-accent: var(--product-accent, var(--engine-accent, #006b60));
+  --pub-surface: var(--product-surface, var(--engine-panel, #fff));
+  margin: 64px 0 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--pub-line);
+  color: var(--pub-ink);
+  scroll-margin-top: 96px;
+}
+.product-publications .publications-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.product-publications .publications-kicker { color: var(--pub-accent); font-size: 11px; font-weight: 700; letter-spacing: .13em; margin: 0 0 12px; }
+body[data-page] .product-publications h2 { color: var(--pub-ink); font-size: clamp(26px, 3vw, 35px); line-height: 1.3; margin: 0 0 12px; letter-spacing: -.025em; }
+.product-publications .publications-heading p:last-child { color: var(--pub-muted); font-size: 13px; line-height: 1.8; margin: 0; }
+.product-publications .publication-count { color: var(--pub-muted); font: 500 13px/1.3 ui-monospace, monospace; padding-left: 8px; vertical-align: middle; }
+.product-publications .publications-all { font-size: 12px; white-space: nowrap; }
+.product-publications a { color: var(--pub-accent); text-underline-offset: 4px; }
+.product-publications :focus-visible { outline: 3px solid var(--pub-accent); outline-offset: 4px; }
+.product-publications .publication-navigation { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 14px 0; border-block: 1px solid var(--pub-line); font-size: 12px; }
+.product-publications .publication-group { margin-top: 28px; }
+body[data-page] .product-publications h3 { color: var(--pub-ink); font-size: 16px; line-height: 1.6; margin: 0 0 8px; scroll-margin-top: 96px; }
+.product-publications .publication-list { padding: 0; margin: 0; list-style: none; }
+.product-publications .publication-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 28px; padding: 18px 0; border-bottom: 1px solid var(--pub-line); scroll-margin-top: 96px; }
+.product-publications .publication-record { min-width: 0; }
+.product-publications .publication-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; color: var(--pub-muted); font-size: 11px; line-height: 1.6; }
+.product-publications .publication-status { border: 1px solid var(--pub-line); border-radius: 3px; padding: 1px 6px; }
+.product-publications h4 { color: var(--pub-ink); margin: 6px 0 0; font-size: 15px; line-height: 1.65; font-weight: 600; overflow-wrap: anywhere; }
+.product-publications .publication-title { color: inherit; text-decoration: none; }
+.product-publications .publication-title:hover { color: var(--pub-accent); text-decoration: underline; }
+.product-publications .publication-links { display: flex; align-items: start; flex-wrap: wrap; justify-content: end; gap: 8px 14px; padding-top: 25px; max-width: 180px; font-size: 11px; line-height: 1.8; }
+.product-publications .publication-links a { white-space: nowrap; }
+.product-publications .publication-citation { margin-top: 7px; }
+.product-publications .publication-citation summary { color: var(--pub-muted); font-size: 11px; cursor: pointer; width: fit-content; }
+.product-publications .publication-citation p { color: var(--pub-muted); font-size: 12px; line-height: 1.8; margin: 10px 0 0; overflow-wrap: anywhere; }
+.product-publications .publication-provenance { margin-top: 28px; padding: 16px; border: 1px solid var(--pub-line); border-radius: 4px; background: var(--pub-surface); font-size: 12px; line-height: 1.8; }
+.product-publications .publication-provenance summary { color: var(--pub-muted); cursor: pointer; }
+.product-publications .publication-provenance p { color: var(--pub-muted); }
+@media (max-width: 760px) {
+  .product-publications { margin-top: 44px; }
+  .product-publications .publications-heading { align-items: start; flex-direction: column; gap: 16px; }
+  .product-publications .publication-item { grid-template-columns: 1fr; gap: 8px; }
+  .product-publications .publication-links { justify-content: start; max-width: none; padding-top: 0; }
+  .product-publications h4 { font-size: 14px; }
+}

@@ -51,12 +51,36 @@ def dashboard_layout(root):
     )
 
 
+def assert_controller_progress(page, root, publication, lang):
+    button = root.locator('[data-detail="controller-progress"]')
+    button.click()
+    dialog = root.locator("dialog")
+    expect(dialog).to_be_visible()
+    expect(dialog).to_contain_text(publication["engine_release"])
+    expect(dialog).to_contain_text(
+        f"{publication['result']['time_reduction_percent']:.2f}%"
+    )
+    expect(dialog.locator("table")).to_have_count(2)
+    for row in publication["profiles"]:
+        expect(dialog).to_contain_text(row["label_zh" if lang == "zh" else "label_en"])
+    details = dialog.locator("details")
+    details.locator("summary").click()
+    for row in publication["changelog"]:
+        expect(details).to_contain_text(row["zh" if lang == "zh" else "en"])
+    page.keyboard.press("Escape")
+    expect(dialog).not_to_be_visible()
+    expect(button).to_be_focused()
+
+
 def verify(url, output):
     output.mkdir(parents=True, exist_ok=True)
     checks = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
         context = browser.new_context()
+        controller = context.request.get(
+            url + "/data/controller-experiment-progress-v1.json"
+        ).json()
         data = context.request.get(url + "/" + SUMMARY).json()
         combo = context.request.get(url + "/" + COMBINATION).json()
         catalog = context.request.get(url + "/" + HISTORY).json()
@@ -87,6 +111,7 @@ def verify(url, output):
                     expect(root.locator(".bar-value")).to_have_count(56)
                     expect(root.locator(".mod-tags span")).to_have_count(10)
                     assert_release_control_readable(page, root)
+                    assert_controller_progress(page, root, controller, lang)
                     r8_layout = dashboard_layout(root)
                     assert r8_layout["profiles"] == [
                         "mmlu",
@@ -253,6 +278,7 @@ def verify(url, output):
                     )
                     assert dashboard_layout(root) == r8_layout
                     assert_release_control_readable(page, root)
+                    assert_controller_progress(page, root, controller, lang)
                     expect(root).to_have_attribute(
                         "data-baseline-id", "original018-cann8.5.1"
                     )

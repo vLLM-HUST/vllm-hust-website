@@ -44,6 +44,7 @@ Thumbs.db
 .planning/
 .playwright-cli/
 output/
+screenshots/
 tmp/
 findings.md
 progress.md

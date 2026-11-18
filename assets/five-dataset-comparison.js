@@ -10,7 +10,7 @@
   const root = document.getElementById('five-dataset-comparison');
   if (!root) return;
   const combinationPath = 'data/five-datasets-r6-20261114/frozen-combination-v1.json';
-  let data, manifest, combination;
+  let data, manifest, combination, controllerProgress;
   const t = (zh, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? zh : en;
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const n = v => Number.isFinite(v) ? v.toFixed(2) : '—';
@@ -187,13 +187,54 @@
     bindDetails(detailContent);
     root.dataset.loaded=data.run_id;root.setAttribute('aria-busy','false');
   }
+  function controllerProgressContent() {
+    const d = controllerProgress, r = d.result;
+    const rows = d.profiles.map(profile => [t(profile.label_zh, profile.label_en), (profile.engine_comparison==='historical_b1_replay' ? t('历史 B1 回放', 'Historical B1 replay') : t('已有引擎对照', 'Engine comparison published')), profile.controller_comparison === 'complete' ? t('已完成', 'Complete') : t('待补跑', 'Pending')]);
+    const metrics = [
+      [t('整批耗时（秒）', 'Batch time (s)'), n(r.direct.elapsed_seconds), n(r.request_throttling_controller.elapsed_seconds)],
+      [t('KV 缓存输入命中率', 'Cached input tokens'), n(r.direct.cached_input_percent)+'%', n(r.request_throttling_controller.cached_input_percent)+'%'],
+      [t('成功请求', 'Successful requests'), r.direct.successful_requests, r.request_throttling_controller.successful_requests],
+      [t('续轮零命中次数 / 224', 'Zero-hit continuations / 224'), r.direct.zero_hit_continuations, r.request_throttling_controller.zero_hit_continuations],
+    ];
+    const source = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${controllerProgressCommit}/${d.report_path}`;
+    return {title:t('限流层实验结果与更新记录', 'Request Throttling Controller results and changelog'),body:`
+      <p><a href="./controlplane/">${t('查看第八版控制面完整结果','View the r8 control-plane results')} ↗</a></p><p>${t('以下为第六版历史配对，不代表第八版。','The following is the historical r6 pair, not r8.')}</p><p>${esc(d.updated)} · ${esc(d.model)} · ${esc(d.platform)}</p><p>${esc(d.engine_release)} · max_num_seqs=${d.max_num_seqs} · state_resident_seats=${d.state_resident_seats}</p>
+      <p>${t('SWE-smith 三轮长度/等待微基准：整批耗时缩短 ', 'SWE-smith three-turn length/wait microbenchmark: batch time reduced by ')}<strong>${n(r.time_reduction_percent)}%</strong></p>
+      ${table(t(['指标','直连 B1','B1 加原版 ThunderAgent'], ['Metric','B1 direct','B1 with original ThunderAgent']), metrics)}
+      <p>${t('112 个任务同时到达，每组 336 次请求全部成功。两组各自冷启动和预热，执行上限 24、任务状态驻留数 80；KV 缓存占用峰值均为 99.83%。', '112 simultaneous tasks, all 336 requests successful in each arm. Both arms cold-started and warmed up independently, with execution limit 24 and 80 resident states; peak KV usage was 99.83% in both arms.')}</p>
+      <p>${t('每组一次顺序配对。续轮继承各自实际输出，336 次请求中 170 次输入 token 序列一致。任务解决率尚未测量；独立重复待验证。', 'One ordered run per arm. Continuations inherit each arm’s generated outputs; 170 of 336 prompt token sequences match. Task solve rate and independent repetitions remain unmeasured.')}</p>
+      <p>${t('56份长度与工具等待模板，各两个独立合成token-ID实例；续轮继承真实输出，不是原始题目文本或完整Agent任务。','56 length/tool-wait templates with two independent synthetic token-ID instances each. Continuations inherit real outputs; this is not original task text or complete Agent execution.')}</p>${table(t(['数据集','B0/B1 引擎结果','历史限流层配对覆盖'], ['Dataset','B0/B1 engine results','Historical controller-pair coverage']), rows)}
+      <details><summary>${t('更新记录', 'Changelog')}</summary><ul>${d.changelog.map(row=>`<li><strong>${esc(row.date)}</strong> ${esc(t(row.zh,row.en))}</li>`).join('')}</ul></details>
+      <p><a href="${esc(source)}">${t('实验配置、原始指标与复算', 'Configuration, recorded metrics and recomputation')} ↗</a> · <a href="./b0-b1-legacy.html#method-2">${t('历史对照', 'Historical comparison')} ↗</a></p>`};
+  }
+  let controllerProgressCommit;
+  async function loadControllerProgress() {
+    const path='data/controller-experiment-progress-v1.json';
+    const publication=await (await fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'})).json();
+    if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark' || publication.status!=='published-source' || !/^[a-f0-9]{40}$/.test(publication.commit)) throw Error('Invalid controller publisher');
+    const matches=publication.files.filter(row=>row.website_path===path);
+    if(matches.length!==1) throw Error('Missing controller publication');
+    const response=await fetch('./'+path,{cache:'no-cache'});
+    if(!response.ok) throw Error('Unavailable controller publication');
+    const bytes=await response.arrayBuffer();
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(hash!==matches[0].sha256 || bytes.byteLength!==matches[0].bytes) throw Error('Controller publication checksum mismatch');
+    const value=JSON.parse(new TextDecoder().decode(bytes));
+    const result=value.result;
+    if(value.schema!=='controller-experiment-progress/v1' || !result.completed_pair || value.state_resident_seats!==80 || value.repetitions_per_arm!==1 || value.task_quality_evaluated!==false || !Array.isArray(value.profiles) || !Array.isArray(value.changelog)) throw Error('Invalid controller comparison scope');
+    for(const arm of [result.direct,result.request_throttling_controller]) {
+      if(arm.completed_tasks!==112 || arm.successful_requests!==336 || arm.failed_requests!==0 || !Number.isFinite(arm.elapsed_seconds) || arm.elapsed_seconds<=0) throw Error('Incomplete controller comparison');
+    }
+    if(!close(result.time_reduction_percent,100*(1-result.request_throttling_controller.elapsed_seconds/result.direct.elapsed_seconds))) throw Error('Controller arithmetic mismatch');
+    controllerProgress=value;controllerProgressCommit=publication.commit;
+  }
   function detailDialog() {
     return `<dialog id="comparison-detail-dialog" class="comparison-dialog" aria-labelledby="comparison-dialog-title"><div class="dialog-header"><h2 id="comparison-dialog-title"></h2><button type="button" class="dialog-close" aria-label="${t('关闭详情','Close details')}">×</button></div><div id="comparison-dialog-body"></div></dialog>`;
   }
   function bindDetails(content) {
     const dialog=root.querySelector('dialog');
     root.querySelectorAll('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
-      const value=content(button.dataset.detail);
+      const value=button.dataset.detail==='controller-progress' ? controllerProgressContent() : content(button.dataset.detail);
       root.querySelector('#comparison-dialog-title').textContent=value.title;
       root.querySelector('#comparison-dialog-body').innerHTML=value.body;
       dialog.showModal();
@@ -202,7 +243,7 @@
     dialog.addEventListener('click',event=>{if(event.target===dialog && event.clientX>=dialog.getBoundingClientRect().right)dialog.close();});
   }
   function frozenProfile(release, cann, mods, settings) {
-    return `<section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${esc(cann.B0)}</span></div><div><strong>B1 · ${esc(release)}</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${esc(cann.B1)}</span></div></div><div class="mod-tags">${mods.map(c=>`<span>${esc(c)}</span>`).join('')}</div><p class="frozen-settings">${esc(settings)}</p></section>`;
+    return `<section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button><button type="button" data-detail="controller-progress">${t('限流层实验与更新记录','Controller experiments and changelog')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${esc(cann.B0)}</span></div><div><strong>B1 · ${esc(release)}</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${esc(cann.B1)}</span></div></div><div class="mod-tags">${mods.map(c=>`<span>${esc(c)}</span>`).join('')}</div><p class="frozen-settings">${esc(settings)}</p></section>`;
   }
 
   async function loadR6() {
@@ -397,7 +438,7 @@
     const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
-      await loadReleaseCatalog();
+      await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress()]);
       if(request!==releaseRequest)return;
       if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();

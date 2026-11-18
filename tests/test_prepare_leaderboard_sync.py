@@ -283,6 +283,47 @@ def test_empty_snapshot_replacement_fails_closed(tmp_path: Path) -> None:
         MODULE.validate_snapshot_set(source, info)
 
 
+def test_candidate_keeps_its_runtime_and_transport_overrides(tmp_path: Path) -> None:
+    _, _, info = registry(tmp_path)
+    payload = exact_target_entry(info)
+    payload.update(engine="vllm-hust", engine_version="0.25.1+hust")
+    target = info.targets["official-target"]
+    target["server_parameters"].update(host="127.0.0.1", port=8000, model="/baseline")
+    target["workload"]["client_parameters"].update(port=8000, model="/baseline")
+    payload["same_spec"]["resolved_server_parameters"].update(
+        host="localhost", port=8001, model="/candidate"
+    )
+    payload["same_spec"]["resolved_client_parameters"].update(
+        port=8001, model="/candidate"
+    )
+
+    assert MODULE.require_public_entry_contract(payload, "candidate", info) == []
+    assert payload["same_spec"]["resolved_server_parameters"]["port"] == 8001
+    payload["same_spec"]["resolved_server_parameters"]["tensor_parallel_size"] = 1
+    assert any(
+        "tensor_parallel_size" in error
+        for error in MODULE.require_public_entry_contract(payload, "candidate", info)
+    )
+
+
+@pytest.mark.parametrize(
+    ("engine", "version", "message"),
+    [
+        ("vllm", "0.25.1", "baseline runtime"),
+        ("other-engine", "0.25.1", "neither the baseline nor vllm-hust"),
+        ("vllm-hust", "", "candidate engine_version"),
+    ],
+)
+def test_runtime_identity_stays_required(
+    tmp_path: Path, engine: str, version: str, message: str
+) -> None:
+    _, _, info = registry(tmp_path)
+    payload = exact_target_entry(info)
+    payload.update(engine=engine, engine_version=version)
+    errors = MODULE.require_public_entry_contract(payload, "entry", info)
+    assert any(message in error for error in errors)
+
+
 def test_sync_cannot_silently_remove_existing_admitted_entry(tmp_path: Path) -> None:
     _, _, info = registry(tmp_path)
     target = snapshot_dir(tmp_path, info)
