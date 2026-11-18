@@ -7,6 +7,36 @@ from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
 
+def verify_navigation(page, width):
+    product = page.locator('[data-nav-group="products"]')
+    link = product.locator('[data-nav-page="controlplane"]')
+    expect(link).to_have_attribute("aria-current", "page")
+    expect(product.locator('[data-nav-page="control-plane"]')).not_to_have_attribute(
+        "aria-current", "page"
+    )
+    page.wait_for_function(
+        """() => {
+            const nav = document.querySelector('.site-nav').getBoundingClientRect();
+            const heading = document.querySelector('#control-results-title').getBoundingClientRect();
+            return heading.top >= nav.bottom && heading.bottom <= innerHeight;
+        }""",
+        timeout=3000,
+    )
+    if width <= 860:
+        toggle = page.locator("#navToggle")
+        toggle.click()
+        expect(toggle).to_have_attribute("aria-expanded", "true")
+        expect(link).to_be_visible()
+        page.keyboard.press("Escape")
+        expect(toggle).to_be_focused()
+        expect(toggle).to_have_attribute("aria-expanded", "false")
+    else:
+        product.locator("summary").click()
+        expect(link).to_be_visible()
+        page.keyboard.press("Escape")
+        expect(product.locator("summary")).to_be_focused()
+
+
 def verify(args):
     args.output.mkdir(parents=True, exist_ok=True)
     receipts = []
@@ -23,9 +53,10 @@ def verify(args):
                     "pageerror", lambda error, errors=errors: errors.append(str(error))
                 )
                 response = page.goto(
-                    args.url.rstrip("/") + "/controlplane/", wait_until="networkidle"
+                    args.url.rstrip("/") + "/controlplane/#results", wait_until="networkidle"
                 )
                 assert response.status == 200
+                verify_navigation(page, width)
                 root = page.locator("#control-results")
                 expect(root).to_have_attribute("aria-busy", "false")
                 assert not root.get_attribute("data-error"), root.inner_text()

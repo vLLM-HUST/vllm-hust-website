@@ -431,11 +431,12 @@
 
     function updateNavigationState() {
         const currentPage = document.body?.dataset?.page || 'home';
-        const pathname = window.location.pathname.replace(/\/$/, '/index.html');
+        const normalizePath = (path) => path.replace(/\/$/, '/index.html');
+        const pathname = normalizePath(window.location.pathname);
         document.querySelectorAll('.nav-links a, .benchmark-tabs a').forEach((link) => {
             const target = new URL(link.href, window.location.href);
             const current = target.origin === window.location.origin
-                && target.pathname === pathname
+                && normalizePath(target.pathname) === pathname
                 && (!target.hash || target.hash === window.location.hash);
             link.classList.toggle('active', current);
             if (current) link.setAttribute('aria-current', target.hash ? 'location' : 'page');
