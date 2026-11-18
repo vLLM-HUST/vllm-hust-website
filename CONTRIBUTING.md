@@ -20,3 +20,9 @@ CSV、TSV、JSONL、Parquet 和 Arrow 文件。 检查同时覆盖 rename 的原
 
 工作流合并后，将 `No data PRs in website` 设置为 main 的必需状态检查，并禁止绕过。 仅有工作流失败、但没有分支保护或 ruleset，不能保证管理员或维护者无法合并。
 在启用前，不得宣称仓库已经具备不可绕过的拦截。
+
+## Agent 与跨仓库流程
+
+Agent 开始修改前阅读 [AGENTS.md](AGENTS.md) 和 benchmark 的
+[统一协作流程](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/AGENT_WORKFLOW.md)。
+所有版本共用页面组件；缺数据保留相同位置并明确缺项。数据来源合并、固定提交发布、 PR 当前 head 检查、部署和正式域名验收是不同步骤，不能用其中一步代替完整交付。
