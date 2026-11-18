@@ -28,6 +28,13 @@
   let workloadNavigation = { traits: {}, plugins: {} };
   let modTaxonomy = {};
   let selectedType = "extensions";
+  const productIds = ['all', 'engine', 'control-plane', 'continuum'];
+  const requestedProduct = new URLSearchParams(location.search).get('product');
+  let selectedProduct = productIds.includes(requestedProduct) ? requestedProduct : 'all';
+  // Product views follow existing component identity; they do not certify host compatibility.
+  const productView = item => taxonomyProfile(item).kind === 'control_plane'
+    ? 'control-plane' : taxonomyProfile(item).kind === 'retired' ? 'archive' : 'engine';
+  const matchesProduct = item => selectedProduct === 'all' || productView(item) === selectedProduct;
   let selectedPhase = "all";
   let selectedScenario = "all";
   const taxonomyProfile = item => modTaxonomy[item.id] || {};
@@ -423,6 +430,73 @@
       return { id, items, primary };
     });
   }
+  function productCopy(id) {
+    const zh = language() === 'zh';
+    const rows = {
+      engine: ['Engine', zh ? '执行优化 · KV · 图与算子' : 'Execution · KV · graphs & kernels', './engine.html'],
+      'control-plane': ['Control Plane', zh ? '路由 · 准入 · 生命周期策略' : 'Routing · admission · lifecycle policies', './control-plane.html'],
+      continuum: ['Continuum', zh ? '记忆写入 · 检索 · 任务恢复' : 'Memory capture · retrieval · task recovery', './continuum.html'],
+      archive: [zh ? '历史归档' : 'Archives', zh ? '保留历史组件与原始记录' : 'Historical components and original records', null]
+    };
+    return rows[id];
+  }
+
+  function renderProductNavigation() {
+    const root = document.querySelector('[data-product-navigation]');
+    if (!root) return;
+    root.replaceChildren();
+    ['engine', 'control-plane', 'continuum'].forEach(id => {
+      const [name, description, href] = productCopy(id);
+      const card = element('div', 'mod-product-option');
+      const button = element('button', '');
+      button.type = 'button'; button.dataset.productFilter = id;
+      button.setAttribute('aria-pressed', String(selectedProduct === id));
+      button.disabled = !registry;
+      button.append(element('strong', '', name), element('span', '', description));
+      if (id === 'continuum') button.append(element('small', '', language() === 'zh' ? '架构规划' : 'Architecture planning'));
+      const link = element('a', '', language() === 'zh' ? '产品主页 ↗' : 'Product home ↗');
+      link.href = href;
+      card.append(button, link); root.append(card);
+    });
+    document.querySelector('[data-product-filter="all"]').setAttribute('aria-pressed', String(selectedProduct === 'all'));
+    document.querySelector('[data-product-navigation]').setAttribute('aria-label', language() === 'zh' ? '按产品浏览 MOD' : 'Browse MODs by product');
+    document.querySelector('[data-product-view-note]').textContent = language() === 'zh'
+      ? '按现有组件身份浏览；宿主与接入状态见各条目。'
+      : 'Browse by existing component role; each entry retains its host and integration status.';
+    const planned = selectedProduct === 'continuum';
+    document.querySelectorAll('.plugin-controls, .workload-navigation').forEach(node => { node.hidden = planned; });
+    document.querySelectorAll('.r8-catalog-stack, .workshop-scope-note').forEach(node => { node.hidden = !['all', 'engine'].includes(selectedProduct); });
+    if (modelSelect) modelSelect.closest('label').hidden = ['continuum', 'control-plane'].includes(selectedProduct);
+  }
+
+  document.querySelector('.mod-products').addEventListener('click', event => {
+    const button = event.target.closest('[data-product-filter]');
+    if (!button || !registry) return;
+    selectedProduct = button.dataset.productFilter;
+    selectedType = 'extensions'; selectedPhase = 'all'; selectedScenario = 'all'; selectedModel = ''; search.value = '';
+    if (modelSelect) modelSelect.value = '';
+    if (performanceData && frontierData && window.PluginPerformance) performanceResults = PluginPerformance.summarize(performanceData, frontierData);
+    const url = new URL(location.href);
+    if (selectedProduct === 'all') url.searchParams.delete('product'); else url.searchParams.set('product', selectedProduct);
+    url.hash = ''; history.replaceState(null, '', url);
+    renderProductNavigation(); renderFilters(); renderDiscoveryNavigation(); renderCatalog();
+    document.querySelector(`[data-product-filter="${selectedProduct}"]`)?.focus({preventScroll: true});
+  });
+
+  function continuumPlan() {
+    const zh = language() === 'zh';
+    const panel = element('div', 'continuum-mod-plan');
+    panel.append(element('span', 'mod-plan-status', zh ? '架构规划' : 'Architecture planning'));
+    const list = element('ul', '');
+    (zh ? ['记忆写入与更新', '检索与上下文组织', '任务检查点与恢复']
+      : ['Memory capture and updates', 'Retrieval and context assembly', 'Task checkpoints and recovery'])
+      .forEach(text => list.append(element('li', '', text)));
+    panel.append(list, element('p', '', zh ? '上述为扩展方向，现有目录尚无 Continuum MOD。' : 'These are extension directions; the current catalog has no Continuum MODs.'));
+    const link = element('a', '', zh ? '查看 Continuum 规划与负责人招募 ↗' : 'Continuum plans & lead recruitment ↗');
+    link.href = './continuum.html'; panel.append(link);
+    return panel;
+  }
+
   const compatibilityLabels = {
     ready: { en: "Ready", zh: "可用" },
     verified: { en: "Verified", zh: "已验证" },
@@ -805,6 +879,8 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
       const button = element("button", `plugin-filter${selectedType === type ? " active" : ""}`, title);
       button.type = "button";
       button.dataset.layer = type;
+      button.disabled = type !== 'extensions' && !registry.components.some(item => matchesProduct(item) && taxonomyProfile(item).kind === type);
+      button.hidden = button.disabled;
       button.setAttribute("aria-pressed", String(selectedType === type));
       button.addEventListener("click", () => {
         selectedType = type;
@@ -830,7 +906,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
   }
 
   function matchesSelectedType(item) {
-    return selectedType === "extensions" || taxonomyProfile(item).kind === selectedType;
+    return matchesProduct(item) && (selectedType === "extensions" || taxonomyProfile(item).kind === selectedType);
   }
 
   function itemSearchText(item) {
@@ -1864,6 +1940,7 @@ vllm-hust-ext extension check ${extensionId}`
       .filter(card => card.querySelector('.plugin-technical-details')?.open).map(card => card.id));
     const priority = { ready: 0, verified: 1, experimental: 2, external_service: 3, inspect_only: 4, source_scaffold: 5 };
     catalog.replaceChildren();
+    let target = catalog;
     const appendGroup = (title, items, kind) => {
       if (!items.length) return;
       items.sort((leftProject, rightProject) => {
@@ -1886,7 +1963,7 @@ vllm-hust-ext extension check ${extensionId}`
         grid.append(card);
       });
       section.append(grid);
-      catalog.append(section);
+      target.append(section);
     };
     const groups = [
       ["runtime_mod", copy().runtimeMods],
@@ -1896,16 +1973,41 @@ vllm-hust-ext extension check ${extensionId}`
       ["external_system", copy().externalSystems],
       ["retired", copy().retiredItems]
     ];
-    groups.forEach(([kind, title]) => {
-      appendGroup(title, visible.filter((project) => project.kind === kind), kind);
+    ['engine', 'control-plane', 'continuum', 'archive'].forEach(product => {
+      const matches = visible.filter(project => productView(project.primary) === product);
+      const showPlan = product === 'continuum' && ['all', 'continuum'].includes(selectedProduct)
+        && !query && selectedType === 'extensions' && selectedPhase === 'all' && selectedScenario === 'all';
+      if (!matches.length && !showPlan) return;
+      const [name, description, href] = productCopy(product);
+      const section = element('section', 'mod-product-results');
+      section.dataset.productScope = product;
+      const header = element('header', 'mod-product-results-heading');
+      const heading = element('div', '');
+      heading.append(element('h2', '', name), element('p', '', description));
+      header.append(heading);
+      if (href) {
+        const link = element('a', '', language() === 'zh' ? '查看主页 ↗' : 'Product home ↗');
+        link.href = href;
+        header.append(link);
+      }
+      section.append(header); target = section;
+      groups.forEach(([kind, title]) => {
+        appendGroup(title, visible.filter((project) => project.kind === kind && productView(project.primary) === product), kind);
+      });
+      if (showPlan) section.append(continuumPlan());
+      catalog.append(section);
     });
-    status.textContent = visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
+    status.textContent = selectedProduct === 'continuum'
+      ? (language() === 'zh' ? 'Continuum · 记忆扩展规划' : 'Continuum · planned memory extensions')
+      : visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
+    renderProductNavigation();
     const activeCount = window.EcosystemCatalog.summarize(registry, {schema_version: 'mod-taxonomy/v2', components: modTaxonomy}).total;
     const extraCount = catalogProjects().length - activeCount;
     const scope = element('p', 'plugin-catalog-scope', language() === 'zh'
       ? `目录共 ${catalogProjects().length} 个项目：${activeCount} 个公开 MOD（与首页一致），另有 ${extraCount} 个外部系统或退役项目。`
       : `${catalogProjects().length} catalog projects: ${activeCount} public MODs (as on the homepage), plus ${extraCount} external or retired projects.`);
     document.querySelector('.plugin-catalog-scope')?.remove();
+    scope.hidden = selectedProduct === 'continuum';
     status.after(scope);
     if (more) {
       more.hidden = true;
@@ -1930,6 +2032,7 @@ vllm-hust-ext extension check ${extensionId}`
     const zh = language() === "zh";
     const values = {
       "plugins-title": zh ? "MOD 目录" : "MOD catalog",
+      "plugins-lede": zh ? "按 Engine、Control Plane、Continuum 浏览扩展，再查看兼容性、接入方式与实测结果。" : "Explore MODs for Engine, Control Plane and Continuum. Filter by product, then inspect compatibility and results.",
       "plugins-fact-items": zh ? "个公开 MOD" : "public MODs",
       "plugins-fact-runtime": zh ? "个兼容性已验证" : "compatibility verified",
       "plugins-fact-review": zh ? "个实验性或仅检查" : "experimental or inspection-only",
@@ -1942,6 +2045,7 @@ vllm-hust-ext extension check ${extensionId}`
     if (modelSelect?.options.length) modelSelect.options[0].textContent = copy().allModels;
   }
   renderPageLabels();
+  renderProductNavigation();
   search.placeholder = copy().searchPlaceholder;
 
   const supportsModTaxonomy = (taxonomy) => (
@@ -2094,6 +2198,7 @@ vllm-hust-ext extension check ${extensionId}`
 
   const renderLanguage = () => {
     renderPageLabels();
+    renderProductNavigation();
     if (!registry) return;
     search.placeholder = copy().searchPlaceholder;
     renderFilters();
@@ -2102,6 +2207,17 @@ vllm-hust-ext extension check ${extensionId}`
     renderBoundaries();
     renderPortfolio();
   };
+  function revealReferenceAnchor() {
+    const node = document.getElementById(location.hash.slice(1));
+    if (!node) return;
+    let expanded = false;
+    for (let ancestor = node.parentElement; ancestor; ancestor = ancestor.parentElement) {
+      if (ancestor.classList.contains('mod-reference')) { ancestor.open = true; expanded = true; }
+    }
+    if (expanded) requestAnimationFrame(() => node.scrollIntoView());
+  }
+  window.addEventListener('hashchange', revealReferenceAnchor);
+  window.addEventListener('load', revealReferenceAnchor);
   window.addEventListener("vllm-hust-language-change", renderLanguage);
   window.addEventListener("vllm-hust:langchange", renderLanguage);
 })();

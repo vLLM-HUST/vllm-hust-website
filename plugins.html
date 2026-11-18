@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MOD catalog | vLLM-HUST</title>
-  <meta name="description" content="The runtime, platform profiles, KV state systems, control-plane bridges, runtime components, and evidence tooling in the vLLM-HUST ecosystem.">
+  <meta name="description" content="MOD extensions for Engine, Control Plane and Continuum: execution optimization, service policies and persistent memory.">
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/plugins.html">
   <meta property="og:image" content="https://vllm-hust.sage.org.ai/assets/brand/vllm-hust-icon.png">
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png">
@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029">
 <link rel="stylesheet" href="./assets/subpages.css?v=site-structure-20260816-page-focus-20260901-public-pages-20261024">
-<link rel="stylesheet" href="./assets/plugins.css?v=catalog-copy-20261116">
+<link rel="stylesheet" href="./assets/plugins.css?v=product-mods-20261118">
 <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
 </head>
 <body data-page="plugins">
@@ -37,7 +37,7 @@
     <section class="page-hero plugin-hero">
 <div class="content-panel">
 <h1 id="plugins-title">MOD catalog</h1>
-<p id="plugins-lede" class="hero-lede">Browse MODs by inference stage and use case. Cards include compatibility, deployment, and measured results where available.</p>
+<p id="plugins-lede" class="hero-lede">Explore MODs for Engine, Control Plane and Continuum. Filter by product, then inspect compatibility and results.</p>
 <div class="plugin-hero-facts">
 <span>
 <strong data-plugin-count>—</strong>
@@ -62,263 +62,59 @@
 </div>
 </div>
 </section>
-    <section class="content-panel plugin-boundary">
-<div>
-<span id="plugins-boundary-kicker" class="eyebrow">Architecture rule</span>
-<h2 id="plugins-boundary-title">Find the right extension without losing sight of who runs it.</h2>
-</div>
-<p id="plugins-boundary-copy">The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.</p>
-</section>
-    <nav class="plugin-section-nav" aria-label="Ecosystem page sections">
-<a href="#technical-highlights">
-<span class="lang-en">Technical Highlights</span>
-<span class="lang-zh">技术亮点</span>
-<small>WHY vLLM-HUST</small>
-</a>
-<a href="#plugin-standard">
-<span class="lang-en">Architecture Contract</span>
-<span class="lang-zh">架构契约</span>
-<small>ROLE · CONTRACT · DELIVERY</small>
-</a>
-<a href="#mod-test-protocol">
-<span class="lang-en">Test & Review</span>
-<span class="lang-zh">测试与复查</span>
-<small>CONFIG · WORKLOAD · METRIC</small>
-</a>
-<a href="#plugin-catalog">
-<span class="lang-en">Ecosystem Catalog</span>
-<span class="lang-zh">生态目录</span>
-<small>CANONICAL REGISTRY</small>
-</a>
-<a href="#repository-portfolio">
-<span class="lang-en">Repository Portfolio</span>
-<span class="lang-zh">仓库组合</span>
-<small>55 CURATED REPOSITORIES</small>
-</a>
-</nav>
-
-
-    <section id="technical-highlights" class="content-panel technical-highlights" aria-labelledby="technical-highlights-title">
-      <header class="highlights-head">
-        <div>
-<span class="eyebrow">
-<span class="lang-en">Why vLLM-HUST</span>
-<span class="lang-zh">为什么选择 vLLM-HUST</span>
-</span>
-<h2 id="technical-highlights-title">
-<span class="lang-en">Replaceable policy, state, execution, and hardware paths—with evidence attached.</span>
-<span class="lang-zh">策略、状态、执行与硬件路径可替换，并为结果附上证据。
-</span>
-</h2>
-</div>
-        <p>
-<span class="lang-en">The technical edge is the combination: programmable scheduling and KV policy surfaces; graph-aware decoding, MoE, and precision paths; explicit Ascend and Metal capability negotiation; narrow control-plane actions; and matched results with exact provenance and rollback.
-Available code, published work, and open designs remain separate evidence levels.</span>
-<span class="lang-zh">技术亮点来自完整组合：调度与 KV 策略可编程，解码、MoE 与精度路径感知计算图，Ascend 与 Metal 能力显式协商，上层控制动作保持窄接口，并以 matched 结果、精确版本和回退闭合证据链。
-已有代码、发表成果和开放设计始终分层展示。
-</span>
-</p>
-      </header>
-
-      <div class="highlight-grid">
-        <article class="highlight-card highlight-lead">
-<div class="highlight-card-top">
-<span>01 / ARCHITECTURE</span>
-<strong>CONTRACT FIRST</strong>
-</div>
-<h3>
-<span class="lang-en">Typed, reversible integration</span>
-<span class="lang-zh">类型化、可回退的系统集成</span>
-</h3>
-<p>
-<span class="lang-en">The runtime owns typed domain contracts.
-Bundles deliver components, connectors adapt external systems, and control planes remain outside the engine.
-Research code can evolve without permanent forks or a universal plugin abstraction.</span>
-<span class="lang-zh">运行时拥有类型化领域契约；bundle 交付组件，connector 适配外部系统，control plane 保持在引擎之外。
-研究代码无需依赖永久分叉或万能插件抽象。
-</span>
-</p>
-<a href="https://github.com/vLLM-HUST/vllm-hust-docs/blob/codex/ecosystem-architecture-reorganization/architecture/ecosystem-architecture.md">
-<span class="lang-en">Read the ecosystem architecture</span>
-<span class="lang-zh">阅读生态架构规范</span> ↗</a>
-</article>
-
-        <article class="highlight-card">
-<div class="highlight-card-top">
-<span>02 / KV POLICY</span>
-<strong>PAPER + LEGACY EVIDENCE</strong>
-</div>
-<h3>
-<span class="lang-en">KV state as a policy surface</span>
-<span class="lang-zh">把 KV 状态变成可编程策略面</span>
-</h3>
-<p>
-<span class="lang-en">BidKV now has a separate Qwen3.5-35B-A3B TP4 KV-pressure observation. Two alternating-order C12 pairs improved output throughput by 17.11% and 10.65%, with active policy selections and zero policy failures. The earlier TP2/SWE and Qwen3.8 observations remain visible as separate settings, including their zero-action and negative boundaries.</span>
-<span class="lang-zh">BidKV 现已增加独立的 Qwen3.5-35B-A3B TP4 KV-pressure 观察。两轮交替顺序 C12 配对的输出吞吐分别提升 17.11% 与 10.65%，策略真实执行且失败为 0。旧 TP2/SWE 与 Qwen3.8 观察继续按独立设定保留，包括未触发与负向边界。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/vLLM-HUST/vllm-hust-bidkv">BidKV ↗</a>
-<a href="https://github.com/vLLM-HUST/vllm-hust-bidkv/tree/main/legacy/vllm-general-plugin">Legacy evidence ↗</a>
-</div>
-</article>
-
-        <article class="highlight-card">
-<div class="highlight-card-top">
-<span>03 / LONG SEQUENCE</span>
-<strong>SC 2026</strong>
-</div>
-<h3>
-<span class="lang-en">Long-sequence speculative execution</span>
-<span class="lang-zh">面向长序列的推测执行</span>
-</h3>
-<p>
-<span class="lang-en">DiffSpec 48b1828 now targets the pinned Qwen3.5-35B-A3B and Specforge Eagle3 pair on Ascend TP4 PIECEWISE execution. The committed-query retrieval implementation is merged, while functional and performance qualification for this exact pair remains pending.</span>
-<span class="lang-zh">DiffSpec 48b1828 现面向固定版本的 Qwen3.5-35B-A3B 与 Specforge Eagle3 组合，使用 Ascend TP4 PIECEWISE 执行。已合并 committed-query retrieval 实现，但该精确组合的功能与性能资格验证仍待完成。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec">DiffSpec ↗</a>
-</div>
-</article>
-
-        <article class="highlight-card result-card">
-<div class="highlight-card-top">
-<span>04 / LIVE ROUTING</span>
-<strong>MATCHED ASCEND RESULT</strong>
-</div>
-<h3>
-<span class="lang-en">Cache-local routing with measured tail-latency gains</span>
-<span class="lang-zh">以实测尾延迟收益验证缓存局部路由</span>
-</h3>
-<p>
-<span class="lang-en">A merged two-replica test on 2× Ascend 910B2 kept throughput effectively unchanged while increasing prefix-cache hit rate and reducing TTFT.</span>
-<span class="lang-zh">已合并的双副本 2× Ascend 910B2 对照实验在吞吐基本不变的同时，提高了前缀缓存命中率并降低 TTFT。
-</span>
-</p>
-<dl>
-<div>
-<dt>Prefix hit rate</dt>
-<dd>24.44% → 47.88%</dd>
-</div>
-<div>
-<dt>P95 TTFT</dt>
-<dd>223.80 → 174.80 ms</dd>
-</div>
-<div>
-<dt>Throughput</dt>
-<dd>−0.01%</dd>
-</div>
-</dl>
-<a href="https://github.com/vLLM-HUST/vllm-hust-prefix-router">
-<span class="lang-en">Prefix Router repository and provenance</span>
-<span class="lang-zh">Prefix Router 独立仓库与来源记录</span> ↗</a>
-</article>
-
-        <article class="highlight-card">
-<div class="highlight-card-top">
-<span>05 / RUNTIME + STATE</span>
-<strong>DISTINCT SYSTEM ROLES</strong>
-</div>
-<h3>
-<span class="lang-en">Device mechanisms and external KV state</span>
-<span class="lang-zh">设备机制与外部 KV 状态</span>
-</h3>
-<p>
-<span class="lang-en">LatchMoE is not applicable to dense Qwen3.8-27B. Qwen3-30B-A3B passed functional TP4 PIECEWISE graph qualification, but throughput was about 2.91 tok/s versus 23.57 tok/s without the plugin, so it is not a speedup claim or production recommendation.
-PegaFlow is an external KV state system; its non-invasive Host Provider renders PegaKVConnector configuration and health checks without owning the service lifecycle.
-</span>
-<span class="lang-zh">LatchMoE 不适用于 dense Qwen3.8-27B；Qwen3-30B-A3B 已通过 TP4 PIECEWISE graph 功能资格验证，但吞吐约为 2.91 tok/s，显著低于无插件基线的 23.57 tok/s，因此不构成加速声明或生产推荐。PegaFlow 是外部 KV 状态系统，其无侵入 Host Provider 只生成 PegaKVConnector 配置并执行健康检查，不接管服务生命周期。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE">LatchMoE ↗</a>
-<a href="https://github.com/vLLM-HUST/pegaflow-hust">PegaFlow ↗</a>
-</div>
-</article>
-
-        <article class="highlight-card">
-<div class="highlight-card-top">
-<span>06 / PLATFORM</span>
-<strong>ASCEND + METAL</strong>
-</div>
-<h3>
-<span class="lang-en">Hardware capabilities in platform profiles</span>
-<span class="lang-zh">以平台 profile 承载硬件能力</span>
-</h3>
-<p>
-<span class="lang-en">Ascend and Apple Silicon are multi-component platform profiles, combining discovery, runners, operators, loaders, native libraries, and device capabilities under explicit compatibility matrices.</span>
-<span class="lang-zh">Ascend 与 Apple Silicon 是多组件平台 profile，组合发现、runner、算子、loader、原生库和设备能力，并以显式兼容矩阵治理。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/vLLM-HUST/vllm-ascend-hust">Ascend profile ↗</a>
-<a href="https://github.com/vLLM-HUST/vllm-metal-hust">Metal profile ↗</a>
-</div>
-</article>
-
-        <article class="highlight-card">
-<div class="highlight-card-top">
-<span>07 / CONTROL PLANE</span>
-<strong>EXPERIMENTAL BRIDGE</strong>
-</div>
-<h3>
-<span class="lang-en">A bounded execution plane for higher-level control</span>
-<span class="lang-zh">面向上层控制面的有界执行平面</span>
-</h3>
-<p>
-<span class="lang-en">The catalog separates three layers: external RIDE decisions, a separately built TLS 1.3 mutual-authentication sidecar, and the core-delivered local host.
-The sidecar allowlists client certificate fingerprints and forwards exact bounded frames; the local host still owns HMAC, schemas, authorization, replay, execution, and receipts.
-The path is default-off and tested end to end locally, but production certificate issuance, revocation, audit, high availability, and mutating action contracts remain release gates.</span>
-<span class="lang-zh">目录明确拆分三层：外部 RIDE 决策系统、独立构建的 TLS 1.3 双向认证 sidecar，以及随核心交付的本地宿主。
-sidecar 按客户端证书指纹准入并透明转发有界原始帧；HMAC、schema、授权、replay、执行与 receipt 仍由本地宿主负责。
-该路径默认关闭并已完成本机端到端测试，但生产证书签发、吊销、审计、高可用与可变更 action contract 仍是发布门槛。
-</span>
-</p>
-<a href="https://ride-lab.github.io/#portfolio">
-<span class="lang-en">Control-plane portfolio</span>
-<span class="lang-zh">查看控制面课题组合</span> ↗</a>
-</article>
-
-        <article class="highlight-card">
-<div class="highlight-card-top">
-<span>08 / EVIDENCE</span>
-<strong>MERGED</strong>
-</div>
-<h3>
-<span class="lang-en">Performance provenance as an engine deliverable</span>
-<span class="lang-zh">把性能证据链作为引擎交付物</span>
-</h3>
-<p>
-<span class="lang-en">Central baselines, exact runtime provenance, fail-closed comparison, plugin preflight, and structured diagnostics make it possible to distinguish reproducible performance evidence from lifecycle-only smoke results.</span>
-<span class="lang-zh">中心基线、精确运行时 provenance、fail-closed 对比、插件预检和结构化诊断，使可复现性能证据与仅验证生命周期的 smoke 结果能够被明确区分。
-</span>
-</p>
-<div class="highlight-links">
-<a href="https://github.com/vLLM-HUST/vllm-hust-benchmark">Benchmark evidence ↗</a>
-<a href="https://github.com/vLLM-HUST/vllm-hust-dev-hub">Developer diagnostics ↗</a>
-</div>
-</article>
-      </div>
-
-      <aside class="evidence-boundary">
-<strong>
-<span class="lang-en">How to read this page</span>
-<span class="lang-zh">如何阅读本页</span>
-</strong>
-<p>
-<span class="lang-en">
-<b>Published</b> links to a paper record; <b>merged</b> means the mechanism is on the engine main branch; <b>available plugin</b> means a public repository exposes a runtime entry point; <b>in review</b> and <b>research draft</b> are not presented as delivered capability.
-Smoke, replay, simulation, and projected profiles are never described as real performance gains.</span>
-<span class="lang-zh">
-<b>已发表</b>链接到论文记录；<b>已合并</b>表示机制进入引擎 main；<b>已有插件</b>表示公开仓库提供运行时入口；<b>评审中</b>与<b>研究草案</b>不作为已交付能力展示。
-smoke、replay、simulation 与 projected profile 均不会被描述为真实性能收益。
-</span>
-</p>
-</aside>
+    <section class="mod-products" aria-labelledby="plugins-boundary-title">
+      <div class="mod-products-heading"><div><span id="plugins-boundary-kicker" class="eyebrow">ONE MOD ECOSYSTEM</span><h2 id="plugins-boundary-title">Three products. One extension ecosystem.</h2></div><p id="plugins-boundary-copy">Execution, service policies and persistent memory can each be extended through MODs.</p></div>
+      <div class="mod-product-navigation" data-product-navigation role="group" aria-label="Product filters"></div>
+      <div class="mod-product-actions"><button type="button" data-product-filter="all" aria-pressed="true"><span class="lang-en">All products</span><span class="lang-zh">全部产品</span></button><span data-product-view-note></span></div>
     </section>
 
-    <section id="plugin-standard" class="content-panel plugin-standard" aria-labelledby="plugin-standard-title">
+    <section id="plugin-catalog" class="plugin-controls" aria-label="MOD filters">
+<label>
+<span id="plugins-search-label">Search</span>
+<input data-plugin-search type="search" placeholder="Search MODs, hosts, platforms, or repositories">
+</label>
+<label>
+<span><span class="lang-en">Performance model</span><span class="lang-zh">性能模型</span></span>
+<select data-plugin-model aria-label="Performance model">
+<option value="">All models</option>
+</select>
+</label>
+<div data-plugin-filters>
+</div>
+</section>
+    <p class="workshop-scope-note">
+      <span class="lang-en">Performance filters cover runtime and connector MODs. Results include measured gains and regressions.</span>
+      <span class="lang-zh">性能筛选适用于运行时 MOD 和连接器 MOD，实测结果包含提升与下降。</span>
+    </p>
+    <section class="r8-catalog-stack" aria-labelledby="r8-mod-stack-title">
+      <h2 id="r8-mod-stack-title"><span class="lang-en">Frozen r8 · included MODs</span><span class="lang-zh">冻结r8 · 已包含的MOD</span></h2>
+      <p><span class="lang-en">The same r8 badges identify the frozen composition on the Engine page and in this catalog.</span><span class="lang-zh">与引擎页使用相同r8标识，统一显示本版冻结组合。</span></p>
+      <div class="r8-mod-list"><span class="r8-mod-chip" data-r8-mod-id="extension-manager"><span>Extension Manager</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="betterscale"><span>BetterScale</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="microflow"><span>Microflow</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="kv-materialization"><span>KV materialization</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="m01-correction"><span>M01 correction</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="packed-host"><span>Packed host state</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="sealed-serving-warmup"><span>Sealed serving warmup</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="guarded-progress-async"><span>Guarded progress async</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="capacity-tuning"><span>Capacity tuning</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="short-prefill-tail"><span>Short prefill tail</span><strong>r8</strong></span></div>
+      <p><a href="./engine.html#r8-mods"><span class="lang-en">Download r8 and view configuration ↗</span><span class="lang-zh">下载r8与查看运行配置 ↗</span></a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/active-stack-r8.json"><span class="lang-en">Canonical manifest ↗</span><span class="lang-zh">统一机器清单 ↗</span></a></p>
+    </section>
+    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=catalog-b1-r6-20261116" aria-labelledby="workload-navigation-title">
+      <header>
+        <h2 id="workload-navigation-title"><span class="lang-en">Inference stages and use cases</span><span class="lang-zh">推理阶段与使用场景</span></h2>
+      </header>
+      <div class="discovery-axis">
+        <strong><span class="lang-en">Lifecycle phase</span><span class="lang-zh">生命周期阶段</span></strong>
+        <div class="workload-filter-list" data-phase-filters tabindex="0" role="group" aria-label="Lifecycle phase"></div>
+        <p class="workload-filter-description" data-phase-description aria-live="polite"></p>
+      </div>
+      <div class="discovery-axis">
+        <strong><span class="lang-en">Scenario / use case (optional)</span><span class="lang-zh">场景 / 用例（可选）</span></strong>
+        <div class="workload-filter-list" data-workload-filters tabindex="0" role="group" aria-label="Scenario or use case"></div>
+        <p class="workload-filter-description" data-workload-description aria-live="polite"></p>
+      </div>
+    </section>
+    <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
+    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=catalog-b1-r6-20261116" data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106" data-taxonomy="./data/mod-taxonomy.json?v=catalog-b1-r6-20261116">
+</div>
+    <button class="plugin-more" data-plugin-more type="button" hidden>Show all extensions</button>
+
+<section class="mod-reference-list" aria-label="Guides and archives">
+      <details class="mod-reference"><summary><span class="lang-en">Engine integration contracts & architecture</span><span class="lang-zh">Engine 接入契约与架构详情</span></summary><section id="plugin-standard" class="content-panel plugin-standard" aria-labelledby="plugin-standard-title">
+      <p><span class="lang-en">Runtime MODs, KV connectors and external state systems retain distinct integration contracts.</span><span class="lang-zh">运行时 MOD、KV connector 与外部 KV 状态系统保留各自的接入契约。</span></p>
       <header class="standard-head">
 <div>
 <span class="eyebrow">
@@ -859,9 +655,225 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 <span>HISTORICAL ↗</span>
 </a>
       </div>
-    </section>
+    </section><section id="technical-highlights" class="content-panel technical-highlights" aria-labelledby="technical-highlights-title">
+      <header class="highlights-head">
+        <div>
+<span class="eyebrow">
+<span class="lang-en">Why vLLM-HUST</span>
+<span class="lang-zh">为什么选择 vLLM-HUST</span>
+</span>
+<h2 id="technical-highlights-title">
+<span class="lang-en">Replaceable policy, state, execution, and hardware paths—with evidence attached.</span>
+<span class="lang-zh">策略、状态、执行与硬件路径可替换，并为结果附上证据。
+</span>
+</h2>
+</div>
+        <p>
+<span class="lang-en">The technical edge is the combination: programmable scheduling and KV policy surfaces; graph-aware decoding, MoE, and precision paths; explicit Ascend and Metal capability negotiation; narrow control-plane actions; and matched results with exact provenance and rollback.
+Available code, published work, and open designs remain separate evidence levels.</span>
+<span class="lang-zh">技术亮点来自完整组合：调度与 KV 策略可编程，解码、MoE 与精度路径感知计算图，Ascend 与 Metal 能力显式协商，上层控制动作保持窄接口，并以 matched 结果、精确版本和回退闭合证据链。
+已有代码、发表成果和开放设计始终分层展示。
+</span>
+</p>
+      </header>
 
-    <section id="catalog-classification" class="content-panel plugin-legend" aria-labelledby="plugins-legend-title">
+      <div class="highlight-grid">
+        <article class="highlight-card highlight-lead">
+<div class="highlight-card-top">
+<span>01 / ARCHITECTURE</span>
+<strong>CONTRACT FIRST</strong>
+</div>
+<h3>
+<span class="lang-en">Typed, reversible integration</span>
+<span class="lang-zh">类型化、可回退的系统集成</span>
+</h3>
+<p>
+<span class="lang-en">The runtime owns typed domain contracts.
+Bundles deliver components, connectors adapt external systems, and control planes remain outside the engine.
+Research code can evolve without permanent forks or a universal plugin abstraction.</span>
+<span class="lang-zh">运行时拥有类型化领域契约；bundle 交付组件，connector 适配外部系统，control plane 保持在引擎之外。
+研究代码无需依赖永久分叉或万能插件抽象。
+</span>
+</p>
+<a href="https://github.com/vLLM-HUST/vllm-hust-docs/blob/codex/ecosystem-architecture-reorganization/architecture/ecosystem-architecture.md">
+<span class="lang-en">Read the ecosystem architecture</span>
+<span class="lang-zh">阅读生态架构规范</span> ↗</a>
+</article>
+
+        <article class="highlight-card">
+<div class="highlight-card-top">
+<span>02 / KV POLICY</span>
+<strong>PAPER + LEGACY EVIDENCE</strong>
+</div>
+<h3>
+<span class="lang-en">KV state as a policy surface</span>
+<span class="lang-zh">把 KV 状态变成可编程策略面</span>
+</h3>
+<p>
+<span class="lang-en">BidKV now has a separate Qwen3.5-35B-A3B TP4 KV-pressure observation. Two alternating-order C12 pairs improved output throughput by 17.11% and 10.65%, with active policy selections and zero policy failures. The earlier TP2/SWE and Qwen3.8 observations remain visible as separate settings, including their zero-action and negative boundaries.</span>
+<span class="lang-zh">BidKV 现已增加独立的 Qwen3.5-35B-A3B TP4 KV-pressure 观察。两轮交替顺序 C12 配对的输出吞吐分别提升 17.11% 与 10.65%，策略真实执行且失败为 0。旧 TP2/SWE 与 Qwen3.8 观察继续按独立设定保留，包括未触发与负向边界。
+</span>
+</p>
+<div class="highlight-links">
+<a href="https://github.com/vLLM-HUST/vllm-hust-bidkv">BidKV ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-hust-bidkv/tree/main/legacy/vllm-general-plugin">Legacy evidence ↗</a>
+</div>
+</article>
+
+        <article class="highlight-card">
+<div class="highlight-card-top">
+<span>03 / LONG SEQUENCE</span>
+<strong>SC 2026</strong>
+</div>
+<h3>
+<span class="lang-en">Long-sequence speculative execution</span>
+<span class="lang-zh">面向长序列的推测执行</span>
+</h3>
+<p>
+<span class="lang-en">DiffSpec 48b1828 now targets the pinned Qwen3.5-35B-A3B and Specforge Eagle3 pair on Ascend TP4 PIECEWISE execution. The committed-query retrieval implementation is merged, while functional and performance qualification for this exact pair remains pending.</span>
+<span class="lang-zh">DiffSpec 48b1828 现面向固定版本的 Qwen3.5-35B-A3B 与 Specforge Eagle3 组合，使用 Ascend TP4 PIECEWISE 执行。已合并 committed-query retrieval 实现，但该精确组合的功能与性能资格验证仍待完成。
+</span>
+</p>
+<div class="highlight-links">
+<a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec">DiffSpec ↗</a>
+</div>
+</article>
+
+        <article class="highlight-card result-card">
+<div class="highlight-card-top">
+<span>04 / LIVE ROUTING</span>
+<strong>MATCHED ASCEND RESULT</strong>
+</div>
+<h3>
+<span class="lang-en">Cache-local routing with measured tail-latency gains</span>
+<span class="lang-zh">以实测尾延迟收益验证缓存局部路由</span>
+</h3>
+<p>
+<span class="lang-en">A merged two-replica test on 2× Ascend 910B2 kept throughput effectively unchanged while increasing prefix-cache hit rate and reducing TTFT.</span>
+<span class="lang-zh">已合并的双副本 2× Ascend 910B2 对照实验在吞吐基本不变的同时，提高了前缀缓存命中率并降低 TTFT。
+</span>
+</p>
+<dl>
+<div>
+<dt>Prefix hit rate</dt>
+<dd>24.44% → 47.88%</dd>
+</div>
+<div>
+<dt>P95 TTFT</dt>
+<dd>223.80 → 174.80 ms</dd>
+</div>
+<div>
+<dt>Throughput</dt>
+<dd>−0.01%</dd>
+</div>
+</dl>
+<a href="https://github.com/vLLM-HUST/vllm-hust-prefix-router">
+<span class="lang-en">Prefix Router repository and provenance</span>
+<span class="lang-zh">Prefix Router 独立仓库与来源记录</span> ↗</a>
+</article>
+
+        <article class="highlight-card">
+<div class="highlight-card-top">
+<span>05 / RUNTIME + STATE</span>
+<strong>DISTINCT SYSTEM ROLES</strong>
+</div>
+<h3>
+<span class="lang-en">Device mechanisms and external KV state</span>
+<span class="lang-zh">设备机制与外部 KV 状态</span>
+</h3>
+<p>
+<span class="lang-en">LatchMoE is not applicable to dense Qwen3.8-27B. Qwen3-30B-A3B passed functional TP4 PIECEWISE graph qualification, but throughput was about 2.91 tok/s versus 23.57 tok/s without the plugin, so it is not a speedup claim or production recommendation.
+PegaFlow is an external KV state system; its non-invasive Host Provider renders PegaKVConnector configuration and health checks without owning the service lifecycle.
+</span>
+<span class="lang-zh">LatchMoE 不适用于 dense Qwen3.8-27B；Qwen3-30B-A3B 已通过 TP4 PIECEWISE graph 功能资格验证，但吞吐约为 2.91 tok/s，显著低于无插件基线的 23.57 tok/s，因此不构成加速声明或生产推荐。PegaFlow 是外部 KV 状态系统，其无侵入 Host Provider 只生成 PegaKVConnector 配置并执行健康检查，不接管服务生命周期。
+</span>
+</p>
+<div class="highlight-links">
+<a href="https://github.com/vLLM-HUST/vllm-ascend-hust-LatchMoE">LatchMoE ↗</a>
+<a href="https://github.com/vLLM-HUST/pegaflow-hust">PegaFlow ↗</a>
+</div>
+</article>
+
+        <article class="highlight-card">
+<div class="highlight-card-top">
+<span>06 / PLATFORM</span>
+<strong>ASCEND + METAL</strong>
+</div>
+<h3>
+<span class="lang-en">Hardware capabilities in platform profiles</span>
+<span class="lang-zh">以平台 profile 承载硬件能力</span>
+</h3>
+<p>
+<span class="lang-en">Ascend and Apple Silicon are multi-component platform profiles, combining discovery, runners, operators, loaders, native libraries, and device capabilities under explicit compatibility matrices.</span>
+<span class="lang-zh">Ascend 与 Apple Silicon 是多组件平台 profile，组合发现、runner、算子、loader、原生库和设备能力，并以显式兼容矩阵治理。
+</span>
+</p>
+<div class="highlight-links">
+<a href="https://github.com/vLLM-HUST/vllm-ascend-hust">Ascend profile ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-metal-hust">Metal profile ↗</a>
+</div>
+</article>
+
+        <article class="highlight-card">
+<div class="highlight-card-top">
+<span>07 / CONTROL PLANE</span>
+<strong>EXPERIMENTAL BRIDGE</strong>
+</div>
+<h3>
+<span class="lang-en">A bounded execution plane for higher-level control</span>
+<span class="lang-zh">面向上层控制面的有界执行平面</span>
+</h3>
+<p>
+<span class="lang-en">The catalog separates three layers: external RIDE decisions, a separately built TLS 1.3 mutual-authentication sidecar, and the core-delivered local host.
+The sidecar allowlists client certificate fingerprints and forwards exact bounded frames; the local host still owns HMAC, schemas, authorization, replay, execution, and receipts.
+The path is default-off and tested end to end locally, but production certificate issuance, revocation, audit, high availability, and mutating action contracts remain release gates.</span>
+<span class="lang-zh">目录明确拆分三层：外部 RIDE 决策系统、独立构建的 TLS 1.3 双向认证 sidecar，以及随核心交付的本地宿主。
+sidecar 按客户端证书指纹准入并透明转发有界原始帧；HMAC、schema、授权、replay、执行与 receipt 仍由本地宿主负责。
+该路径默认关闭并已完成本机端到端测试，但生产证书签发、吊销、审计、高可用与可变更 action contract 仍是发布门槛。
+</span>
+</p>
+<a href="https://ride-lab.github.io/#portfolio">
+<span class="lang-en">Control-plane portfolio</span>
+<span class="lang-zh">查看控制面课题组合</span> ↗</a>
+</article>
+
+        <article class="highlight-card">
+<div class="highlight-card-top">
+<span>08 / EVIDENCE</span>
+<strong>MERGED</strong>
+</div>
+<h3>
+<span class="lang-en">Performance provenance as an engine deliverable</span>
+<span class="lang-zh">把性能证据链作为引擎交付物</span>
+</h3>
+<p>
+<span class="lang-en">Central baselines, exact runtime provenance, fail-closed comparison, plugin preflight, and structured diagnostics make it possible to distinguish reproducible performance evidence from lifecycle-only smoke results.</span>
+<span class="lang-zh">中心基线、精确运行时 provenance、fail-closed 对比、插件预检和结构化诊断，使可复现性能证据与仅验证生命周期的 smoke 结果能够被明确区分。
+</span>
+</p>
+<div class="highlight-links">
+<a href="https://github.com/vLLM-HUST/vllm-hust-benchmark">Benchmark evidence ↗</a>
+<a href="https://github.com/vLLM-HUST/vllm-hust-dev-hub">Developer diagnostics ↗</a>
+</div>
+</article>
+      </div>
+
+      <aside class="evidence-boundary">
+<strong>
+<span class="lang-en">How to read this page</span>
+<span class="lang-zh">如何阅读本页</span>
+</strong>
+<p>
+<span class="lang-en">
+<b>Published</b> links to a paper record; <b>merged</b> means the mechanism is on the engine main branch; <b>available plugin</b> means a public repository exposes a runtime entry point; <b>in review</b> and <b>research draft</b> are not presented as delivered capability.
+Smoke, replay, simulation, and projected profiles are never described as real performance gains.</span>
+<span class="lang-zh">
+<b>已发表</b>链接到论文记录；<b>已合并</b>表示机制进入引擎 main；<b>已有插件</b>表示公开仓库提供运行时入口；<b>评审中</b>与<b>研究草案</b>不作为已交付能力展示。
+smoke、replay、simulation 与 projected profile 均不会被描述为真实性能收益。
+</span>
+</p>
+</aside>
+    </section><section id="catalog-classification" class="content-panel plugin-legend" aria-labelledby="plugins-legend-title">
 <div>
 <span id="plugins-legend-kicker" class="eyebrow">Canonical classification</span>
 <h2 id="plugins-legend-title">What it is, where it runs, and how it is delivered.</h2>
@@ -884,8 +896,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 <span id="plugins-legend-roadmap-copy">Positive, negative, inconclusive, functional-only, or pending evidence never changes what the component is.</span>
 </li>
 </ul>
-</section>
-    <section id="upstream-sync-forks" class="content-panel adjacent-section upstream-fork-notice" aria-labelledby="upstream-sync-forks-title">
+</section><section id="upstream-sync-forks" class="content-panel adjacent-section upstream-fork-notice" aria-labelledby="upstream-sync-forks-title">
 <div class="adjacent-head">
 <div>
 <span class="eyebrow">
@@ -911,51 +922,8 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 <a class="adjacent-card" href="https://github.com/vLLM-HUST/mooncake-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>Mooncake HUST</h3><p>fork of kvcache-ai/Mooncake</p></a>
 <a class="adjacent-card" href="https://github.com/vLLM-HUST/production-stack-hust"><span class="plugin-code">FOUNDATION FORK</span><h3>Production Stack HUST</h3><p>fork of vllm-project/production-stack</p></a>
 </div>
-</section>
-    <section id="plugin-catalog" class="plugin-controls" aria-label="MOD filters">
-<label>
-<span id="plugins-search-label">Search</span>
-<input data-plugin-search type="search" placeholder="Search MODs, hosts, platforms, or repositories">
-</label>
-<label>
-<span><span class="lang-en">Performance model</span><span class="lang-zh">性能模型</span></span>
-<select data-plugin-model aria-label="Performance model">
-<option value="">All models</option>
-</select>
-</label>
-<div data-plugin-filters>
-</div>
-</section>
-    <p class="workshop-scope-note">
-      <span class="lang-en">Performance filters cover runtime and connector MODs. Results include measured gains and regressions.</span>
-      <span class="lang-zh">性能筛选适用于运行时 MOD 和连接器 MOD，实测结果包含提升与下降。</span>
-    </p>
-    <section class="r8-catalog-stack" aria-labelledby="r8-mod-stack-title">
-      <h2 id="r8-mod-stack-title"><span class="lang-en">Frozen r8 · included MODs</span><span class="lang-zh">冻结r8 · 已包含的MOD</span></h2>
-      <p><span class="lang-en">The same r8 badges identify the frozen composition on the Engine page and in this catalog.</span><span class="lang-zh">与引擎页使用相同r8标识，统一显示本版冻结组合。</span></p>
-      <div class="r8-mod-list"><span class="r8-mod-chip" data-r8-mod-id="extension-manager"><span>Extension Manager</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="betterscale"><span>BetterScale</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="microflow"><span>Microflow</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="kv-materialization"><span>KV materialization</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="m01-correction"><span>M01 correction</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="packed-host"><span>Packed host state</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="sealed-serving-warmup"><span>Sealed serving warmup</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="guarded-progress-async"><span>Guarded progress async</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="capacity-tuning"><span>Capacity tuning</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="short-prefill-tail"><span>Short prefill tail</span><strong>r8</strong></span></div>
-      <p><a href="./engine.html#r8-mods"><span class="lang-en">Download r8 and view configuration ↗</span><span class="lang-zh">下载r8与查看运行配置 ↗</span></a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/33dacf572104c5319c5be3d3d96ac1a5df87f70c/mods/active-stack-r8.json"><span class="lang-en">Canonical manifest ↗</span><span class="lang-zh">统一机器清单 ↗</span></a></p>
-    </section>
-    <section class="workload-navigation" data-workload-navigation data-source="./data/plugin-workload-navigation.json?v=catalog-b1-r6-20261116" aria-labelledby="workload-navigation-title">
-      <header>
-        <h2 id="workload-navigation-title"><span class="lang-en">Inference stages and use cases</span><span class="lang-zh">推理阶段与使用场景</span></h2>
-      </header>
-      <div class="discovery-axis">
-        <strong><span class="lang-en">Lifecycle phase</span><span class="lang-zh">生命周期阶段</span></strong>
-        <div class="workload-filter-list" data-phase-filters tabindex="0" role="group" aria-label="Lifecycle phase"></div>
-        <p class="workload-filter-description" data-phase-description aria-live="polite"></p>
-      </div>
-      <div class="discovery-axis">
-        <strong><span class="lang-en">Scenario / use case (optional)</span><span class="lang-zh">场景 / 用例（可选）</span></strong>
-        <div class="workload-filter-list" data-workload-filters tabindex="0" role="group" aria-label="Scenario or use case"></div>
-        <p class="workload-filter-description" data-workload-description aria-live="polite"></p>
-      </div>
-    </section>
-    <p class="plugin-status" data-plugin-status aria-live="polite">Loading ecosystem registry…</p>
-    <div class="plugin-layer-list" data-plugin-catalog data-source="./data/ecosystem.json?v=catalog-b1-r6-20261116" data-metadata="./data/plugin-workshop-metadata.json?v=catalog-delist-20261106" data-taxonomy="./data/mod-taxonomy.json?v=catalog-b1-r6-20261116">
-</div>
-    <button class="plugin-more" data-plugin-more type="button" hidden>Show all extensions</button>
-    <section id="mod-test-protocol" class="content-panel mod-test-protocol" aria-labelledby="mod-test-protocol-title">
+</section></details>
+      <details class="mod-reference"><summary><span class="lang-en">Performance test methodology</span><span class="lang-zh">性能测试方法</span></summary><section id="mod-test-protocol" class="content-panel mod-test-protocol" aria-labelledby="mod-test-protocol-title">
       <header class="mod-test-protocol-head">
         <div>
           <h2 id="mod-test-protocol-title"><span class="lang-en">Performance test methodology</span><span class="lang-zh">性能测试口径</span></h2>
@@ -973,9 +941,8 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
         <a class="action-button" href="https://github.com/vLLM-HUST/vllm-hust-benchmark" target="_blank" rel="noopener noreferrer"><span class="lang-en">Benchmark records ↗</span><span class="lang-zh">Benchmark 测试记录 ↗</span></a>
         <a class="action-button secondary" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/2e5af5cb84b8500dfa00c5799960803db4c1d5b3/reports/reproductions/native-mtp4-gamma4-20261027" target="_blank" rel="noopener noreferrer"><span class="lang-en">Native MTP4 complete example ↗</span><span class="lang-zh">原生 MTP4 完整样例 ↗</span></a>
       </div>
-    </section>
-
-    <section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
+    </section></details>
+      <details class="mod-reference"><summary><span class="lang-en">Repository directory & related systems</span><span class="lang-zh">仓库目录与相关系统</span></summary><section id="repository-portfolio" class="content-panel repository-portfolio" aria-labelledby="repository-portfolio-title">
       <header class="portfolio-head">
 <div>
 <h2 id="repository-portfolio-title">
@@ -992,8 +959,7 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
       <p class="plugin-status" data-repository-status aria-live="polite">Loading repository portfolio…</p>
       <div class="repository-domain-list" data-repository-portfolio data-source="./data/repository-portfolio.json?v=repository-portfolio-v16-foundation-repositories">
 </div>
-    </section>
-    <section class="content-panel adjacent-section">
+    </section><section class="content-panel adjacent-section">
 <div class="adjacent-head">
 <div>
 <span id="plugins-adjacent-kicker" class="eyebrow">Architecture boundaries</span>
@@ -1003,7 +969,9 @@ This is startup and blocked-admission evidence, not a Mooncake failure or real-o
 </div>
 <div class="adjacent-grid" data-adjacent-assets>
 </div>
-</section>
+</section></details>
+      <nav class="mod-reference-links" aria-label="Reference shortcuts"><a href="#plugin-standard"><span class="lang-en">Engine contracts</span><span class="lang-zh">Engine 接入契约</span></a><a href="#mod-test-protocol"><span class="lang-en">Test methodology</span><span class="lang-zh">测试方法</span></a><a href="#plugin-catalog"><span class="lang-en">Back to catalog ↑</span><span class="lang-zh">返回目录 ↑</span></a></nav>
+    </section>
     <noscript>
 <section class="content-panel">
 <p>JavaScript is required to render the ecosystem catalog.
@@ -1048,7 +1016,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
       </div>
     </section>
   </template>
-  <script>window.vllmHustPageDict={"en":{"title":"MOD catalog | vLLM-HUST","plugins-title":"MOD catalog","plugins-lede":"Browse MODs by inference stage and use case. Cards include compatibility, deployment, and measured results where available.","plugins-fact-items":"public MODs","plugins-fact-runtime":"compatibility verified","plugins-fact-review":"experimental or inspection-only","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"How the catalog works","plugins-boundary-title":"Find the right extension without losing sight of who runs it.","plugins-boundary-copy":"The catalog keeps runtime plugins, KV connectors, external services, and control-plane tools distinct, so setup and ownership remain clear.","plugins-legend-kicker":"Catalog details","plugins-legend-title":"See what each project does, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The versioned interface used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Maintainers and evidence","plugins-legend-roadmap-copy":"Who maintains the project and how far its support has been verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugins, connectors, and control planes play different roles.","plugins-adjacent-copy":"Each catalog entry shows its role, integration contract, execution boundary, deployment shape, and delivery format.","footer-copy":"A practical serving ecosystem for domestic compute, backed by clear compatibility and evidence."},"zh":{"title":"MOD 目录 | vLLM-HUST","plugins-title":"MOD 目录","plugins-lede":"按推理阶段和使用场景浏览 MOD，查看各项的兼容性、部署方式和已有实测结果。","plugins-fact-items":"个公开 MOD","plugins-fact-runtime":"个兼容性已验证","plugins-fact-review":"个实验性或仅检查","plugins-fact-publications":"项硬件或性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"目录使用方式","plugins-boundary-title":"找到合适的扩展，也看清它由谁运行和维护。","plugins-boundary-copy":"目录分别呈现运行时插件、KV connector、外部服务与控制面工具，让配置方式和生命周期归属保持清晰。","plugins-legend-kicker":"目录详情","plugins-legend-title":"了解每个项目做什么、在哪里运行、如何交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的版本化接口。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"维护者与证据","plugins-legend-roadmap-copy":"由谁维护，以及目前验证到什么支持程度。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 承担不同角色。","plugins-adjacent-copy":"每个条目都会展示系统角色、集成契约、执行边界、部署形态与交付方式。","footer-copy":"面向国产算力的实用推理生态，兼容状态与验证依据清晰可查。"}};</script>
+  <script>window.vllmHustPageDict={"en":{"title":"MOD catalog | vLLM-HUST","plugins-title":"MOD catalog","plugins-lede":"Explore MODs for Engine, Control Plane and Continuum. Filter by product, then inspect compatibility and results.","plugins-fact-items":"public MODs","plugins-fact-runtime":"compatibility verified","plugins-fact-review":"experimental or inspection-only","plugins-fact-publications":"hardware/performance evidence","plugins-fact-adjacent":"external systems","plugins-boundary-kicker":"ONE MOD ECOSYSTEM","plugins-boundary-title":"Three products. One extension ecosystem.","plugins-boundary-copy":"Execution, service policies and persistent memory can each be extended through MODs.","plugins-legend-kicker":"Catalog details","plugins-legend-title":"See what each project does, where it runs, and how it is delivered.","plugins-legend-existing":"System role","plugins-legend-existing-copy":"Runtime, platform, policy, KV system, control plane, evidence, or application.","plugins-legend-active":"Integration contract","plugins-legend-active-copy":"The versioned interface used to connect to vLLM.","plugins-legend-prototype":"Execution and topology","plugins-legend-prototype-copy":"The process, device, service, and deployment boundaries.","plugins-legend-roadmap":"Maintainers and evidence","plugins-legend-roadmap-copy":"Who maintains the project and how far its support has been verified.","plugins-search-label":"Search","plugins-adjacent-kicker":"Architecture boundaries","plugins-adjacent-title":"Plugins, connectors, and control planes play different roles.","plugins-adjacent-copy":"Each catalog entry shows its role, integration contract, execution boundary, deployment shape, and delivery format.","footer-copy":"A practical serving ecosystem for domestic compute, backed by clear compatibility and evidence."},"zh":{"title":"MOD 目录 | vLLM-HUST","plugins-title":"MOD 目录","plugins-lede":"按 Engine、Control Plane、Continuum 浏览扩展，再查看兼容性、接入方式与实测结果。","plugins-fact-items":"个公开 MOD","plugins-fact-runtime":"个兼容性已验证","plugins-fact-review":"个实验性或仅检查","plugins-fact-publications":"项硬件或性能证据","plugins-fact-adjacent":"个外部系统","plugins-boundary-kicker":"共同扩展生态","plugins-boundary-title":"三个产品，共用 MOD 扩展生态。","plugins-boundary-copy":"MOD 分别扩展执行优化、服务策略与持久记忆，按产品方向组织浏览。","plugins-legend-kicker":"目录详情","plugins-legend-title":"了解每个项目做什么、在哪里运行、如何交付。","plugins-legend-existing":"系统角色","plugins-legend-existing-copy":"运行时、平台、策略、KV 系统、控制面、证据或应用。","plugins-legend-active":"集成契约","plugins-legend-active-copy":"连接 vLLM 时使用的版本化接口。","plugins-legend-prototype":"执行面与拓扑","plugins-legend-prototype-copy":"进程、设备、服务与部署边界。","plugins-legend-roadmap":"维护者与证据","plugins-legend-roadmap-copy":"由谁维护，以及目前验证到什么支持程度。","plugins-search-label":"搜索","plugins-adjacent-kicker":"架构边界","plugins-adjacent-title":"插件、connector 与 control plane 承担不同角色。","plugins-adjacent-copy":"每个条目都会展示系统角色、集成契约、执行边界、部署形态与交付方式。","footer-copy":"面向国产算力的实用推理生态，兼容状态与验证依据清晰可查。"}};</script>
   <script>
     Object.assign(window.vllmHustPageDict.en, {
       "plugins-legend-existing": "MOD identity",
@@ -1075,7 +1043,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
 </script>
 <script src="./assets/plugin-performance.js?v=mod-review-20261110"></script>
 <script src="./assets/ecosystem-catalog.js?v=catalog-audit-20261105"></script>
-<script src="./assets/plugins-page.js?v=catalog-copy-20261116">
+<script src="./assets/plugins-page.js?v=product-mods-20261118">
 </script>
 </body>
 </html>
