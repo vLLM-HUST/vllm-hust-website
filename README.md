@@ -4,6 +4,19 @@
 [vllm-hust-benchmark](https://github.com/vLLM-HUST/vllm-hust-benchmark)。 网站只接收展示和代码变更。详见
 [贡献规则](CONTRIBUTING.md)。
 
+## 产品主页
+
+- [Engine](https://vllm-hust.sage.org.ai/engine.html)：冻结的优化组合与推理执行能力。负责人：张书豪。
+- [SAGE Control Plane](https://vllm-hust.sage.org.ai/control-plane.html)：统一服务入口、模型路由与调度。负责人：毛言粲。
+- [Continuum](https://vllm-hust.sage.org.ai/continuum.html)：面向 Agent
+  的持久记忆与任务数据系统，目前为架构规划；张书豪暂任负责人，招募合适的负责人。
+
+**MOD 是三个产品共同的扩展机制**，分别承载执行优化、服务策略与记忆处理扩展。
+
+两个新主页共用 `assets/product-home.css` 和 `assets/product-home.js`，全站入口由 `assets/site.js`
+维护。中英文文案、交互流程和阶段状态应同步更新；KV 存储、分层缓存和传输归 Engine， 长期记忆和任务恢复归 Continuum。浏览器回归
+`scripts/verify_product_homepages_browser.py` 已接入 CI； 产品流程图为本地架构示意，不调用模型或模拟线上性能。
+
 <!-- BEGIN:VERSION_META -->
 
 **vllm-hust 项目概览** vllm-hust 围绕上游 vLLM 展开，聚焦国产算力适配、AGI4S 服务场景和 benchmark 驱动验证。

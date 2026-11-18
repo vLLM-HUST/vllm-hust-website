@@ -20,6 +20,8 @@
             navIssues: 'Issues',
             navProducts: 'Products',
             navEngine: 'Engine',
+            navControlPlane: 'Control Plane',
+            navContinuum: 'Continuum',
             navProjects: 'Projects',
             navPlugins: 'MOD catalog',
             navPublications: 'Papers & news',
@@ -62,6 +64,8 @@
             navIssues: '议题',
             navProducts: '产品',
             navEngine: '引擎',
+            navControlPlane: 'Control Plane',
+            navContinuum: 'Continuum',
             navProjects: '项目',
             navPlugins: 'MOD 目录',
             navPublications: '论文与新闻',
@@ -250,6 +254,17 @@
 
     const NAV_GROUPS = [
         {
+            id: 'products',
+            label: 'navProducts',
+            pages: ['home', 'engine', 'control-plane', 'continuum'],
+            links: [
+                ['home', './index.html', 'navHome'],
+                ['engine', './engine.html', 'navEngine'],
+                ['control-plane', './control-plane.html', 'navControlPlane'],
+                ['continuum', './continuum.html', 'navContinuum'],
+            ],
+        },
+        {
             id: 'publications',
             label: 'navPublications',
             pages: ['achievements', 'news'],
@@ -309,19 +324,20 @@
         if (!nav || !inner || !links) return;
 
         links.id = 'site-navigation';
+        const groups = NAV_GROUPS.map((group) => `
+            <details class="nav-group" data-nav-group="${group.id}">
+                <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
+                <div class="nav-group-menu">
+                    ${group.links.map((link) => navLink(...link)).join('')}
+                </div>
+            </details>
+        `);
         links.innerHTML = [
-            navLink('', './index.html', 'navProducts'),
+            groups[0],
             navLink('', './index.html#projects', 'navProjects'),
             navLink('plugins', './plugins.html', 'navPlugins'),
             navLink('engine', './engine.html', 'navEngine'),
-            ...NAV_GROUPS.map((group) => `
-                <details class="nav-group" data-nav-group="${group.id}">
-                    <summary class="nav-group-label" id="nav-${group.id}" data-i18n-common="${group.label}">${I18N.en[group.label]}</summary>
-                    <div class="nav-group-menu">
-                        ${group.links.map((link) => navLink(...link)).join('')}
-                    </div>
-                </details>
-            `),
+            ...groups.slice(1),
         ].join('');
 
         const button = document.createElement('button');
@@ -396,7 +412,7 @@
                     <span id="${summaryId}">${summary}</span>
                 </div>
                 <nav class="site-directory-links" aria-label="Footer navigation">
-                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html" data-i18n-common="navProducts">Products</a><a href="./engine.html" data-i18n-common="navEngine">Engine</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
+                    <div><strong data-i18n-common="footerBuild">Build</strong><a href="./index.html" data-i18n-common="navProducts">Products</a><a href="./engine.html" data-i18n-common="navEngine">Engine</a><a href="./control-plane.html" data-i18n-common="navControlPlane">Control Plane</a><a href="./continuum.html" data-i18n-common="navContinuum">Continuum</a><a href="./index.html#projects" data-i18n-common="navProjects">Projects</a><a href="./plugins.html" data-i18n-common="navPlugins">Plugins</a><a href="./versions.html" data-i18n-common="navVersions">Versions</a></div>
                     <div><strong data-i18n-common="footerPerformance">Performance data</strong><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. Designated datasets</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 results</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">Capacity &amp; cost</a></div>
                     <div><strong data-i18n-common="footerPublications">Papers & news</strong><a href="./achievements.html" data-i18n-common="navAchievements">Papers & achievements</a><a href="./news.html" data-i18n-common="navNews">News</a></div>
                     <div><strong data-i18n-common="footerCommunity">Community</strong><a href="./members.html" data-i18n-common="navMembers">Members</a><a href="./contributors.html" data-i18n-common="navContributors">Contributors</a><a href="./conferences.html" data-i18n-common="navConferences">Conferences</a><a href="./courses.html" data-i18n-common="navCourses">Courses</a><a href="https://github.com/vLLM-HUST" target="_blank" rel="noopener noreferrer" data-i18n-common="navGithub">GitHub</a></div>

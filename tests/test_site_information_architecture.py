@@ -60,7 +60,7 @@ def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
         < performance.index("./b0-b1.html")
         < performance.index("./serving-plan.html")
     )
-    assert groups.count("id:") == 4
+    assert groups.count("id:") == 5
     for name in ("publications", "community", "resources"):
         assert f"id: '{name}'" in groups
     assert "id: 'engine'" not in groups
