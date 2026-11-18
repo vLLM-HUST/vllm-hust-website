@@ -8,6 +8,26 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright, expect
 
+from snapshot_expectation import snapshot_expectation
+
+
+async def verify_version_snapshot(page, lang):
+    metadata = await page.evaluate(
+        "async () => {const response = await fetch('./data/version_meta.json', {cache: 'no-store'});"
+        "if (!response.ok) throw new Error('Cannot read version snapshot'); return response.json();}"
+    )
+    now_ms = await page.evaluate("Date.now()")
+    text, stale = snapshot_expectation(metadata.get("updated_at"), now_ms, lang)
+    status = page.locator("#versions-verified")
+    await expect(status).to_contain_text(text)
+    await expect(status).to_have_attribute("data-stale", str(stale).lower())
+    if stale:
+        await expect(status).to_contain_text(
+            "已过期" if lang == "zh" else "out of date"
+        )
+    else:
+        await expect(status).to_contain_text("不是实时" if lang == "zh" else "not live")
+
 
 async def run(args):
     root = Path(__file__).resolve().parents[1]
@@ -142,9 +162,7 @@ async def run(args):
                     if filename == "ecosystem-archive.html" and width == 390:
                         await expect(page.locator(".inference-fabric")).to_be_hidden()
                     if filename == "versions.html":
-                        await expect(
-                            page.locator("#versions-verified")
-                        ).to_contain_text("2026-10-20")
+                        await verify_version_snapshot(page, lang)
                         assert await page.locator("#versions-verified").evaluate(
                             "e=>e.getBoundingClientRect().bottom < innerHeight"
                         )
