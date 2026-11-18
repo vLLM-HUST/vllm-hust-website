@@ -120,6 +120,18 @@ def verify_publications(page, product, language):
     return len(entries)
 
 
+def close_publication_library(page):
+    """Native close remains closed after the preceding anchor events drain."""
+    summary = page.locator(".publication-library > summary")
+    summary.focus()
+    page.keyboard.press("Enter")
+    expect(page.locator(".publication-library")).not_to_have_attribute("open", "")
+    page.evaluate(
+        "() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
+    )
+    expect(page.locator(".publication-library")).not_to_have_attribute("open", "")
+
+
 LAYOUT_SIGNATURES = {}
 
 
@@ -642,9 +654,7 @@ def main():
                             page.keyboard.press("Enter")
                         verify_product_layout(page, slug, width, theme, language)
                         publications = verify_publications(page, slug, language)
-                        page.locator(".publication-library").evaluate(
-                            "el => el.open = false"
-                        )
+                        close_publication_library(page)
                         selectors = [
                             "h1",
                             ".product-eyebrow",
@@ -778,9 +788,7 @@ def main():
                             / f"engine-publications-{width}-{theme}-{language}.png"
                         )
                     )
-                    page.locator(".publication-library").evaluate(
-                        "el => el.open = false"
-                    )
+                    close_publication_library(page)
                     page.evaluate("window.scrollTo(0,0)")
                     page.screenshot(
                         path=str(
