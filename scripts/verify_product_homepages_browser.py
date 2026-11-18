@@ -120,6 +120,99 @@ def verify_publications(page, product, language):
     return len(entries)
 
 
+LAYOUT_SIGNATURES = {}
+
+
+def verify_product_layout(page, product, width, theme, language):
+    """All three products use one visual hierarchy without erasing their scope."""
+    expect(page.locator("body.product-home")).to_have_count(1)
+    expect(page.locator('link[href*="assets/product-layout.css?v="]')).to_have_count(1)
+    expect(page.locator('script[src*="assets/product-layout.js?v="]')).to_have_count(1)
+    main = page.locator("main.product-shell")
+    expect(main.locator(":scope > .product-hero h1")).to_have_count(1)
+    expect(main.locator(":scope > .product-capabilities > article")).to_have_count(3)
+    expect(main.locator(".product-diagram")).to_have_count(1)
+    expect(main.locator(".product-owner")).to_contain_text(
+        "毛言粲" if product == "control-plane" else "张书豪"
+    )
+    roles = main.evaluate("""el => [...el.children].map(n =>
+        n.classList.contains('product-switcher') ? 'switcher' :
+        n.classList.contains('product-jumps') ? 'jumps' :
+        n.classList.contains('product-hero') ? 'hero' :
+        n.classList.contains('product-capabilities') ? 'capabilities' :
+        n.id === 'workflow' ? 'workflow' : n.id)
+    """)
+    assert roles == [
+        "switcher",
+        "jumps",
+        "hero",
+        "capabilities",
+        "workflow",
+        "product-details",
+        "product-stack",
+        "publications",
+    ], roles
+    signature = page.evaluate("""() => {
+        const style = s => getComputedStyle(document.querySelector(s));
+        return {
+            width: document.querySelector('main').getBoundingClientRect().width,
+            titleSize: style('h1').fontSize,
+            titleWeight: style('h1').fontWeight,
+            radius: style('.product-diagram').borderRadius,
+            cardRadius: style('.product-capabilities article').borderRadius,
+            padding: style('.product-hero').padding,
+            background: style('body').backgroundColor
+        };
+    }""")
+    key = (width, theme, language)
+    if key in LAYOUT_SIGNATURES:
+        assert signature == LAYOUT_SIGNATURES[key], (product, key, signature)
+    else:
+        LAYOUT_SIGNATURES[key] = signature
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    for selector in (
+        ".product-jumps a",
+        ".product-capabilities p",
+        ".product-owner",
+        ".product-status",
+        ".product-actions a",
+    ):
+        for node in page.locator(selector).all():
+            assert node.evaluate(CONTRAST) >= 4.5, (product, selector)
+    library = page.locator(".publication-library")
+    expect(library).not_to_have_attribute("open", "")
+    library.locator(":scope > summary").focus()
+    page.keyboard.press("Enter")
+    expect(library).to_have_attribute("open", "")
+    page.keyboard.press("Enter")
+    expect(library).not_to_have_attribute("open", "")
+
+
+def verify_product_deep_links(browser, args):
+    """A shared collapsed library must still support saved and repeated links."""
+    context = browser.new_context(viewport={"width": 390, "height": 1000})
+    page = context.new_page()
+    for slug in ("engine", "control-plane", "continuum"):
+        url = urljoin(args.url.rstrip("/") + "/", f"{slug}.html")
+        page.goto(url)
+        paper = page.locator(".publication-item").first.get_attribute("id")
+        page.goto(url + "#" + paper)
+        page.reload(wait_until="networkidle")
+        expect(page.locator(".publication-library")).to_have_attribute("open", "")
+        expect(page.locator("#" + paper)).to_be_visible()
+        page.goto(url + "#publications")
+        expect(page.locator(".publication-library")).to_have_attribute("open", "")
+        page.locator(".publication-library > summary").click()
+        expect(page.locator(".publication-library")).not_to_have_attribute("open", "")
+        page.locator(".publications-shortcut").click()
+        expect(page.locator(".publication-library")).to_have_attribute("open", "")
+        if slug == "engine":
+            for anchor in ("#r8-mods", "#release", "#r8-current-results"):
+                page.goto(url + anchor)
+                expect(page.locator(anchor)).to_be_visible()
+    context.close()
+
+
 RESEARCH_URL = "https://lab.sage.org.ai/auto-research-report-website/"
 
 
@@ -547,7 +640,11 @@ def main():
                             expect(detail).to_have_attribute("open", "")
                             assert detail.locator("p").is_visible()
                             page.keyboard.press("Enter")
+                        verify_product_layout(page, slug, width, theme, language)
                         publications = verify_publications(page, slug, language)
+                        page.locator(".publication-library").evaluate(
+                            "el => el.open = false"
+                        )
                         selectors = [
                             "h1",
                             ".product-eyebrow",
@@ -620,7 +717,7 @@ def main():
                             == "true"
                         ):
                             page.locator("#navToggle").click()
-                        for anchor in ("#workflow", "#product-stack"):
+                        for anchor in ("#workflow",):
                             page.locator(f'.product-actions a[href="{anchor}"]').click()
                             assert page.url.endswith(anchor)
                         assert (
@@ -656,7 +753,7 @@ def main():
             page.locator('.nav-links a[href="./continuum.html"]').click()
         expect(page.locator("body")).to_have_attribute("data-page", "continuum")
         page.close()
-        # Engine retains its existing layout and install/download actions.
+        # Engine shares the product layout and retains install/download actions.
         for width in (390, 1440):
             for theme in ("light", "dark"):
                 context = browser.new_context(
@@ -670,6 +767,7 @@ def main():
                 for language in ("en", "zh"):
                     if language == "zh":
                         page.locator("#langToggle").click()
+                    verify_product_layout(page, "engine", width, theme, language)
                     count = verify_publications(page, "engine", language)
                     expect(page.locator("#engine-install-title")).to_be_visible()
                     assert page.locator("#engine-hero-download").get_attribute("href")
@@ -679,6 +777,16 @@ def main():
                             args.output
                             / f"engine-publications-{width}-{theme}-{language}.png"
                         )
+                    )
+                    page.locator(".publication-library").evaluate(
+                        "el => el.open = false"
+                    )
+                    page.evaluate("window.scrollTo(0,0)")
+                    page.screenshot(
+                        path=str(
+                            args.output / f"engine-{width}-{theme}-{language}.png"
+                        ),
+                        full_page=True,
                     )
                     rows.append(
                         dict(
@@ -727,6 +835,7 @@ def main():
                         )
                     )
                 context.close()
+        verify_product_deep_links(browser, args)
         browser.close()
     receipt = dict(passed=True, views=rows, model_requests=0)
     (args.output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
