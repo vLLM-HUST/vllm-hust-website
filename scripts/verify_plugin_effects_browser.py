@@ -50,10 +50,15 @@ def check_product_views(page, taxonomy):
         if product == "continuum":
             expect(cards).to_have_count(0)
             expect(scope.locator(".mod-plan-status")).to_be_visible()
-            expect(scope.locator("li")).to_have_count(3)
+            expect(scope.locator("li")).to_have_count(4)
             expect(page.locator(".plugin-controls")).to_be_hidden()
             expect(page.locator(".workload-navigation")).to_be_hidden()
             expect(page.locator(".plugin-catalog-scope")).to_be_hidden()
+            expect(page.locator(".continuum-mod-plan")).to_contain_text(
+                "沙箱"
+                if page.locator("html").get_attribute("lang") == "zh"
+                else "Sandbox"
+            )
         else:
             assert (
                 set(cards.evaluate_all("nodes => nodes.map(n => n.id)"))
