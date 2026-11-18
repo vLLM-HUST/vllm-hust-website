@@ -49,7 +49,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
         if step.get("uses", "").startswith("actions/checkout@")
     ]
     assert len(checkouts) == 3
-    assert checkouts[0]["with"]["ref"] == "main"
+    assert checkouts[0]["with"]["ref"] == "${{ github.sha }}"
     # MOD catalog and Workshop statistics use the reviewed canonical snapshot.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
@@ -129,3 +129,57 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     assert deploy["needs"] == "build"
     assert deploy["permissions"] == {"pages": "write", "id-token": "write"}
     assert deploy["environment"]["name"] == "github-pages"
+
+
+def test_source_eligibility_precedes_execution_and_provenance_is_uploaded():
+    workflow = yaml.load(
+        (ROOT / ".github/workflows/deploy-benchmark-pages.yml").read_text(),
+        Loader=yaml.BaseLoader,
+    )
+    assert set(workflow["on"]) == {"push", "workflow_dispatch", "repository_dispatch"}
+    steps = workflow["jobs"]["build"]["steps"]
+    guard = next(
+        i
+        for i, s in enumerate(steps)
+        if "verify_release_sources.py" in s.get("run", "")
+    )
+    publication = next(
+        i
+        for i, s in enumerate(steps)
+        if "sync_website_publication.py publish" in s.get("run", "")
+    )
+    assert guard < publication
+    assert '--presentation-revision "${{ github.sha }}"' in steps[guard]["run"]
+    projection = next(
+        i for i, s in enumerate(steps) if "build_public_site.py" in s.get("run", "")
+    )
+    provenance = next(
+        i
+        for i, s in enumerate(steps)
+        if "deployment-provenance.json" in s.get("run", "")
+    )
+    upload = next(
+        i
+        for i, s in enumerate(steps)
+        if s.get("uses", "").startswith("actions/upload-pages-artifact@")
+    )
+    assert projection < provenance < upload
+
+
+def test_each_ci_job_verifies_sources_before_running_publication_code():
+    workflow = yaml.load(
+        (ROOT / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader
+    )
+    for job in workflow["jobs"].values():
+        steps = job["steps"]
+        guard = next(
+            i
+            for i, step in enumerate(steps)
+            if "verify_release_sources.py --benchmark-only" in step.get("run", "")
+        )
+        publisher = next(
+            i
+            for i, step in enumerate(steps)
+            if "sync_website_publication.py publish" in step.get("run", "")
+        )
+        assert guard < publisher
