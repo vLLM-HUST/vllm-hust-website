@@ -120,6 +120,214 @@ def verify_publications(page, product, language):
     return len(entries)
 
 
+RESEARCH_URL = "https://lab.sage.org.ai/auto-research-report-website/"
+
+
+def verify_homepage_research(browser, args, rows):
+    """Check the appended research card without visiting its external service."""
+    homepage_rows = []
+    origin = urljoin(args.url, "/")
+    for width in (390, 1440):
+        for theme in ("light", "dark"):
+            context = browser.new_context(
+                viewport={"width": width, "height": 1000},
+                color_scheme=theme,
+                reduced_motion="reduce",
+            )
+            context.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
+            page = context.new_page()
+            errors = []
+            network_errors = []
+            model_requests = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.on(
+                "response",
+                lambda response: (
+                    network_errors.append(response.url)
+                    if response.status >= 400 and response.url.startswith(origin)
+                    else None
+                ),
+            )
+            page.on(
+                "request",
+                lambda request: (
+                    model_requests.append(request.url)
+                    if re.search(r"/v1/(chat|responses|completions)", request.url)
+                    else None
+                ),
+            )
+            try:
+                response = page.goto(
+                    urljoin(args.url.rstrip("/") + "/", "index.html"),
+                    wait_until="domcontentloaded",
+                )
+                assert response is not None and response.status == 200
+                research = page.locator("#product-research")
+                expect(research).to_have_count(1)
+                cards = page.locator("#products > .product-grid > .product-card")
+                assert cards.count() >= 3
+                expect(cards.nth(0).locator("#product-workstation-name")).to_have_text(
+                    "vLLM-HUST Workstation"
+                )
+                expect(cards.nth(1).locator("#product-mate-name")).to_have_text(
+                    "Sage Mate"
+                )
+                expect(cards.nth(2)).to_have_attribute("id", "product-research")
+                expect(research.locator("a")).to_have_count(1)
+                cta = research.locator("a.product-cta")
+                expect(cta).to_have_attribute("href", RESEARCH_URL)
+                expect(cta).to_have_attribute("target", "_blank")
+                assert {"noopener", "noreferrer"} <= set(
+                    (cta.get_attribute("rel") or "").split()
+                )
+                for language in ("en", "zh"):
+                    if page.locator("html").get_attribute("lang") != language:
+                        page.locator("#langToggle").click()
+                    expect(page.locator("html")).to_have_attribute("lang", language)
+                    expected = (
+                        {
+                            "name": "推理研究日报",
+                            "lead": "基于 SAGE 构建，提供每日研报与专题综述。",
+                            "daily": "每日研报",
+                            "topic": "专题综述",
+                            "feature": "推理全景",
+                            "cta": "进入研究总览",
+                        }
+                        if language == "zh"
+                        else {
+                            "name": "Inference Research Reports",
+                            "lead": (
+                                "Built with SAGE, offering daily reports "
+                                "and topic reviews."
+                            ),
+                            "daily": "Daily report",
+                            "topic": "Topic review",
+                            "feature": "Inference map",
+                            "cta": "Explore research",
+                        }
+                    )
+                    for selector, key in (
+                        ("#product-research-name", "name"),
+                        ("#product-research-positioning", "lead"),
+                        ("#product-research-visual-daily", "daily"),
+                        ("#product-research-visual-topic", "topic"),
+                        ("#product-research-feature-2", "feature"),
+                        ("#product-research-cta-copy", "cta"),
+                    ):
+                        expect(research.locator(selector)).to_have_text(expected[key])
+                    if language == "en":
+                        assert not re.search(r"[\u4e00-\u9fff]", research.inner_text())
+                    assert page.evaluate(
+                        "document.documentElement.scrollWidth <= innerWidth + 1"
+                    ), (width, theme, language)
+                    boxes = [cards.nth(index).bounding_box() for index in range(3)]
+                    assert all(box is not None for box in boxes)
+                    first, second, third = boxes
+                    if width == 1440:
+                        assert abs(first["y"] - second["y"]) <= 1, boxes
+                        assert first["x"] + first["width"] <= second["x"] + 1, boxes
+                        assert abs(first["width"] - second["width"]) <= 1, boxes
+                        assert (
+                            third["y"]
+                            >= max(
+                                first["y"] + first["height"],
+                                second["y"] + second["height"],
+                            )
+                            - 1
+                        ), boxes
+                        assert abs(third["x"] - first["x"]) <= 1, boxes
+                        assert abs(third["width"] - first["width"]) <= 1, boxes
+                    else:
+                        assert second["y"] >= (first["y"] + first["height"] - 1), boxes
+                        assert third["y"] >= (second["y"] + second["height"] - 1), boxes
+                    daily = research.locator(".research-sheet-daily").bounding_box()
+                    topic = research.locator(".research-sheet-topic").bounding_box()
+                    visual = research.locator(".research-visual").bounding_box()
+                    assert daily and topic and visual
+                    assert daily["x"] < topic["x"], (daily, topic)
+                    for sheet in (daily, topic):
+                        assert sheet["x"] >= visual["x"] - 1, (sheet, visual)
+                        assert sheet["x"] + sheet["width"] <= (
+                            visual["x"] + visual["width"] + 1
+                        ), (sheet, visual)
+
+                    accents = {
+                        name: page.locator(
+                            f".product-card-{name} .product-cta"
+                        ).evaluate("el => getComputedStyle(el).backgroundColor")
+                        for name in ("workstation", "mate", "research")
+                    }
+                    assert all(accents.values()) and len(set(accents.values())) == 3, (
+                        theme,
+                        accents,
+                    )
+                    # Tab from the preceding product reaches the new card's one CTA.
+                    page.locator("#product-mate-cta").focus()
+                    page.keyboard.press("Tab")
+                    expect(cta).to_be_focused()
+                    assert cta.evaluate("el => el.matches(':focus-visible')")
+                    cta.scroll_into_view_if_needed()
+                    assert cta.evaluate(
+                        """el => {
+                            const r = el.getBoundingClientRect();
+                            return el.contains(document.elementFromPoint(
+                                r.x + r.width / 2, r.y + r.height / 2));
+                        }"""
+                    ), (width, theme, language)
+                    # The existing parser is sufficient for an opaque rgb CTA:
+                    # its background fully replaces any color-mix ancestors.
+                    opaque = cta.evaluate(
+                        r"""el => {
+                            const value = getComputedStyle(el).backgroundColor;
+                            const match = value.match(/^rgba?\(([^)]+)\)$/);
+                            if (!match) return false;
+                            const channels = match[1].split(/[,\s/]+/)
+                                .filter(Boolean).map(Number);
+                            return channels.length === 3 ||
+                                (channels.length === 4 && channels[3] === 1);
+                        }"""
+                    )
+                    assert opaque, (
+                        theme,
+                        cta.evaluate("el => getComputedStyle(el).backgroundColor"),
+                    )
+                    ratio = cta.evaluate(CONTRAST)
+                    assert ratio >= 4.5, (width, theme, language, ratio)
+                    assert not errors and not network_errors and not model_requests, (
+                        errors,
+                        network_errors,
+                        model_requests,
+                    )
+                    screenshot = f"home-research-{width}-{theme}-{language}.png"
+                    page.screenshot(
+                        path=str(args.output / screenshot),
+                        full_page=True,
+                    )
+                    row = dict(
+                        page="home",
+                        width=width,
+                        theme=theme,
+                        language=language,
+                        passed=True,
+                        screenshot=screenshot,
+                        research_href=RESEARCH_URL,
+                        cta_contrast=round(ratio, 3),
+                        accents=accents,
+                        keyboard_reachable=True,
+                        daily_before_topic=True,
+                    )
+                    rows.append(row)
+                    homepage_rows.append(row)
+            finally:
+                context.close()
+    assert len(homepage_rows) == 8
+    (args.output / "home-research-receipt.json").write_text(
+        json.dumps(dict(passed=True, views=homepage_rows, model_requests=0), indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
@@ -341,6 +549,7 @@ def main():
                             )
                         )
                     context.close()
+        verify_homepage_research(browser, args, rows)
         # Product navigation is also available on the existing Engine page.
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
         page.goto(urljoin(args.url.rstrip("/") + "/", "engine.html"))
