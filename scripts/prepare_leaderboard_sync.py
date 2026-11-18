@@ -20,6 +20,10 @@ SNAPSHOT_FILES = (
     "last_updated.json",
 )
 
+# Match benchmark.same_spec's runtime-only overrides. Canonical model identity
+# is checked separately below; addresses do not define a comparable workload.
+RUNTIME_PARAMETER_KEYS = {"host", "port", "model"}
+
 
 @dataclass(frozen=True)
 class RegistryInfo:
@@ -35,6 +39,11 @@ def _require_mapping_values(
         return [f"{prefix} must be an object"]
     errors: list[str] = []
     for key, expected_value in expected.items():
+        if key in RUNTIME_PARAMETER_KEYS and prefix in {
+            "same_spec.resolved_server_parameters",
+            "same_spec.resolved_client_parameters",
+        }:
+            continue
         actual_value = actual.get(key)
         if isinstance(expected_value, dict):
             errors.extend(
@@ -192,14 +201,19 @@ def require_public_entry_contract(
         )
 
     baseline = target.get("baseline_runtime") or {}
-    if baseline.get("engine") and entry.get("engine") != baseline.get("engine"):
-        errors.append(f"{prefix}: engine does not match target baseline runtime")
-    if baseline.get("engine_version") and entry.get("engine_version") != baseline.get(
-        "engine_version"
-    ):
-        errors.append(
-            f"{prefix}: engine_version does not match target baseline runtime"
-        )
+    if baseline.get("engine"):
+        if entry.get("engine") == baseline["engine"]:
+            if (
+                baseline.get("engine_version")
+                and entry.get("engine_version") != baseline["engine_version"]
+            ):
+                errors.append(
+                    f"{prefix}: engine_version does not match target baseline runtime"
+                )
+        elif entry.get("engine") != "vllm-hust":
+            errors.append(f"{prefix}: engine is neither the baseline nor vllm-hust")
+        elif not str(entry.get("engine_version") or "").strip():
+            errors.append(f"{prefix}: candidate engine_version is required")
 
     target_model = target.get("model") or {}
     entry_model = entry.get("model") or {}

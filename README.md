@@ -82,7 +82,35 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 - vLLM 实际运行时架构与 9 个子任务映射：`docs/ARCHITECTURE_TASK_MAPPING.md`
 - 首阶段实施优先级与验证清单：`docs/IMPLEMENTATION_PRIORITIES.md`
 
-## Benchmark Data Chain
+## Benchmark Publication And Preview
+
+Production Pages assembles `vllm-hust-benchmark/website-publication` at a reviewed full commit,
+checks its byte identities, applies the pinned public visibility projection, runs browser checks,
+and deploys the resulting artifact. The source checkout contains historical evidence and build
+outputs as well as presentation code. The assembled public artifact defines the served file set.
+
+`.github/benchmark-publication.json` owns the reviewed publication and visibility-policy revisions.
+After reviewing a benchmark commit, update the corresponding revision in that file and run
+`python scripts/update_benchmark_publication.py --write`, then
+`python scripts/update_benchmark_publication.py --check`. CI checks all consuming workflow pins.
+Dataset navigation retains its independent content hashes in
+`scripts/assemble_dataset_entrypoints.py`.
+
+The scheduled `Prepare Benchmark Data Artifact` workflow validates the legacy leaderboard snapshot
+set and saves a preview artifact. It is a separate maintenance consumer, alongside the production
+Pages workflow. Each target-bound baseline must match its registered runtime version. A `vllm-hust`
+candidate retains its own engine version and transport addresses while matching the target's model,
+hardware and workload parameters. Host, port and local model path follow benchmark's runtime-only
+override rules.
+
+The legacy leaderboard paints the bundled snapshot first, then checks GitHub in the background.
+Hugging Face remains available as an explicit compatibility source. This matches
+`assets/hf-data-loader.js`; older HF-first instructions in historical data documentation describe
+the previous publication process.
+
+[Repository maintenance and artifact ownership](docs/REPOSITORY_MAINTENANCE.md).
+
+## Historical Leaderboard Export Contract
 
 website does not ingest raw compare directories and does not hand-edit benchmark rows.
 
@@ -95,7 +123,7 @@ contract and empty local fixture are documented in
 snapshot chain below remains a legacy compatibility surface until its replacement data contract is
 explicitly migrated; it must not be used as the dataset validation service contract.
 
-The only supported leaderboard data chain is:
+The historical standard leaderboard export chain is:
 
 1. Any benchmark pipeline that exports standard leaderboard artifacts (`leaderboard_manifest.json` +
    `*_leaderboard.json`)
@@ -109,8 +137,8 @@ The only supported leaderboard data chain is:
    - `data/leaderboard_compare.json`
    - `data/last_updated.json`
 
-Leaderboard rendering consumes benchmark GitHub raw snapshots first, then HF, then the checked-in
-website projection. `leaderboard_compare.json` provides neutral engine-vs-engine head-to-head views.
+The current source priority is described above. `leaderboard_compare.json` provides neutral
+engine-vs-engine head-to-head views.
 
 Leaderboard version rendering follows a split UI contract:
 

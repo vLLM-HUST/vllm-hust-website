@@ -44,7 +44,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/assemble_dataset_entrypoints.py
       - name: Run unit tests
-        run: python -m pytest tests/ -v
+        # One reviewed manifest owns publication refs across all workflows.
+        run: |
+          python scripts/update_benchmark_publication.py --check
+          python -m pytest tests/ -v
       - name: Run JS data and Frontier tests
         run: >-
           node --test tests/controller_discovery.test.cjs tests/loader_publication_identity.test.cjs tests/snapshot_status.test.cjs
