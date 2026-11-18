@@ -99,15 +99,17 @@
     const met = final ? goal.attainment === 'demonstrated' : goal.accepted;
     return met ? t('达成目标','Target met') : t('未达成目标','Target not met');
   };
+  const continuousWorkloadLabel = () => t('闭环连续压测 · 并发 8','Closed-loop continuous stress test · concurrency 8');
+  const terminalReplayWorkloadLabel = () => t('Terminal-Bench 2.1 离线请求回放 · 并发 8','Terminal-Bench 2.1 offline request replay · concurrency 8');
   function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames()) {
     const maximum = Math.max(1,...rows.filter(row=>row.arms?.B0&&row.arms?.B1).map(d=>d.arms.B1[key]/d.arms.B0[key]));
     return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">B0</span><span class="legend-b1">B1</span></div>${rows.map((row,i)=>{
       if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
-      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${labels[i]}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
+      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${esc(labels[i])}${row.workloadLabel?`<small class="chart-workload-label">${esc(row.workloadLabel)}</small>`:''}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
         const value=row.arms[role][key]/divisor;
-        return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${role} ${n(value)} ${unit}`)}"><span class="bar-role">${role}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
+        return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${row.workloadLabel||''} ${role} ${n(value)} ${unit}`)}"><span class="bar-role">${role}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
       }).join('')}</div>`;
     }).join('')}</article>`;
   }
@@ -140,7 +142,7 @@
     }
     if (key==='supplement') {
       const a=data.acceptance_supplement;
-      const labels=t(['4K–8K/C8','16K–24K/C8','32K–48K/C8','四租户/C24'],['4K–8K/C8','16K–24K/C8','32K–48K/C8','Four tenants/C24']);
+      const labels=['4K–8K','16K–24K','32K–48K'].map(band=>`${band} · ${terminalReplayWorkloadLabel()}`).concat(t('四租户/C24','Four tenants/C24'));
       return {title:t('上下文与四租户：范围、窗口和原件','Context and four tenants: scope, windows and evidence'),body:`
         <p>${t('五条原始公开Terminal任务历史，不裁剪或补齐。两臂共享启动预热，每阶段再预热60秒、正式提交300秒，固定输出256；最终排空计入整阶段吞吐。','Five original public Terminal histories, without cropping or padding. Both arms share startup warmup, then60s warmup and300s formal submissions per phase, fixed256 output; whole-phase throughput includes the final drain.')}</p>
         ${table(t(['阶段','B0 token/s','B1 token/s','B1/B0','成本降低'],['Phase','B0 token/s','B1 token/s','B1/B0','Cost reduction']),a.comparisons.map((r,i)=>[labels[i],n(r.arms.B0.metrics.output_tokens_per_second),n(r.arms.B1.metrics.output_tokens_per_second),n(r.throughput_ratio)+'×',n(r.cost_reduction_percent)+'%']))}
@@ -171,7 +173,7 @@
     return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · 4K–8K /16K–24K /32K–48K · C8 · ${t('四租户C24 · 各300秒','Four tenants C24 ·300s each')}</p>
       <div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vsB0')}</span><strong>${n(a.comparisons[1].throughput_ratio)}×</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant.cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant.B0_utilization.mean_percent)} → ${n(tenant.B1_utilization.mean_percent)}%</strong></div></div>
-      <figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与四租户配对图，可横向滚动','Context and tenant paired chart; scroll horizontally')}"><img src="${esc(a.chart_path)}" alt="${t('两臂上下文吞吐、尾时延和四租户利用率实测图','Measured paired context throughput, tail latency and four-tenant utilization')}" width="1426" height="1022"></div><figcaption>${t('输入变长时输出吞吐下降；五窗口稳定性与局部回归见详情。','Output throughput decreases with longer inputs; see details for five-window stability and individual regressions.')}</figcaption></figure></section>`;
+      <figure><div class="supplement-workload-label" data-workload="terminal-replay" role="note"><strong>4K–8K · 16K–24K · 32K–48K</strong><span>${terminalReplayWorkloadLabel()}</span></div><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与四租户配对图，可横向滚动','Context and tenant paired chart; scroll horizontally')}"><img src="${esc(a.chart_path)}" alt="${t('4K–8K、16K–24K、32K–48K：Terminal-Bench 2.1 离线请求回放 · 并发 8；四租户并发 24 的吞吐、尾时延和利用率实测图','4K–8K, 16K–24K and 32K–48K: Terminal-Bench 2.1 offline request replay · concurrency 8; four-tenant concurrency 24 throughput, tail-latency and utilization measurements')}" width="1426" height="1022"></div><figcaption>${t('输入变长时输出吞吐下降；五窗口稳定性与局部回归见详情。','Output throughput decreases with longer inputs; see details for five-window stability and individual regressions.')}</figcaption></figure></section>`;
   }
   function renderR6() {
     if (!data || !combination) return;
@@ -361,7 +363,7 @@
       return {id:row.id,label:row.label,arms,changes_percent};
     });
     if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'});
-    return rows;
+    return rows.map(row=>entry.id==='r8'&&['4096-formal','16384-formal'].includes(row.id)?{...row,workloadLabel:continuousWorkloadLabel()}:row);
   }
   function versionDetails(entry, rows, key, attempt) {
     const title={configuration:t('冻结配置与MOD','Configuration and MODs'),methods:t('计算公式与比较方式','Formulas and comparison'),metrics:t('完整数值','Complete metrics'),quality:t('质量与评分明细','Quality and grading'),evidence:t('原始证据','Original evidence'),supplement:t('上下文与四租户补测','Context and four-tenant supplement')}[key];
