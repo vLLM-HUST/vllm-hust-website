@@ -7,6 +7,121 @@ from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
 
+from verify_product_homepages_browser import CONTRAST
+
+
+def check_product_views(page, taxonomy):
+    """Product browsing must preserve identities, results and legacy guide links."""
+    search = page.locator("[data-plugin-search]")
+    search.fill("")
+    cards = page.locator(".plugin-card")
+    original = set(cards.evaluate_all("nodes => nodes.map(n => n.id)"))
+    assert len(original) == cards.count()
+    expected = {"engine": set(), "control-plane": set(), "archive": set()}
+    for component_id in original:
+        kind = taxonomy[component_id]["kind"]
+        product = (
+            "control-plane"
+            if kind == "control_plane"
+            else "archive"
+            if kind == "retired"
+            else "engine"
+        )
+        expected[product].add(component_id)
+    assert expected["engine"] and expected["control-plane"]
+    expect(page.locator(".mod-reference[open]")).to_have_count(0)
+    for product, home in (
+        ("engine", "engine.html"),
+        ("control-plane", "control-plane.html"),
+        ("continuum", "continuum.html"),
+    ):
+        button = page.locator(f'[data-product-filter="{product}"]')
+        button.focus()
+        button.press("Enter")
+        expect(button).to_be_focused()
+        expect(button).to_have_attribute("aria-pressed", "true")
+        assert f"product={product}" in page.url
+        scope = page.locator(f'[data-product-scope="{product}"]')
+        expect(scope).to_be_visible()
+        expect(scope.locator(".mod-product-results-heading a")).to_have_attribute(
+            "href", f"./{home}"
+        )
+        expect(page.locator("[data-plugin-model]")).to_have_value("")
+        if product == "continuum":
+            expect(cards).to_have_count(0)
+            expect(scope.locator(".mod-plan-status")).to_be_visible()
+            expect(scope.locator("li")).to_have_count(3)
+            expect(page.locator(".plugin-controls")).to_be_hidden()
+            expect(page.locator(".workload-navigation")).to_be_hidden()
+            expect(page.locator(".plugin-catalog-scope")).to_be_hidden()
+        else:
+            assert (
+                set(cards.evaluate_all("nodes => nodes.map(n => n.id)"))
+                == (expected[product])
+            )
+            expect(page.locator(".plugin-controls")).to_be_visible()
+            expect(page.locator("[data-layer=retired]")).to_be_disabled()
+            assert page.locator("[data-layer=control_plane]").is_enabled() == (
+                product == "control-plane"
+            )
+            # A filter with a real phase must not escape its product scope.
+            phases = page.locator("[data-phase]:enabled:not([data-phase=all])")
+            if phases.count():
+                phases.first.click()
+                filtered = set(cards.evaluate_all("nodes => nodes.map(n => n.id)"))
+                assert filtered and filtered <= expected[product]
+            search.fill("no-such-product-mod-entry")
+            expect(cards).to_have_count(0)
+            # Switching products clears filters and search, including empty states.
+            page.locator('[data-product-filter="all"]').click()
+            button.click()
+            expect(search).to_have_value("")
+            assert (
+                set(cards.evaluate_all("nodes => nodes.map(n => n.id)"))
+                == (expected[product])
+            )
+        if product != "engine":
+            expect(page.locator(".r8-catalog-stack")).to_be_hidden()
+            expect(page.locator("[data-plugin-model]")).to_be_hidden()
+        else:
+            expect(page.locator(".r8-catalog-stack")).to_be_visible()
+        # Language changes keep the selected product rather than restoring all.
+        page.locator("#langToggle").click()
+        expect(button).to_have_attribute("aria-pressed", "true")
+        page.locator("#langToggle").click()
+        for title in page.locator(
+            ".mod-products-heading h2, .mod-product-results-heading h2, "
+            ".mod-product-option strong, .mod-product-option a, "
+            '.mod-product-actions button[aria-pressed="true"], '
+            ".r8-catalog-stack h2, .mod-plan-status"
+        ).all():
+            if title.is_visible():
+                assert title.evaluate(CONTRAST) >= 4.5, title.inner_text()
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+    page.reload(wait_until="domcontentloaded")
+    expect(page.locator('[data-product-filter="continuum"]')).to_have_attribute(
+        "aria-pressed", "true"
+    )
+    expect(page.locator('[data-product-filter="continuum"]')).to_be_enabled()
+    expect(cards).to_have_count(0)
+    all_products = page.locator('[data-product-filter="all"]')
+    all_products.focus()
+    all_products.press("Space")
+    expect(all_products).to_be_focused()
+    assert "product=" not in page.url
+    assert set(cards.evaluate_all("nodes => nodes.map(n => n.id)")) == original
+    # Old anchors must open the relevant disclosure on initial load and clicks.
+    base_url = page.url.split("?", 1)[0].split("#", 1)[0]
+    page.goto(f"{base_url}#plugin-standard", wait_until="domcontentloaded")
+    expect(page.locator(".mod-reference[open] #plugin-standard")).to_be_visible()
+    page.locator('.mod-reference-links a[href="#mod-test-protocol"]').click()
+    expect(page.locator(".mod-reference[open] #mod-test-protocol")).to_be_visible()
+    page.goto(f"{base_url}?product=unknown", wait_until="domcontentloaded")
+    expect(all_products).to_have_attribute("aria-pressed", "true")
+    expect(cards).to_have_count(len(original))
+    assert set(cards.evaluate_all("nodes => nodes.map(n => n.id)")) == original
+    return {key: sorted(value) for key, value in expected.items()}
+
 
 def check_people(page, components, metadata, lang):
     checked = []
@@ -59,11 +174,25 @@ def main():
     parser.add_argument(
         "--output", type=Path, default=Path("output/playwright/plugin-effects")
     )
+    parser.add_argument(
+        "--host-ip", help="Optional verified origin IPv4 for browser DNS"
+    )
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     receipts = []
+    launch_args = []
+    if args.host_ip:
+        import socket
+        from urllib.parse import urlparse
+
+        host = urlparse(args.url).hostname
+        assert args.host_ip in {r[4][0] for r in socket.getaddrinfo(host, 443)}
+        launch_args = [
+            "--disable-quic",
+            f"--host-resolver-rules=MAP {host} {args.host_ip}",
+        ]
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = pw.chromium.launch(args=launch_args)
         for width in (390, 1440):
             for lang in ("zh", "en"):
                 for theme in ("light", "dark"):
@@ -295,13 +424,17 @@ def main():
                         context.request.get(f"{args.url}/betterscale.html").status
                         == 404
                     )
+                    receipts[-1]["products"] = check_product_views(
+                        page, payloads["mod-taxonomy.json"]["components"]
+                    )
+                    assert not errors, errors
                     context.close()
         browser.close()
     (args.output / "verification.json").write_text(
         json.dumps(receipts, ensure_ascii=False, indent=2) + "\n"
     )
     print(
-        f"PASS: {len(receipts)} modes; MOD people and effects visible with exact links"
+        f"PASS: {len(receipts)} modes; product views, MOD people, effects and sources"
     )
 
 
