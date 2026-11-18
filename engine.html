@@ -463,16 +463,6 @@
     "engine-r6-history": "B0/r6完整报告 ↗"
   }
 };
-    function revealEngineAnchor() {
-      const target = document.getElementById(location.hash.slice(1));
-      if (!target) return;
-      for (let ancestor = target.parentElement; ancestor; ancestor = ancestor.parentElement) {
-        if (ancestor.tagName === 'DETAILS') ancestor.open = true;
-      }
-      target.scrollIntoView();
-    }
-    window.addEventListener('hashchange', revealEngineAnchor);
-    window.addEventListener('load', revealEngineAnchor);
   </script>
   <script src="./assets/site.js?v=engine-navigation-20261117&amp;ui=hierarchy-20261118-r1"></script>
   <script src="./assets/product-layout.js?v=product-layout-20261118-r1"></script>
