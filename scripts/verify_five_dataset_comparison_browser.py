@@ -44,6 +44,8 @@ def dashboard_layout(root):
           charts:el.querySelectorAll('.metric-grid>.metric-chart').length,
           columns:getComputedStyle(el.querySelector('.metric-grid')).gridTemplateColumns,
           dialogs:el.querySelectorAll('.comparison-dialog').length,
+          supplements:el.querySelectorAll('#context-tenant-supplement').length,
+          supplementCards:el.querySelectorAll('.supplement-highlights>div').length,
           profiles:[...el.querySelectorAll('.dataset-coverage [data-dataset]')].map(row=>row.dataset.dataset),
           chartProfiles:[...el.querySelectorAll('.metric-chart')].map(chart=>[...chart.querySelectorAll('.chart-row')].slice(0,5).map(row=>row.dataset.profile))})"""
     )

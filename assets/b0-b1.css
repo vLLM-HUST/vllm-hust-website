@@ -112,3 +112,4 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .metric-missing .chart-row-heading { align-items:baseline; }.metric-missing .missing-metric { margin:0; }
 @media(max-width:900px) { .dataset-coverage-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media(max-width:600px) { .dataset-coverage-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.dataset-coverage-grid article { padding:12px; } }
+.supplement-plot.missing-plot { background:transparent;border:1px dashed #819498;padding:24px;font-size:13px;line-height:1.7; }
