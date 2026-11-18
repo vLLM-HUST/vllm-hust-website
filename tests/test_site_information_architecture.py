@@ -141,7 +141,7 @@ def test_brand_always_returns_home_and_workflow_marks_current_page() -> None:
     assert "3. 产能与成本" in SITE_JS
     assert "function updateNavigationState()" in SITE_JS
     assert "window.addEventListener('hashchange', updateNavigationState)" in SITE_JS
-    assert "target.pathname === pathname" in SITE_JS
+    assert "normalizePath(target.pathname) === pathname" in SITE_JS
     assert "link.removeAttribute('aria-current')" in SITE_JS
     assert '.benchmark-tabs a[aria-current="page"]' in SITE_CSS
 
