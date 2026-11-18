@@ -20,6 +20,7 @@
             navIssues: 'Issues',
             navProducts: 'Products',
             navEngine: 'Engine',
+            navRequestThrottling: 'Request Throttling Controller',
             navControlPlane: 'Control Plane',
             navContinuum: 'Continuum',
             navProjects: 'Projects',
@@ -64,6 +65,7 @@
             navIssues: '议题',
             navProducts: '产品',
             navEngine: '引擎',
+            navRequestThrottling: 'Request Throttling Controller',
             navControlPlane: 'Control Plane',
             navContinuum: 'Continuum',
             navProjects: '项目',
@@ -115,7 +117,12 @@
             link.append(note);
         });
         document.querySelectorAll('[data-repository-access="required"]').forEach((link) => {
-            const note = link.querySelector('.repository-access-note');
+            let note = link.querySelector('.repository-access-note');
+            if (!note) {
+                note = document.createElement('span');
+                note.className = 'repository-access-note';
+                link.append(note);
+            }
             const text = ` · ${label}`;
             if (note.textContent !== text) note.textContent = text;
             if (link.title !== label) link.title = label;
@@ -256,11 +263,12 @@
         {
             id: 'products',
             label: 'navProducts',
-            pages: ['home', 'engine', 'control-plane', 'continuum'],
+            pages: ['home', 'engine', 'control-plane', 'controlplane', 'continuum'],
             links: [
                 ['home', './index.html', 'navHome'],
                 ['engine', './engine.html', 'navEngine'],
                 ['control-plane', './control-plane.html', 'navControlPlane'],
+                ['controlplane', './controlplane/', 'navRequestThrottling'],
                 ['continuum', './continuum.html', 'navContinuum'],
             ],
         },
