@@ -23,7 +23,7 @@
         flowTitle: '一次请求，四步协同。', flowLead: '选择步骤，查看请求如何经过服务层。',
         step0: '接入', step1: '选路', step2: '执行', step3: '反馈',
         capTitle0: '统一入口', capText0: '认证、模型映射与流式代理。', capTitle1: '感知负载', capText1: '结合并发、健康与 KV 利用率选择实例。', capTitle2: '协调生命周期', capText2: '管理引擎注册、故障转移与扩缩容接口。',
-        detailTitle0: '实现范围', detailText0: '当前实现包含 API 网关、显式模型映射、调度策略、健康管理、流式转发、追踪与聚合指标。扩缩容接口与 PD 路由属于调度边界；具体部署组合单独验证。',
+        detailTitle0: '实现范围', detailText0: 'RTC 是服务控制的请求限流与程序调度组件。当前实现包含 API 网关、显式模型映射、调度策略、健康管理、流式转发、追踪与聚合指标。扩缩容接口与 PD 路由属于调度边界；具体部署组合单独验证。',
         detailTitle1: '与 Engine 的接口', detailText1: 'Control Plane 读取实例健康、负载与容量信息，下发请求并接收状态。Engine 负责 token 执行、KV 管理和数据传输。',
         detailTitle2: '与 Continuum 的接口 · 规划', detailText2: '应用可从 Continuum 取得任务状态和相关记忆，组织为模型输入，再交给服务入口。记忆持久化与版本管理由 Continuum 承担。',
         flows: [
@@ -39,7 +39,7 @@
         flowTitle: 'One request. Four coordinated steps.', flowLead: 'Select a step to explore the serving path.',
         step0: 'Admit', step1: 'Route', step2: 'Execute', step3: 'Observe',
         capTitle0: 'One entry point', capText0: 'Authentication, model mappings and streaming proxy.', capTitle1: 'Load-aware routing', capText1: 'Use concurrency, health and KV utilization to select an instance.', capTitle2: 'Coordinated lifecycle', capText2: 'Engine registration, failover and scaling hooks.',
-        detailTitle0: 'Implemented scope', detailText0: 'The implementation includes an API gateway, explicit model mappings, scheduling policies, health management, streaming, traces and aggregate metrics. Scaling hooks and PD routing belong to the scheduling boundary; individual deployment combinations are validated separately.',
+        detailTitle0: 'Implemented scope', detailText0: 'RTC is the request-throttling and program-scheduling component of Control Plane. The implementation includes an API gateway, explicit model mappings, scheduling policies, health management, streaming, traces and aggregate metrics. Scaling hooks and PD routing belong to the scheduling boundary; individual deployment combinations are validated separately.',
         detailTitle1: 'The Engine interface', detailText1: 'Control Plane reads instance health, load and capacity, dispatches requests and receives status. Engine owns token execution, KV management and data transfer.',
         detailTitle2: 'The Continuum interface · planned', detailText2: 'An application can retrieve task state and relevant memories from Continuum, assemble model input and submit it to the service entry point. Continuum owns memory persistence and versioning.',
         flows: [

@@ -11,6 +11,9 @@
 - [Continuum](https://vllm-hust.sage.org.ai/continuum.html)：面向 Agent
   的持久记忆与任务数据系统，目前为架构规划；张书豪暂任负责人，招募合适的负责人。
 
+RTC（Request Throttling Controller）属于服务控制产品的请求限流与程序调度组件；其
+[实现与实测](https://vllm-hust.sage.org.ai/controlplane/) 从服务控制页进入，不在产品导航中另列。
+
 **MOD 是三个产品共同的扩展机制**，分别承载执行优化、服务策略与记忆处理扩展。
 
 两个新主页共用 `assets/product-home.css` 和 `assets/product-home.js`，全站入口由 `assets/site.js`
