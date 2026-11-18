@@ -62,4 +62,3 @@ jobs:
         with:
           name: plugin-effects-browser-evidence
           path: output/plugin-effects/
-

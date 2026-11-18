@@ -64,4 +64,3 @@ jobs:
           name: plugin-workshop-metadata-candidate
           path: data/plugin-workshop-metadata.json
           retention-days: 7
-

@@ -86,4 +86,3 @@ jobs:
           path: |
             output/playwright/leaderboard-runs/
             output/playwright/leaderboard-contract/
-

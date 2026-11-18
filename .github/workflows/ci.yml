@@ -166,4 +166,3 @@ jobs:
             output/playwright/performance-navigation/
             output/playwright/evidence-links/
             output/playwright/all-page-links/
-
