@@ -22,14 +22,13 @@ body:is([data-page="dataset-standard"], [data-page="dataset-entrypoints"]) :focu
 .guide-topbar { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px 24px; margin-bottom: 30px; }
 .guide-back { display: inline-block; font-size: 14px; text-decoration: none; padding-top: 9px; }
 .prompt-download { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-left: auto; }
-.prompt-download button { color: #fff; background: #006b70; border: 1px solid #006b70; border-radius: 5px; padding: 10px 16px; font: 600 13px/1.6 system-ui,sans-serif; cursor: pointer; }
+.prompt-download :is(button, .secondary-download) { color: #fff; background: #006b70; border: 1px solid #006b70; border-radius: 5px; padding: 10px 16px; font: 600 13px/1.6 system-ui,sans-serif; cursor: pointer; }
 .prompt-download button:hover { background: #00565b; }
 .download-buttons { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
-.prompt-download button.secondary-download { background: #fff; color: #006b70; border-color: #7dacab; }
-.prompt-download button.secondary-download:hover { background: #edf6f4; }
+.prompt-download .secondary-download { background: #fff; color: #006b70; border-color: #7dacab; text-decoration: none; }
+.prompt-download .secondary-download:hover { background: #edf6f4; }
 .prompt-download button:disabled { background: #e8eeee; color: #526569; border-color: #b6c5c4; cursor: wait; }
 #prompt-download-status { color: var(--guide-muted); font-size: 11px; }
-.engine-download-description { max-width: 480px; margin: 0; color: var(--guide-muted); font-size: 12px; line-height: 1.6; text-align: right; }
 .entry-main .guide-topbar { align-items: center; margin-bottom: 16px; }
 .entry-main .guide-topbar h1 { margin-bottom: 0; }
 .guide-hero { max-width: 940px; padding-bottom: 24px; }

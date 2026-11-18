@@ -61,17 +61,34 @@ def check_prompt_download(page, language, target="mod"):
     if key in prompts:
         assert prompts[key] == content, "Both pages must download the same standard"
     prompts[key] = content
-    with page.expect_download() as pending_script:
-        page.locator("#download-test-script").click()
-    script = pending_script.value
-    assert script.suggested_filename == "one_click.py"
-    raw = Path(script.path()).read_bytes()
-    expected = re.search(r"downloaded_script_sha256: ([a-f0-9]{64})", content)[1]
-    assert hashlib.sha256(raw).hexdigest() == expected
-    runner = re.search(r"reference_runner_commit: ([a-f0-9]{40})", content)[1]
-    assert re.search(r"^COMMIT = [\"\']" + runner + r"[\"\']", raw.decode(), re.M)
-    assert "engine_release: full-answer-b1-20261113-r6" in content
-    compile(raw, "downloaded-one_click.py", "exec")
+
+
+def check_engine_link(page, language):
+    link = page.locator("#engine-page-link")
+    assert link.get_attribute("href") == "./engine.html"
+    assert link.inner_text() == (
+        "引擎与下载 →" if language == "zh" else "Engine & downloads →"
+    )
+    assert (
+        page.locator("#download-test-script, #engine-download-description").count() == 0
+    )
+    navigation = page.context.browser.new_page()
+    navigation.add_init_script(f"localStorage.setItem('vllm-hust_lang', '{language}')")
+    navigation.goto(page.url, wait_until="networkidle")
+    requests = []
+    downloads = []
+    navigation.on("request", lambda request: requests.append(request.url))
+    navigation.on("download", lambda download: downloads.append(download))
+    navigation.route(
+        "**/engine.html",
+        lambda route: route.fulfill(body="<h1>Engine</h1>", content_type="text/html"),
+    )
+    with navigation.expect_navigation():
+        navigation.locator("#engine-page-link").focus()
+        navigation.keyboard.press("Enter")
+    assert navigation.url.endswith("/engine.html")
+    assert not downloads and not any("one_click.py" in url for url in requests)
+    navigation.close()
 
 
 def no_overflow(page):
@@ -134,18 +151,7 @@ with sync_playwright() as play:
                 assert "B0: 672/672" in current.inner_text()
                 assert "B1: 672/672" in current.inner_text()
                 assert "用户未确认" not in current.inner_text()
-                assert (
-                    "r6 Engine test script"
-                    in page.locator("#download-test-script").inner_text()
-                )
-                assert (
-                    "engine r6"
-                    in page.locator("#engine-download-description").inner_text()
-                )
-                assert (
-                    "tools r7"
-                    in page.locator("#engine-download-description").inner_text()
-                )
+                check_engine_link(page, "en")
                 assert page.locator("#standard-rows tr").count() == 5
                 assert (
                     "no additional model or external judge service is required"
@@ -312,7 +318,7 @@ with sync_playwright() as play:
                     for detail in page.locator(".entry-reference-command").all():
                         detail.evaluate("element => element.open = false")
                 check_prompt_download(page, "en")
-                check_contrast(page, ["#download-test-prompt", "#download-test-script"])
+                check_contrast(page, ["#download-test-prompt", "#engine-page-link"])
                 no_overflow(page)
                 page.evaluate("window.scrollTo(0,0)")
                 page.screenshot(
@@ -341,6 +347,7 @@ with sync_playwright() as play:
                         details.evaluate("element => element.open = false")
                 else:
                     assert page.locator("#entry-title").inner_text() == "测试数据集"
+                check_engine_link(page, "zh")
                 check_prompt_download(page, "zh")
                 no_overflow(page)
                 assert not errors, errors
@@ -362,31 +369,16 @@ with sync_playwright() as play:
                     status=200, body="{}", content_type="application/json"
                 ),
             )
+            page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
             page.goto(url, wait_until="networkidle")
             page.wait_for_selector("#standard-status[role=alert]")
             assert page.locator("#standard-content").is_hidden()
             assert page.locator("#download-test-prompt").is_disabled()
-            assert page.locator("#download-test-script").is_disabled()
+            check_engine_link(page, "en")
             assert expected in page.locator("#standard-status").get_attribute(
                 "data-error"
             )
             page.close()
-        page = browser.new_page()
-        page.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
-        page.goto(url, wait_until="networkidle")
-        page.wait_for_selector("#standard-content:not([hidden])")
-        page.route(
-            "**/downloads/standard-test/one_click.py",
-            lambda route: route.fulfill(status=200, body="print('modified')"),
-        )
-        downloads = []
-        page.on("download", lambda download: downloads.append(download))
-        page.locator("#download-test-script").click()
-        page.wait_for_function(
-            "document.querySelector('#prompt-download-status').textContent.includes('verification failed')"
-        )
-        assert not downloads
-        page.close()
     page = browser.new_page()
     page.goto(
         urljoin(args.url, "dataset-standard.html?scope=quick"), wait_until="networkidle"
@@ -447,7 +439,7 @@ print(
             languages=["en", "zh"],
             contrast="at least 4.5:1",
             commands="mode selection, shell quoting, clipboard and validation",
-            downloads="bilingual prompts, pinned executable, tamper rejection",
+            downloads="bilingual prompts; Engine navigation without a script download",
             integrity_failure="rejected",
         )
     )

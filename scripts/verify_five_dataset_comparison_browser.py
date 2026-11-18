@@ -21,7 +21,7 @@ def assert_release_control_readable(page, root):
               .map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
             return .2126*channels[0]+.7152*channels[1]+.0722*channels[2];
           };
-          return [select,...select.options].map(el=>{
+          return [select,...select.options,...select.querySelectorAll("optgroup")].map(el=>{
             const css=getComputedStyle(el),a=luminance(css.color),b=luminance(css.backgroundColor);
             return {ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),background:css.backgroundColor};
           });
@@ -43,7 +43,11 @@ def dashboard_layout(root):
           runtimes:el.querySelector('.runtime-pair').children.length,
           charts:el.querySelectorAll('.metric-grid>.metric-chart').length,
           columns:getComputedStyle(el.querySelector('.metric-grid')).gridTemplateColumns,
-          dialogs:el.querySelectorAll('.comparison-dialog').length})"""
+          dialogs:el.querySelectorAll('.comparison-dialog').length,
+          supplements:el.querySelectorAll('#context-tenant-supplement').length,
+          supplementCards:el.querySelectorAll('.supplement-highlights>div').length,
+          profiles:[...el.querySelectorAll('.dataset-coverage [data-dataset]')].map(row=>row.dataset.dataset),
+          chartProfiles:[...el.querySelectorAll('.metric-chart')].map(chart=>[...chart.querySelectorAll('.chart-row')].slice(0,5).map(row=>row.dataset.profile))})"""
     )
 
 
@@ -80,10 +84,20 @@ def verify(url, output):
                     expect(root.locator("#r8-current-continuous")).to_be_visible()
                     expect(root.locator("#report-history-links")).to_have_count(0)
                     expect(root.locator(".metric-chart")).to_have_count(4)
-                    expect(root.locator(".bar-value")).to_have_count(16)
+                    expect(root.locator(".bar-value")).to_have_count(56)
                     expect(root.locator(".mod-tags span")).to_have_count(10)
                     assert_release_control_readable(page, root)
                     r8_layout = dashboard_layout(root)
+                    assert r8_layout["profiles"] == [
+                        "mmlu",
+                        "hle",
+                        "frontier",
+                        "swe",
+                        "terminal",
+                    ]
+                    assert r8_layout["chartProfiles"] == [r8_layout["profiles"]] * 4
+                    expect(root.locator(".metric-missing .bar-fill")).to_have_count(0)
+                    expect(root.locator(".metric-missing .bar-value")).to_have_count(0)
                     for key, divisor in [
                         ("output_tokens_per_second", 1),
                         ("mean_ttft_ms", 1000),
@@ -107,6 +121,28 @@ def verify(url, output):
                                     else r8["groups"][role][phase][key] / divisor
                                 )
                                 expected.append(f"{value:.2f}")
+                            expect(values).to_have_text(expected)
+                    published_r8 = next(
+                        row for row in catalog["entries"] if row["id"] == "r8"
+                    )
+                    expect(
+                        root.locator('.dataset-coverage [data-available="true"]')
+                    ).to_have_count(5)
+                    expect(root.locator(".metric-missing")).to_have_count(0)
+                    for row in published_r8["measurements"]:
+                        for key, divisor in [
+                            ("output_tokens_per_second", 1),
+                            ("mean_ttft_ms", 1000),
+                            ("mean_tpot_ms", 1),
+                            ("relative_cost_per_token", 1),
+                        ]:
+                            values = root.locator(
+                                f'[data-metric="{key}"] [data-profile="{row["id"]}"] .bar-value'
+                            )
+                            expected = [
+                                f"{(row['arms'][0]['output_tokens_per_second'] / arm['output_tokens_per_second'] if key == 'relative_cost_per_token' else arm[key] / divisor):.2f}"
+                                for arm in row["arms"]
+                            ]
                             expect(values).to_have_text(expected)
                     for key in ("metrics", "configuration", "methods", "evidence"):
                         button = root.locator(f'[data-detail="{key}"]')
@@ -136,9 +172,9 @@ def verify(url, output):
                         ("r1", [], []),
                         ("r2", [], []),
                         ("r3", [], []),
-                        ("r4", ["B0", "r4"], ["495.84", "944.47"]),
+                        ("r4", ["B0", "B1"], ["495.84", "944.47"]),
                         ("r5", [], []),
-                        ("r7", ["B0", "r7"], ["126.72", "385.30"]),
+                        ("r7", ["B0", "B1"], ["126.72", "385.30"]),
                     ]:
                         root.locator("#comparison-release-select").select_option(
                             release
@@ -151,6 +187,14 @@ def verify(url, output):
                         )
                         expect(root.locator("#r8-current-continuous")).to_have_count(0)
                         expect(root.locator(".goal-card")).to_have_count(0)
+                        assert dashboard_layout(root) == r8_layout
+                        assert_release_control_readable(page, root)
+                        expect(root.locator(".metric-missing .bar-fill")).to_have_count(
+                            0
+                        )
+                        expect(
+                            root.locator(".metric-missing .bar-value")
+                        ).to_have_count(0)
                         if controls:
                             expect(root).to_have_attribute(
                                 "data-baseline-id", "original018-cann8.5.1"
@@ -171,22 +215,28 @@ def verify(url, output):
                                 values[1]
                             )
                         else:
-                            expect(root.locator(".metric-chart")).to_have_count(0)
+                            expect(root.locator(".metric-chart")).to_have_count(4)
+                            expect(root.locator(".metric-missing")).to_have_count(20)
+                            expect(root.locator(".bar-value")).to_have_count(0)
                             if release == "r5":
                                 expect(root).to_contain_text(
                                     "ready" if lang == "zh" else "readiness"
                                 )
                         if release in ("r1", "r2", "r3"):
-                            root.locator("details summary").click()
-                            expect(root.locator("details")).to_contain_text(
+                            root.locator('[data-detail="evidence"]').click()
+                            expect(root.locator("dialog")).to_contain_text(
                                 "continuous-b1-packed-" + release
                             )
+                            page.keyboard.press("Escape")
                         if release == "r7":
+                            root.locator('[data-detail="quality"]').click()
                             expect(root.locator(".historical-quality")).to_contain_text(
                                 "138/200"
                             )
-                            root.locator("details summary").click()
-                            expect(root.locator("details")).to_contain_text("8742.65")
+                            page.keyboard.press("Escape")
+                            root.locator('[data-detail="evidence"]').click()
+                            expect(root.locator("dialog")).to_contain_text("8742.65")
+                            page.keyboard.press("Escape")
                         assert page.evaluate(
                             "document.documentElement.scrollWidth <= innerWidth+1"
                         )
@@ -331,7 +381,7 @@ def verify(url, output):
                             "language": lang,
                             "width": width,
                             "theme": theme,
-                            "verified": "matching release layouts,16 r8 and40 r6 values,MODs,contrast,dialogs and keyboard",
+                            "verified": "matching release layouts,56 r8 and40 r6 values,five completed r8 pairs,MODs,contrast,dialogs and keyboard",
                         }
                     )
                     page.close()
@@ -347,7 +397,48 @@ def verify(url, output):
             expect(page.locator("#comparison-title")).not_to_have_text(initial_title)
             expect(root.locator("#comparison-release-select")).to_have_value(release)
             page.close()
-            checks.append(dict(direct_release=release, language_switch=True))
+            checks.append({"direct_release": release, "language_switch": True})
+        # A new catalog-only release keeps the same empty dashboard without a JS edit.
+        future = copy.deepcopy(context.request.get(url + "/" + HISTORY).json())
+        entry = copy.deepcopy(
+            next(row for row in future["entries"] if row["id"] == "r5")
+        )
+        entry.update(
+            id="r9",
+            release="full-answer-b1-catalog-test-r9",
+            release_url="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/catalog-test-r9",
+        )
+        future["entries"].append(entry)
+        future["order"].insert(0, "r9")
+        future["default_release"] = "r9"
+        raw = (json.dumps(future, ensure_ascii=False) + "\n").encode()
+        updated = copy.deepcopy(manifest)
+        published = next(
+            row for row in updated["files"] if row["website_path"] == HISTORY
+        )
+        published.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+        page = context.new_page()
+        page.route(
+            "**/" + HISTORY,
+            lambda route: route.fulfill(body=raw, content_type="application/json"),
+        )
+        page.route(
+            "**/data/benchmark-source-manifest.json",
+            lambda route: route.fulfill(json=updated),
+        )
+        page.goto(url + "/b0-b1.html?release=r9")
+        root = page.locator("#five-dataset-comparison")
+        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        expect(root.locator(".metric-chart")).to_have_count(4)
+        expect(root.locator(".metric-missing")).to_have_count(20)
+        expect(root.locator(".bar-value")).to_have_count(0)
+        expect(root.locator("#comparison-release-select option")).to_have_count(9)
+        page.goto(url + "/b0-b1.html")
+        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        page.close()
+        checks.append(
+            {"catalog_only_new_release": "r9", "uniform_empty_dashboard": True}
+        )
         page = context.new_page()
         page.add_init_script("""{
             const original = window.fetch.bind(window);
@@ -367,7 +458,7 @@ def verify(url, output):
         expect(root).to_have_attribute("data-release", "r4")
         assert root.get_attribute("data-error") is None
         page.close()
-        checks.append(dict(rapid_switch="r8-r6-r4", stale_failure_ignored=True))
+        checks.append({"rapid_switch": "r8-r6-r4", "stale_failure_ignored": True})
         for label, path, transform, resign in [
             (
                 "unsupported-historical-pass",
@@ -505,7 +596,7 @@ def verify(url, output):
                 "data-error", "publication-rejected", timeout=30000
             )
             expect(root.locator(".metric-chart")).to_have_count(0)
-            checks.append(dict(rejected=label))
+            checks.append({"rejected": label})
             page.close()
         page = context.new_page()
         page.route(

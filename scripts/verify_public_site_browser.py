@@ -60,6 +60,44 @@ async def verify(args):
                         assert not re.search(
                             r"\b(?:undefined|NaN)\b|\[object Object\]", body
                         ), body
+                        if name == "engine.html":
+                            command = await page.locator(
+                                "#engine-install-command"
+                            ).inner_text()
+                            assert (
+                                "pip install vllm-hust-engine==2026.11.17.8" in command
+                            )
+                            assert (
+                                "python install-engine-r8.py --out ./r8-install"
+                                in command
+                            )
+                            expected = re.search(r"'[a-f0-9]{64}'", command).group()[
+                                1:-1
+                            ]
+                            installer = root / "downloads/install-engine-r8.py"
+                            assert (
+                                hashlib.sha256(installer.read_bytes()).hexdigest()
+                                == expected
+                            )
+                            download = await page.request.get(
+                                f"{args.url.rstrip('/')}/downloads/install-engine-r8.py"
+                            )
+                            assert download.status == 200
+                            assert (
+                                hashlib.sha256(await download.body()).hexdigest()
+                                == expected
+                            )
+                            assert not await page.locator(
+                                "#engine-install-details"
+                            ).evaluate("e => e.parentElement.open")
+                            await page.locator("#engine-install-details").click()
+                            assert (
+                                "Torch 2.13.0+cpu"
+                                in await page.locator(
+                                    "#engine-install-deps"
+                                ).inner_text()
+                            )
+                            await page.locator("#engine-install-details").click()
                         if name == "serving-plan.html":
                             assert await page.locator("#cost").input_value() == "1200"
                             assert await page.locator("#days").input_value() == "28"
