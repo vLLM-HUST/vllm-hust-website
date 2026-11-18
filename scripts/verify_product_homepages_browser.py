@@ -21,6 +21,100 @@ CONTRAST = r"""el => {
 }"""
 
 
+def verify_publications(page, product, language):
+    """Check the published citations against the editorial coverage inventory."""
+    inventory = (
+        Path(__file__).resolve().parents[1] / "docs/product-publications.md"
+    ).read_text()
+    expected = set()
+    for line in inventory.splitlines():
+        fields = [field.strip() for field in line.split("|")]
+        if len(fields) == 5 and product in fields[3].split(", "):
+            expected.add(re.sub(r"\\([\[\]])", r"\1", fields[1]))
+    assert expected
+    section = page.locator("#publications")
+    expect(section).to_have_count(1)
+    expect(page.locator(".publications-shortcut")).to_have_attribute(
+        "href", "#publications"
+    )
+    page.locator(".publications-shortcut").focus()
+    page.keyboard.press("Enter")
+    expect(section).to_be_visible()
+    assert page.url.endswith("#publications")
+    expect(section.locator("#publications-title")).to_contain_text(
+        "相关论文" if language == "zh" else "Related publications"
+    )
+    entries = section.locator(".publication-item").evaluate_all(
+        """nodes => nodes.map(node => ({
+            id: node.id, title: node.querySelector('.publication-title').textContent,
+            href: node.querySelector('.publication-title').href,
+            citation: node.querySelector('.publication-citation p').textContent,
+            year: Number(node.dataset.publicationYear),
+            links: [...node.querySelectorAll('a')].map(a=>a.href)
+        }))"""
+    )
+    assert len(entries) == len(expected)
+    assert {entry["title"] for entry in entries} == expected
+    assert len({entry["id"] for entry in entries}) == len(entries)
+    assert int(section.locator(".publication-count").inner_text()) == len(entries)
+    for entry in entries:
+        assert entry["citation"] and 2013 <= entry["year"] <= 2027
+        assert all(link.startswith("https://") for link in entry["links"])
+    for group in section.locator(".publication-group").all():
+        years = group.locator(".publication-item").evaluate_all(
+            "nodes => nodes.map(n=>Number(n.dataset.publicationYear))"
+        )
+        assert years == sorted(years, reverse=True)
+    expect(section.locator(".publication-citation[open]")).to_have_count(0)
+    for details in (
+        section.locator(".publication-citation").first,
+        section.locator(".publication-citation").last,
+        section.locator(".publication-provenance"),
+    ):
+        details.locator("summary").focus()
+        page.keyboard.press("Enter")
+        expect(details).to_have_attribute("open", "")
+        expect(details.locator("p")).to_be_visible()
+        page.keyboard.press("Enter")
+        expect(details).not_to_have_attribute("open", "")
+    source = section.get_attribute("data-publication-source")
+    revision = section.get_attribute("data-source-revision")
+    assert re.fullmatch(r"[a-f0-9]{40}", revision)
+    assert f"/blob/{revision}/contents/publications.md" in source
+    for link in section.locator('a[href*="raw.githubusercontent.com"]').all():
+        assert f"/{revision}/contents/research_papers/" in link.get_attribute("href")
+    if product == "continuum":
+        accepted = section.locator(".publication-item").filter(
+            has_text="BriskSeed: Online History-Guided Reuse"
+        )
+        expect(accepted.locator(".publication-status")).to_contain_text(
+            "已接收" if language == "zh" else "Accepted"
+        )
+        expect(accepted.locator('a[href$=".pdf"]')).to_have_count(0)
+    if product == "control-plane":
+        for title in ("Demonstrating SAGE:", "BriskSnapshot:"):
+            demo = section.locator(".publication-item").filter(has_text=title)
+            expect(demo.locator(".publication-status")).to_contain_text("Demo")
+    for selector in (
+        "h2",
+        "h3",
+        ".publication-title",
+        ".publication-meta",
+        ".publication-links a",
+        ".publication-citation summary",
+    ):
+        for element in section.locator(selector).all():
+            assert element.evaluate(CONTRAST) >= 4.5, (product, selector)
+    for link in section.locator(".publication-navigation a").all():
+        target = link.get_attribute("href")
+        link.focus()
+        page.keyboard.press("Enter")
+        assert page.url.endswith(target)
+        expect(page.locator(target)).to_be_visible()
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    return len(entries)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
@@ -165,6 +259,7 @@ def main():
                             expect(detail).to_have_attribute("open", "")
                             assert detail.locator("p").is_visible()
                             page.keyboard.press("Enter")
+                        publications = verify_publications(page, slug, language)
                         selectors = [
                             "h1",
                             ".product-eyebrow",
@@ -236,6 +331,7 @@ def main():
                                 width=width,
                                 theme=theme,
                                 language=language,
+                                publications=publications,
                                 passed=True,
                             )
                         )
@@ -248,6 +344,42 @@ def main():
         with page.expect_navigation():
             page.locator('.nav-links a[href="./continuum.html"]').click()
         expect(page.locator("body")).to_have_attribute("data-page", "continuum")
+        page.close()
+        # Engine retains its existing layout and install/download actions.
+        for width in (390, 1440):
+            for theme in ("light", "dark"):
+                context = browser.new_context(
+                    viewport={"width": width, "height": 1000}, color_scheme=theme
+                )
+                context.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
+                page = context.new_page()
+                errors = []
+                page.on("pageerror", lambda error: errors.append(str(error)))
+                page.goto(urljoin(args.url.rstrip("/") + "/", "engine.html"))
+                for language in ("en", "zh"):
+                    if language == "zh":
+                        page.locator("#langToggle").click()
+                    count = verify_publications(page, "engine", language)
+                    expect(page.locator("#engine-install-title")).to_be_visible()
+                    assert page.locator("#engine-hero-download").get_attribute("href")
+                    assert not errors, errors
+                    page.locator("#publications").screenshot(
+                        path=str(
+                            args.output
+                            / f"engine-publications-{width}-{theme}-{language}.png"
+                        )
+                    )
+                    rows.append(
+                        dict(
+                            page="engine",
+                            width=width,
+                            theme=theme,
+                            language=language,
+                            publications=count,
+                            passed=True,
+                        )
+                    )
+                context.close()
         browser.close()
     receipt = dict(passed=True, views=rows, model_requests=0)
     (args.output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
