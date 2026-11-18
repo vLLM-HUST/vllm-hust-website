@@ -8,16 +8,17 @@
 
 - [Engine](https://vllm-hust.sage.org.ai/engine.html)：冻结的优化组合与推理执行能力。负责人：张书豪。
 - [SAGE Control Plane](https://vllm-hust.sage.org.ai/control-plane.html)：统一服务入口、模型路由与调度。负责人：毛言粲。
-- [Continuum](https://vllm-hust.sage.org.ai/continuum.html)：面向 Agent
-  的持久记忆与任务数据系统，目前为架构规划；张书豪暂任负责人，招募合适的负责人。
+- [Continuum](https://vllm-hust.sage.org.ai/continuum.html)：面向 Agent 的智能体工作环境（Agent
+  Workspace），规划覆盖上下文与记忆、文件与产物、沙箱及任务恢复；目前为架构规划，张书豪暂任负责人，招募合适的负责人。
 
 RTC（Request Throttling Controller）属于服务控制产品的请求限流与程序调度组件；其
 [实现与实测](https://vllm-hust.sage.org.ai/controlplane/) 从服务控制页进入，不在产品导航中另列。
 
-**MOD 是三个产品共同的扩展机制**，分别承载执行优化、服务策略与记忆处理扩展。
+**MOD 是三个产品共同的扩展机制**，分别承载执行优化、服务策略、上下文与沙箱扩展。
 
-两个新主页共用 `assets/product-home.css` 和 `assets/product-home.js`，全站入口由 `assets/site.js`
-维护。中英文文案、交互流程和阶段状态应同步更新；KV 存储、分层缓存和传输归 Engine， 长期记忆和任务恢复归 Continuum。浏览器回归
+三个产品页共用 `assets/product-layout.css` 和 `assets/product-layout.js`；服务控制与工作环境页共用
+`assets/product-home.js`，全站入口由 `assets/site.js` 维护。中英文文案、交互流程和阶段状态应同步更新；KV 存储、分层缓存和传输归 Engine，
+上下文、记忆、文件、沙箱保存与恢复归 Continuum，资源分配与服务调度归 Control Plane。浏览器回归
 `scripts/verify_product_homepages_browser.py` 已接入 CI； 产品流程图为本地架构示意，不调用模型或模拟线上性能。
 
 <!-- BEGIN:VERSION_META -->

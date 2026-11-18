@@ -191,6 +191,17 @@ def verify_product_layout(page, product, width, theme, language):
     ):
         for node in page.locator(selector).all():
             assert node.evaluate(CONTRAST) >= 4.5, (product, selector)
+    if product == "continuum":
+        expect(page.locator(".product-intro .product-eyebrow")).to_have_text(
+            "智能体工作环境" if language == "zh" else "AGENT WORKSPACE"
+        )
+        expect(page.locator(".memory-stack > div")).to_have_count(4)
+        expect(page.locator('[data-copy="memoryC"]')).to_contain_text(
+            "沙箱" if language == "zh" else "Sandbox"
+        )
+        expect(page.locator(".product-status")).to_have_text(
+            "架构规划" if language == "zh" else "Architecture planning"
+        )
     library = page.locator(".publication-library")
     expect(library).not_to_have_attribute("open", "")
     library.locator(":scope > summary").focus()
@@ -697,9 +708,9 @@ def main():
                                 == 1
                             )
                         expect(menu.locator("a")).to_have_text(
-                            ["首页", "引擎", "服务控制", "长期记忆"]
+                            ["首页", "引擎", "服务控制", "智能体工作环境"]
                             if language == "zh"
-                            else ["Home", "Engine", "Control Plane", "Continuum"]
+                            else ["Home", "Engine", "Control Plane", "Agent Workspace"]
                         )
                         if slug == "control-plane":
                             expect(

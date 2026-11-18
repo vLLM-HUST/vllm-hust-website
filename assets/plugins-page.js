@@ -435,7 +435,7 @@
     const rows = {
       engine: ['Engine', zh ? '执行优化 · KV · 图与算子' : 'Execution · KV · graphs & kernels', './engine.html'],
       'control-plane': ['Control Plane', zh ? '路由 · 准入 · 生命周期策略' : 'Routing · admission · lifecycle policies', './control-plane.html'],
-      continuum: ['Continuum', zh ? '记忆写入 · 检索 · 任务恢复' : 'Memory capture · retrieval · task recovery', './continuum.html'],
+      continuum: ['Continuum', zh ? '上下文 · 沙箱 · 任务恢复' : 'Context · sandboxes · task recovery', './continuum.html'],
       archive: [zh ? '历史归档' : 'Archives', zh ? '保留历史组件与原始记录' : 'Historical components and original records', null]
     };
     return rows[id];
@@ -488,8 +488,8 @@
     const panel = element('div', 'continuum-mod-plan');
     panel.append(element('span', 'mod-plan-status', zh ? '架构规划' : 'Architecture planning'));
     const list = element('ul', '');
-    (zh ? ['记忆写入与更新', '检索与上下文组织', '任务检查点与恢复']
-      : ['Memory capture and updates', 'Retrieval and context assembly', 'Task checkpoints and recovery'])
+    (zh ? ['记忆与上下文组织', '文件与工具产物管理', '沙箱预热、快照与复用', '任务检查点与恢复']
+      : ['Memory and context assembly', 'Files and tool artifacts', 'Sandbox warmup, snapshots and reuse', 'Task checkpoints and recovery'])
       .forEach(text => list.append(element('li', '', text)));
     panel.append(list, element('p', '', zh ? '上述为扩展方向，现有目录尚无 Continuum MOD。' : 'These are extension directions; the current catalog has no Continuum MODs.'));
     const link = element('a', '', zh ? '查看 Continuum 规划与负责人招募 ↗' : 'Continuum plans & lead recruitment ↗');
@@ -1998,7 +1998,7 @@ vllm-hust-ext extension check ${extensionId}`
       catalog.append(section);
     });
     status.textContent = selectedProduct === 'continuum'
-      ? (language() === 'zh' ? 'Continuum · 记忆扩展规划' : 'Continuum · planned memory extensions')
+      ? (language() === 'zh' ? 'Continuum · 工作环境扩展规划' : 'Continuum · planned workspace extensions')
       : visible.length ? `${visible.length} ${copy().entries}` : copy().empty;
     renderProductNavigation();
     const activeCount = window.EcosystemCatalog.summarize(registry, {schema_version: 'mod-taxonomy/v2', components: modTaxonomy}).total;

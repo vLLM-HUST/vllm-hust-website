@@ -67,9 +67,9 @@ def verify(args):
                         page.locator("#langToggle").click()
                     product_links = page.locator('[data-nav-group="products"] a')
                     expect(product_links).to_have_text(
-                        ["首页", "引擎", "服务控制", "长期记忆"]
+                        ["首页", "引擎", "服务控制", "智能体工作环境"]
                         if language == "zh"
-                        else ["Home", "Engine", "Control Plane", "Continuum"]
+                        else ["Home", "Engine", "Control Plane", "Agent Workspace"]
                     )
                     expect(page.locator("#control-title")).to_have_text(
                         "请求限流控制器"
