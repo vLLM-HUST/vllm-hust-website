@@ -123,8 +123,80 @@ def verify_publications(page, product, language):
 RESEARCH_URL = "https://lab.sage.org.ai/auto-research-report-website/"
 
 
+def verify_home_product_navigation(browser, args, rows):
+    """The three product lines own the homepage; apps stay in ecosystem details."""
+    for width in (390, 1440):
+        for theme in ("light", "dark"):
+            context = browser.new_context(
+                viewport={"width": width, "height": 1000}, color_scheme=theme
+            )
+            context.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
+            page = context.new_page()
+            errors = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.goto(
+                urljoin(args.url.rstrip("/") + "/", "index.html"),
+                wait_until="domcontentloaded",
+            )
+            for language in ("en", "zh"):
+                if page.locator("html").get_attribute("lang") != language:
+                    page.locator("#langToggle").click()
+                expect(page.locator(".core-product h3")).to_have_text(
+                    ["Engine", "Control Plane", "Continuum"]
+                )
+                expect(
+                    page.locator(
+                        "#products .product-card, #product-research, [data-product-id]"
+                    )
+                ).to_have_count(0)
+                expect(
+                    page.locator('.nav-links > a[href="./engine.html"]')
+                ).to_have_count(0)
+                expect(
+                    page.locator('[data-nav-group="products"] a[href="./engine.html"]')
+                ).to_have_count(1)
+                expect(page.locator("#core-memory-role")).to_contain_text(
+                    "规划中" if language == "zh" else "Planned"
+                )
+                for slug in ("engine", "control-plane", "continuum"):
+                    expect(
+                        page.locator(f'#products a[href="./{slug}.html"]')
+                    ).to_have_count(1)
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= innerWidth + 1"
+                )
+                for selector in (
+                    ".core-product p",
+                    ".core-product-link",
+                    ".core-product-kicker",
+                ):
+                    for node in page.locator(selector).all():
+                        assert node.evaluate(CONTRAST) >= 4.5, (
+                            selector,
+                            width,
+                            theme,
+                            language,
+                        )
+                page.locator("#products").scroll_into_view_if_needed()
+                page.screenshot(
+                    path=str(
+                        args.output / f"home-products-{width}-{theme}-{language}.png"
+                    )
+                )
+                rows.append(
+                    dict(
+                        page="home-products",
+                        width=width,
+                        theme=theme,
+                        language=language,
+                    )
+                )
+            assert not errors, errors
+            context.close()
+
+
 def verify_homepage_research(browser, args, rows):
-    """Check the appended research card without visiting its external service."""
+    """Preserve application links on the ecosystem detail page."""
     homepage_rows = []
     origin = urljoin(args.url, "/")
     for width in (390, 1440):
@@ -158,7 +230,7 @@ def verify_homepage_research(browser, args, rows):
             )
             try:
                 response = page.goto(
-                    urljoin(args.url.rstrip("/") + "/", "index.html"),
+                    urljoin(args.url.rstrip("/") + "/", "ecosystem-archive.html"),
                     wait_until="domcontentloaded",
                 )
                 assert response is not None and response.status == 200
@@ -217,6 +289,9 @@ def verify_homepage_research(browser, args, rows):
                         expect(research.locator(selector)).to_have_text(expected[key])
                     if language == "en":
                         assert not re.search(r"[\u4e00-\u9fff]", research.inner_text())
+                    page.evaluate(
+                        "() => document.fonts.ready.then(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))"
+                    )
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth + 1"
                     ), (width, theme, language)
@@ -549,6 +624,7 @@ def main():
                             )
                         )
                     context.close()
+        verify_home_product_navigation(browser, args, rows)
         verify_homepage_research(browser, args, rows)
         # Product navigation is also available on the existing Engine page.
         page = browser.new_page(viewport={"width": 1440, "height": 1000})

@@ -344,7 +344,6 @@
             groups[0],
             navLink('', './index.html#projects', 'navProjects'),
             navLink('plugins', './plugins.html', 'navPlugins'),
-            navLink('engine', './engine.html', 'navEngine'),
             ...groups.slice(1),
         ].join('');
 

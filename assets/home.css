@@ -513,3 +513,17 @@ body[data-page="home"] .lang-toggle {
 @media (prefers-color-scheme: light) {
   .product-card-research { --product-accent: #425bc9; }
 }
+
+/* The homepage presents the three products; application cards live in the ecosystem detail page. */
+.core-product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.core-product { display: flex; flex-direction: column; min-width: 0; padding: 30px 24px; border: 1px solid var(--product-border); border-top: 4px solid var(--exec-amber); background: var(--product-surface); color: var(--product-text); }
+.core-product-control { border-top-color: var(--exec-cyan); }
+.core-product-memory { border-top-color: #9aafff; }
+.core-product-kicker { color: var(--product-copy); font: 11px ui-monospace, monospace; letter-spacing: .06em; }
+.core-product h3 { color: var(--product-text); font-family: "Sora", "Inter", sans-serif; font-size: 32px; margin: 26px 0 12px; }
+.core-product p { color: var(--product-copy); font-size: 15px; line-height: 1.8; margin: 8px 0; }
+.core-product .core-product-role { color: var(--product-text); font-weight: 700; }
+.core-product .core-product-owner { font-size: 12px; margin: 16px 0 24px; }
+.core-product-link { color: var(--product-text); font-weight: 700; font-size: 14px; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--product-border); min-height: 44px; }
+.core-product-link:focus-visible { outline: 3px solid var(--exec-cyan); outline-offset: 5px; }
+@media (max-width: 900px) { .core-product-grid { grid-template-columns: 1fr; } .core-product h3 { font-size: 28px; } }
