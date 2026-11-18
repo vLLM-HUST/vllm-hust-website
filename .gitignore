@@ -17,7 +17,9 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
+wheels/*
+!wheels/r8.html
+!wheels/r8.txt
 *.egg-info/
 .installed.cfg
 *.egg
