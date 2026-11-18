@@ -806,7 +806,7 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert ".repository-portfolio {" in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' not in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
-    assert "visible.filter((project) => project.kind === kind)" in SCRIPT
+    assert "project.kind === kind && productView(project.primary) === product" in SCRIPT
 
 
 def test_workshop_supports_phase_first_scenario_discovery() -> None:
@@ -1192,8 +1192,8 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=catalog-copy-20261116" in PAGE
-    assert "plugins-page.js?v=catalog-copy-20261116" in PAGE
+    assert "plugins.css?v=product-mods-20261118" in PAGE
+    assert "plugins-page.js?v=product-mods-20261118" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1231,7 +1231,7 @@ def test_control_plane_remains_external_and_uses_a_bridge_contract() -> None:
     ]
     assert remote_sidecar["evidence_level"] == "integration_tested"
     assert local_host["evidence_level"] == "integration_tested"
-    assert "control-plane tools distinct" in PAGE
+    assert "Engine、Control Plane、Continuum" in PAGE
     assert "admission" in PAGE
     assert "local host still owns HMAC, schemas, authorization, replay" in PAGE
     assert "catalog separates three layers" in PAGE
@@ -1508,7 +1508,7 @@ def test_extension_standard_covers_core_and_host_providers() -> None:
 def test_public_copy_uses_ecosystem_language() -> None:
     assert "MOD catalog" in PAGE
     assert "MOD 目录" in PAGE
-    assert "Find the right extension without losing sight of who runs it." in PAGE
+    assert "Three products. One extension ecosystem." in PAGE
     assert "插件、connector 与 control plane 承担不同角色。" in PAGE
 
 
