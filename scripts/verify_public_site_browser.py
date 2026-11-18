@@ -64,18 +64,35 @@ async def verify(args):
                             command = await page.locator(
                                 "#engine-install-command"
                             ).inner_text()
-                            assert (
-                                "pip install vllm-hust-engine==2026.11.17.8.post1"
-                                in command
-                            )
-                            assert (
-                                "--find-links https://vllm-hust.sage.org.ai/wheels/r8.html"
-                                in command
+                            assert command.strip() == (
+                                "python -m pip install --no-deps -r "
+                                "https://vllm-hust.sage.org.ai/wheels/r8.txt"
                             )
                             assert (
                                 "curl " not in command
                                 and "install-engine-r8.py" not in command
                             )
+                            manifest = root / "wheels/r8.txt"
+                            fetched = await page.request.get(
+                                f"{args.url.rstrip('/')}/wheels/r8.txt"
+                            )
+                            assert fetched.status == 200
+                            assert await fetched.body() == manifest.read_bytes()
+                            requirements = [
+                                line
+                                for line in manifest.read_text().splitlines()
+                                if line and not line.startswith(("#", "--"))
+                            ]
+                            assert len(requirements) == 4
+                            assert any(
+                                line.startswith("vllm-hust-engine==2026.11.17.8.post2 ")
+                                for line in requirements
+                            )
+                            assert all(
+                                re.search(r" --hash=sha256:[a-f0-9]{64}$", line)
+                                for line in requirements
+                            )
+                            assert "--require-hashes" in manifest.read_text()
                             index = root / "wheels/r8.html"
                             download = await page.request.get(
                                 f"{args.url.rstrip('/')}/wheels/r8.html"

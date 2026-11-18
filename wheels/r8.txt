@@ -1,0 +1,9 @@
+# Frozen r8: CPython3.12 / Linux aarch64 / CANN9.1.0.
+# Run pip install --no-deps -r THIS_FILE in the qualified environment.
+# All four replacements are explicit; vendor dependencies are external.
+--find-links https://github.com/vLLM-HUST/vllm-hust-website/releases/expanded_assets/engine-wheels-r8-v1
+--require-hashes
+vllm-hust-engine==2026.11.17.8.post2 --hash=sha256:2ccb1e14cc58840bee730832d29ac519e6ca98de5d48ecc8701a9df265c0c935
+vllm==0.28.1.post1.dev143+gf18cf803c.empty --hash=sha256:4854cce2e713499e9f1b9bd514f0a1136008758b2b367ba943100ed9f97d01dc
+vllm-ascend==0.25.1rc2.dev125+hust.20260903.4.g74f0c0a27 --hash=sha256:a04f758a6973c1afe42a4fe2f123c7de295e32a3fe2583e7445dd7047c9186a9
+vllm-hust-runtime==2026.11.17.8+r8.3f7eacc1 --hash=sha256:1dea132a69efb3a6ce05e893e52d65777b5907b17b2b5c227cb8ecf9cacc0ce5
