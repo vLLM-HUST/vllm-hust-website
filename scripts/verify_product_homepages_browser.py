@@ -229,7 +229,18 @@ def verify_product_deep_links(browser, args):
         page.on("pageerror", lambda error: errors.append(str(error)))
         for slug in ("engine", "control-plane", "continuum"):
             url = urljoin(args.url.rstrip("/") + "/", f"{slug}.html")
-            page.goto(url)
+            page.goto(url, wait_until="networkidle")
+            # Close within the anchor's task: a queued hashchange must not undo
+            # the native disclosure toggle, even on a fast browser/runner.
+            page.evaluate("""() => new Promise(resolve => {
+                window.addEventListener('hashchange', () => requestAnimationFrame(
+                    () => requestAnimationFrame(resolve)), {once:true});
+                document.querySelector('.publications-shortcut').click();
+                document.querySelector('.publication-library > summary').click();
+            })""")
+            expect(page.locator(".publication-library")).not_to_have_attribute(
+                "open", ""
+            )
             paper = page.locator(".publication-item").first.get_attribute("id")
             page.goto(url + "#" + paper)
             page.reload(wait_until="networkidle")
@@ -309,6 +320,7 @@ def verify_product_deep_links(browser, args):
                     page=slug,
                     width=width,
                     history=True,
+                    rapid_close=True,
                     new_window=True,
                     download=True,
                     canceled_click=True,

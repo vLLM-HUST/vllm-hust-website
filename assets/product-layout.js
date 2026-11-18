@@ -2,7 +2,11 @@
 (function () {
   'use strict';
   if (!document.body.classList.contains('product-home')) return;
+  let revealedHash = null;
   function reveal(hash) {
+    // Track every fragment, including missing/malformed targets, so history
+    // traversal can revisit a previously resolved target.
+    revealedHash = hash;
     let id;
     try { id = decodeURIComponent(hash.replace(/^#/, '')); } catch { return; }
     const target = document.getElementById(id);
@@ -17,13 +21,14 @@
     const anchor = event.target.closest('a[href]');
     if (!anchor || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const url = new URL(anchor.href, location.href);
-    // A different fragment is handled by hashchange, including history traversal.
-    // Only repeated links need an explicit reveal; other documents and windows
-    // must not change the current page's collapsed details.
+    // Reveal before native scrolling, but leave other documents and windows
+    // untouched. The ensuing hashchange must not undo a user's quick close.
     if (anchor.hasAttribute('download') || (anchor.target && anchor.target.toLowerCase() !== '_self')) return;
     if (url.origin === location.origin && url.pathname === location.pathname &&
-        url.search === location.search && url.hash && url.hash === location.hash) reveal(url.hash);
+        url.search === location.search && url.hash) reveal(url.hash);
   });
-  window.addEventListener('hashchange', () => reveal(location.hash));
+  window.addEventListener('hashchange', () => {
+    if (location.hash !== revealedHash) reveal(location.hash);
+  });
   window.addEventListener('load', () => reveal(location.hash));
 }());
