@@ -1,12 +1,12 @@
 """Keep reviewed benchmark publication pins consistent across website workflows."""
 
 import argparse
-import json
 from pathlib import Path
 import re
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / ".github/benchmark-publication.json"
+MANIFEST = ROOT / ".github/benchmark-publication.toml"
 WORKFLOWS = (
     "ci.yml",
     "deploy-benchmark-pages.yml",
@@ -18,7 +18,7 @@ WORKFLOWS = (
 
 
 def load_pins():
-    pins = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    pins = tomllib.loads(MANIFEST.read_text(encoding="utf-8"))
     for name in ("publication_revision", "visibility_policy_revision"):
         if not re.fullmatch(r"[0-9a-f]{40}", pins[name]):
             raise ValueError(f"{name} must be a full reviewed commit SHA")

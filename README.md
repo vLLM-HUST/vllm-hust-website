@@ -89,7 +89,7 @@ checks its byte identities, applies the pinned public visibility projection, run
 and deploys the resulting artifact. The source checkout contains historical evidence and build
 outputs as well as presentation code. The assembled public artifact defines the served file set.
 
-`.github/benchmark-publication.json` owns the reviewed publication and visibility-policy revisions.
+`.github/benchmark-publication.toml` owns the reviewed publication and visibility-policy revisions.
 After reviewing a benchmark commit, update the corresponding revision in that file and run
 `python scripts/update_benchmark_publication.py --write`, then
 `python scripts/update_benchmark_publication.py --check`. CI checks all consuming workflow pins.

@@ -1,9 +1,9 @@
 """Keep production data assembly separate from website data PRs."""
 
 from pathlib import Path
-import json
 import re
 import runpy
+import tomllib
 
 import yaml
 
@@ -53,7 +53,7 @@ def test_deployment_uses_only_merged_sources_and_validated_artifact():
     # MOD catalog and Workshop statistics use the reviewed canonical snapshot.
     # Freeze the same reviewed data identity across
     # deployment and both CI workflows instead of advancing to an untested main.
-    pins = json.loads((ROOT / ".github/benchmark-publication.json").read_text())
+    pins = tomllib.loads((ROOT / ".github/benchmark-publication.toml").read_text())
     benchmark_revision = pins["publication_revision"]
     assert checkouts[1]["with"]["ref"] == benchmark_revision
     policy_revision = pins["visibility_policy_revision"]

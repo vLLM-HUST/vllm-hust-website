@@ -18,7 +18,7 @@ tracked files need that explicit migration.
 
 ## Publication revisions
 
-Edit `.github/benchmark-publication.json` after reviewing the merged source commit. The publication
+Edit `.github/benchmark-publication.toml` after reviewing the merged source commit. The publication
 and visibility-policy commits are independently pinned. Regenerate the workflow references and
 validate them together.
 
