@@ -64,7 +64,9 @@ def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     for name in ("publications", "community", "resources"):
         assert f"id: '{name}'" in groups
     assert "id: 'engine'" not in groups
-    assert "navLink('engine', './engine.html', 'navEngine')" in SITE_JS
+    products = groups.split("id: 'products'", 1)[1].split("id: 'publications'", 1)[0]
+    assert "['engine', './engine.html', 'navEngine']" in products
+    assert "navLink('engine', './engine.html', 'navEngine')" not in SITE_JS
     assert (ROOT / "engine.html").is_file()
     for old in ("leaderboard-runs.html", "dataset-validation.html"):
         assert old not in performance

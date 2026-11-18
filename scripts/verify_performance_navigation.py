@@ -68,6 +68,11 @@ def main():
                             ).to_have_count(0)
                             expect(
                                 page.locator('.nav-links > a[href="./engine.html"]')
+                            ).to_have_count(0)
+                            expect(
+                                page.locator(
+                                    '[data-nav-group="products"] a[href="./engine.html"]'
+                                )
                             ).to_have_count(1)
                             expect(
                                 page.locator(".site-nav .brand-link")
@@ -106,7 +111,6 @@ def main():
                                     "产品",
                                     "项目",
                                     "MOD 目录",
-                                    "引擎",
                                     "论文与新闻",
                                     "性能数据",
                                     "社区",
@@ -117,7 +121,6 @@ def main():
                                     "Products",
                                     "Projects",
                                     "MOD catalog",
-                                    "Engine",
                                     "Papers & news",
                                     "Performance data",
                                     "Community",
@@ -127,10 +130,12 @@ def main():
                             if width == 390:
                                 page.locator("#navToggle").click()
                                 direct = page.locator(".nav-links > a")
-                                expect(direct).to_have_count(3)
+                                expect(direct).to_have_count(2)
                                 boxes = [link.bounding_box() for link in direct.all()]
                                 assert boxes[0]["y"] == boxes[1]["y"]
-                                assert boxes[2]["y"] > boxes[0]["y"]
+                                assert (
+                                    boxes[0]["x"] + boxes[0]["width"] <= boxes[1]["x"]
+                                )
                             for group in page.locator(".site-nav .nav-group").all():
                                 if group.get_attribute("open") is not None:
                                     group.locator("summary").click()
