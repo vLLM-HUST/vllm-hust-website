@@ -62,7 +62,7 @@
         <p id="engine-install-copy">Run in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The installer verifies the frozen sources and replaces both official distributions using pip.</p>
         <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">python -m pip install vllm-hust-engine==2026.11.17.8 &amp;&amp; \
 curl -fL https://vllm-hust.sage.org.ai/downloads/install-engine-r8.py -o install-engine-r8.py &amp;&amp; \
-printf '%s  %s\n' '067530653312086bd9e9b454c15b4adb3d01cb16bc5a62c04b6ee14a605eb8d6' install-engine-r8.py | sha256sum -c - &amp;&amp; \<!-- pragma: allowlist secret: public installer SHA256 -->
+printf '%s  %s\n' '904f5f8f670be3b9cd4bbffc6eaf7e2b9f88e53806e7079857ed148bd1e185fa' install-engine-r8.py | sha256sum -c - &amp;&amp; \<!-- pragma: allowlist secret: public installer SHA256 -->
 python install-engine-r8.py --out ./r8-install</code></pre>
         <p id="engine-install-scope" class="engine-note">Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.</p>
         <details><summary id="engine-install-details">Dependencies, verification and uninstall</summary>

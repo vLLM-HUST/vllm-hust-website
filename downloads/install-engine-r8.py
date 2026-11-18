@@ -84,7 +84,7 @@ def metadata_bytes(name, version, dependencies=()):
     text = (
         f"Metadata-Version: 2.2\nName: {name}\nVersion: {version}\n"
         "Summary: Frozen vLLM-HUST r8 runtime\nRequires-Python: >=3.12,<3.13\n"
-        "License-Expression: Apache-2.0\n"
+        "License: Apache-2.0\n"
     )
     text += "".join(f"Requires-Dist: {dep}\n" for dep in dependencies)
     return (text + "\n").encode()
