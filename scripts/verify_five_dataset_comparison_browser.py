@@ -84,7 +84,7 @@ def verify(url, output):
                     expect(root.locator("#r8-current-continuous")).to_be_visible()
                     expect(root.locator("#report-history-links")).to_have_count(0)
                     expect(root.locator(".metric-chart")).to_have_count(4)
-                    expect(root.locator(".bar-value")).to_have_count(16)
+                    expect(root.locator(".bar-value")).to_have_count(56)
                     expect(root.locator(".mod-tags span")).to_have_count(10)
                     assert_release_control_readable(page, root)
                     r8_layout = dashboard_layout(root)
@@ -121,6 +121,28 @@ def verify(url, output):
                                     else r8["groups"][role][phase][key] / divisor
                                 )
                                 expected.append(f"{value:.2f}")
+                            expect(values).to_have_text(expected)
+                    published_r8 = next(
+                        row for row in catalog["entries"] if row["id"] == "r8"
+                    )
+                    expect(
+                        root.locator('.dataset-coverage [data-available="true"]')
+                    ).to_have_count(5)
+                    expect(root.locator(".metric-missing")).to_have_count(0)
+                    for row in published_r8["measurements"]:
+                        for key, divisor in [
+                            ("output_tokens_per_second", 1),
+                            ("mean_ttft_ms", 1000),
+                            ("mean_tpot_ms", 1),
+                            ("relative_cost_per_token", 1),
+                        ]:
+                            values = root.locator(
+                                f'[data-metric="{key}"] [data-profile="{row["id"]}"] .bar-value'
+                            )
+                            expected = [
+                                f"{(row['arms'][0]['output_tokens_per_second'] / arm['output_tokens_per_second'] if key == 'relative_cost_per_token' else arm[key] / divisor):.2f}"
+                                for arm in row["arms"]
+                            ]
                             expect(values).to_have_text(expected)
                     for key in ("metrics", "configuration", "methods", "evidence"):
                         button = root.locator(f'[data-detail="{key}"]')
@@ -359,7 +381,7 @@ def verify(url, output):
                             "language": lang,
                             "width": width,
                             "theme": theme,
-                            "verified": "matching release layouts,16 r8 and40 r6 values,MODs,contrast,dialogs and keyboard",
+                            "verified": "matching release layouts,56 r8 and40 r6 values,five completed r8 pairs,MODs,contrast,dialogs and keyboard",
                         }
                     )
                     page.close()
