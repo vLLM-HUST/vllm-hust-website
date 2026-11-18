@@ -112,6 +112,20 @@ def verify(url, output):
                     expect(root.locator(".mod-tags span")).to_have_count(10)
                     assert_release_control_readable(page, root)
                     assert_controller_progress(page, root, controller, lang)
+                    workload = (
+                        "闭环连续压测 · 并发 8"
+                        if lang == "zh"
+                        else "Closed-loop continuous stress test · concurrency 8"
+                    )
+                    for phase in ("4096-formal", "16384-formal"):
+                        labels = root.locator(
+                            f'.metric-chart [data-profile="{phase}"] .chart-workload-label'
+                        )
+                        expect(labels).to_have_count(4)
+                        expect(labels).to_have_text([workload] * 4)
+                    expect(
+                        root.locator('[data-profile="mmlu"] .chart-workload-label')
+                    ).to_have_count(0)
                     r8_layout = dashboard_layout(root)
                     assert r8_layout["profiles"] == [
                         "mmlu",
@@ -311,6 +325,16 @@ def verify(url, output):
                     supplement = root.locator("#context-tenant-supplement")
                     expect(supplement).to_contain_text("62.89%")
                     expect(supplement).to_contain_text("82.77%")
+                    replay = (
+                        "Terminal-Bench 2.1 离线请求回放 · 并发 8"
+                        if lang == "zh"
+                        else "Terminal-Bench 2.1 offline request replay · concurrency 8"
+                    )
+                    label = supplement.locator(".supplement-workload-label")
+                    expect(label).to_be_visible()
+                    expect(label).to_contain_text(replay)
+                    for band in ("4K–8K", "16K–24K", "32K–48K"):
+                        expect(label).to_contain_text(band)
                     image = supplement.locator("img")
                     assert image.evaluate("el=>el.complete && el.naturalWidth>0")
                     root.locator('[data-detail="supplement"]').click()
