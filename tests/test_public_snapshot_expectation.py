@@ -7,7 +7,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
-    "public_snapshot_browser", ROOT / "scripts/verify_public_pages_browser.py"
+    "public_snapshot_browser", ROOT / "scripts/snapshot_expectation.py"
 )
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)

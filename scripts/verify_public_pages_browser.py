@@ -4,27 +4,11 @@ import argparse
 import asyncio
 import json
 import re
-from datetime import datetime, timezone
 from pathlib import Path
 
 from playwright.async_api import async_playwright, expect
 
-
-def snapshot_expectation(timestamp, now_ms, lang):
-    try:
-        moment = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        if moment.tzinfo is None:
-            moment = moment.replace(tzinfo=timezone.utc)
-        moment = moment.astimezone(timezone.utc)
-        age = now_ms / 1000 - moment.timestamp()
-        text = (
-            moment.isoformat(timespec="milliseconds")
-            .replace("T", " ")
-            .replace("+00:00", " UTC")
-        )
-        return text, age > 7 * 86400 or age < -300
-    except (ValueError, TypeError, AttributeError):
-        return "未核验" if lang == "zh" else "not verified", True
+from snapshot_expectation import snapshot_expectation
 
 
 async def verify_version_snapshot(page, lang):
