@@ -1,0 +1,22 @@
+body[data-page="controlplane"] .engine-hero h1 { font-size:clamp(2.3rem,5.4vw,4.6rem); overflow-wrap:anywhere; }
+.control-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin:24px 0; }
+.control-summary article { background:var(--engine-panel); border:1px solid var(--engine-line); border-radius:12px; padding:20px; }
+.control-summary strong { display:block; font-size:clamp(1.6rem,3vw,2.25rem); margin:8px 0; }
+.control-summary p, .control-scope { color:var(--engine-muted); line-height:1.65; }
+.control-toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:20px 0; }
+.control-toolbar select { color:var(--engine-ink); background:var(--engine-panel); border:1px solid var(--engine-line); padding:10px; border-radius:6px; max-width:100%; }
+.control-chart { display:grid; gap:16px; padding:24px; border:1px solid var(--engine-line); border-radius:12px; margin:20px 0; }
+.control-bar-line { display:grid; grid-template-columns:minmax(90px,150px) 1fr 100px; align-items:center; gap:12px; }
+.control-bar { height:28px; background:var(--engine-accent); border-radius:3px; min-width:2px; }
+.control-bar.direct { opacity:.55; }
+.control-bar-line output { text-align:right; font-variant-numeric:tabular-nums; }
+.control-table-wrap { max-width:100%; overflow-x:auto; margin:18px 0; }
+.control-table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.control-table th,.control-table td { padding:12px 10px; text-align:left; border-bottom:1px solid var(--engine-line); vertical-align:top; }
+.control-table th { color:var(--engine-muted); }
+.control-details { padding:16px 0; border-bottom:1px solid var(--engine-line); }
+.control-details summary { cursor:pointer; font-weight:700; }
+.control-details li { margin:10px 0; line-height:1.65; }
+.control-error { padding:20px; border:2px solid var(--engine-line); }
+@media(max-width:760px) { .control-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .control-bar-line { grid-template-columns:80px 1fr 85px; gap:6px; } .control-chart { padding:16px 10px; } }
+@media(max-width:390px) { .control-summary { grid-template-columns:1fr; } }

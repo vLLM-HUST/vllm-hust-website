@@ -35,7 +35,7 @@ def verify_publications(page, product, language):
     section = page.locator("#publications")
     expect(section).to_have_count(1)
     expect(page.locator(".publications-shortcut")).to_have_attribute(
-        "href", "#publications"
+        "href", re.compile(r"#publications$")
     )
     page.locator(".publications-shortcut").focus()
     page.keyboard.press("Enter")
@@ -110,11 +110,12 @@ def verify_publications(page, product, language):
         for element in section.locator(selector).all():
             assert element.evaluate(CONTRAST) >= 4.5, (product, selector)
     for link in section.locator(".publication-navigation a").all():
-        target = link.get_attribute("href")
+        target = link.evaluate("a => a.href")
+        target_id = "#" + target.split("#", 1)[1]
         link.focus()
         page.keyboard.press("Enter")
-        expect(page).to_have_url(re.compile(re.escape(target) + "$"))
-        expect(page.locator(target)).to_be_visible()
+        expect(page).to_have_url(target)
+        expect(page.locator(target_id)).to_be_visible()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     return len(entries)
 
@@ -376,6 +377,42 @@ def main():
                     rows.append(
                         dict(
                             page="engine",
+                            width=width,
+                            theme=theme,
+                            language=language,
+                            publications=count,
+                            passed=True,
+                        )
+                    )
+                context.close()
+        # The controller's directory entry point keeps the same bibliography.
+        for width in (390, 1440):
+            for theme in ("light", "dark"):
+                context = browser.new_context(
+                    viewport={"width": width, "height": 1000}, color_scheme=theme
+                )
+                context.add_init_script("localStorage.setItem('vllm-hust_lang', 'en')")
+                page = context.new_page()
+                errors = []
+                page.on("pageerror", lambda error: errors.append(str(error)))
+                page.goto(urljoin(args.url.rstrip("/") + "/", "controlplane/"))
+                for language in ("en", "zh"):
+                    if language == "zh":
+                        page.locator("#langToggle").click()
+                    count = verify_publications(page, "control-plane", language)
+                    expect(page.locator("#control-owner")).to_contain_text(
+                        "毛言粲" if language == "zh" else "Yancan Mao"
+                    )
+                    assert not errors, errors
+                    page.locator("#publications").screenshot(
+                        path=str(
+                            args.output
+                            / f"controller-publications-{width}-{theme}-{language}.png"
+                        )
+                    )
+                    rows.append(
+                        dict(
+                            page="controlplane",
                             width=width,
                             theme=theme,
                             language=language,

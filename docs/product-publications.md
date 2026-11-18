@@ -14,6 +14,9 @@ PDF 使用该固定提交的作者版路径，已核对 Git 树文件存在；�
 2016，Co-Run Study 为 TPDS 2017（online 2016），Select Edges Wisely 为 PVLDB 2025，Data-Aware Adaptive
 Compression 为 TKDE 2024。Adaptive Sampling 保留 PACMMOD 2024 / SIGMOD 2025 双重信息。
 
+Control Plane 的概览页 `control-plane.html` 与实际部署/结果入口 `controlplane/index.html` 均展示同一份 19 条论文清单；后者包含
+`<base>`，页内论文链接必须显式指向 `./controlplane/#...`。
+
 ## 完整覆盖核对
 
 | 论文                                                                                                               | 年份 | 产品页或未列入原因                                         |
@@ -89,5 +92,5 @@ Compression 为 TKDE 2024。Adaptive Sampling 保留 PACMMOD 2024 / SIGMOD 2025 
 
 ## 后续更新
 
-先核对个人主页新提交、题录、核准年份、接收状态与实际 PDF 路径，再更新三个产品页的 `PRODUCT PUBLICATIONS`
+先核对个人主页新提交、题录、核准年份、接收状态与实际 PDF 路径，再更新三个产品及 Control Plane 两个入口的 `PRODUCT PUBLICATIONS`
 区块和本覆盖表。新增条目沿用共享样式与原生引用详情，避免把论文中的性能提升写成当前冻结引擎的实测结果。执行既有产品主页浏览器回归；保留不同产品的负责人、安装、MOD 和评测入口。
