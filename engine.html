@@ -68,7 +68,7 @@
       <section class="engine-section" id="r8-current-results" style="scroll-margin-top:96px" aria-labelledby="engine-current-title">
         <span id="results" aria-hidden="true"></span><h2 id="engine-current-title">B0 → r8 · current 4K / 16K continuous load</h2>
         <p id="engine-current-performance-copy">Throughput 3.06× / 2.68×; mean TTFT −52.8% / −48.4%, TPOT −68.5% / −65.4%. Zero failed requests.</p>
-        <figure style="margin:20px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="Open full-size comparison chart"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K"></a><figcaption id="engine-current-caption" class="engine-note">C8 closed loop · 871 measured requests · one run per arm. The full five-profile comparison is running.</figcaption></figure>
+        <figure style="margin:20px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="Open full-size comparison chart"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K"></a><figcaption id="engine-current-caption" class="engine-note">C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.</figcaption></figure>
         <details><summary id="engine-current-method">Method, original data and CPU replay</summary>
           <p id="engine-current-method-copy">Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.</p>
           <p><a id="engine-current-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">Original streams and portable CPU replay ↗</a> · <a id="engine-current-stats" href="./data/r8-continuous-20261117/summary-v1.json">Statistics and tail latency ↗</a> · <a id="engine-current-manifest" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json">Current release manifest ↗</a></p>
@@ -187,7 +187,7 @@
     "engine-mod-badge-link": "10 MODs · r8 included ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
     "engine-current-title": "B0 → r8 · current 4K / 16K continuous load",
-    "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The full five-profile comparison is running.",
+    "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.",
     "engine-current-method": "Method, original data and CPU replay",
     "engine-current-method-copy": "Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.",
     "engine-current-raw": "Original streams and portable CPU replay ↗",
@@ -271,7 +271,7 @@
     "engine-mod-badge-link": "10项MOD · r8已包含 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
     "engine-current-title": "B0 → r8 · 新一轮 4K / 16K 连续负载",
-    "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项完整对照正在执行。",
+    "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项配对结果见 B0/B1 对比页面。",
     "engine-current-method": "计算方式、原件与离线复算",
     "engine-current-method-copy": "两臂相同输入配方与71条非计分预热，TP2、并发8、输出256 token。每个正式阶段提交300秒，再等待全部完成；吞吐计入排空耗时。TPOT=(结束时间−首token时间)/(输出token−1)。两rank在测量前封住Torch Dynamo与Triton编译入口。数据集质量与参考算力效率分别验收。",
     "engine-current-raw": "原始流与独立CPU复算 ↗",
