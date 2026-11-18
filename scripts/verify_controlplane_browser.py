@@ -53,7 +53,8 @@ def verify(args):
                     "pageerror", lambda error, errors=errors: errors.append(str(error))
                 )
                 response = page.goto(
-                    args.url.rstrip("/") + "/controlplane/#results", wait_until="networkidle"
+                    args.url.rstrip("/") + "/controlplane/#results",
+                    wait_until="networkidle",
                 )
                 assert response.status == 200
                 verify_navigation(page, width)
