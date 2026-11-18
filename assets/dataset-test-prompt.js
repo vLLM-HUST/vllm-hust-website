@@ -3,26 +3,14 @@
   'use strict';
   let payload;
   let testTarget = 'mod';
-  let downloadingScript = false;
   const button = document.getElementById('download-test-prompt');
-  const scriptButton = document.getElementById('download-test-script');
+  const engineLink = document.getElementById('engine-page-link');
   const status = document.getElementById('prompt-download-status');
-  const description = document.getElementById('engine-download-description');
-  const bootstrap = {
-    repository: 'vLLM-HUST/vllm-hust-engine',
-    commit: 'e3c3e2bc3f896e40a5577c1181adb7df6c3c61a4', // pragma: allowlist secret
-    path: 'download_and_run.py',
-    runner: 'ceeff236d26e1922bc09448322defb7dcbf12b2d', // pragma: allowlist secret
-    sha256: '395194f8ace873dc84d9fc18fd1d5143aefe1ca08f55bcd4ee99ae25fad96d3b', // pragma: allowlist secret
-    bytes: 9577,
-    engineRelease: 'full-answer-b1-20261113-r6',
-    toolsRelease: 'acceptance-tools-20261116-r7',
-  };
   const language = () => (window.vllmHustSite?.getCurrentLang()
     || localStorage.getItem('vllm-hust_lang') || navigator.language || 'en').startsWith('zh') ? 'zh' : 'en';
   const copy = {
-    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', script: 'r6 Engine 一键脚本 ↓', scriptReady: '固定引擎 r6 · 执行工具 r7；脚本与附件均校验 SHA256', scriptMismatch: '脚本与当前协议版本不匹配，暂不可下载', scriptLoading: '正在校验脚本…', scriptDone: '已下载 one_click.py（引擎 r6 / 工具 r7）；按指南命令运行', scriptFailed: '脚本下载或校验失败，请重试', hint: '脚本与运行指南已校验', description: '当前默认引擎 r6 · 执行工具 r7。保存为 one_click.py，按指南命令运行；终端自动显示实时日志。'},
-    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', script: 'r6 Engine test script ↓', scriptReady: 'Frozen engine r6 · execution tools r7; script and artifacts verified by SHA256', scriptMismatch: 'Script version does not match the current protocol', scriptLoading: 'Verifying the script…', scriptDone: 'Downloaded one_click.py (engine r6 / tools r7); run the guide command', scriptFailed: 'Script download or verification failed. Please retry.', hint: 'Script and run guide verified', description: 'Default engine r6 · execution tools r7. Save as one_click.py and run the guide command; live logs follow automatically.'},
+    zh: {button: '下载 AI 测试提示词 ↓', ready: '下载 TXT，含完整执行步骤与固定协议身份', loading: '标准与运行指南校验通过后可下载', done: '已生成 TXT 下载', failed: '下载失败，请重试', engine: '引擎与下载 →', hint: '标准与运行指南已校验'},
+    en: {button: 'Download AI test prompt ↓', ready: 'Download TXT with execution steps and pinned protocol identities', loading: 'Available after standard and run-guide verification', done: 'TXT download generated', failed: 'Download failed. Please try again.', engine: 'Engine & downloads →', hint: 'Standard and run guide verified'},
   };
 
   function command(guide, mode) {
@@ -52,7 +40,7 @@
       `reference_runner: ${engine}/one_click.py`,
       `deployment_instructions: ${engine}/README.md`,
       `public_bootstrap_source: https://github.com/${guide.execution.public_bootstrap_repository}/blob/${guide.execution.bootstrap_commit}/${guide.execution.public_bootstrap_path}`,
-      `downloaded_script_sha256: ${bootstrap.sha256}
+      `downloaded_script_sha256: ${guide.execution.bootstrap_sha256}
 engine_release: ${guide.execution.engine_release}`,
     ].join('\n');
     const scope = data.datasets.map(dataset => {
@@ -216,7 +204,7 @@ ${scope}
 - trace 的 tokenizer、模板与 16K 输入资格已冻结；两臂 /tokenize 须逐项匹配冻结 token ID 哈希，使用新 cache_salt 与零 KV 复用。更换模型或 tokenizer 须另立 profile，不能静默重算后继续使用原标准名。
 
 ## 4. 执行测试
-使用固定 Engine 的 one_click.py，或从执行指南右上角下载同版本公开引导脚本 one_click.py；后者会校验并恢复私有 Engine 工具。下载文件须与上面的 downloaded_script_sha256 一致。把脚本放在独立目录，在 one_click.py 所在目录先替换模型/SDK/结果路径与物理卡号，再运行：
+使用固定 Engine 的 one_click.py，或按上面的 public_bootstrap_source 下载同版本公开引导脚本并保存为 one_click.py；后者会校验并恢复私有 Engine 工具。下载文件须与上面的 downloaded_script_sha256 一致。把脚本放在独立目录，在 one_click.py 所在目录先替换模型/SDK/结果路径与物理卡号，再运行：
 
 ${command(guide, full)}
 
@@ -281,7 +269,7 @@ Use identical frozen inputs, order, prompts and generation budgets for both arms
 - Trace tokenizer, template and 16K eligibility are frozen. Both arms must match frozen token ID hashes via /tokenize. Use fresh cache_salt and zero KV reuse. A changed model/tokenizer requires a new profile.
 
 ## 4. Execute
-Use the pinned Engine entrypoint, or download the matching public one_click.py bootstrap using the button at the top right of the execution guide. The bootstrap verifies and restores private Engine tools. Verify the downloaded file against downloaded_script_sha256 above. Save it in an isolated directory, replace model/SDK/output paths and device IDs, then run from the directory containing one_click.py:
+Use the pinned Engine entrypoint, or download the matching public bootstrap from public_bootstrap_source above and save it as one_click.py. The bootstrap verifies and restores private Engine tools. Verify the downloaded file against downloaded_script_sha256 above. Save it in an isolated directory, replace model/SDK/output paths and device IDs, then run from the directory containing one_click.py:
 
 ${command(guide, full)}
 
@@ -318,17 +306,6 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
 `;
   }
 
-  function scriptMatches() {
-    return payload && payload.guide.execution.public_bootstrap_repository === bootstrap.repository
-      && payload.guide.execution.bootstrap_commit === bootstrap.commit
-      && payload.guide.execution.public_bootstrap_path === bootstrap.path
-      && payload.guide.execution.bootstrap_sha256 === bootstrap.sha256
-      && payload.guide.execution.bootstrap_bytes === bootstrap.bytes
-      && payload.guide.execution.verified_runner_commit === bootstrap.runner
-      && payload.guide.execution.engine_release === bootstrap.engineRelease
-      && payload.guide.execution.tools_release === bootstrap.toolsRelease;
-  }
-
   function saveDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
     try {
@@ -344,11 +321,8 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
     button.textContent = testTarget === 'mod' ? (language() === 'zh' ? '下载 MOD 测试提示词 ↓' : 'Download MOD test prompt ↓') : c.button;
     button.title = payload ? c.ready : c.loading;
     button.disabled = !payload;
-    scriptButton.textContent = c.script;
-    if (description) description.textContent = c.description;
-    scriptButton.disabled = !scriptMatches() || downloadingScript;
-    scriptButton.title = !payload ? c.loading : scriptMatches() ? c.scriptReady : c.scriptMismatch;
-    status.textContent = !payload ? c.loading : scriptMatches() ? c.hint : c.scriptMismatch;
+    engineLink.textContent = c.engine;
+    status.textContent = payload ? c.hint : c.loading;
   }
   button.addEventListener('click', () => {
     if (!payload) return;
@@ -358,23 +332,6 @@ Execution guide: https://vllm-hust.sage.org.ai/dataset-standard.html
       status.textContent = copy[language()].done;
     } catch {
       status.textContent = copy[language()].failed;
-    }
-  });
-  scriptButton.addEventListener('click', async () => {
-    if (!scriptMatches() || downloadingScript) return;
-    downloadingScript = true; scriptButton.disabled = true; status.textContent = copy[language()].scriptLoading;
-    try {
-      const response = await fetch('./downloads/standard-test/one_click.py', {cache: 'no-store'});
-      if (!response.ok) throw new Error(`script HTTP ${response.status}`);
-      const raw = await response.arrayBuffer();
-      const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', raw)), byte => byte.toString(16).padStart(2, '0')).join('');
-      if (raw.byteLength !== bootstrap.bytes || digest !== bootstrap.sha256) throw new Error('script checksum mismatch');
-      saveDownload(new Blob([raw], {type: 'text/x-python;charset=utf-8'}), 'one_click.py');
-      status.textContent = copy[language()].scriptDone;
-    } catch {
-      status.textContent = copy[language()].scriptFailed;
-    } finally {
-      downloadingScript = false; scriptButton.disabled = !scriptMatches();
     }
   });
   window.vllmHustTestPrompt = {

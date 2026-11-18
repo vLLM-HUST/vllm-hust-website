@@ -62,7 +62,7 @@ def main():
                                 )
                                 == LINKS
                             )
-                            assert page.locator(".site-nav .nav-group").count() == 4
+                            assert page.locator(".site-nav .nav-group").count() == 5
                             expect(
                                 page.locator('.site-nav [data-nav-group="engine"]')
                             ).to_have_count(0)
@@ -127,12 +127,13 @@ def main():
                             if width == 390:
                                 page.locator("#navToggle").click()
                                 direct = page.locator(".nav-links > a")
-                                expect(direct).to_have_count(4)
+                                expect(direct).to_have_count(3)
                                 boxes = [link.bounding_box() for link in direct.all()]
                                 assert boxes[0]["y"] == boxes[1]["y"]
-                                assert boxes[2]["y"] == boxes[3]["y"]
                                 assert boxes[2]["y"] > boxes[0]["y"]
                             for group in page.locator(".site-nav .nav-group").all():
+                                if group.get_attribute("open") is not None:
+                                    group.locator("summary").click()
                                 group.locator("summary").click()
                                 assert group.locator("a").first.is_visible()
                                 expect(
@@ -436,9 +437,10 @@ def main():
                         ).to_have_attribute("href", "./index.html#projects")
                         if width == 390:
                             page.locator("#navToggle").click()
-                        page.locator(
-                            '.nav-links [data-i18n-common="navProducts"]'
-                        ).click()
+                        products = page.locator('[data-nav-group="products"]')
+                        if products.get_attribute("open") is None:
+                            products.locator("summary").click()
+                        products.locator('a[href="./index.html"]').click()
                         expect(page).to_have_url(f"{base}/index.html")
                         assert page.evaluate("scrollY") == 0
                         page.locator(".brand-link").click()

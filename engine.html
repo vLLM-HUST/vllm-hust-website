@@ -10,11 +10,6 @@
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
   <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
-  <style>
-    .sr1-metrics { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
-    .sr1-metrics th, .sr1-metrics td { padding:.7rem .5rem; text-align:left; border-bottom:1px solid var(--engine-line); }
-    .sr1-metrics thead th { color:var(--engine-muted); }
-  </style>
 </head>
 <body data-page="engine">
   <nav class="site-nav">
@@ -44,12 +39,12 @@
         <div>
           <p id="engine-kicker" class="engine-kicker">Ascend serving stack</p>
           <h1 id="engine-title">vLLM-HUST Engine</h1>
+          <p id="engine-owner" class="engine-note">负责人：张书豪</p>
           <p id="engine-lede" class="engine-lede">Frozen r8 is available for reproduction, MOD development and further optimization.</p>
           <div class="engine-actions">
             <a id="engine-hero-benchmark" class="engine-button" href="./b0-b1.html">B0 / B1 results ↗</a>
             <a id="engine-hero-download" class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v3.py">Download r8 runner ↗</a>
             <a id="engine-hero-release" class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8">r8 sources and artifacts ↗</a>
-            <a id="sr1-shortcut" class="engine-button" href="#sr1-evaluation">B1-sr1 experiment ↗</a>
           </div>
           <p id="engine-short-status" class="engine-note">Fixed starting point: r8 · E36/R54 · async H2D · Tail256</p>
         </div>
@@ -63,6 +58,21 @@
       </div>
     </section>
     <div class="engine-shell">
+      <section class="engine-section" id="install-runtime" style="scroll-margin-top:96px" aria-labelledby="engine-install-title">
+        <h2 id="engine-install-title">Install and replace the official packages</h2>
+        <p id="engine-install-copy">Run in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The installer verifies the frozen sources and replaces both official distributions using pip.</p>
+        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">python -m pip install vllm-hust-engine==2026.11.17.8 &amp;&amp; \
+curl -fL https://vllm-hust.sage.org.ai/downloads/install-engine-r8.py -o install-engine-r8.py &amp;&amp; \
+printf '%s  %s\n' '904f5f8f670be3b9cd4bbffc6eaf7e2b9f88e53806e7079857ed148bd1e185fa' install-engine-r8.py | sha256sum -c - &amp;&amp; \<!-- pragma: allowlist secret: public installer SHA256 -->
+python install-engine-r8.py --out ./r8-install</code></pre>
+        <p id="engine-install-scope" class="engine-note">Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.</p>
+        <details><summary id="engine-install-details">Dependencies, verification and uninstall</summary>
+          <p id="engine-install-deps">Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. The installer checks requirements before replacement. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
+          <p id="engine-install-sdk-note">The pip command installs the full SDK; the following installer makes the replacement. It creates local wheels without recompiling native code or downloading private sources. --build-only creates wheels without installing. Receipts and pip logs are saved under --out. Installation does not start a model.</p>
+          <p><a id="engine-install-source" href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/scripts/install_frozen_runtime.py">Installer source ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.17.8/">PyPI</a></p>
+          <pre style="max-width:100%;overflow-x:auto"><code>python -m pip uninstall vllm vllm-ascend vllm-hust-runtime</code></pre>
+        </details>
+      </section>
       <section class="engine-section" id="try-r8" aria-labelledby="engine-try-title">
         <h2 id="engine-try-title">Build on frozen r8</h2>
         <p id="engine-try-copy">Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.</p>
@@ -74,32 +84,11 @@
       <section class="engine-section" id="r8-current-results" style="scroll-margin-top:96px" aria-labelledby="engine-current-title">
         <span id="results" aria-hidden="true"></span><h2 id="engine-current-title">B0 → r8 · current 4K / 16K continuous load</h2>
         <p id="engine-current-performance-copy">Throughput 3.06× / 2.68×; mean TTFT −52.8% / −48.4%, TPOT −68.5% / −65.4%. Zero failed requests.</p>
-        <figure style="margin:20px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="Open full-size comparison chart"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K"></a><figcaption id="engine-current-caption" class="engine-note">C8 closed loop · 871 measured requests · one run per arm. The full five-profile comparison is running.</figcaption></figure>
+        <figure style="margin:20px 0"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" aria-label="Open full-size comparison chart"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" style="display:block;width:100%;height:auto" alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K"></a><figcaption id="engine-current-caption" class="engine-note">C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.</figcaption></figure>
         <details><summary id="engine-current-method">Method, original data and CPU replay</summary>
           <p id="engine-current-method-copy">Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.</p>
           <p><a id="engine-current-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip">Original streams and portable CPU replay ↗</a> · <a id="engine-current-stats" href="./data/r8-continuous-20261117/summary-v1.json">Statistics and tail latency ↗</a> · <a id="engine-current-manifest" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json">Current release manifest ↗</a></p>
         </details>
-      </section>
-
-      <section class="engine-section" id="sr1-evaluation" style="scroll-margin-top:96px" aria-labelledby="sr1-title">
-        <h2 id="sr1-title">B1-sr1 experimental results</h2>
-        <p id="sr1-status">Same-card results showed a throughput and latency regression. B1-r8 remains the frozen engine.</p>
-        <p id="sr1-method">One paired run per workload on the same two Ascend 910B2 cards, with Qwen3.5-35B-A3B BF16 and TP2 at E36/R54.</p>
-        <div style="overflow-x:auto">
-          <table class="sr1-metrics">
-            <thead><tr><th scope="col" id="sr1-workload">Workload</th><th scope="col" id="sr1-throughput">Output tok/s · r8 → sr1</th><th scope="col" id="sr1-tail">End-to-end P95/P99 (s) · r8 → sr1</th></tr></thead>
-            <tbody>
-              <tr><th scope="row">4K C8</th><td>386.69 → 95.68 (-75.26%)</td><td>5.83 / 6.31 → 23.07 / 23.42</td></tr>
-<tr><th scope="row">16K C8</th><td>159.69 → 69.36 (-56.56%)</td><td>14.19 / 15.38 → 32.90 / 35.02</td></tr>
-<tr><th scope="row">MMLU-Pro 200</th><td>1,499.31 → 131.86 (-91.21%)</td><td>438.11 / 465.07 → 5,128.76 / 5,365.80</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p id="sr1-quality">MMLU-Pro 200 accuracy was 75.0% → 75.5% (150 → 151 correct). All 200 requests per arm succeeded. The tails include queueing from submitting all requests together.</p>
-        <p id="sr1-kv">Effective target KV capacity was 1,447,936 → 847,872 tokens (−41.44%). C8 peak device memory across both cards was 121,614 → 128,185 MiB.</p>
-        <p id="sr1-preflight">Cross-page C1, mixed-length C8, host State restore and HLE image preflights passed.</p>
-        <p id="sr1-coverage">Snapshot dated 2026-11-18 UTC. HLE, FrontierScience, SWE-bench-Pro and Terminal-Bench 2.1 have no completed pair in this snapshot.</p>
-        <p><a id="sr1-data" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/reports/b1-sr1-20261118">Public metrics and per-request measurements ↗</a> · <a id="sr1-raw" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/b1-sr1-evidence-20261118">Raw evidence (private) ↗</a></p>
       </section>
 
 <div class="engine-detail-grid"><details class="engine-fold"><summary><span id="engine-config-summary">Frozen MODs and resource budgets</span></summary>      <section class="engine-section" id="composition" aria-labelledby="engine-stack-title">
@@ -126,7 +115,7 @@
             <li><a id="engine-metrics-link" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json">Current release manifest</a></li>
           </ul></details>
         </div>
-      </section></details><details class="engine-fold"><summary><span id="engine-archive-summary">Historical reports</span></summary><p><a id="engine-development-history" href="./engine-r8-development.html">r6 → r8 development pairs ↗</a> · <a id="engine-r6-history" href="./b0-b1.html?release=r6">B0/r6 full report ↗</a> · <a href="./b0-b1.html?release=r7">r7 ↗</a> · <a href="./b0-b1.html?release=r5">r5 ↗</a> · <a href="./b0-b1.html?release=r4">r4 ↗</a> · <a href="./b0-b1.html?release=r3">r1–r3 ↗</a> · <a id="engine-history-link" href="./report-history.html">Reports by date ↗</a></p></details></div>
+      </section></details><details class="engine-fold"><summary><span id="engine-archive-summary">Historical reports</span></summary><p><a id="engine-development-history" href="./engine-r8-development.html">r6 → r8 development pairs ↗</a> · <a id="engine-r6-history" href="./b0-b1.html?release=r6">B0/r6 full report ↗</a> · <a href="./b0-b1.html?release=r7">r7 ↗</a> · <a href="./b0-b1.html?release=r5">r5 ↗</a> · <a href="./b0-b1.html?release=r4">r4 ↗</a> · <a href="./b0-b1.html?release=r3">r1–r3 ↗</a> · <a id="engine-history-link" href="./report-history.html">Reports by date ↗</a> · <a id="sr1-shortcut" href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/reports/b1-sr1-20261118">SR experiment details ↗</a></p></details></div>
     </div>
   </main>
 
@@ -141,20 +130,16 @@
   <script>
     window.vllmHustPageDict = {
   "en": {
-    "sr1-title": "B1-sr1 experimental results",
-    "sr1-shortcut": "B1-sr1 experiment ↗",
-    "sr1-status": "Same-card results showed a throughput and latency regression. B1-r8 remains the frozen engine.",
-    "sr1-method": "One paired run per workload on the same two Ascend 910B2 cards, with Qwen3.5-35B-A3B BF16 and TP2 at E36/R54.",
-    "sr1-workload": "Workload",
-    "sr1-throughput": "Output tok/s · r8 → sr1",
-    "sr1-tail": "End-to-end P95/P99 (s) · r8 → sr1",
-    "sr1-quality": "MMLU-Pro 200 accuracy was 75.0% → 75.5% (150 → 151 correct). All 200 requests per arm succeeded. The tails include queueing from submitting all requests together.",
-    "sr1-kv": "Effective target KV capacity was 1,447,936 → 847,872 tokens (−41.44%). C8 peak device memory across both cards was 121,614 → 128,185 MiB.",
-    "sr1-preflight": "Cross-page C1, mixed-length C8, host State restore and HLE image preflights passed.",
-    "sr1-coverage": "Snapshot dated 2026-11-18 UTC. HLE, FrontierScience, SWE-bench-Pro and Terminal-Bench 2.1 have no completed pair in this snapshot.",
-    "sr1-data": "Public metrics and per-request measurements ↗",
-    "sr1-raw": "Raw evidence (private) ↗",
+    "engine-install-title": "Install and replace the official packages",
+    "engine-install-copy": "Run in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The installer verifies the frozen sources and replaces both official distributions using pip.",
+    "engine-install-scope": "Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.",
+    "engine-install-details": "Dependencies, verification and uninstall",
+    "engine-install-deps": "Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. The installer checks requirements before replacement. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.",
+    "engine-install-sdk-note": "The pip command installs the full SDK; the following installer makes the replacement. It creates local wheels without recompiling native code or downloading private sources. --build-only creates wheels without installing. Receipts and pip logs are saved under --out. Installation does not start a model.",
+    "engine-install-source": "Installer source ↗",
+    "sr1-shortcut": "SR experiment details ↗",
     "engine-kicker": "Ascend serving stack",
+    "engine-owner": "Lead: Shuhao Zhang (张书豪)",
     "engine-lede": "Frozen r8 is available for reproduction, MOD development and further optimization.",
     "engine-hero-benchmark": "B0 / B1 results ↗",
     "engine-hero-release": "r8 sources and artifacts ↗",
@@ -226,7 +211,7 @@
     "engine-mod-badge-link": "10 MODs · r8 included ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
     "engine-current-title": "B0 → r8 · current 4K / 16K continuous load",
-    "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The full five-profile comparison is running.",
+    "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.",
     "engine-current-method": "Method, original data and CPU replay",
     "engine-current-method-copy": "Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.",
     "engine-current-raw": "Original streams and portable CPU replay ↗",
@@ -237,20 +222,16 @@
     "engine-r6-history": "B0/r6 full report ↗"
   },
   "zh": {
-    "sr1-title": "B1-sr1 实验结果",
-    "sr1-shortcut": "查看 B1-sr1 实验 ↗",
-    "sr1-status": "同卡实测显示吞吐和尾延迟回退，B1-r8 仍为冻结版本。",
-    "sr1-method": "每个工作负载各做一对，使用同一对 Ascend 910B2、Qwen3.5-35B-A3B BF16、TP2、E36/R54。",
-    "sr1-workload": "工作负载",
-    "sr1-throughput": "输出 token/s · r8 → sr1",
-    "sr1-tail": "端到端 P95/P99（秒）· r8 → sr1",
-    "sr1-quality": "MMLU-Pro 200 正确率为 75.0% → 75.5%（答对 150 → 151 题）。两臂各 200 条请求全部成功。尾延迟含一次提交全部请求的排队时间。",
-    "sr1-kv": "目标 KV 有效容量为 1,447,936 → 847,872 token（−41.44%）。C8 双卡同次采样显存峰值为 121,614 → 128,185 MiB。",
-    "sr1-preflight": "跨页 C1、混合长度 C8、宿主 State 恢复和 HLE 图像预检均通过。",
-    "sr1-coverage": "快照日期为 2026-11-18 UTC。HLE、FrontierScience、SWE-bench-Pro 和 Terminal-Bench 2.1 在这份快照中暂无完整配对。",
-    "sr1-data": "公开汇总和逐请求指标 ↗",
-    "sr1-raw": "原始证据（私有）↗",
+    "engine-install-title": "安装并替换官方包",
+    "engine-install-copy": "在目标 CPython 3.12 / Linux aarch64 虚拟环境中执行，需 CANN 9.1.0。安装器核验冻结源码后，由 pip 替换 vllm、vllm-ascend 两个官方包。",
+    "engine-install-scope": "保留 import vllm、import vllm_ascend 和 vllm 命令。Qwen35 的整套 MOD 组合使用下方冻结 r8 入口启用。",
+    "engine-install-details": "依赖、校验与卸载详情",
+    "engine-install-deps": "固定依赖：Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0、Transformers 5.14.1、tokenizers 0.22.2。替换前会检查依赖。已验证的模型与硬件范围：Qwen3.5-35B-A3B BF16、双 Ascend 910B2、TP2。",
+    "engine-install-sdk-note": "pip 命令安装完整 SDK；后续安装器才完成替换。本地生成 wheel，不重编 native 代码、不下载私有源码。--build-only 只构建不安装；--out 保存校验回执和 pip 日志。安装阶段不启动模型。",
+    "engine-install-source": "安装器源码 ↗",
+    "sr1-shortcut": "SR 系列实验详情 ↗",
     "engine-kicker": "Ascend 推理服务栈",
+    "engine-owner": "负责人：张书豪",
     "engine-lede": "r8 已冻结发布，可直接复现、开发 MOD 与继续优化。",
     "engine-hero-benchmark": "B0 / B1 对比结果 ↗",
     "engine-hero-release": "r8 源码与原件 ↗",
@@ -322,7 +303,7 @@
     "engine-mod-badge-link": "10项MOD · r8已包含 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
     "engine-current-title": "B0 → r8 · 新一轮 4K / 16K 连续负载",
-    "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项完整对照正在执行。",
+    "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项配对结果见 B0/B1 对比页面。",
     "engine-current-method": "计算方式、原件与离线复算",
     "engine-current-method-copy": "两臂相同输入配方与71条非计分预热，TP2、并发8、输出256 token。每个正式阶段提交300秒，再等待全部完成；吞吐计入排空耗时。TPOT=(结束时间−首token时间)/(输出token−1)。两rank在测量前封住Torch Dynamo与Triton编译入口。数据集质量与参考算力效率分别验收。",
     "engine-current-raw": "原始流与独立CPU复算 ↗",
