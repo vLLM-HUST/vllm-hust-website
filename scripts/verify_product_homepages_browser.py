@@ -40,7 +40,7 @@ def verify_publications(page, product, language):
     page.locator(".publications-shortcut").focus()
     page.keyboard.press("Enter")
     expect(section).to_be_visible()
-    assert page.url.endswith("#publications")
+    expect(page).to_have_url(re.compile(r"#publications$"))
     expect(section.locator("#publications-title")).to_contain_text(
         "相关论文" if language == "zh" else "Related publications"
     )
@@ -78,9 +78,13 @@ def verify_publications(page, product, language):
         page.keyboard.press("Enter")
         expect(details).not_to_have_attribute("open", "")
     source = section.get_attribute("data-publication-source")
-    revision = section.get_attribute("data-source-revision")
-    assert re.fullmatch(r"[a-f0-9]{40}", revision)
-    assert f"/blob/{revision}/contents/publications.md" in source
+    identity = re.fullmatch(
+        r"https://github[.]com/ShuhaoZhangTony/shuhaozhangtony[.]github[.]io/"
+        r"blob/([a-f0-9]{40})/contents/publications[.]md",
+        source,
+    )
+    assert identity, source
+    revision = identity[1]
     for link in section.locator('a[href*="raw.githubusercontent.com"]').all():
         assert f"/{revision}/contents/research_papers/" in link.get_attribute("href")
     if product == "continuum":
@@ -109,7 +113,7 @@ def verify_publications(page, product, language):
         target = link.get_attribute("href")
         link.focus()
         page.keyboard.press("Enter")
-        assert page.url.endswith(target)
+        expect(page).to_have_url(re.compile(re.escape(target) + "$"))
         expect(page.locator(target)).to_be_visible()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     return len(entries)
