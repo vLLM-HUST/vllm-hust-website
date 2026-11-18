@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import ssl
 import urllib.error
@@ -153,6 +154,19 @@ def sync_version_meta() -> bool:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Render reviewed metadata or refresh local development metadata"
+    )
+    parser.add_argument("--readme-only", action="store_true")
+    parser.add_argument("--metadata", type=Path, default=VERSION_META_PATH)
+    args = parser.parse_args()
+    if args.readme_only:
+        meta = json.loads(args.metadata.read_text(encoding="utf-8"))
+        changed = _sync_readme(meta)
+        print(
+            "README metadata rendered" if changed else "README metadata already current"
+        )
+        return
     changed = sync_version_meta()
     if changed:
         print("version_meta.json updated")

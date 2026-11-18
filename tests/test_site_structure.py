@@ -915,9 +915,10 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
     )
 
     assert "python scripts/sync_leaderboard_snapshots.py" in workflow
-    assert "python scripts/refresh_leadership_target_pin.py" in workflow
-    assert "--pin data/leadership_performance_targets.json" in workflow
-    assert "--current-registry data/official_targets.json" in workflow
+    assert "refresh_leadership_target_pin.py" not in workflow
+    assert workflow.count("--target-dir output/leaderboard-preview/data") == 2
+    assert "path: output/leaderboard-preview/" in workflow
+    assert (root / "scripts/refresh_leadership_target_pin.py").is_file()
     assert "vLLM-HUST/vllm-hust-benchmark" in workflow
     assert "docs/official-baselines" in workflow
     assert "SNAPSHOT_FILES = (" in script
@@ -934,27 +935,23 @@ def test_leaderboard_sync_workflow_uses_snapshot_sync_script() -> None:
 def test_scheduled_site_data_refreshes_are_self_healing() -> None:
     root = Path(__file__).resolve().parents[1]
     workflows = root / ".github" / "workflows"
-    status = (workflows / "site-status-check.yml").read_text(encoding="utf-8")
+    assert not (workflows / "site-status-check.yml").exists()
     plugin = (workflows / "sync-plugin-workshop-metadata.yml").read_text(
         encoding="utf-8"
     )
     versions = (workflows / "sync-version-meta.yml").read_text(encoding="utf-8")
-
-    assert "python scripts/refresh_site_status.py --refresh" in status
-    assert "tests/test_site_status_refresh.py" in status
-    assert 'git commit -m "chore: refresh public site snapshots"' in status
-    assert "contents: write" in status
     assert "tests/test_sync_plugin_workshop_metadata.py" in plugin
     assert "tests/test_plugins_page.py" in plugin
     assert "python -m pip install -r requirements-dev.txt" in plugin
     assert "bash scripts/check_stale_versions.sh" in versions
-    for workflow in (status, plugin, versions):
-        assert "group: ${{ github.workflow }}" in workflow
-    for workflow in (status, versions):
-        assert "git pull --rebase origin main" in workflow
-    assert "contents: read" in plugin
-    assert "git push" not in plugin and "git commit" not in plugin
-    assert "actions/upload-artifact@v4" in plugin
+    assert "--readme-only" in versions
+    assert "add-paths: README.md" in versions
+    assert "peter-evans/create-pull-request@" in versions
+    for workflow in (plugin, versions):
+        assert "concurrency:" in workflow and "cancel-in-progress: false" in workflow
+        assert "contents: read" in workflow
+        assert "git push" not in workflow and "git commit" not in workflow
+        assert "actions/upload-artifact@v4" in workflow
     assert "sync_website_publication.py publish" in plugin
 
 

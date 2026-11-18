@@ -14,6 +14,7 @@ WORKFLOWS = (
     "midterm-browser.yml",
     "plugin-effects-browser.yml",
     "sync-plugin-workshop-metadata.yml",
+    "sync-version-meta.yml",
 )
 
 

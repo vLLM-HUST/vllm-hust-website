@@ -50,35 +50,32 @@ jobs:
 
       - name: Prepare admitted sync evidence
         run: |
+          mkdir -p output/leaderboard-preview
           python scripts/prepare_leaderboard_sync.py \
             --source-dir _benchmark/leaderboard-data/snapshots \
             --target-dir data \
             --registry _benchmark/leaderboard-data/official-targets.json \
             --registry-checksum _benchmark/leaderboard-data/official-targets.sha256 \
             --benchmark-commit "${{ steps.benchmark-source.outputs.commit }}" \
-            --pr-body /tmp/leaderboard-sync-pr-body.md
+            --pr-body output/leaderboard-preview/ADMISSION.md
 
-      - name: Sync snapshot files to website data/
+      - name: Build an isolated benchmark snapshot preview
         run: |
-          python scripts/refresh_leadership_target_pin.py \
-            --pin data/leadership_performance_targets.json \
-            --registry _benchmark/leaderboard-data/official-targets.json \
-            --registry-checksum _benchmark/leaderboard-data/official-targets.sha256 \
-            --current-registry data/official_targets.json \
-            --current-registry-checksum data/official_targets.sha256
           python scripts/sync_leaderboard_snapshots.py \
             --source-dir _benchmark/leaderboard-data/snapshots \
-            --target-dir data
+            --target-dir output/leaderboard-preview/data
           python scripts/sync_dataset_validation_snapshots.py \
             --source-dir _benchmark/leaderboard-data/dataset-validation \
-            --target-dir data
+            --target-dir output/leaderboard-preview/data
+          printf '%s\n' \
+            'Benchmark snapshot preview only. This is not a deployable website.' \
+            'Frozen leadership pins remain in the production publication; target migrations require review.' \
+            > output/leaderboard-preview/README.txt
 
       - name: Save benchmark-derived preview artifact (never a website data PR)
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-data-preview-${{ steps.benchmark-source.outputs.commit }}
-          path: |
-            data/
-            /tmp/leaderboard-sync-pr-body.md
+          path: output/leaderboard-preview/
           retention-days: 7
           if-no-files-found: error
