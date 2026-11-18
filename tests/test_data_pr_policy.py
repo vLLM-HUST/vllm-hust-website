@@ -54,3 +54,45 @@ def test_sync_workflow_no_longer_creates_or_merges_website_data_prs():
     assert "gh pr merge" not in workflow
     assert "contents: write" not in workflow
     assert "actions/upload-artifact@" in workflow
+
+
+def test_scheduled_writers_only_propose_readme_changes_in_website():
+    import yaml
+
+    assert not (ROOT / ".github/workflows/site-status-check.yml").exists()
+    workflow = yaml.load(
+        (ROOT / ".github/workflows/sync-version-meta.yml").read_text(),
+        Loader=yaml.BaseLoader,
+    )
+    assert workflow["permissions"] == {"contents": "read"}
+    steps = workflow["jobs"]["sync-version-meta"]["steps"]
+    proposal = next(
+        step
+        for step in steps
+        if step.get("uses", "").startswith("peter-evans/create-pull-request@")
+    )
+    assert proposal["with"]["add-paths"] == "README.md"
+    commands = "\n".join(step.get("run", "") for step in steps)
+    assert "--readme-only" in commands
+    assert "git push" not in commands
+
+
+def test_snapshot_preview_is_separate_from_frozen_website_data():
+    import yaml
+
+    workflow = yaml.load(
+        (ROOT / ".github/workflows/sync-leaderboard-data.yml").read_text(),
+        Loader=yaml.BaseLoader,
+    )
+    steps = workflow["jobs"]["sync"]["steps"]
+    commands = "\n".join(step.get("run", "") for step in steps)
+    # The immutable-target guard remains available for explicit migration reviews.
+    assert (ROOT / "scripts/refresh_leadership_target_pin.py").is_file()
+    assert "refresh_leadership_target_pin.py" not in commands
+    assert commands.count("--target-dir output/leaderboard-preview/data") == 2
+    upload = next(
+        step
+        for step in steps
+        if step.get("uses", "").startswith("actions/upload-artifact@")
+    )
+    assert upload["with"]["path"] == "output/leaderboard-preview/"
