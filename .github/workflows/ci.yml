@@ -125,6 +125,7 @@ jobs:
           python scripts/verify_capacity_layout_browser.py --url http://127.0.0.1:8769 --output output/playwright/capacity-layout
           python scripts/verify_report_history_browser.py --url http://127.0.0.1:8769 --output output/playwright/report-history
           python scripts/verify_capability_coverage_browser.py --url http://127.0.0.1:8769
+          python scripts/verify_product_homepages_browser.py --url http://127.0.0.1:8769 --output output/product-homepages
           python scripts/verify_site_browser.py --url http://127.0.0.1:8769
           python scripts/verify_clarity_browser.py --url http://127.0.0.1:8769
           python scripts/verify_public_pages_browser.py --url http://127.0.0.1:8769
@@ -138,6 +139,7 @@ jobs:
         with:
           name: website-browser-evidence
           path: |
+            output/product-homepages/
             output/playwright/dataset-matrix/
             output/playwright/dataset-entrypoints/
             output/playwright/b1-definition/

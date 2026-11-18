@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="面向 Agent 的持久记忆与任务数据底座，连接会话、决策与工作进度。" />
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/continuum.html" />
+  <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
+  <title>Continuum · vLLM-HUST</title>
+  <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
+  <link rel="stylesheet" href="./assets/product-home.css?v=20261118" />
+</head>
+<body data-page="continuum" class="product-home product-memory">
+  <nav class="site-nav"><div class="site-shell site-nav-inner"><a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>面向国产算力的推理引擎</small></span></a><div class="nav-links"><a class="nav-link" href="./engine.html">Engine</a><a class="nav-link" href="./control-plane.html">Control Plane</a><a class="nav-link" href="./continuum.html">Continuum</a></div></div></nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
+  <main class="product-shell">
+    <nav class="product-switcher" aria-label="产品" data-copy-aria="productNavigation"><a href="./engine.html">Engine</a><span aria-hidden="true">/</span><a href="./control-plane.html" >Control Plane</a><span aria-hidden="true">/</span><a href="./continuum.html" aria-current="page">Continuum</a></nav>
+    <section class="product-hero" aria-labelledby="product-title">
+      <div class="product-intro"><p class="product-eyebrow">MEMORY FOR CONTINUOUS WORK</p><div class="product-identity"><strong>Continuum</strong><span data-copy="status" class="product-status">架构规划</span></div><h1 id="product-title"><span data-copy="titleLine1">让下一次开始，</span><br><span data-copy="titleLine2">接着上一次。</span></h1><p class="product-owner" data-copy="owner">暂任负责人：张书豪 · 招募负责人</p><p data-copy="lead" class="product-lead">面向 Agent 的持久记忆与任务数据底座，连接会话、决策与工作进度。</p><div class="product-actions"><a class="product-button" href="#workflow" data-copy="explore">探索工作方式 ↓</a><a class="product-text-link" href="#product-stack" data-copy="stackLink">查看产品分工 ↘</a></div></div>
+      <figure class="product-diagram" aria-label="产品架构示意" data-copy-aria="diagramAria"><div class="diagram-caption"><span data-copy="diagramLabel">跨会话的工作上下文</span><span data-copy="diagramNote">产品设计示意</span></div>
+          <div class="memory-sessions"><span>01</span><i aria-hidden="true"></i><span>02</span><i aria-hidden="true"></i><span>03</span></div>
+          <div class="memory-caption" data-copy="sessions">不同会话，同一项工作</div>
+          <div class="memory-stack"><div><span class="memory-marker">A</span><strong data-copy="memoryA">项目事实与约束</strong><span data-copy="memoryATag">长期记忆</span></div><div><span class="memory-marker">B</span><strong data-copy="memoryB">任务进度与检查点</strong><span data-copy="memoryBTag">任务状态</span></div><div><span class="memory-marker">C</span><strong data-copy="memoryC">工具结果与原始记录</strong><span data-copy="memoryCTag">来源追溯</span></div></div>
+          <div class="memory-return"><span aria-hidden="true">↳</span><strong data-copy="memoryReturn">恢复上下文，继续工作</strong></div></figure>
+    </section>
+    <section class="product-workflow" id="workflow" aria-labelledby="workflow-title"><div class="section-heading"><p class="product-eyebrow">HOW IT WORKS</p><h2 id="workflow-title" data-copy="flowTitle">从一次交互，到持续记忆。</h2><p data-copy="flowLead">选择步骤，了解计划中的记忆生命周期。</p></div>
+      <div class="flow-tabs" role="tablist" aria-label="工作流程" data-copy-aria="workflowAria"><button type="button" id="flow-tab-0" role="tab" aria-controls="flow-panel" aria-selected="true" tabindex="0" data-step="0"><span class="step-index">01</span><span data-copy="step0">记录</span></button><button type="button" id="flow-tab-1" role="tab" aria-controls="flow-panel" aria-selected="false" tabindex="-1" data-step="1"><span class="step-index">02</span><span data-copy="step1">整理</span></button><button type="button" id="flow-tab-2" role="tab" aria-controls="flow-panel" aria-selected="false" tabindex="-1" data-step="2"><span class="step-index">03</span><span data-copy="step2">取回</span></button><button type="button" id="flow-tab-3" role="tab" aria-controls="flow-panel" aria-selected="false" tabindex="-1" data-step="3"><span class="step-index">04</span><span data-copy="step3">接续</span></button></div>
+      <div class="flow-panel" role="tabpanel" id="flow-panel" aria-labelledby="flow-tab-0" tabindex="0"><div><span class="flow-tag" id="flow-tag">01 / CAPTURE</span><h3 id="flow-heading">保留事件和原始来源</h3><p id="flow-text">记录会话、工具结果与任务事件，为每条记录保留所属项目、时间和来源。</p></div><div class="flow-outcome"><span data-copy="outcomeLabel">结果</span><strong id="flow-outcome">形成可追溯的原始记录</strong><span class="outcome-arrow" aria-hidden="true">↗</span></div></div>
+    </section>
+    <section class="product-capabilities" aria-label="产品能力" data-copy-aria="capabilitiesAria"><article><h3 data-copy="capTitle0">记得有依据</h3><p data-copy="capText0">关联事实、决策与原始来源。</p></article><article><h3 data-copy="capTitle1">任务可接续</h3><p data-copy="capText1">保存进度、产物引用与恢复检查点。</p></article><article><h3 data-copy="capTitle2">记忆可演进</h3><p data-copy="capText2">管理更新、冲突、过期与删除。</p></article></section>
+    <section class="product-stack" id="product-stack" aria-labelledby="stack-title"><div class="section-heading"><p class="product-eyebrow">ONE INFERENCE ECOSYSTEM</p><h2 id="stack-title" data-copy="stackTitle">计算、调度、记忆，各司其职。</h2><p data-copy="stackMods">三个产品均通过 MOD 扩展：执行优化、服务策略与记忆处理。</p></div><div class="stack-links"><a href="./engine.html"><span class="stack-number">01</span><strong>Engine</strong><span data-copy="stackEngine">高效执行推理</span><span aria-hidden="true">↗</span></a><a href="./control-plane.html"><span class="stack-number">02</span><strong>Control Plane</strong><span data-copy="stackControl">组织推理服务</span><span aria-hidden="true">↗</span></a><a href="./continuum.html"><span class="stack-number">03</span><strong>Continuum</strong><span data-copy="stackMemory">保存长期上下文</span><span aria-hidden="true">↗</span></a></div></section>
+    <section class="product-details" aria-label="实现与规划" data-copy-aria="detailsAria"><div class="section-heading"><h2 data-copy="detailsTitle">实现与规划</h2><p data-copy="detailsLead">展开查看范围与接口。</p></div><div><details><summary data-copy="detailTitle0">第一阶段 · 任务恢复</summary><p data-copy="detailText0">先面向长任务 Agent：保存项目约束、任务事件、工具结果和检查点，支持跨会话读取与接续。验收重点是恢复后是否保留约束、避免重复执行，以及恢复所需的时间与 token。</p></details><details><summary data-copy="detailTitle1">第二阶段 · 记忆组织</summary><p data-copy="detailText1">计划支持带来源的事实与决策、版本更新、检索和上下文装配。使用项目与用户作用域组织记忆，并提供明确的访问与删除接口。</p></details><details><summary data-copy="detailTitle2">与推理服务的边界</summary><p data-copy="detailText2">Continuum 保存可跨会话使用的信息与任务状态。Engine 管理 KV、recurrent state、分层缓存与传输；Control Plane 管理模型路由、资源分配和服务调度。</p></details><details><summary data-copy="detailTitle3">招募 Continuum 负责人</summary><p data-copy="detailText3">由张书豪暂任负责人。招募能够推动 Agent 记忆与任务数据系统架构、实现和验证的负责人，重点包括记忆生命周期、检索与上下文组织、任务恢复及数据系统工程。</p><a class="recruit-link" href="https://github.com/vLLM-HUST/vllm-hust-website/issues/new?title=Continuum%20maintainer%20interest" data-copy="recruitLink">通过 GitHub 联系 ↗</a></details></div></section>
+  </main>
+  <footer class="site-footer"><span id="footer-copy">Continuum · vLLM-HUST</span></footer>
+  <script src="./assets/site.js?v=products-20261118"></script>
+  <script src="./assets/product-home.js?v=20261118"></script>
+</body>
+</html>
