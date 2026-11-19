@@ -145,7 +145,9 @@ def verify_product_layout(page, product, width, theme, language):
     expect(main.locator(":scope > .product-capabilities > article")).to_have_count(3)
     expect(main.locator(".product-diagram")).to_have_count(1)
     expect(main.locator(".product-owner")).to_contain_text(
-        "毛言粲" if product == "control-plane" else "张书豪"
+        ("毛言粲" if language == "zh" else "Yancan Mao")
+        if product == "control-plane"
+        else "张书豪"
     )
     roles = main.evaluate("""el => [...el.children].map(n =>
         n.classList.contains('product-switcher') ? 'switcher' :
@@ -191,22 +193,25 @@ def verify_product_layout(page, product, width, theme, language):
     ):
         for node in page.locator(selector).all():
             assert node.evaluate(CONTRAST) >= 4.5, (product, selector)
-    if language == "en" and product in ("control-plane", "continuum"):
+    if language == "en" and product == "continuum":
         expect(page.locator(".product-tagline")).to_have_text(
-            "The right compute. For every request."
-            if product == "control-plane"
-            else "Pick up where you left off.",
+            "Pick up where you left off.",
             use_inner_text=True,
         )
     if product == "control-plane":
         expect(page.locator("#product-title")).to_have_text(
-            "服务控制" if language == "zh" else "Control Plane"
+            "引擎控制面" if language == "zh" else "Inference Engine Control Plane"
         )
         expect(page).to_have_title(
-            "服务控制 · vLLM-HUST"
+            "引擎控制面 · vLLM-HUST"
             if language == "zh"
-            else "SAGE Control Plane · vLLM-HUST"
+            else "RIDE Inference Engine Control Plane · vLLM-HUST"
         )
+    if product in ("engine", "control-plane"):
+        expect(main.locator(".product-jumps > a")).to_have_count(3)
+        expect(main.locator(".engine-profile > .engine-layer")).to_have_count(3)
+        expect(main.locator(".product-start-grid > section")).to_have_count(2)
+        expect(main.locator(".engine-detail-grid > details")).to_have_count(4)
     if product == "continuum":
         expect(page.locator(".product-intro .product-eyebrow")).to_have_text(
             "智能体工作环境" if language == "zh" else "AGENT WORKSPACE",
@@ -689,9 +694,10 @@ def main():
                         wait_until="networkidle",
                     )
                     assert response.status == 200
-                    expect(page.locator("body")).to_have_attribute(
-                        "data-product-ready", "true"
-                    )
+                    if slug == "continuum":
+                        expect(page.locator("body")).to_have_attribute(
+                            "data-product-ready", "true"
+                        )
                     assert page.locator("h1").count() == 1
                     for language in ("en", "zh"):
                         if language == "zh":
@@ -704,13 +710,9 @@ def main():
                                 .replace("毛言粲", "")
                                 .replace("张书豪", ""),
                             )
-                        assert (
-                            "毛言粲" if slug == "control-plane" else "张书豪"
-                        ) in page.locator(".product-owner").inner_text()
-                        assert (
-                            "MOD"
-                            in page.locator('[data-copy="stackMods"]').inner_text()
-                        )
+                        expect(
+                            page.locator(".product-stack .section-heading p").last
+                        ).to_contain_text("MOD")
                         assert page.locator(
                             '.stack-links a[href="./engine.html"] strong'
                         ).inner_text() == ("引擎" if language == "zh" else "Engine")
@@ -729,35 +731,36 @@ def main():
                                 if language == "zh"
                                 else "Architecture planning"
                             )
-                        headings = set()
-                        for step in (0, 1, 2, 3):
-                            page.locator(f"#flow-tab-{step}").click()
-                            expect(page.locator("#flow-panel")).to_have_attribute(
-                                "aria-labelledby", f"flow-tab-{step}"
+                        if slug == "continuum":
+                            headings = set()
+                            for step in (0, 1, 2, 3):
+                                page.locator(f"#flow-tab-{step}").click()
+                                expect(page.locator("#flow-panel")).to_have_attribute(
+                                    "aria-labelledby", f"flow-tab-{step}"
+                                )
+                                expect(
+                                    page.locator('[role="tab"][tabindex="0"]')
+                                ).to_have_count(1)
+                                expect(
+                                    page.locator('[role="tab"][aria-selected="true"]')
+                                ).to_have_count(1)
+                                headings.add(page.locator("#flow-heading").inner_text())
+                                assert page.locator("#flow-outcome").inner_text()
+                            assert len(headings) == 4
+                            page.keyboard.press("Home")
+                            expect(page.locator("#flow-tab-0")).to_be_focused()
+                            page.keyboard.press("ArrowLeft")
+                            expect(page.locator("#flow-tab-3")).to_be_focused()
+                            page.keyboard.press("ArrowRight")
+                            expect(page.locator("#flow-tab-0")).to_be_focused()
+                            page.keyboard.press("End")
+                            expect(page.locator("#flow-tab-3")).to_be_focused()
+                            # Switching languages preserves the selected workflow step.
+                            page.locator("#langToggle").click()
+                            expect(page.locator("#flow-tab-3")).to_have_attribute(
+                                "aria-selected", "true"
                             )
-                            expect(
-                                page.locator('[role="tab"][tabindex="0"]')
-                            ).to_have_count(1)
-                            expect(
-                                page.locator('[role="tab"][aria-selected="true"]')
-                            ).to_have_count(1)
-                            headings.add(page.locator("#flow-heading").inner_text())
-                            assert page.locator("#flow-outcome").inner_text()
-                        assert len(headings) == 4
-                        page.keyboard.press("Home")
-                        expect(page.locator("#flow-tab-0")).to_be_focused()
-                        page.keyboard.press("ArrowLeft")
-                        expect(page.locator("#flow-tab-3")).to_be_focused()
-                        page.keyboard.press("ArrowRight")
-                        expect(page.locator("#flow-tab-0")).to_be_focused()
-                        page.keyboard.press("End")
-                        expect(page.locator("#flow-tab-3")).to_be_focused()
-                        # Switching languages preserves the selected workflow step.
-                        page.locator("#langToggle").click()
-                        expect(page.locator("#flow-tab-3")).to_have_attribute(
-                            "aria-selected", "true"
-                        )
-                        page.locator("#langToggle").click()
+                            page.locator("#langToggle").click()
                         assert not page.locator(
                             ".product-details details[open]"
                         ).count()
@@ -765,7 +768,7 @@ def main():
                             detail.locator("summary").focus()
                             page.keyboard.press("Enter")
                             expect(detail).to_have_attribute("open", "")
-                            assert detail.locator("p").is_visible()
+                            expect(detail.locator("p").first).to_be_visible()
                             page.keyboard.press("Enter")
                         verify_product_layout(page, slug, width, theme, language)
                         publications = verify_publications(page, slug, language)
@@ -812,19 +815,20 @@ def main():
                                 == 1
                             )
                         expect(menu.locator("a")).to_have_text(
-                            ["首页", "引擎", "服务控制", "智能体工作环境"]
+                            ["首页", "引擎", "控制面", "智能体工作环境"]
                             if language == "zh"
                             else ["Home", "Engine", "Control Plane", "Agent Workspace"]
                         )
                         if slug == "control-plane":
                             expect(
                                 page.locator(
-                                    '.product-actions a[href="./controlplane/"]'
+                                    '.product-actions a[href="./controlplane/#results"]'
                                 )
                             ).to_have_text(
-                                "请求限流控制器"
+                                "控制面实测 ↗"
                                 if language == "zh"
-                                else "Request Throttling Controller"
+                                else "Control plane results ↗",
+                                use_inner_text=True,
                             )
                         page.screenshot(
                             path=str(
@@ -848,7 +852,8 @@ def main():
                         assert (
                             not errors and not network_errors and not model_requests
                         ), (errors, network_errors, model_requests)
-                        page.locator("#flow-tab-0").click()
+                        if slug == "continuum":
+                            page.locator("#flow-tab-0").click()
                         page.evaluate("window.scrollTo(0,0)")
                         page.screenshot(
                             path=str(

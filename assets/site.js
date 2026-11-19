@@ -66,7 +66,7 @@
             navProducts: '产品',
             navEngine: '引擎',
             navRequestThrottling: '请求限流组件',
-            navControlPlane: '服务控制',
+            navControlPlane: '控制面',
             navContinuum: '智能体工作环境',
             navProjects: '项目',
             navPlugins: 'MOD 目录',

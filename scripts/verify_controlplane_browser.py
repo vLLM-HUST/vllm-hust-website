@@ -67,7 +67,7 @@ def verify(args):
                         page.locator("#langToggle").click()
                     product_links = page.locator('[data-nav-group="products"] a')
                     expect(product_links).to_have_text(
-                        ["首页", "引擎", "服务控制", "智能体工作环境"]
+                        ["首页", "引擎", "控制面", "智能体工作环境"]
                         if language == "zh"
                         else ["Home", "Engine", "Control Plane", "Agent Workspace"]
                     )
@@ -80,7 +80,7 @@ def verify(args):
                         "href", "./control-plane.html"
                     )
                     expect(page).to_have_title(
-                        "请求限流控制器 · 服务控制 | vLLM-HUST"
+                        "请求限流控制器 · 引擎控制面 | vLLM-HUST"
                         if language == "zh"
                         else "Request Throttling Controller | vLLM-HUST"
                     )
