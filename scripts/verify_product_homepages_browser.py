@@ -120,6 +120,44 @@ def verify_publications(page, product, language):
     return len(entries)
 
 
+def verify_engine_mod_creators(page, language):
+    """The release shortcut reveals named creators without mixing in advisors."""
+    page.locator("#engine-mod-badge-link").focus()
+    page.keyboard.press("Enter")
+    table = page.locator("#r8-mods .r8-mod-table")
+    expect(table).to_be_visible()
+    expect(table.locator("caption")).to_have_text(
+        "r8 已包含的 MOD 与制作者"
+        if language == "zh"
+        else "Included r8 MODs and their creators",
+        use_inner_text=True,
+    )
+    rows = table.locator("tbody tr")
+    expect(rows).to_have_count(10)
+    ids = rows.evaluate_all("nodes => nodes.map(n => n.dataset.r8ModId)")
+    assert len(set(ids)) == len(ids)
+    for row in rows.all():
+        creator = row.locator(".r8-mod-creator a")
+        identifier = row.get_attribute("data-r8-mod-id")
+        if identifier in ("betterscale", "microflow"):
+            name = "田景远" if language == "zh" else "Jingyuan Tian"
+            login = "CubeLander"
+        elif identifier == "kv-materialization":
+            name = "何维" if language == "zh" else "Wei He"
+            login = "healer-positive"
+        else:
+            name = "张书豪" if language == "zh" else "Shuhao Zhang"
+            login = "ShuhaoZhangTony"
+        expect(creator).to_have_text(name, use_inner_text=True)
+        expect(creator).to_have_attribute("href", f"https://github.com/{login}")
+        assert creator.evaluate(CONTRAST) >= 4.5, identifier
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    disclosure = page.locator(".engine-fold").filter(has=table)
+    disclosure.locator(":scope > summary").focus()
+    page.keyboard.press("Enter")
+    expect(table).not_to_be_visible()
+
+
 def close_publication_library(page):
     """Native close remains closed after the preceding anchor events drain."""
     summary = page.locator(".publication-library > summary")
@@ -898,6 +936,7 @@ def main():
                     if language == "zh":
                         page.locator("#langToggle").click()
                     verify_product_layout(page, "engine", width, theme, language)
+                    verify_engine_mod_creators(page, language)
                     count = verify_publications(page, "engine", language)
                     expect(page.locator("#engine-install-title")).to_be_visible()
                     assert page.locator("#engine-hero-download").get_attribute("href")
