@@ -79,6 +79,23 @@ def verify(args):
                     expect(page.locator("#control-product-link")).to_have_attribute(
                         "href", "./control-plane.html"
                     )
+                    expect(page).to_have_title(
+                        "请求限流控制器 · 服务控制 | vLLM-HUST"
+                        if language == "zh"
+                        else "Request Throttling Controller | vLLM-HUST"
+                    )
+                    expect(page.locator("#control-deploy-copy")).to_contain_text(
+                        "请求限流控制器"
+                        if language == "zh"
+                        else "Request Throttling Controller"
+                    )
+                    expect(
+                        page.locator("#control-release option").first
+                    ).to_contain_text(
+                        "请求限流控制器"
+                        if language == "zh"
+                        else "Request Throttling Controller"
+                    )
                     for identity in options:
                         page.locator("#control-release").select_option(identity)
                         expect(root).to_have_attribute("data-loaded", identity)

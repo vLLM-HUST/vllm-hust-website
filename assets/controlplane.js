@@ -11,17 +11,17 @@
     'control-wait-title':'管理等待','control-wait-copy':'让部分程序暂时等待，其他程序继续运行。端到端结果包含限流层里的等待时间。',
     'control-cache-title':'保留有用状态','control-cache-copy':'协调程序续轮、结束释放与引擎状态管理。对照两组都必须开启跨轮缓存复用。',
     'control-results-title':'实测结果','control-results-intro':'在同一个优化引擎上，对比直连与加入原版 ThunderAgent 调度的结果。引擎自身 B0/B1 收益单独报告。',
-    'control-deploy-title':'限流组件与模型分别启动','control-deploy-copy':'先用引擎入口启动模型并预热；再以 RIDE local 启动独立的 Request Throttling Controller CPU 服务，指定模型地址；最后把带程序身份的请求发送到限流层。',
+    'control-deploy-title':'限流组件与模型分别启动','control-deploy-copy':'先用引擎入口启动模型并预热；再以 RIDE local 启动独立的请求限流控制器 CPU 服务，指定模型地址；最后把带程序身份的请求发送到限流层。',
     'control-model-step':'1. 模型服务','control-model-copy':'固定引擎版本、模型、设备编号与缓存设置，为目标负载配置任务状态和 KV 容量。','control-engine-link':'引擎版本与启动入口 ↗',
-    'control-service-step':'2. 限流组件','control-service-copy':'Controller 与引擎分别管理生命周期。本次实测使用 RIDE local，无需以 Ray 接入为前提。','control-guide-link':'部署指南 ↗',
+    'control-service-step':'2. 限流组件','control-service-copy':'请求限流控制器与引擎分别管理生命周期。本次实测使用 RIDE local，无需以 Ray 接入为前提。','control-guide-link':'部署指南 ↗',
     'control-benchmark-step':'3. 匹配实验','control-benchmark-copy':'两组使用同一冻结输入和引擎配置，完整保留输出量、质量、等待时间与失败。','control-protocol-link':'实验规范 ↗',
-    'control-build-title':'基于限流组件继续开发','control-build-copy':'沿现有接口开发调度策略；在相同负载下与原版 Controller 对比，同时保留收益与退化。',
+    'control-build-title':'基于限流组件继续开发','control-build-copy':'沿现有接口开发调度策略；在相同负载下与原版请求限流控制器对比，同时保留收益与退化。',
     'control-development-link':'仓库与接口 ↗','control-track-link':'实验跟踪与开放问题 ↗','control-engine-results-link':'引擎 B0/B1 结果 ↗',
     'footer-copy':'vLLM-HUST · 请求调度与可复现实测。'
   };
   const en = Object.fromEntries(Object.keys(zh).map(id => [id, document.getElementById(id)?.textContent || '']));
   en.title = 'Request Throttling Controller | vLLM-HUST';
-  zh.title = '请求限流组件 · 服务控制 | vLLM-HUST';
+  zh.title = `${zh['control-title']} · 服务控制 | vLLM-HUST`;
   window.vllmHustPageDict = {en, zh};
   let publication, selected, data;
   const root = document.getElementById('control-results');
@@ -60,7 +60,7 @@
       [t('完成的三轮程序实例','Completed three-turn instances'),num(a.completed_tasks,0),t('单次配对；任务解决率未测量','One paired run; task solve rate unmeasured')]
     ];
     const rows=e.profiles.map(p=>p.status==='complete' ? [p.label,num(p.direct.elapsed_seconds),num(p.controller.elapsed_seconds),`${num(p.time_reduction_percent)}%`,`${num(p.output_token_change_percent)}%`] : [p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
-    root.innerHTML=`<div class="control-toolbar"><label for="control-release">${t('版本与历史记录','Version and history')}</label><select id="control-release">${data.releases.map(v=>`<option value="${esc(v.id)}" ${v.id===selected?'selected':''}>${esc(v.label)}</option>`).join('')}</select><a href="${esc(source)}">${t('报告与证据','Report and evidence')} ↗</a></div>
+    root.innerHTML=`<div class="control-toolbar"><label for="control-release">${t('版本与历史记录','Version and history')}</label><select id="control-release">${data.releases.map(v=>`<option value="${esc(v.id)}" ${v.id===selected?'selected':''}>${esc(t(v.label.replace(en['control-title'], zh['control-title']),v.label))}</option>`).join('')}</select><a href="${esc(source)}">${t('报告与证据','Report and evidence')} ↗</a></div>
       <p class="control-scope">${esc(e.engine_release)} · Qwen3.5-35B-A3B BF16 · 2 × Ascend 910B2 · ${t('执行上限','Execution limit')} ${esc(e.max_num_seqs)} · ${t('状态驻留','Resident states')} ${esc(e.state_resident_seats)}</p>
       <div class="control-summary">${cards.map(([label,value,note])=>`<article><span>${esc(label)}</span><strong>${esc(value)}</strong><p>${esc(note)}</p></article>`).join('')}</div>
       <h3>${t('SWE-smith 多轮长度与工具等待回放','SWE-smith multi-turn length and tool-wait replay')}</h3>
