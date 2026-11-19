@@ -17,13 +17,13 @@
     zh: {
       back: '← 返回测试数据集', eyebrow: '执行指南 / 固定协议 v1', title: '标准测试，按这四步完成',
       lead: 'B0 是对照配置，B1 是启用待测 MOD 的候选配置；用同一批输入比较质量和性能。',
-      boundary: '全量为固定五项，快速为 MMLU200。参考 Engine 使用引擎 r6 / 工具 r7；SWE / Terminal 运行公开轨迹，专项结果分别入账。',
+      boundary: '全量为固定五项，快速为 MMLU200。历史组合复跑使用引擎 r6 / 工具 r7；送测以方案 V2 冻结最新 B1。SWE / Terminal 运行公开轨迹。',
       onThisPage: '按顺序执行', choose: '选择测试范围', prepare: '准备运行环境', run: '执行配对测试', review: '核对结果与交付',
       detailsNav: '协议细节与下载 ↓', sideNote: '第一次运行？从第 01 步开始。复核协议？直接看底部详情。',
       chooseLead: '联调选快速；正式完整测试选五项。两种模式都需要 B0 / B1。',
       timing: '耗时估算包含什么？', scopeTable: '查看五项任务数与请求数', tableCaption: '每臂 = B0 或 B1；每臂都使用同一份冻结清单。',
       dataset: '数据集', tasks: '固定任务 / 源任务', requests: '每臂请求', purpose: '测什么',
-      prepareLead: '以下步骤复跑固定 r6 引擎组合，使用执行工具 r7。先确认条件，再启动测试。',
+      prepareLead: '以下入口复跑历史 r6 引擎组合，使用执行工具 r7。送测最新 B1 的身份和判据见方案 V2，引擎入口见右上角。',
       otherEngines: '其他引擎沿用同一冻结数据范围，使用各自执行器；模型或 tokenizer 改变时，trace 必须另立 profile。',
       engineDocs: '打开固定版本的部署与运行说明 ↗', runnerSource: '查看执行器源码 ↗',
       runLead: '将固定版本的参考执行器保存为 one_click.py，在所在目录运行下方命令。填写本机路径、卡号和全新输出目录；终端自动显示日志。',
@@ -31,7 +31,7 @@
       commandHint: '路径与卡号只在本页生成命令，网页不会启动测试。', copied: '命令已复制。请在运行前确认路径、卡号与环境。',
       copyFailed: '无法自动复制，请选中上方命令手动复制。', invalid: '请填写全部参数；物理卡号应为两个不同的非负整数，例如 0,1。',
       stopRule: '失败时保留原始记录与未执行阶段。不要删掉失败项、缩短输出预算或换题补跑来凑齐结果。',
-      reviewLead: '参考分母统计自动核验并缓存；本轮有效算力分子与效率按匹配工作域重新计算。四项目标及来源在结果页逐项展示。', deliveryTitle: '交付时带上这些证据',
+      reviewLead: '核验可复用的独立参考分母，以本轮同一次执行的 F、同步 T 计算有效算力及效率。结果页逐项展示四项目标、实测值与来源。', deliveryTitle: '交付时带上这些证据',
       acceptanceLink: '查看 B0/B1 四项目标 →', referenceEyebrow: '需要复核时再展开', detailsTitle: '协议细节与下载',
       immutable: '样本、顺序、来源、预算、评分或 tokenizer 变化须发布新版本。冻结协议不代表实测已完成。',
       judgeNotice: '参考Engine的HLE/Frontier评分复用同一份35B权重，由脚本单独启动固定B1阶段，无需另备模型或外部裁判服务。评分增加总耗时，其流量不计solver性能和单位token成本。同模型辅助评分不构成独立模型验证；裁判未决单列，不等同引擎请求失败。MMLU200使用规则评分。',
@@ -86,13 +86,13 @@
     en: {
       back: '← Back to test datasets', eyebrow: 'EXECUTION GUIDE / FROZEN PROTOCOL v1', title: 'Run a standard test in four steps',
       lead: 'B0 is the control and B1 is the candidate configuration with the target MOD enabled. Compare quality and performance using the same inputs.',
-      boundary: 'Full covers five frozen profiles; quick covers MMLU200. The reference Engine uses engine r6 / tools r7; SWE / Terminal replay public traces and supplements are recorded separately.',
+      boundary: 'Full covers five frozen profiles; quick covers MMLU200. Historical reproduction uses engine r6 / tools r7; submission pins the latest B1 under plan V2. SWE / Terminal replay public traces.',
       onThisPage: 'FOLLOW THE STEPS', choose: 'Choose a test scope', prepare: 'Prepare the environment', run: 'Run the paired test', review: 'Review and deliver',
       detailsNav: 'Protocol details & downloads ↓', sideNote: 'First run? Start at step 01. Auditing the protocol? Jump to the details below.',
       chooseLead: 'Use quick for integration checks; select all five for full testing. Both modes require B0 and B1.',
       timing: 'What does the estimate include?', scopeTable: 'View tasks and requests for all five profiles', tableCaption: 'One arm = B0 or B1. Each arm uses the same frozen manifest.',
       dataset: 'Dataset', tasks: 'Fixed / source tasks', requests: 'Requests per arm', purpose: 'Scope',
-      prepareLead: 'These steps reproduce the frozen r6 engine with execution tools r7. Check the prerequisites before starting.',
+      prepareLead: 'This entry reproduces historical engine r6 with tools r7. Plan V2 defines the submitted B1 identity and criteria; the engine page provides the release entry point.',
       otherEngines: 'Other engines use their own runners with the same frozen workload. A changed model or tokenizer requires a new trace profile.',
       engineDocs: 'Open pinned deployment and run instructions ↗', runnerSource: 'View runner source ↗',
       runLead: 'Save the pinned reference runner as one_click.py and run the command from its directory. Set local paths, device IDs and a fresh output directory; live logs follow automatically.',
@@ -100,7 +100,7 @@
       commandHint: 'Paths and device IDs only generate a command locally. This page does not start tests.', copied: 'Command copied. Verify paths, devices and environment before running.',
       copyFailed: 'Automatic copy failed. Select the command above and copy it manually.', invalid: 'Fill in all fields. Device IDs must be two distinct non-negative integers, for example 0,1.',
       stopRule: 'On failure, retain raw records and unexecuted stages. Do not remove failures, shorten generation budgets or replace tasks to fill the result.',
-      reviewLead: 'Reference denominator statistics are automatically verified and cached. Recompute current effective compute and efficiency from matched-workload numerator measurements; target states and sources are listed in the report.', deliveryTitle: 'Include these in the handoff',
+      reviewLead: 'Verify reusable independent reference denominators and compute effective throughput and efficiency from same-execution F and synchronized T. Report all four targets, measured values and sources.', deliveryTitle: 'Include these in the handoff',
       acceptanceLink: 'View the four B0/B1 targets →', referenceEyebrow: 'EXPAND WHEN YOU NEED THE DETAILS', detailsTitle: 'Protocol details & downloads',
       immutable: 'Changes to samples, order, sources, budgets, grading or tokenizer require a new version. A frozen protocol is not a completed measurement.',
       judgeNotice: 'The reference Engine reuses the same 35B weights in separate fixed-B1 HLE/Frontier scoring stages; no additional model or external judge service is required. Scoring adds total runtime and is excluded from solver performance and unit-token cost. Same-model auxiliary scores are not independent-model validation; unresolved judgments are listed separately from engine request failures. MMLU200 uses rule scoring.',
@@ -139,7 +139,7 @@
   const modCopy = {
     zh: {
       targetTitle: '先选择要测什么', modTarget: '评估待测 MOD', modTargetNote: '默认：同一基础引擎，关闭 / 启用目标 MOD',
-      engineTarget: '复跑参考 Engine', engineTargetNote: '参考 Engine r6 · 执行工具 r7',
+      engineTarget: '复跑参考 Engine', engineTargetNote: '历史组合 r6 · 执行工具 r7',
       armDefinitions: '本页 MOD 对比默认 B0 = 同一基础配置关闭目标 MOD，B1 = 启用待测 MOD。每轮冻结实际版本与开关，不把 B1 固定为某个 Engine。',
       prepareLead: '先固定本轮的基础引擎、目标 MOD 与对照方式，再准备同一冻结数据范围。',
       otherEngines: '先核对基础引擎是否已默认具备目标能力。保留共同基线的现有优化；以实际启用记录和受益条件解释 MOD 增量效果。',
@@ -168,7 +168,7 @@
     },
     en: {
       targetTitle: 'Choose what to evaluate', modTarget: 'Evaluate the target MOD', modTargetNote: 'Default: the same base engine with the target MOD off / on',
-      engineTarget: 'Reproduce the reference Engine', engineTargetNote: 'Reference engine r6 · execution tools r7',
+      engineTarget: 'Reproduce the reference Engine', engineTargetNote: 'Historical engine r6 · execution tools r7',
       armDefinitions: 'For this MOD comparison, B0 defaults to the same base configuration with the target MOD off; B1 enables the target MOD. Freeze actual versions and switches for each run. B1 is not a fixed Engine product.',
       prepareLead: 'Define the base engine, target MOD and control before preparing the frozen workload.',
       otherEngines: 'Check whether the base engine already provides the target capability. Preserve its existing optimizations and explain incremental MOD effects using activation evidence and applicable conditions.',
@@ -326,7 +326,7 @@
     judgeNotice.textContent = c.judgeNotice;
     let acceptanceNotice = document.getElementById('acceptance-policy-note');
     if (!acceptanceNotice) { acceptanceNotice = node('p'); acceptanceNotice.id = 'acceptance-policy-note'; judgeNotice.after(acceptanceNotice); }
-    acceptanceNotice.textContent = language() === 'zh' ? '新版验收口径：一个固定数据集同时满足该项目标全部条件即可，不要求五项均达标，不跨数据集拼接指标。五项结果仍完整披露，参考算力、长上下文和多租户等专项分别判定。' : 'Updated acceptance: one fixed dataset meeting all conditions of a target is sufficient; all five need not pass. Never combine metrics across datasets. Disclose all results and assess reference compute, long-context and multi-tenant requirements separately.';
+    acceptanceNotice.textContent = language() === 'zh' ? '吞吐与时延目标：至少一个固定场景在同组配对中同时满足吞吐、TTFT、TPOT及质量与服务要求。五项结果完整披露；有效算力、长上下文和成本按各自工况与判据分别核验。' : 'Throughput and latency: at least one fixed workload must jointly meet throughput, TTFT, TPOT, quality and service requirements in the same pair. Disclose all five results; assess compute, context and cost under their own workloads and criteria.';
     const files = document.getElementById('standard-files'); files.replaceChildren();
     for (const [name, artifact] of Object.entries(data.artifacts)) {
       const link = node('a', name); link.href = `./data/dataset-standard-v1/${name}`; link.download = name;

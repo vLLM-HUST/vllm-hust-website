@@ -134,6 +134,40 @@ async def verify(args):
                                 ).inner_text()
                             )
                             await page.locator("#engine-install-details").click()
+                        if name == "test-plan.html":
+                            active = page.locator(f'[data-plan-lang="{language}"]')
+                            assert await active.is_visible()
+                            assert await active.locator("tbody tr").count() == 9
+                            contrast = await active.evaluate(
+                                r"""root => {
+                                  const rgb = value => value.match(/[\d.]+/g).map(Number).slice(0, 3);
+                                  const luminance = color => rgb(color).map(v => {
+                                    v /= 255;
+                                    return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4;
+                                  }).reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+                                  return Array.from(root.querySelectorAll('td, th, article, details, pre')).map(node => {
+                                    const style = getComputedStyle(node);
+                                    let parent = node;
+                                    while (parent && getComputedStyle(parent).backgroundColor === 'rgba(0, 0, 0, 0)') parent = parent.parentElement;
+                                    const background = parent ? getComputedStyle(parent).backgroundColor : 'rgb(3, 7, 18)';
+                                    const values = [luminance(style.color), luminance(background)].sort((a, b) => b - a);
+                                    return (values[0] + .05) / (values[1] + .05);
+                                  });
+                                }"""
+                            )
+                            assert contrast and min(contrast) >= 4.5, contrast
+                            details = active.locator("details")
+                            assert await details.count() == 5
+                            await page.goto(
+                                f"{args.url.rstrip('/')}/test-plan.html#compute-{language}"
+                            )
+                            assert await active.locator("details").first.evaluate(
+                                "element => element.open"
+                            )
+                            await active.locator("details > summary").first.click()
+                            assert not await active.locator("details").first.evaluate(
+                                "element => element.open"
+                            )
                         if name == "serving-plan.html":
                             assert await page.locator("#cost").input_value() == "1200"
                             assert await page.locator("#days").input_value() == "28"

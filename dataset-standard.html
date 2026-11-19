@@ -26,6 +26,7 @@
       <p class="guide-lead" data-guide-copy="lead">B0 是对照配置，B1 是启用待测 MOD 的候选配置；用同一批输入比较质量和性能。</p>
       <p class="guide-boundary" data-guide-copy="boundary">完整测试覆盖项目冻结的五项范围；SWE / Terminal 仅测轨迹回放性能。跑完测试后，还须单独判断各项验收目标是否达标。</p>
     </header>
+<p class="plan-entry"><a href="./test-plan.html" data-plan-zh="课题四送测方案 V2：固定 B0 对比送测时最新 B1" data-plan-en="Topic 4 plan V2: fixed B0 vs B1 pinned at submission">课题四送测方案 V2：固定 B0 对比送测时最新 B1</a></p>
     <p id="standard-status" class="guide-status" role="status">正在校验测试标准与运行指南…</p>
     <div id="standard-content" class="guide-layout" hidden>
       <aside class="guide-sidebar">
@@ -42,7 +43,7 @@
       <div class="guide-body">
         <section id="choose-scope" class="guide-step">
           <div class="step-heading"><span class="step-number">01</span><div><h2 data-guide-copy="choose">选择测试范围</h2><p data-guide-copy="chooseLead">联调选快速；正式完整测试选五项。两种模式都需要 B0 / B1。</p></div></div>
-          <fieldset class="test-targets"><legend data-guide-copy="targetTitle">先选择要测什么</legend><label><input type="radio" name="test-target" value="mod" checked><span><strong data-guide-copy="modTarget">评估待测 MOD</strong><small data-guide-copy="modTargetNote">默认：同一基础引擎，关闭 / 启用目标 MOD</small></span></label><label><input type="radio" name="test-target" value="reference-engine"><span><strong data-guide-copy="engineTarget">复跑参考 Engine</strong><small data-guide-copy="engineTargetNote">参考 Engine r6 · 执行工具 r7</small></span></label></fieldset>
+          <fieldset class="test-targets"><legend data-guide-copy="targetTitle">先选择要测什么</legend><label><input type="radio" name="test-target" value="mod" checked><span><strong data-guide-copy="modTarget">评估待测 MOD</strong><small data-guide-copy="modTargetNote">默认：同一基础引擎，关闭 / 启用目标 MOD</small></span></label><label><input type="radio" name="test-target" value="reference-engine"><span><strong data-guide-copy="engineTarget">复跑参考 Engine</strong><small data-guide-copy="engineTargetNote">历史组合 r6 · 执行工具 r7</small></span></label></fieldset>
           <p class="guide-boundary" data-guide-copy="armDefinitions">本页 MOD 对比默认 B0 = 同一基础配置关闭目标 MOD，B1 = 启用待测 MOD。每轮冻结实际版本与开关，不把 B1 固定为某个 Engine。</p>
           <div id="test-modes"><div id="test-mode-cards" class="test-mode-cards" role="radiogroup" aria-label="测试范围"></div></div>
           <p id="test-mode-scope" class="guide-note"></p>
@@ -50,7 +51,7 @@
           <details class="guide-details" id="dataset-scope"><summary data-guide-copy="scopeTable">查看五项任务数与请求数</summary><div class="scroll"><table><caption data-guide-copy="tableCaption">每臂 = B0 或 B1；每臂都使用同一份冻结清单。</caption><thead><tr><th data-guide-copy="dataset">数据集</th><th data-guide-copy="tasks">固定任务 / 源任务</th><th data-guide-copy="requests">每臂请求</th><th data-guide-copy="purpose">测什么</th></tr></thead><tbody id="standard-rows"></tbody></table></div></details>
         </section>
         <section id="prepare" class="guide-step">
-          <div class="step-heading"><span class="step-number">02</span><div><h2 data-guide-copy="prepare">准备运行环境</h2><p data-guide-copy="prepareLead">以下步骤复跑固定 r6 引擎组合，使用执行工具 r7。先确认条件，再启动测试。</p></div></div>
+          <div class="step-heading"><span class="step-number">02</span><div><h2 data-guide-copy="prepare">准备运行环境</h2><p data-guide-copy="prepareLead">以下入口复跑历史 r6 引擎组合，使用执行工具 r7。送测最新 B1 的身份和判据见方案 V2，引擎入口见右上角。</p></div></div>
           <ul class="guide-checklist" id="preparation-list"></ul>
           <p class="guide-note" data-guide-copy="otherEngines">其他引擎沿用同一冻结数据范围，使用各自执行器；模型或 tokenizer 改变时，trace 必须另立 profile。</p>
           <p id="reference-engine-links" class="guide-actions"><a id="engine-instructions" class="guide-text-link" data-guide-copy="engineDocs">打开固定版本的部署与运行说明 ↗</a><a id="runner-source" data-guide-copy="runnerSource">查看执行器源码 ↗</a></p>
@@ -105,8 +106,8 @@
   <footer class="site-footer"><span id="footer-copy">固定标准 · 执行步骤 · 可复核证据</span></footer>
   <script src="./assets/site.js?v=public-audit-20261101&amp;ui=product-workspace-20261118-r1"></script>
   <script src="./assets/dataset-test-prompt.js?v=engine-page-link-20261118"></script>
-  <script src="./assets/dataset-standard-guide.js?v=engine-page-link-20261118"></script>
+  <script src="./assets/dataset-standard-guide.js?v=topic4-v2-20261119"></script>
   <script src="./assets/project-milestones.js?v=20261115-v1"></script><script src="./assets/dataset-current-results.js?v=engine-page-link-20261118"></script>
   <script src="./assets/dataset-standard.js?v=mod-target-20261113"></script>
-</body>
+<script src="./assets/test-plan.js?v=topic4-v2-20261119"></script></body>
 </html>

@@ -34,7 +34,7 @@
   function render() {
     const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
     const title = qualityPage
-      ? (zh ? 'MMLU-Pro · 同题质量回归' : 'MMLU-Pro · Matched quality regression')
+      ? (zh ? 'MMLU-Pro · 同题质量回归' : 'MMLU-Pro · Paired quality')
       : (zh ? 'MMLU-Pro · 服务性能摘要' : 'MMLU-Pro · Serving performance summary');
     if (!data || !reportData) {
       section.innerHTML = `<h2>${title}</h2><p>${failed
@@ -72,7 +72,7 @@
     const qualityUrl = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${reportData.source_commit}/${quality.evidence_path}`;
     section.innerHTML = `<div class="result-heading"><div><span class="result-eyebrow">${zh ? '中期报告摘要 · 固定基线与按指标最优配置' : 'MIDTERM SUMMARY · FIXED BASELINE & METRIC-SPECIFIC BEST CONFIGURATIONS'}</span><h1>${title}</h1></div><span class="result-date">${escape(reportData.version)}</span></div>
       <p class="result-context">${escape(data.scenario.model)} · ${escape(data.scenario.precision)} · TP2 · ${data.scenario.num_prompts} ${zh ? '请求' : 'requests'} · out${data.scenario.output_length} · ${escape(data.scenario.hardware)}</p>
-      <p class="result-boundary">${zh ? 'B0 固定：vLLM 0.18 / vLLM-Ascend 0.18。B1 基座版本不限，本页已测优化配置使用 0.28.1 / 0.25.1rc2 开发栈。' : 'B0 is fixed: vLLM 0.18 / vLLM-Ascend 0.18. B1 has no base-version restriction; the measured optimizations here use the 0.28.1 / 0.25.1rc2 development stack.'}</p>
+      <p class="result-boundary">${zh ? '本组实测：B0 为 vLLM/vLLM-Ascend 0.18；B1 优化配置基于 0.28.1/0.25.1rc2。' : 'Measured pair: B0 uses vLLM/vLLM-Ascend 0.18; B1 uses the 0.28.1/0.25.1rc2 stack.'}</p>
       <div class="result-quality"><strong>${zh ? '同题质量 · out8192' : 'Matched quality · out8192'}</strong><span>B0: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b0.correct}/${quality.b0.total}</a></span><span>${zh ? 'B1 · 当前纠正组合' : 'B1 · corrected combination'}: <a class="raw-evidence" href="${escape(qualityUrl)}">${quality.b1.candidate_correct}/${quality.b0.total}</a></span><small>${zh ? '固定200题子集；不代表全集或统计非劣' : 'Fixed 200-task subset; not full-corpus quality or statistical noninferiority'}</small></div>
       <p class="result-reference"><a href="#midterm-m01-verdict">${zh ? 'M01 · 参考修订中，达成率未确定' : 'M01 · Reference under revision; attainment unresolved'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片；旧参考与达标判定已退出当前结论。' : 'chip; the old reference and acceptance verdicts are withdrawn.'}</small></p>
       <p class="result-comparison-note">${zh ? '服务性能 · out256：各指标分别选优，并非同一部署。本工况尚无固定 B0 性能配对，不计算收益。' : 'Serving performance · out256: metric-specific best configurations, not one deployment. No matched fixed B0 performance pair for this workload; gain not calculated.'}</p>
@@ -103,8 +103,8 @@
         : (zh ? '完整回答联合测量 · 同轮质量、性能与成本' : 'FULL-ANSWER JOINT MEASUREMENT · SAME-RUN QUALITY, PERFORMANCE & COST');
       section.querySelector('.result-boundary').textContent = zh
         ? 'B0：vLLM 0.18 / vLLM-Ascend 0.18。B1：0.28.1 / 0.25.1rc2 开发栈，4GiB/rank 主机状态预算。'
-        : 'B0: vLLM 0.18 / vLLM-Ascend 0.18. B1: 0.28.1 / 0.25.1rc2 development stack; 4GiB/rank host State.';
-      section.querySelector('.result-reference').innerHTML = `<a href="#midterm-m01-verdict">${zh ? 'M01 · 原 out256 计数工况，参考修订中' : 'M01 · Prior out256 counted workload; reference under revision'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片；不是本轮8192回答的算力。' : 'chip; not compute measured from this8192-answer run.'}</small>`;
+        : 'B0: vLLM/Ascend 0.18. B1: 0.28.1/0.25.1rc2; host State 4GiB/rank.';
+      section.querySelector('.result-reference').innerHTML = `<a href="#midterm-m01-verdict">${zh ? 'M01 · 历史 out256 参考计算' : 'M01 · Archived out256 reference calculation'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片 · 历史 out256 工况。' : 'chip · archived out256 workload.'}</small>`;
       section.querySelector('.result-context').textContent = 'Qwen3.5-35B-A3B · BF16 · TP2 · 200 ' + (zh ? '请求' : 'requests') + ' · out8192 · Ascend 910B2 × 2';
       section.querySelector('.result-comparison-note').textContent = zh
         ? '同一200题完整回答：质量、时延、吞吐、利用率和成本来自同一轮响应。'

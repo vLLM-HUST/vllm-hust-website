@@ -43,6 +43,7 @@ body .midterm-report .midterm-audit { background: var(--result-tint); }
 }
 @media (max-width: 700px) {
   .current-measurements:not(.midterm-report) { padding: 16px; border-radius: 12px; }
+  .quality-summary.current-measurements:not(.midterm-report) { margin-block: 16px; padding-block: 12px; }
   .result-heading { display: block; }
   .result-date { display: inline-block; margin: 0 0 8px; }
   .result-metrics { grid-template-columns: 1fr; gap: 8px; margin-top: 12px; }
