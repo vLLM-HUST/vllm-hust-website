@@ -164,7 +164,7 @@ def main():
                         pegaflow.get_attribute("data-project-component-count") == "2"
                     ), pegaflow_text
                     assert "PROJECT COMPONENTS" in pegaflow_text, pegaflow_text
-                    assert "PegaFlow vLLM Connectors" in pegaflow.inner_text()
+                    assert "PegaFlow KV Transfer" in pegaflow.inner_text()
                     assert "+6.34%" in pegaflow.inner_text()
                     performance_link = pegaflow.locator(
                         ".plugin-performance a.plugin-public-effect-link"
@@ -185,7 +185,7 @@ def main():
                     assert mooncake.count() == 1
                     mooncake.locator(".plugin-technical-details > summary").click()
                     assert "Mooncake HUST" in mooncake.inner_text()
-                    assert "Mooncake vLLM Connectors" in mooncake.inner_text()
+                    assert "Mooncake KV Storage and Transfer" in mooncake.inner_text()
                     search.fill("")
                     filters = page.locator("[data-workload-filters]")
                     assert filters.get_attribute("tabindex") == "0"

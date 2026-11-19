@@ -302,7 +302,7 @@ def test_pegaflow_credits_upstream_and_scopes_local_adaptation_maintainers() -> 
     assert "fail-closed" in connector_summary
     assert "不负责启动、扩缩或修复" in connector_summary
     assert "尚不能外推到其他模型、设备或拓扑" in connector_summary
-    assert 'adaptationMaintainers: "国产化适配维护者"' in SCRIPT
+    assert 'adaptationMaintainers: "国产化适配制作者"' in SCRIPT
     assert 'upstreamOwner: "上游原项目"' in SCRIPT
     assert 'item.contribution_scope === "local_adaptation"' in SCRIPT
 
@@ -389,8 +389,8 @@ def test_legacy_migration_cards_preserve_original_ownership() -> None:
             "https://github.com/vLLM-HUST/"
         )
 
-    assert "Original maintainers" in SCRIPT
-    assert "原负责人" in SCRIPT
+    assert "Original creators" in SCRIPT
+    assert "原制作者" in SCRIPT
     assert "item.maintainers" in SCRIPT
 
 
@@ -691,7 +691,9 @@ def test_vspec_maintainer_uses_the_canonical_contributor_identity() -> None:
 
     assert canonical_names["renty-0"] == "任天宇"
     assert vspec["maintainers"] == ["Renty-0"]
-    assert "maintainer_profiles" not in vspec
+    assert vspec["maintainer_profiles"] == [
+        {"login": "Renty-0", "name": canonical_names["renty-0"]}
+    ]
     assert maintainer["login"] == "Renty-0"
     assert maintainer["name"] == canonical_names[maintainer["login"].casefold()]
 
@@ -1192,8 +1194,8 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
-    assert "plugins.css?v=product-mods-20261118" in PAGE
-    assert "plugins-page.js?v=engine-creators-sync-20261119" in PAGE
+    assert "plugins.css?v=catalog-attribution-20261119" in PAGE
+    assert "plugins-page.js?v=catalog-attribution-20261119" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
@@ -1998,7 +2000,10 @@ def test_tool_mods_are_grouped_without_performance_placeholders():
         for component_id in visible_tools
     )
     assert visible_tools <= set(WORKLOAD_NAVIGATION["plugins"])
-    assert "scheduler-policy-lab" not in MOD_TAXONOMY["components"]
+    assert MOD_TAXONOMY["components"]["scheduler-policy-lab"]["kind"] == "tool_mod"
+    assert MOD_TAXONOMY["components"]["scheduler-policy-lab"]["evidence"] == (
+        "host_integration_pending"
+    )
 
 
 def test_new_ecpa_descriptors_are_listed_with_truthful_activation_boundaries():
