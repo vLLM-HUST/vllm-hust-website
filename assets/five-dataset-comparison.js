@@ -276,10 +276,9 @@
   }
   let releaseIds = ['r8','r7','r6','r5','r4'];
   let attemptIds = ['r3','r2','r1'];
-  const srIds = ['sr2','sr1'];
-  let selectableIds = [...releaseIds,...attemptIds,...srIds];
+  let srIds = [];
   const requestedRelease = new URL(location.href).searchParams.get('release');
-  let selectedRelease = /^(?:r[1-9][0-9]*|sr[12])$/.test(requestedRelease||'') ? requestedRelease : null;
+  let selectedRelease = /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(requestedRelease||'') ? requestedRelease : null;
   let releaseCatalog = null;
   let catalogRequest = null;
   let releaseRequest = 0;
@@ -322,8 +321,7 @@
         const matches=value.attempts.filter(row=>row.id===id);
         if (matches.length!==1 || matches[0].kind!=='pre-freeze-attempt' || matches[0].status!=='failed' || matches[0].measurements?.length!==0 || !matches[0].source?.url) throw Error('Invalid early-attempt identity');
       }
-      releaseIds=[...value.order];attemptIds=[...value.attempt_order];selectableIds=[...releaseIds,...attemptIds,...srIds];
-      if(!selectableIds.includes(selectedRelease))selectedRelease=value.default_release;
+      releaseIds=[...value.order];attemptIds=[...value.attempt_order];
       releaseCatalog=value;
     })();
     try { await catalogRequest; } finally { catalogRequest=null; }
@@ -522,22 +520,27 @@
   const srPath = 'data/sr-development-results-v1.json';
   let srEntries;
   async function loadSr() {
+    if(srEntries)return;
     const [meta, response]=await Promise.all([fetch('./data/benchmark-source-manifest.json'),fetch('./'+srPath)]);
     if(!meta.ok||!response.ok)throw Error('SR publication unavailable');
     const publication=await meta.json();
+    if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark'||publication.status!=='published-source'||!/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Invalid SR publication identity');
     const binding=publication.files.filter(file=>file.website_path===srPath);
     const raw=await response.arrayBuffer();
     const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
     if(binding.length!==1||binding[0].sha256!==digest||binding[0].bytes!==raw.byteLength)throw Error('SR publication checksum mismatch');
     const value=JSON.parse(new TextDecoder().decode(raw));
-    if(value.schema!=='vllm-hust-sr-development/v1'||value.control!=='B1-r8'||value.entries?.length!==srIds.length)throw Error('Invalid SR publication scope');
-    for(const id of srIds){
-      const entries=value.entries.filter(entry=>entry.id===id);
-      if(entries.length!==1)throw Error('Invalid SR identity');
-      const entry=entries[0];
+    if(value.schema!=='vllm-hust-sr-development/v1'||value.control!=='B1-r8'||!Array.isArray(value.entries)||!value.entries.length)throw Error('Invalid SR publication scope');
+    const ids=new Set();
+    for(const entry of value.entries){
+      const {id}=entry;
+      if(!/^sr[1-9][0-9]*$/.test(id)||ids.has(id))throw Error('Invalid SR identity');
+      ids.add(id);
       const url=new URL(entry.release_url);
       if(url.origin!=='https://github.com'||!url.pathname.startsWith('/vLLM-HUST/vllm-hust-engine/releases/tag/b1-'+id+'-'))throw Error('Invalid SR evidence link');
       const expected=id==='sr1'?['mmlu','4096-formal','16384-formal']:[...fixedProfiles.map(([id])=>id),'4096-formal','16384-formal'];
+      const repeat=['4096-repeat','16384-repeat'];
+      if(entry.rows.some(row=>repeat.includes(row.id)))expected.push(...repeat);
       if(entry.rows.length!==expected.length||expected.some(id=>entry.rows.filter(row=>row.id===id).length!==1))throw Error('Invalid SR row coverage');
       for(const row of entry.rows){
         if(row.arms?.length!==2||row.cards?.length!==2||row.cards.some(cards=>cards.length!==2||!cards.every(Number.isInteger)))throw Error('Invalid SR arm identity');
@@ -548,6 +551,7 @@
       }
     }
     srEntries=value.entries;
+    srIds=[...ids].sort((a,b)=>Number(b.slice(2))-Number(a.slice(2)));
   }
   function srRows(entry) {
     return entry.rows.map(row=>{
@@ -555,14 +559,15 @@
       const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
       const workloadLabel=[row.variant,crossCard?t('跨卡位对照','Different card positions'):t('同卡对照','Matched cards')].filter(Boolean).join(' · ');
-      return {...row,arms,changes_percent,crossCard,workloadLabel};
+      const label=row.id.endsWith('-repeat')?row.label+' · '+t('复测','Repeat'):row.label;
+      return {...row,label,arms,changes_percent,crossCard,workloadLabel};
     });
   }
   function srDetails(entry,rows,key,roles) {
     const measurements=rows.filter(row=>row.arms);
     const settings='E36/R54 · MTP2 · FULL · TP2';
     if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.name)} · ${settings} · BF16 · Qwen3.5-35B-A3B</p><p><a href="${esc(entry.release_url)}">B1-${entry.id} Release ↗</a></p>`};
-    if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${t('各场景各记录一次对照。吞吐为输出 token 除以批次耗时，含排空。TTFT 和 TPOT 为逐请求均值。成本比按同费率计算，为 B1-r8 吞吐除以候选吞吐。','Each scenario reports one comparison. Throughput is output tokens divided by batch duration including drain. TTFT and TPOT are request means. Equal-rate cost is B1-r8 throughput divided by candidate throughput.')}</p>`};
+    if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${t('各行单独列出对应轮次。吞吐为输出 token 除以批次耗时，含排空。TTFT 和 TPOT 为逐请求均值。成本比按同费率计算，为 B1-r8 吞吐除以候选吞吐。','Each row reports its corresponding run. Throughput is output tokens divided by batch duration including drain. TTFT and TPOT are request means. Equal-rate cost is B1-r8 throughput divided by candidate throughput.')}</p>`};
     if(key==='quality'){
       const scored=measurements.filter(row=>Number.isInteger(row.arms.B1.correct));
       return {title:t('质量与评分明细','Quality and grading'),body:table(t(['场景','版本','正确 / 总数','长度终止','未判定'],['Profile','Version','Correct / total','Length stops','Unresolved']),scored.flatMap(row=>['B0','B1'].map(role=>{const arm=row.arms[role];return [row.label,roles[role],`${arm.correct}/${arm.requests}`,arm.truncated,arm.unresolved];})))+`<p>${t('SWE 与 Terminal 回放仅统计请求性能。','SWE and Terminal replays measure request performance only.')}</p>`};
@@ -637,10 +642,11 @@
     const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
-      await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress()]);
+      await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(),
+        loadSr().catch(error=>{if(/^sr[1-9][0-9]*$/.test(selectedRelease||''))throw error;})]);
       if(request!==releaseRequest)return;
-      if(srIds.includes(selectedRelease)&&!srEntries)await loadSr();
-      else if(selectedRelease==='r8'&&!currentR8)await loadR8();
+      if(![...releaseIds,...attemptIds,...srIds].includes(selectedRelease))selectedRelease=releaseCatalog.default_release;
+      if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();
       if(request!==releaseRequest)return;
       render();

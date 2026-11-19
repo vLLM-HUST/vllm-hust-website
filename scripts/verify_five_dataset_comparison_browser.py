@@ -105,7 +105,12 @@ def assert_sr(page, root, entry, layout, lang):
     page.keyboard.press("Escape")
     expect(button).to_be_focused()
     root.locator('[data-detail="quality"]').click()
-    expect(dialog).to_contain_text("151/200" if release == "sr1" else "144/200")
+    candidate_mmlu = next(row for row in entry["rows"] if row["id"] == "mmlu")["arms"][
+        1
+    ]
+    expect(dialog).to_contain_text(
+        f"{candidate_mmlu['correct']}/{candidate_mmlu['requests']}"
+    )
     page.keyboard.press("Escape")
 
 
@@ -305,7 +310,11 @@ def verify(url, output):
                     )
                     expect(
                         root.locator("#comparison-release-select option")
-                    ).to_have_count(10)
+                    ).to_have_count(
+                        len(catalog["order"])
+                        + len(catalog["attempt_order"])
+                        + len(sr["entries"])
+                    )
                     for entry in sr["entries"]:
                         assert_sr(page, root, entry, r8_layout, lang)
                     for release, controls, values in [
@@ -538,7 +547,8 @@ def verify(url, output):
                         }
                     )
                     page.close()
-        for release in ("r1", "r2", "r3", "r4", "r5", "r7", "sr1", "sr2"):
+        sr_ids = [entry["id"] for entry in sr["entries"]]
+        for release in ("r1", "r2", "r3", "r4", "r5", "r7", *sr_ids):
             page = context.new_page()
             page.goto(url + "/b0-b1.html?release=" + release)
             root = page.locator("#five-dataset-comparison")
@@ -585,7 +595,9 @@ def verify(url, output):
         expect(root.locator(".metric-chart")).to_have_count(4)
         expect(root.locator(".metric-missing")).to_have_count(20)
         expect(root.locator(".bar-value")).to_have_count(0)
-        expect(root.locator("#comparison-release-select option")).to_have_count(11)
+        expect(root.locator("#comparison-release-select option")).to_have_count(
+            len(future["order"]) + len(future["attempt_order"]) + len(sr["entries"])
+        )
         page.goto(url + "/b0-b1.html")
         expect(root).to_have_attribute("data-release", "r9", timeout=30000)
         page.close()
