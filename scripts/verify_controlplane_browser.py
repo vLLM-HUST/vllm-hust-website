@@ -205,6 +205,44 @@ def verify(args):
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= innerWidth + 1"
                 )
+            page.goto(
+                args.url.rstrip("/") + "/control-plane.html#instance-scaling-results"
+            )
+            scaling = page.locator("#instance-scaling-results")
+            expect(scaling).to_have_attribute(
+                "data-loaded", "instance-controller-scaling/v1"
+            )
+            expect(scaling.locator("tbody tr")).to_have_count(2)
+            page.wait_for_function(
+                """() => {
+                    const nav = document.querySelector('.site-nav').getBoundingClientRect();
+                    const heading = document.querySelector('#instance-scaling-title').getBoundingClientRect();
+                    return heading.top >= nav.bottom && heading.bottom <= innerHeight;
+                }"""
+            )
+            publication = page.request.get(
+                args.url.rstrip("/") + "/data/instance-controller-scaling-v1.json"
+            ).json()
+            for index, scenario in enumerate(publication["scenarios"]):
+                row = scaling.locator("tbody tr").nth(index)
+                fixed, dynamic = scenario["fixed"], scenario["dynamic"]
+                expect(row).to_contain_text(f"{scenario['completed_per_arm']:,}")
+                expect(row).to_contain_text(
+                    f"{fixed['p95_latency_seconds']:.2f} → {dynamic['p95_latency_seconds']:.2f}"
+                )
+                expect(row).to_contain_text(
+                    f"{fixed['mean_reserved_replicas']:.3f} → {dynamic['mean_reserved_replicas']:.3f}"
+                )
+            for language, title in (
+                ("zh", "实例控制器扩缩容实测"),
+                ("en", "Instance Controller scaling benchmark"),
+            ):
+                if page.locator("html").get_attribute("lang") != language:
+                    page.locator("#langToggle").click()
+                expect(scaling.get_by_role("heading", name=title)).to_be_visible()
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= innerWidth + 1"
+                )
             context.close()
 
         page = browser.new_page()
@@ -222,6 +260,24 @@ def verify(args):
         receipts.append(
             {
                 "kv_routing": "both languages, desktop/mobile and checksum rejection passed"
+            }
+        )
+        page.close()
+        page = browser.new_page()
+        page.route(
+            "**/data/instance-controller-scaling-v1.json",
+            lambda route: route.fulfill(
+                status=200, content_type="application/json", body="{}"
+            ),
+        )
+        page.goto(args.url.rstrip("/") + "/control-plane.html#instance-scaling-results")
+        scaling = page.locator("#instance-scaling-results")
+        expect(scaling).to_have_attribute("aria-busy", "false")
+        expect(scaling.locator("table")).to_have_count(0)
+        assert not scaling.get_attribute("data-loaded")
+        receipts.append(
+            {
+                "instance_scaling": "both languages, desktop/mobile and checksum rejection passed"
             }
         )
         browser.close()
