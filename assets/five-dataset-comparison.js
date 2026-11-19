@@ -123,7 +123,7 @@
         [t('项目最终目标','Project final'),t(final[id].requirement,final[id].requirement_en),attainment(id,true)]]);
       if (id==='3.4.1') {
         const stats=data.compute_reference_statistics;
-        body+=`<p>${t('项目50%里程碑已由原固定MMLU200/out256认证工况达成。当前冻结版本另行复测效率，复用参考分母统计，重新采集分子；不把原效率百分比当成本轮新测结果。','The project50% milestone was achieved by the original certified MMLU200/out256 workload. Requalify the current frozen version separately: reuse reference denominator statistics and measure a fresh numerator, without presenting the historical efficiency as a new measurement.')}</p>
+        body+=`<p>${t('原固定MMLU200/out256工况的50%里程碑记录见下表。当前送测版本以同轮F、同步T及适用的独立参考分母计算效率；三轮原始值与复算表一并归档。','The table retains the original MMLU200/out256 record for the 50% milestone. Assess the submitted version using same-run F, synchronized T and an applicable independent reference denominator; archive all three repetitions and recomputation tables.')}</p>
           <p class="formula">C<sub>ref</sub><sup>U</sup> = ΣF<sup>U</sup> / (k × ΣT<sub>ref</sub><sup>L</sup> × 10¹²)</p>
           <p>${t('单位TFLOP/s/卡，k=2。F上界是必要算量上界，参考耗时下界来自独立组件标定与资源依赖图。','Unit:TFLOP/s/card; k=2. F upper bounds necessary work; reference time lower bounds come from independently calibrated component/resource dependency graphs.')}</p>
           ${table(t(['原参考域','ΣF上界 / FLOPs','ΣT参考下界 / 秒','参考算力上界 / TFLOP/s/卡'],['Original domain','ΣF upper / FLOPs','ΣTref lower / s','Reference upper / TFLOP/s/card']),['B0','B1'].map(role=>{const r=stats.arms[role];return [role,r.effective_flops_interval[1],r.sum_reference_seconds_lower,Number(r.reference_tflops_per_card_upper).toFixed(8)];}))}
@@ -138,6 +138,7 @@
         '3.4.1': t('原验收工况已达到50%里程碑。继续完成当前冻结版本的必要算量与三轮同步计时，并推进90%最终目标。','The certified original workload already met the50% milestone. Complete current-version necessary-work accounting and three synchronized timings, then pursue the90% final target.'),
       };
       if ((!goal.accepted || final[id].attainment!=='demonstrated') && actions[id]) body+=`<p>${actions[id]}</p><p><a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/main/experiments/optimization-20261115/acceptance-goals-20261115-v3.json">${t('目标、差距与执行任务','Goals, gaps and execution tasks')}</a></p>`;
+      body+=`<p><a href="./test-plan.html">${t('送测方案V2：四项两阶段判据与同轮计量','Submission plan V2: two-stage criteria and same-run measurement')}</a></p>`;
       return {title:`${id} ${names()[i]}`,body};
     }
     if (key==='supplement') {
