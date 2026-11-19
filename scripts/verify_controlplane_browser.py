@@ -186,6 +186,44 @@ def verify(args):
             assert root.locator(".control-summary").count() == 0
             receipts.append({"rejection": failure, "status": "passed"})
             context.close()
+        for width, theme in ((1440, "light"), (390, "dark")):
+            context = browser.new_context(
+                viewport={"width": width, "height": 1000}, color_scheme=theme
+            )
+            page = context.new_page()
+            page.goto(args.url.rstrip("/") + "/control-plane.html#kv-routing-results")
+            routing = page.locator("#kv-routing-results")
+            expect(routing).to_have_attribute("data-loaded", "0.1.6")
+            expect(routing.locator("tbody tr")).to_have_count(2)
+            expect(routing.locator("tbody tr").last).to_contain_text("+17.25%")
+            for language, verdict in (("zh", "通过"), ("en", "Passed")):
+                if page.locator("html").get_attribute("lang") != language:
+                    page.locator("#langToggle").click()
+                expect(
+                    routing.get_by_role("cell", name=verdict, exact=True)
+                ).to_be_visible()
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= innerWidth + 1"
+                )
+            context.close()
+
+        page = browser.new_page()
+        page.route(
+            "**/data/kv-controller-routing-v1.json",
+            lambda route: route.fulfill(
+                status=200, content_type="application/json", body="{}"
+            ),
+        )
+        page.goto(args.url.rstrip("/") + "/control-plane.html#kv-routing-results")
+        routing = page.locator("#kv-routing-results")
+        expect(routing).to_have_attribute("aria-busy", "false")
+        expect(routing.locator("table")).to_have_count(0)
+        assert not routing.get_attribute("data-loaded")
+        receipts.append(
+            {
+                "kv_routing": "both languages, desktop/mobile and checksum rejection passed"
+            }
+        )
         browser.close()
     (args.output / "receipt.json").write_text(json.dumps(receipts, indent=2) + "\n")
     print(json.dumps(receipts, indent=2))
