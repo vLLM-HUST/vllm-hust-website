@@ -5,6 +5,7 @@ import copy
 import hashlib
 import json
 import os
+from decimal import Decimal, ROUND_FLOOR
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -13,6 +14,44 @@ SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
 HISTORY = "data/engine-release-history-v1.json"
 SR = "data/sr-development-results-v1.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
+
+
+def assert_current_compute_reference(root, entry, lang):
+    reference = entry.get("compute_reference")
+    card = root.locator(".result-card").first
+    if reference:
+        lower = Decimal(reference["arms"]["B1"]["efficiency_lower_percent"])
+        value = format(lower.quantize(Decimal("0.0001"), rounding=ROUND_FLOOR), ".4f")
+        value = value.rstrip("0").rstrip(".")
+        expect(card.locator("strong")).to_have_text("≥" + value + "%")
+    else:
+        expect(card.locator("strong")).to_have_text("—")
+    button = root.locator('[data-detail="compute"]')
+    button.click()
+    dialog = root.locator("dialog")
+    expect(dialog).to_be_visible()
+    if reference:
+        expect(dialog.locator("tbody tr")).to_have_count(2)
+        for role in ("B0", "B1"):
+            expect(dialog).to_contain_text(reference["arms"][role]["T_seconds"])
+        expect(dialog).to_contain_text("8192")
+        expect(dialog).to_contain_text(
+            "精确效率未知" if lang == "zh" else "Exact efficiency is unknown"
+        )
+        image = dialog.locator("img")
+        expect(image).to_be_visible()
+        assert image.evaluate("el=>el.complete && el.naturalWidth>0")
+        expect(dialog.locator("a").first).to_have_attribute(
+            "href", "./" + reference["report"]["path"]
+        )
+        expect(dialog.locator("a").last).to_have_attribute(
+            "href", reference["raw_asset"]["url"]
+        )
+    else:
+        expect(dialog.locator("img")).to_have_count(0)
+        expect(dialog).to_contain_text("尚无已发布" if lang == "zh" else "no published")
+    dialog.locator(".dialog-close").click()
+    expect(button).to_be_focused()
 
 
 def assert_release_control_readable(page, root):
@@ -218,6 +257,7 @@ def verify(url, output):
                     published_r8 = next(
                         row for row in catalog["entries"] if row["id"] == "r8"
                     )
+                    assert_current_compute_reference(root, published_r8, lang)
                     expect(
                         root.locator('.dataset-coverage [data-available="true"]')
                     ).to_have_count(5)
