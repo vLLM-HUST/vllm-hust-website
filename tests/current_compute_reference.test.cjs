@@ -87,6 +87,28 @@ test('missing reference leaves a specific missing-data explanation', async () =>
   assert.ok(!html.includes('<img'));
 });
 
+test('V2 verifies every repetition and sums work and time before division', async () => {
+  const context = sandbox(), { entry, publication } = fixture(context);
+  const data=entry.compute_reference;
+  data.accepted_scope='topic4_submission_v2_fixed200_max256_three_formal_runs';
+  data.protocol.max_completion_tokens=256;data.protocol.formal_repetitions=3;
+  for(const arm of Object.values(data.arms)) {
+    arm.repetitions=Array.from({length:3},(_,index)=>({repetition:index+1,
+      F_interval:[...arm.F_interval],T_seconds:arm.T_seconds,reference_seconds_lower:arm.reference_seconds_lower,
+      geometry_sha256:'1'.repeat(64),timing_sha256:'2'.repeat(64),work_sha256:'3'.repeat(64),graph_sha256:'4'.repeat(64)}));
+    arm.F_interval=['3000000000000','6000000000000'];arm.T_seconds='3';arm.reference_seconds_lower='1.5';
+  }
+  await context.computeTest.validateVersionComputeReference(entry,publication);
+  const html=context.computeTest.versionComputeReferenceDetails(entry);
+  assert.ok(html.includes('256 output cap'));
+  assert.ok(html.includes('three formal native runs per arm; sum before division'));
+  assert.ok(!html.includes('8192 output cap'));
+  data.arms.B1.repetitions[2].T_seconds='2';
+  await assert.rejects(context.computeTest.validateVersionComputeReference(entry,publication));
+  data.arms.B1.repetitions.pop();
+  await assert.rejects(context.computeTest.validateVersionComputeReference(entry,publication));
+});
+
 test('wrong workload, foreign baseline, incomplete proof, inconsistent math and broken assets are rejected', async () => {
   const changes = [
     data => { data.protocol.max_completion_tokens = 256; },

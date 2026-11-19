@@ -348,14 +348,16 @@
     if(!a)return;
     const fail=()=>{throw Error('Invalid version-specific compute reference');};
     const protocol=a.protocol;
+    const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
+    const legacy=a.accepted_scope==='full_answer_max8192_single_formal_run';
     if(a.schema!=='engine-current-compute-reference/v1'||a.engine_release!==entry.release||
        a.baseline_id!==entry.baseline_id||a.status!=='measured'||a.full_model_certificate!==true||
-       a.accepted_scope!=='full_answer_max8192_single_formal_run'||
+       (!submission&&!legacy)||
        a.certificate_kind!=='matched_complete_necessary_work_and_full_reference_lower_bound'||
        a.efficiency_exact_percent!==null||a.hardware_peak_utilization_percent!==null||
        a.model!=='Qwen3.5-35B-A3B'||a.precision!=='BF16'||a.tensor_parallel_size!==2||
-       a.chip_model!=='Ascend 910B2'||protocol?.requests!==200||protocol.max_completion_tokens!==8192||
-       protocol.formal_repetitions!==1||protocol.temperature!==0||protocol.seed!==0||protocol.eos!=='enabled'||
+       a.chip_model!=='Ascend 910B2'||protocol?.requests!==200||protocol.max_completion_tokens!==(submission?256:8192)||
+       protocol.formal_repetitions!==(submission?3:1)||protocol.temperature!==0||protocol.seed!==0||protocol.eos!=='enabled'||
        protocol.quality_plan_sha256!=='f4ed4ce5956c9ed08f360400b5a996ef92a217ce295d50648d4dc06443db768e'|| // pragma: allowlist secret -- fixed public workload digest
        !/^[a-f0-9]{64}$/.test(a.source_status_sha256||'')||
        !/^[a-f0-9]{64}$/.test(a.source_pair_sha256||'')||
@@ -378,6 +380,19 @@
          !close(Number(arm.achieved_tflops_per_card_interval[1]),high/(2*time*1e12))||
          !close(Number(arm.reference_tflops_per_card_upper),high/(2*ref*1e12))||
          !close(Number(arm.efficiency_lower_percent),100*ref/time))fail();
+      if(submission) {
+        if(arm.repetitions?.length!==3)fail();
+        const totals={F:[0,0],time:0,reference:0};
+        for(const [index,row] of arm.repetitions.entries()) {
+          if(row.repetition!==index+1||row.F_interval?.length!==2||
+             ![row.geometry_sha256,row.timing_sha256,row.work_sha256,row.graph_sha256].every(v=>/^[a-f0-9]{64}$/.test(v||'')))fail();
+          const values=[...row.F_interval,row.T_seconds,row.reference_seconds_lower];
+          if(!values.every(v=>typeof v==='string'&&Number.isFinite(Number(v))&&Number(v)>0)||Number(row.F_interval[0])>Number(row.F_interval[1]))fail();
+          totals.F[0]+=Number(row.F_interval[0]);totals.F[1]+=Number(row.F_interval[1]);
+          totals.time+=Number(row.T_seconds);totals.reference+=Number(row.reference_seconds_lower);
+        }
+        if(!close(low,totals.F[0])||!close(high,totals.F[1])||!close(time,totals.time)||!close(ref,totals.reference))fail();
+      }
     }
     const current=Number(computeBound(a.arms.B1.efficiency_lower_percent));
     if(a.milestone_met!==(current>=50)||a.final_numeric_met!==(current>=90))fail();
@@ -396,17 +411,18 @@
   function versionComputeReferenceDetails(entry) {
     const a=entry.compute_reference;
     if(!a)return `<p>${t('本版尚无已发布的有效算力参考核算。','This version has no published compute reference accounting.')}</p>`;
+    const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
     const rows=['B0','B1'].map(role=>{
       const arm=a.arms[role];
       return [role,arm.T_seconds,'['+arm.F_interval.join(', ')+']',
         '['+computeBound(arm.achieved_tflops_per_card_interval[0])+', '+computeBound(arm.achieved_tflops_per_card_interval[1],true)+']',
         '≤'+computeBound(arm.reference_tflops_per_card_upper,true),'≥'+computeBound(arm.efficiency_lower_percent)+'%'];
     });
-    return `<p>MMLU200 · ${t('输出上限8192 · EOS保留 · 每臂一轮正式原生计时','8192 output cap · EOS enabled · one formal native run per arm')} · BF16 · TP2</p>
+    return `<p>MMLU200 · ${submission?t('输出上限256 · EOS保留 · 每臂三轮正式原生计时，先求和再计算','256 output cap · EOS enabled · three formal native runs per arm; sum before division'):t('输出上限8192 · EOS保留 · 每臂一轮正式原生计时','8192 output cap · EOS enabled · one formal native run per arm')} · BF16 · TP2</p>
       <figure><img style="max-width:100%" src="./${esc(a.chart.path)}" alt="${t('B0/B1参考效率下界','B0/B1 reference efficiency lower bounds')}"></figure>
       ${table(t(['运行臂','原生时间 / s','必要算量 / FLOPs','每卡有效算力 / TFLOP/s','参考算力上界 / TFLOP/s','效率下界'],['Arm','Native time / s','Necessary work / FLOPs','Effective compute per card / TFLOP/s','Reference upper bound / TFLOP/s','Efficiency lower bound']),rows)}
       <p>${t('里程碑50%','50% milestone')}：${a.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')} · ${t('最终90%','90% final target')}：${a.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</p>
-      <p>${t('精确效率未知。未达成表示本次下界尚低于目标；一轮测量不表示重复性或置信区间。','Exact efficiency is unknown. A target not met means this lower bound is below its threshold; one run does not measure repeatability or confidence intervals.')}</p>
+      <p>${submission?t('精确效率未知。三轮必要算量、实测时间及参考时间下界分别求和后复算；不将三轮当作独立任务样本或置信区间。','Exact efficiency is unknown. Necessary work, measured time and reference time lower bounds are each summed across three runs before recomputation; the runs are not independent task samples or confidence intervals.'):t('精确效率未知。未达成表示本次下界尚低于目标；一轮测量不表示重复性或置信区间。','Exact efficiency is unknown. A target not met means this lower bound is below its threshold; one run does not measure repeatability or confidence intervals.')}</p>
       <p>η ≥ 100 × T${t('参考下界','reference lower')} / T${t('原生','native')} · ${t('同一个实际必要F在配对比值中相消。','The same actual necessary F cancels in the matched ratio.')}</p>
       <p><a href="./${esc(a.report.path)}">${t('完整报告、图表与复算来源','Full report, charts and recomputation sources')} ↗</a> · <a href="${esc(a.raw_asset.url)}">${t('完整原件（需仓库访问权限）','Complete originals (repository access required)')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>`;
   }
