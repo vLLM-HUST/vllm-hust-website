@@ -137,6 +137,7 @@ def verify_engine_mod_creators(page, language):
     ids = rows.evaluate_all("nodes => nodes.map(n => n.dataset.r8ModId)")
     assert len(set(ids)) == len(ids)
     for row in rows.all():
+        assert not re.search(r"\d", row.locator("th").inner_text())
         creator = row.locator(".r8-mod-creator a")
         identifier = row.get_attribute("data-r8-mod-id")
         if identifier in ("betterscale", "microflow"):
