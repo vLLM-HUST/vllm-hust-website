@@ -101,15 +101,15 @@
   };
   const continuousWorkloadLabel = () => t('闭环连续压测 · 并发 8','Closed-loop continuous stress test · concurrency 8');
   const terminalReplayWorkloadLabel = () => t('Terminal-Bench 2.1 离线请求回放 · 并发 8','Terminal-Bench 2.1 offline request replay · concurrency 8');
-  function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames()) {
+  function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames(), roles = {B0:'B0',B1:'B1'}) {
     const maximum = Math.max(1,...rows.filter(row=>row.arms?.B0&&row.arms?.B1).map(d=>d.arms.B1[key]/d.arms.B0[key]));
-    return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">B0</span><span class="legend-b1">B1</span></div>${rows.map((row,i)=>{
+    return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">${esc(roles.B0)}</span><span class="legend-b1">${esc(roles.B1)}</span></div>${rows.map((row,i)=>{
       if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
       return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${esc(labels[i])}${row.workloadLabel?`<small class="chart-workload-label">${esc(row.workloadLabel)}</small>`:''}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
         const value=row.arms[role][key]/divisor;
-        return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${row.workloadLabel||''} ${role} ${n(value)} ${unit}`)}"><span class="bar-role">${role}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
+        return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${row.workloadLabel||''} ${roles[role]} ${n(value)} ${unit}`)}"><span class="bar-role">${esc(roles[role])}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
       }).join('')}</div>`;
     }).join('')}</article>`;
   }
@@ -275,9 +275,10 @@
   }
   let releaseIds = ['r8','r7','r6','r5','r4'];
   let attemptIds = ['r3','r2','r1'];
-  let selectableIds = [...releaseIds,...attemptIds];
+  const srIds = ['sr2','sr1'];
+  let selectableIds = [...releaseIds,...attemptIds,...srIds];
   const requestedRelease = new URL(location.href).searchParams.get('release');
-  let selectedRelease = /^r[1-9][0-9]*$/.test(requestedRelease||'') ? requestedRelease : null;
+  let selectedRelease = /^(?:r[1-9][0-9]*|sr[12])$/.test(requestedRelease||'') ? requestedRelease : null;
   let releaseCatalog = null;
   let catalogRequest = null;
   let releaseRequest = 0;
@@ -320,7 +321,7 @@
         const matches=value.attempts.filter(row=>row.id===id);
         if (matches.length!==1 || matches[0].kind!=='pre-freeze-attempt' || matches[0].status!=='failed' || matches[0].measurements?.length!==0 || !matches[0].source?.url) throw Error('Invalid early-attempt identity');
       }
-      releaseIds=[...value.order];attemptIds=[...value.attempt_order];selectableIds=[...releaseIds,...attemptIds];
+      releaseIds=[...value.order];attemptIds=[...value.attempt_order];selectableIds=[...releaseIds,...attemptIds,...srIds];
       if(!selectableIds.includes(selectedRelease))selectedRelease=value.default_release;
       releaseCatalog=value;
     })();
@@ -331,7 +332,7 @@
   let currentR8 = null;
   const currentR8Sha = 'c81cd8078a1c9ea61af84cb31c2b59c99fa94876ae1cfaa3a5a12180f9408c61'; // pragma: allowlist secret -- fixed public evidence digest
   function releaseMenu() {
-    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label><select id="comparison-release-select"><optgroup label="${t('冻结版本','Frozen releases')}">${releaseIds.map(id=>{const entry=releaseCatalog?.entries.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${attemptIds.map(id=>{const entry=releaseCatalog?.attempts.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup></select><a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
+    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label><select id="comparison-release-select"><optgroup label="${t('冻结版本','Frozen releases')}">${releaseIds.map(id=>{const entry=releaseCatalog?.entries.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${attemptIds.map(id=>{const entry=releaseCatalog?.attempts.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('SR 实验版本','Experimental SR releases')}">${srIds.map(id=>`<option value="${id}" ${selectedRelease===id?'selected':''}>B1-${id}</option>`).join('')}</optgroup></select><a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
   }
   function bindMenu() {
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
@@ -353,7 +354,7 @@
   function coverageView(rows, qualityOnly=false) {
     return `<section class="dataset-coverage" aria-labelledby="dataset-coverage-title"><div class="section-heading"><h2 id="dataset-coverage-title">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
       const row=rows.find(row=>row.id===id),available=!!row?.arms;
-      const status=available?t('已发布配对','Published pair'):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
+      const status=available?(row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
       return `<article data-dataset="${id}" data-available="${available}"><strong>${label}</strong><span>${status}</span></article>`;
     }).join('')}</div></section>`;
   }
@@ -465,13 +466,13 @@
               workloadLabel:t(a.workload_label_zh,a.workload_label_en)};
     });
   }
-  function versionSupplement(entry, values) {
+  function versionSupplement(entry, values, control = 'B0') {
     const a=entry.context_tenant_supplement;
-    if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot missing-plot">${t('本版未发布完整的上下文与四租户补测图。','This version has no published complete context and four-tenant supplement chart.')}</div></section>`;
+    if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot missing-plot">${t('本版未发布完整的上下文与四租户补测图。','This version has no published complete context and four-tenant supplement chart.')}</div></section>`;
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · ${esc(t(a.workload_label_zh,a.workload_label_en))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
-      <div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant?.equal_rate_same_card_count_unit_cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant?.B0.utilization.mean_percent)} → ${n(tenant?.B1.utilization.mean_percent)}%</strong></div></div>
+      <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant?.equal_rate_same_card_count_unit_cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant?.B0.utilization.mean_percent)} → ${n(tenant?.B1.utilization.mean_percent)}%</strong></div></div>
       <figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(t(a.workload_label_zh,a.workload_label_en))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure></section>`;
   }
   function versionSupplementDetails(entry) {
@@ -517,25 +518,86 @@
     const tails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
     return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
   }
+  const srPath = 'data/sr-development-results-v1.json';
+  let srEntries;
+  async function loadSr() {
+    const [meta, response]=await Promise.all([fetch('./data/benchmark-source-manifest.json'),fetch('./'+srPath)]);
+    if(!meta.ok||!response.ok)throw Error('SR publication unavailable');
+    const publication=await meta.json();
+    const binding=publication.files.filter(file=>file.website_path===srPath);
+    const raw=await response.arrayBuffer();
+    const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(binding.length!==1||binding[0].sha256!==digest||binding[0].bytes!==raw.byteLength)throw Error('SR publication checksum mismatch');
+    const value=JSON.parse(new TextDecoder().decode(raw));
+    if(value.schema!=='vllm-hust-sr-development/v1'||value.control!=='B1-r8'||value.entries?.length!==srIds.length)throw Error('Invalid SR publication scope');
+    for(const id of srIds){
+      const entries=value.entries.filter(entry=>entry.id===id);
+      if(entries.length!==1)throw Error('Invalid SR identity');
+      const entry=entries[0];
+      const url=new URL(entry.release_url);
+      if(url.origin!=='https://github.com'||!url.pathname.startsWith('/vLLM-HUST/vllm-hust-engine/releases/tag/b1-'+id+'-'))throw Error('Invalid SR evidence link');
+      const expected=id==='sr1'?['mmlu','4096-formal','16384-formal']:[...fixedProfiles.map(([id])=>id),'4096-formal','16384-formal'];
+      if(entry.rows.length!==expected.length||expected.some(id=>entry.rows.filter(row=>row.id===id).length!==1))throw Error('Invalid SR row coverage');
+      for(const row of entry.rows){
+        if(row.arms?.length!==2||row.cards?.length!==2||row.cards.some(cards=>cards.length!==2||!cards.every(Number.isInteger)))throw Error('Invalid SR arm identity');
+        for(const arm of row.arms){
+          if(!['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','ttft_p95_ms','ttft_p99_ms','end_to_end_p95_ms','end_to_end_p99_ms'].every(key=>Number.isFinite(arm[key])&&arm[key]>0))throw Error('Invalid SR metrics');
+          if(arm.correct!==undefined&&(!Number.isInteger(arm.correct)||!Number.isInteger(arm.requests)||arm.correct<0||arm.correct>arm.requests))throw Error('Invalid SR score');
+        }
+      }
+    }
+    srEntries=value.entries;
+  }
+  function srRows(entry) {
+    return entry.rows.map(row=>{
+      const crossCard=row.cards[0].join()!==row.cards[1].join();
+      const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
+      const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
+      const workloadLabel=[row.variant,crossCard?t('跨卡位对照','Different card positions'):t('同卡对照','Matched cards')].filter(Boolean).join(' · ');
+      return {...row,arms,changes_percent,crossCard,workloadLabel};
+    });
+  }
+  function srDetails(entry,rows,key,roles) {
+    const measurements=rows.filter(row=>row.arms);
+    const settings='E36/R54 · MTP2 · FULL · TP2';
+    if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.name)} · ${settings} · BF16 · Qwen3.5-35B-A3B</p><p><a href="${esc(entry.release_url)}">B1-${entry.id} Release ↗</a></p>`};
+    if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${t('各场景各记录一次对照。吞吐为输出 token 除以批次耗时，含排空。TTFT 和 TPOT 为逐请求均值。成本比按同费率计算，为 B1-r8 吞吐除以候选吞吐。','Each scenario reports one comparison. Throughput is output tokens divided by batch duration including drain. TTFT and TPOT are request means. Equal-rate cost is B1-r8 throughput divided by candidate throughput.')}</p>`};
+    if(key==='quality'){
+      const scored=measurements.filter(row=>Number.isInteger(row.arms.B1.correct));
+      return {title:t('质量与评分明细','Quality and grading'),body:table(t(['场景','版本','正确 / 总数','长度终止','未判定'],['Profile','Version','Correct / total','Length stops','Unresolved']),scored.flatMap(row=>['B0','B1'].map(role=>{const arm=row.arms[role];return [row.label,roles[role],`${arm.correct}/${arm.requests}`,arm.truncated,arm.unresolved];})))+`<p>${t('SWE 与 Terminal 回放仅统计请求性能。','SWE and Terminal replays measure request performance only.')}</p>`};
+    }
+    if(key==='metrics')return {title:t('完整数值','Complete metrics'),body:table(t(['场景','版本','物理卡','tok/s','TTFT / s','TPOT / ms','TTFT P95 / s','TTFT P99 / s','E2E P95 / s','E2E P99 / s'],['Profile','Arm','Physical cards','tok/s','TTFT / s','TPOT / ms','TTFT P95 / s','TTFT P99 / s','E2E P95 / s','E2E P99 / s']),measurements.flatMap(row=>['B0','B1'].map((role,i)=>{const arm=row.arms[role];return [[row.label,row.variant].filter(Boolean).join(' · '),roles[role],row.cards[i].join(', '),n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms/1000),n(arm.ttft_p99_ms/1000),n(arm.end_to_end_p95_ms/1000),n(arm.end_to_end_p99_ms/1000)];})))};
+    return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p><a href="./${srPath}">${t('公开汇总','Public summary')} ↗</a> · <a href="${esc(entry.release_url)}">${t('私有 Release','Private Release')} ↗</a></p>`};
+  }
   function renderVersion() {
     const attempt=attemptIds.includes(selectedRelease);
-    const entry=attempt?releaseCatalog.attempts.find(row=>row.id===selectedRelease):releaseEntry();
+    const sr=srIds.includes(selectedRelease);
+    const entry=sr?srEntries.find(row=>row.id===selectedRelease):attempt?releaseCatalog.attempts.find(row=>row.id===selectedRelease):releaseEntry();
+    const roles=sr?{B0:'B1-r8',B1:'B1-'+entry.id}:{B0:'B0',B1:'B1'};
     const reason=attempt?t(entry.reason_zh,entry.reason_en):entry.id==='r5'?t(entry.scope_zh,entry.scope_en):'';
     const missingNote=attempt||entry.id==='r5'?t('运行未完成，无配对数据','Run incomplete; no paired data'):'';
-    const rows=standardRows(attempt?[]:versionRows(entry),missingNote),available=rows.filter(row=>row.arms);
-    const throughput=available.length?Math.max(...available.map(row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second)):null;
+    const rows=standardRows(attempt?[]:sr?srRows(entry):versionRows(entry),missingNote),available=rows.filter(row=>row.arms);
+    const throughput=available.length?Math.max(...available.filter(row=>!row.crossCard).map(row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second)):null;
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id));
-    const values=['—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(1-1/throughput))+'%':'—'];
-    const notes=[t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?t('已发布场景最高吞吐比','Highest published throughput ratio'):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t('16K相对B0吞吐','16K throughput vs B0'):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
-    document.getElementById('comparison-title').textContent=t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
+    const values=['—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
+    const notes=[t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
+    document.getElementById('comparison-title').textContent=sr?t(`B1-r8 / B1-${entry.id} 实测对比`,`B1-r8 / B1-${entry.id} measured comparison`):t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
     document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
-    const settings=attempt?t('本次尝试未形成冻结配置','This attempt did not produce a frozen configuration'):`E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · TP2 · host ${entry.settings.state_gib_per_rank} GiB/rank · KV ${entry.settings.kv_gib_per_rank} GiB/rank`;
-    const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:entry.mods,settings);
+    const settings=sr?'E36/R54 · MTP2 · FULL · TP2':attempt?t('本次尝试未形成冻结配置','This attempt did not produce a frozen configuration'):`E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · TP2 · host ${entry.settings.state_gib_per_rank} GiB/rank · KV ${entry.settings.kv_gib_per_rank} GiB/rank`;
+    const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
     const scope=attempt?reason:t(entry.scope_zh,entry.scope_en);
-    root.innerHTML=`<section class="comparison-dashboard">${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t('条形按 B0 = 1 归一，右侧为实测值；— 表示缺少本版配对数据。','Bars normalize B0 to 1; labels show measured values. — indicates missing version-specific paired data.')}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label))}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label))}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label))}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'B0 = 1',1,rows,rows.map(row=>row.label))}</div></section>${versionSupplement(entry,values)}<div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
-    if(!attempt&&!['r4','r5','r7','r8'].includes(entry.id))root.querySelector('.runtime-pair>div:last-child span').textContent=t('运行时身份见配置详情','See configuration details for runtime identity');
-    if(attempt){const config=root.querySelector('.frozen-profile');config.querySelector('h2').textContent=t('本次运行配置','Run configuration');config.querySelector('.runtime-pair>div:last-child span').textContent=t('冻结前尝试，运行时身份见原件','Pre-freeze attempt; see originals for runtime identity');config.querySelector('.mod-tags').textContent=t('未形成冻结MOD组合','No frozen MOD stack');config.dataset.historyAttempt=entry.id;delete root.dataset.baselineId;}else{root.querySelector('.frozen-profile').dataset.historyRelease=entry.id;root.dataset.baselineId=releaseCatalog.baseline.id;}
-    bindMenu();bindDetails(key=>versionDetails(entry,rows,key,attempt));root.dataset.release=entry.id;root.dataset.loaded=entry.id==='r8'?'r8-continuous-20261117':attempt?'engine-release-attempt-'+entry.id:'engine-release-history-'+entry.id;root.dataset.layout='release-dashboard-v1';root.setAttribute('aria-busy','false');
+    const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
+    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small></article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`条形按 ${roles.B0} = 1 归一，右侧为实测值。— 表示缺少本版配对数据。`,`Bars normalize ${roles.B0} to 1. Labels show measured values. — indicates missing version-specific paired data.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    if(sr){
+      const control=root.querySelector('.runtime-pair>div:first-child');
+      control.querySelector('strong').textContent=roles.B0;
+      control.querySelector('span').textContent='vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN 9.1.0';
+      root.querySelector('.runtime-pair>div:last-child strong').textContent=roles.B1;
+      root.querySelector('[data-detail="controller-progress"]').remove();
+    }
+    if(!sr&&!attempt&&!['r4','r5','r7','r8'].includes(entry.id))root.querySelector('.runtime-pair>div:last-child span').textContent=t('运行时身份见配置详情','See configuration details for runtime identity');
+    if(attempt){const config=root.querySelector('.frozen-profile');config.querySelector('h2').textContent=t('本次运行配置','Run configuration');config.querySelector('.runtime-pair>div:last-child span').textContent=t('冻结前尝试，运行时身份见原件','Pre-freeze attempt; see originals for runtime identity');config.querySelector('.mod-tags').textContent=t('未形成冻结MOD组合','No frozen MOD stack');config.dataset.historyAttempt=entry.id;delete root.dataset.baselineId;}else{root.querySelector('.frozen-profile').dataset.historyRelease=entry.id;root.dataset.baselineId=sr?'B1-r8':releaseCatalog.baseline.id;}
+    bindMenu();bindDetails(key=>sr?srDetails(entry,rows,key,roles):versionDetails(entry,rows,key,attempt));root.dataset.release=entry.id;root.dataset.loaded=entry.id==='r8'?'r8-continuous-20261117':attempt?'engine-release-attempt-'+entry.id:'engine-release-history-'+entry.id;root.dataset.layout='release-dashboard-v1';root.setAttribute('aria-busy','false');
   }
   const r8Mods = ['Extension Manager','BetterScale','Microflow','KV materialization','M01 correction','Packed host state','Sealed serving warmup','Guarded progress async','Capacity tuning','Short prefill tail'];
   function r8Rows() {
@@ -553,6 +615,7 @@
   }
   function render() {
     if(!releaseCatalog)return;
+    if(srIds.includes(selectedRelease)){if(srEntries)renderVersion();return;}
     if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}
     if(!data||!combination)return;
     renderR6();root.querySelector('.comparison-dashboard').insertAdjacentHTML('afterbegin',releaseMenu());
@@ -575,7 +638,8 @@
     try {
       await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress()]);
       if(request!==releaseRequest)return;
-      if(selectedRelease==='r8'&&!currentR8)await loadR8();
+      if(srIds.includes(selectedRelease)&&!srEntries)await loadSr();
+      else if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();
       if(request!==releaseRequest)return;
       render();

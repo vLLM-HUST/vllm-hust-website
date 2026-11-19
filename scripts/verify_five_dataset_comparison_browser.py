@@ -11,6 +11,7 @@ from playwright.sync_api import expect, sync_playwright
 
 SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
 HISTORY = "data/engine-release-history-v1.json"
+SR = "data/sr-development-results-v1.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
@@ -73,6 +74,41 @@ def assert_controller_progress(page, root, publication, lang):
     expect(button).to_be_focused()
 
 
+def assert_sr(page, root, entry, layout, lang):
+    release = entry["id"]
+    root.locator("#comparison-release-select").select_option(release)
+    expect(root).to_have_attribute("data-release", release, timeout=30000)
+    expect(root).to_have_attribute("data-baseline-id", "B1-r8")
+    expect(page.locator("#comparison-title")).to_contain_text(f"B1-r8 / B1-{release}")
+    expect(root.locator(".runtime-pair strong")).to_have_text(
+        ["B1-r8", f"B1-{release}"]
+    )
+    assert dashboard_layout(root) == layout
+    assert_release_control_readable(page, root)
+    for row in entry["rows"]:
+        bars = root.locator(
+            f'[data-metric="output_tokens_per_second"] [data-profile="{row["id"]}"] .bar-value'
+        )
+        expect(bars).to_have_text(
+            [f"{arm['output_tokens_per_second']:.2f}" for arm in row["arms"]]
+        )
+    expect(root.locator(".metric-missing")).to_have_count(16 if release == "sr1" else 0)
+    if release == "sr2":
+        expect(root.locator('[data-dataset="hle"]')).to_contain_text(
+            "已发布跨卡对照" if lang == "zh" else "Published cross-card comparison"
+        )
+    button = root.locator('[data-detail="metrics"]')
+    button.click()
+    dialog = root.locator("dialog")
+    expect(dialog).to_contain_text("E2E P95 / s")
+    expect(dialog).to_contain_text("E2E P99 / s")
+    page.keyboard.press("Escape")
+    expect(button).to_be_focused()
+    root.locator('[data-detail="quality"]').click()
+    expect(dialog).to_contain_text("151/200" if release == "sr1" else "144/200")
+    page.keyboard.press("Escape")
+
+
 def context_supplement(catalog):
     return next(row for row in catalog["entries"] if row["id"] == "r8")[
         "context_tenant_supplement"
@@ -99,6 +135,7 @@ def verify(url, output):
         r8 = context.request.get(
             url + "/data/r8-continuous-20261117/summary-v1.json"
         ).json()
+        sr = context.request.get(url + "/" + SR).json()
         for lang in ("zh", "en"):
             for width in (390, 1440):
                 for theme in ("light", "dark"):
@@ -268,7 +305,9 @@ def verify(url, output):
                     )
                     expect(
                         root.locator("#comparison-release-select option")
-                    ).to_have_count(8)
+                    ).to_have_count(10)
+                    for entry in sr["entries"]:
+                        assert_sr(page, root, entry, r8_layout, lang)
                     for release, controls, values in [
                         ("r1", [], []),
                         ("r2", [], []),
@@ -398,7 +437,9 @@ def verify(url, output):
                     for band in ("4K–8K", "16K–24K", "32K–48K"):
                         expect(label).to_contain_text(band)
                     image = supplement.locator("img")
-                    assert image.evaluate("el=>el.complete && el.naturalWidth>0")
+                    assert image.evaluate(
+                        "async el=>{await el.decode();return el.naturalWidth>0}"
+                    )
                     root.locator('[data-detail="supplement"]').click()
                     extra = root.locator("dialog")
                     expect(extra.locator("tbody tr")).to_have_count(4)
@@ -497,7 +538,7 @@ def verify(url, output):
                         }
                     )
                     page.close()
-        for release in ("r1", "r2", "r3", "r4", "r5", "r7"):
+        for release in ("r1", "r2", "r3", "r4", "r5", "r7", "sr1", "sr2"):
             page = context.new_page()
             page.goto(url + "/b0-b1.html?release=" + release)
             root = page.locator("#five-dataset-comparison")
@@ -544,7 +585,7 @@ def verify(url, output):
         expect(root.locator(".metric-chart")).to_have_count(4)
         expect(root.locator(".metric-missing")).to_have_count(20)
         expect(root.locator(".bar-value")).to_have_count(0)
-        expect(root.locator("#comparison-release-select option")).to_have_count(9)
+        expect(root.locator("#comparison-release-select option")).to_have_count(11)
         page.goto(url + "/b0-b1.html")
         expect(root).to_have_attribute("data-release", "r9", timeout=30000)
         page.close()
@@ -794,6 +835,17 @@ def verify(url, output):
                 "historical_release_selectable": True,
             }
         )
+        page = context.new_page()
+        page.route("**/" + SR, lambda route: route.fulfill(json={"corrupted": True}))
+        page.goto(url + "/b0-b1.html?release=sr2")
+        root = page.locator("#five-dataset-comparison")
+        expect(root).to_have_attribute(
+            "data-error", "publication-rejected", timeout=30000
+        )
+        root.locator("#comparison-release-select").select_option("r8")
+        expect(root).to_have_attribute("data-release", "r8", timeout=30000)
+        page.close()
+        checks.append({"rejected": "corrupt-sr-publication", "r8_selectable": True})
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
     print(f"Verified {len(checks)} chart/dialog/source cases")
