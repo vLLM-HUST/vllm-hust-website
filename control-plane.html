@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/product-home.css?v=20261118" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
-  <link rel="stylesheet" href="./assets/controlplane.css" />
+  <link rel="stylesheet" href="./assets/controlplane.css?v=instance-scaling-20261120" />
   <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
   <link rel="stylesheet" href="./assets/product-publications.css?v=20261118" />
   <link rel="stylesheet" href="./assets/product-layout.css?v=product-layout-20261118-r1" />
@@ -106,10 +106,14 @@ ride logs model-service MODEL_NAME</code></pre>
           <h2><span class="lang-zh">控制面 MOD 与职责</span><span class="lang-en">Control plane MODs and responsibilities</span></h2>
           <p><span class="lang-zh">RIDE 管理模型服务和控制进程的生命周期。各控制器通过公共 SDK 观察和执行策略。</span><span class="lang-en">RIDE manages the lifecycle of model services and control processes. Controllers observe state and apply policies through the public SDK.</span></p>
         <div class="engine-cards">
-          <article><h3><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></h3><p><span class="lang-zh">决定扩缩容、就绪后启用实例，以及缩容前的排空顺序。</span><span class="lang-en">Decides when to scale replicas, activates ready instances and coordinates draining before scale-down.</span></p><a href="https://github.com/yancanmao/instance-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a></article>
+          <article><h3><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></h3><p><span class="lang-zh">决定扩缩容、就绪后启用实例，以及缩容前的排空顺序。</span><span class="lang-en">Decides when to scale replicas, activates ready instances and coordinates draining before scale-down.</span></p><a href="https://github.com/yancanmao/instance-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a> · <a href="#instance-scaling-results"><span class="lang-zh">扩缩容实测</span><span class="lang-en">Scaling benchmark</span> ↗</a></article>
           <article><h3><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></h3><p><span class="lang-zh">查询缓存后端能力，验证缓存操作并保护排空过程。可依据缓存覆盖和预计在途工作量选择副本。</span><span class="lang-en">Discovers cache backend capabilities, verifies actions and protects draining. Selects replicas using estimated cache coverage and in-flight work.</span></p><a href="https://github.com/yancanmao/kv-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a> · <a href="#kv-routing-results"><span class="lang-zh">实测</span><span class="lang-en">Benchmark</span> ↗</a></article>
           <article><h3><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span></h3><p><span class="lang-zh">管理请求放行、多轮程序归属及请求排空。</span><span class="lang-en">Manages request admission, multi-turn program affinity and request draining.</span></p><a href="./controlplane/"><span class="lang-zh">组件详情</span><span class="lang-en">Component details</span> ↗</a> · <a href="./controlplane/#results"><span class="lang-zh">组件实测</span><span class="lang-en">Component results</span> ↗</a></article>
         </div>
+          <div id="instance-scaling-results" role="region" aria-labelledby="instance-scaling-title" aria-busy="true">
+            <h3 id="instance-scaling-title"><span class="lang-zh">实例控制器扩缩容实测</span><span class="lang-en">Instance Controller scaling benchmark</span></h3>
+            <div id="instance-scaling-measurements"></div>
+          </div>
         </section>
       </details>
       <details class="engine-fold">
@@ -283,6 +287,7 @@ ride logs model-service MODEL_NAME</code></pre>
   </script>
   <script src="./assets/site.js?v=ride-control-preview"></script>
   <script src="./assets/kv-routing-results.js" defer></script>
+  <script src="./assets/instance-scaling-results.js" defer></script>
   <script src="./assets/product-layout.js?v=product-anchors-20261119-r2"></script>
 </body>
 </html>

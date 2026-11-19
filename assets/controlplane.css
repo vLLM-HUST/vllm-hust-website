@@ -26,7 +26,7 @@ body[data-page="control-plane"] .product-details .engine-detail-grid {
   grid-template-columns:minmax(0,1fr);
 }
 
-#kv-routing-results {
+#kv-routing-results, #instance-scaling-results {
   margin-top:24px;
   scroll-margin-top:96px;
 }
