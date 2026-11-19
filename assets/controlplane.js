@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const zh = {
-    'control-kicker':'服务控制组件','control-title':'请求限流控制器','control-component-name':'请求限流控制器','control-product-link':'服务控制产品 ↗','control-owner':'负责人：毛言粲',
+    'control-kicker':'引擎控制面组件','control-title':'请求限流控制器','control-component-name':'请求限流控制器','control-product-link':'引擎控制面 ↗','control-owner':'负责人：毛言粲',
     'control-lede':'在请求到达引擎前协调多轮程序。在资源竞争时保留有用的程序状态，减少重复 prefill。',
     'control-result-link':'实测结果 ↓','control-deploy-link':'部署方式 ↓','control-repo-link':'源码与开发 ↗',
     'control-path-title':'请求路径','control-client':'客户端','control-program':'多轮程序','control-controller':'调度组件','control-engine':'模型服务',
@@ -21,7 +21,7 @@
   };
   const en = Object.fromEntries(Object.keys(zh).map(id => [id, document.getElementById(id)?.textContent || '']));
   en.title = 'Request Throttling Controller | vLLM-HUST';
-  zh.title = `${zh['control-title']} · 服务控制 | vLLM-HUST`;
+  zh.title = `${zh['control-title']} · 引擎控制面 | vLLM-HUST`;
   window.vllmHustPageDict = {en, zh};
   let publication, selected, data;
   const root = document.getElementById('control-results');

@@ -3,33 +3,140 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="统一服务入口，协调模型与引擎，让每次推理各就其位。" />
+  <meta name="description" content="RIDE 是面向分布式推理引擎的分布式控制面。" />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/control-plane.html" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
-  <title>服务控制 · vLLM-HUST</title>
+  <title>引擎控制面 · vLLM-HUST</title>
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/product-home.css?v=20261118" />
+  <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
+  <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
   <link rel="stylesheet" href="./assets/product-publications.css?v=20261118" />
   <link rel="stylesheet" href="./assets/product-layout.css?v=product-layout-20261118-r1" />
 </head>
-<body data-page="control-plane" class="product-home product-control">
+<body data-page="control-plane" class="product-home product-engine">
   <nav class="site-nav"><div class="site-shell site-nav-inner"><a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>面向国产算力的推理引擎</small></span></a><div class="nav-links"><a class="nav-link" href="./engine.html">Engine</a><a class="nav-link" href="./control-plane.html">Control Plane</a><a class="nav-link" href="./continuum.html">Continuum</a></div></div></nav>
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">EN</span></button>
-  <main class="product-shell">
-<nav aria-label="产品" class="product-switcher" data-copy-aria="productNavigation"><a data-i18n-common="navEngine" href="./engine.html">Engine</a><span aria-hidden="true">/</span><a aria-current="page" data-i18n-common="navControlPlane" href="./control-plane.html">Control Plane</a><span aria-hidden="true">/</span><a data-i18n-common="navContinuum" href="./continuum.html">Continuum</a></nav><nav aria-label="Product sections" class="product-jumps"><a href="#workflow"><span class="lang-zh">开始了解</span><span class="lang-en">Explore</span></a><a href="#product-details"><span class="lang-zh">实现与版本</span><span class="lang-en">Implementation</span></a><a href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span></a></nav>
-<section aria-labelledby="product-title" class="product-hero">
-<div class="product-intro"><p class="product-eyebrow"><span><span class="lang-zh">服务控制</span><span class="lang-en">INFERENCE ORCHESTRATION</span></span></p><div class="product-identity"><span class="product-status" data-copy="status">网关与调度已有实现</span></div><h1 id="product-title" data-copy="productName">服务控制</h1><p class="product-tagline"><span data-copy="titleLine1">把请求送到</span><br/><span data-copy="titleLine2">合适的算力。</span></p><p class="product-owner" data-copy="owner">负责人：毛言粲</p><p class="product-lead" data-copy="lead">统一服务入口，协调模型与引擎，让每次推理各就其位。</p><div class="product-actions"><a class="product-button" data-copy="explore" href="#workflow">探索工作方式 ↓</a><a class="product-text-link" data-copy="controllerName" href="./controlplane/">请求限流控制器</a><a class="product-text-link publications-shortcut" href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span> ↓</a></div></div>
-<figure aria-label="产品架构示意" class="product-diagram" data-copy-aria="diagramAria"><div class="diagram-caption"><span data-copy="diagramLabel">服务架构</span><span data-copy="diagramNote">架构示意</span></div>
-<div class="diagram-client" data-copy="client">应用 / Agent</div><div aria-hidden="true" class="diagram-wire"></div>
-<div class="diagram-core"><span aria-hidden="true" class="core-symbol">⌘</span><strong data-i18n-common="navControlPlane">Control Plane</strong><span data-copy="coreNote">网关 · 准入 · 路由</span></div>
-<div aria-hidden="true" class="diagram-fan"><i></i><i></i><i></i></div>
-<div class="diagram-workers"><div><span class="worker-dot"></span><strong>Engine A</strong><small data-copy="workerA">模型服务</small></div><div class="selected"><span class="worker-dot"></span><strong>Engine B</strong><small data-copy="workerB">选定实例</small></div><div><span class="worker-dot"></span><strong>Engine C</strong><small data-copy="workerC">模型服务</small></div></div></figure>
-</section><section aria-label="产品能力" class="product-capabilities" data-copy-aria="capabilitiesAria"><article><h3 data-copy="capTitle0">统一入口</h3><p data-copy="capText0">认证、模型映射与流式代理。</p></article><article><h3 data-copy="capTitle1">感知负载</h3><p data-copy="capText1">结合并发、健康与 KV 利用率选择实例。</p></article><article><h3 data-copy="capTitle2">协调生命周期</h3><p data-copy="capText2">管理引擎注册、故障转移与扩缩容接口。</p></article></section>
-<section aria-labelledby="workflow-title" class="product-workflow" id="workflow"><div class="section-heading"><p class="product-eyebrow">HOW IT WORKS</p><h2 data-copy="flowTitle" id="workflow-title">一次请求，四步协同。</h2><p data-copy="flowLead">选择步骤，查看请求如何经过服务层。</p></div>
-<div aria-label="工作流程" class="flow-tabs" data-copy-aria="workflowAria" role="tablist"><button aria-controls="flow-panel" aria-selected="true" data-step="0" id="flow-tab-0" role="tab" tabindex="0" type="button"><span class="step-index">01</span><span data-copy="step0">接入</span></button><button aria-controls="flow-panel" aria-selected="false" data-step="1" id="flow-tab-1" role="tab" tabindex="-1" type="button"><span class="step-index">02</span><span data-copy="step1">选路</span></button><button aria-controls="flow-panel" aria-selected="false" data-step="2" id="flow-tab-2" role="tab" tabindex="-1" type="button"><span class="step-index">03</span><span data-copy="step2">执行</span></button><button aria-controls="flow-panel" aria-selected="false" data-step="3" id="flow-tab-3" role="tab" tabindex="-1" type="button"><span class="step-index">04</span><span data-copy="step3">反馈</span></button></div>
-<div aria-labelledby="flow-tab-0" class="flow-panel" id="flow-panel" role="tabpanel" tabindex="0"><div><span class="flow-tag" id="flow-tag">01 / GATEWAY</span><h3 id="flow-heading">一个入口接入模型服务</h3><p id="flow-text">验证 API key，执行准入限制，接收 Chat Completions 与 Responses 请求。</p></div><div class="flow-outcome"><span data-copy="outcomeLabel">结果</span><strong id="flow-outcome">请求进入服务系统</strong><span aria-hidden="true" class="outcome-arrow">↗</span></div></div>
-</section>
-<section aria-label="实现与规划" class="product-details" data-copy-aria="detailsAria" id="product-details"><div class="section-heading"><h2 data-copy="detailsTitle">实现与规划</h2><p data-copy="detailsLead">展开查看范围与接口。</p></div><div><details><summary data-copy="detailTitle0">实现范围</summary><p data-copy="detailText0">RTC 是服务控制的请求限流与程序调度组件。当前实现包含 API 网关、显式模型映射、调度策略、健康管理、流式转发、追踪与聚合指标。扩缩容接口与 PD 路由属于调度边界；具体部署组合单独验证。</p></details><details><summary data-copy="detailTitle1">与 Engine 的接口</summary><p data-copy="detailText1">Control Plane 读取实例健康、负载与容量信息，下发请求并接收状态。Engine 负责 token 执行、KV 管理和数据传输。</p></details><details><summary data-copy="detailTitle2">与 Continuum 的接口 · 规划</summary><p data-copy="detailText2">Control Plane 负责资源分配与服务调度；Continuum 负责上下文、文件、沙箱环境和任务检查点的保存与恢复。应用组织好上下文后，经服务入口调用 Engine。</p></details></div></section><section aria-labelledby="stack-title" class="product-stack" id="product-stack"><div class="section-heading"><p class="product-eyebrow">ONE INFERENCE ECOSYSTEM</p><h2 data-copy="stackTitle" id="stack-title">执行、调度、工作环境，各司其职。</h2><p data-copy="stackMods">三个产品均通过 MOD 扩展：执行优化、服务策略、上下文与沙箱。</p></div><div class="stack-links"><a href="./engine.html"><span class="stack-number">01</span><strong data-i18n-common="navEngine">Engine</strong><span data-copy="stackEngine">高效执行推理</span><span aria-hidden="true">↗</span></a><a href="./control-plane.html"><span class="stack-number">02</span><strong data-i18n-common="navControlPlane">Control Plane</strong><span data-copy="stackControl">组织推理服务</span><span aria-hidden="true">↗</span></a><a href="./continuum.html"><span class="stack-number">03</span><strong data-i18n-common="navContinuum">Continuum</strong><span data-copy="stackMemory">接续任务与工作环境</span><span aria-hidden="true">↗</span></a></div></section>
+<main class="product-shell">
+  <nav aria-label="产品" class="product-switcher">
+    <a data-i18n-common="navEngine" href="./engine.html">引擎</a><span aria-hidden="true">/</span>
+    <a aria-current="page" data-i18n-common="navControlPlane" href="./control-plane.html">控制面</a><span aria-hidden="true">/</span>
+    <a data-i18n-common="navContinuum" href="./continuum.html">智能体工作环境</a>
+  </nav>
+  <nav aria-label="Product sections" class="product-jumps"><a href="#workflow"><span class="lang-zh">开始了解</span><span class="lang-en">Explore</span></a><a href="#product-details"><span class="lang-zh">实现与版本</span><span class="lang-en">Implementation</span></a><a href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span></a></nav>
+
+  <section class="product-hero" aria-labelledby="product-title">
+    <div class="product-intro">
+      <p class="product-eyebrow">RIDE</p>
+      <p class="product-status" id="ride-status">固定起点 · 第八版引擎 + 请求限流控制器</p>
+      <h1 id="product-title">引擎控制面</h1>
+      <p id="ride-owner" class="product-owner">负责人：毛言粲</p>
+      <p id="ride-lead" class="product-lead">面向分布式推理引擎的分布式控制面。在已有集群上部署、观测和管理模型服务，协调引擎实例的上线、扩缩容和下线。</p>
+      <div class="product-actions">
+        <a class="product-button" href="#workflow"><span class="lang-zh">开始部署 ↓</span><span class="lang-en">Deploy RIDE ↓</span></a>
+        <a class="product-text-link publications-shortcut" href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span> ↓</a>
+        <a class="product-text-link" href="./controlplane/#results"><span class="lang-zh">控制面实测</span><span class="lang-en">Control plane results</span> ↗</a>
+      </div>
+    </div>
+    <aside class="product-diagram engine-profile" aria-labelledby="ride-evidence-title">
+      <div class="diagram-caption"><span class="lang-zh">冻结组合</span><span class="lang-en">Frozen combination</span></div>
+      <div class="engine-profile-top"><strong id="ride-evidence-title">第八版引擎 + 请求限流控制器</strong><time datetime="2026-11-18">2026-11-18</time></div>
+      <div class="engine-layer"><span id="ride-model-label">模型</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
+      <div class="engine-layer"><span id="ride-runtime-label">本版组合</span><strong id="ride-runtime-value">RIDE 本地托管 · 请求限流控制器</strong></div>
+      <div class="engine-layer"><span id="ride-hardware-label">硬件</span><strong>2 × Ascend 910B2 · TP2</strong></div>
+      <p class="engine-mod-chips"><a href="#components" id="ride-mod-badge" style="color:inherit">1 项已验证的控制面 MOD ↗</a></p>
+    </aside>
+  </section>
+
+  <section class="product-capabilities" aria-label="核心能力">
+    <article><h3><span class="lang-zh">模型实例与生命周期</span><span class="lang-en">Model lifecycle</span></h3><p><span class="lang-zh">部署模型服务，记录实例身份、就绪状态与作业，独立管理启停。</span><span class="lang-en">Deploy model services, track readiness and job identity, and manage each instance independently.</span></p></article>
+    <article><h3><span class="lang-zh">资源与调度决策</span><span class="lang-en">Resource and scheduling decisions</span></h3><p><span class="lang-zh">实例控制器根据负载决定副本数。RIDE 管理作业，Ray 执行进程。</span><span class="lang-en">The Instance Controller decides replica counts. RIDE manages the jobs, and Ray executes them.</span></p></article>
+    <article><h3><span class="lang-zh">状态观测与运行管理</span><span class="lang-en">Observability and operations</span></h3><p><span class="lang-zh">通过管理接口查看服务、控制器和日志，保留作业身份供重启后接管。</span><span class="lang-en">Inspect services, controllers and logs, and preserve job identity for adoption after a restart.</span></p></article>
+  </section>
+
+  <section class="product-workflow" id="workflow" aria-labelledby="workflow-title">
+    <div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2 id="workflow-title"><span class="lang-zh">在已有集群部署</span><span class="lang-en">Deploy on an existing cluster</span></h2></div>
+    <div class="product-start-grid">
+      <section class="engine-section">
+        <h2><span class="lang-zh">启动 RIDE</span><span class="lang-en">Start RIDE</span></h2>
+        <p><span class="lang-zh">在工作区安装 RIDE，连接已有 Ray 集群，并指定持久化状态文件。</span><span class="lang-en">Install RIDE in your workspace, connect to an existing Ray cluster, and specify a persistent state file.</span></p>
+        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>python -m pip install '.[ray]'
+ride start --ray-address http://RAY_HEAD:8265 \
+  --workspace YOUR_WORKSPACE \
+  --state-file /persistent/path/ride-state.json</code></pre>
+        <p class="engine-note"><a href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md"><span class="lang-zh">安装与部署指南</span><span class="lang-en">Installation guide</span> ↗</a></p>
+      </section>
+      <section class="engine-section">
+        <h2><span class="lang-zh">管理模型与控制器</span><span class="lang-en">Manage models and controllers</span></h2>
+        <p><span class="lang-zh">按部署指南启动模型服务并安装所需控制器。用同一个管理入口检查运行状态。</span><span class="lang-en">Follow the guide to deploy a model service and install the controllers you need. Inspect both through the same management endpoint.</span></p>
+        <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>ride get model-services
+ride get controllers
+ride logs model-service MODEL_NAME</code></pre>
+        <p class="engine-note"><a href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/CLI_QUICKSTART.md"><span class="lang-zh">命令行操作说明</span><span class="lang-en">CLI quickstart</span> ↗</a> · <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/SDK.md"><span class="lang-zh">公共 SDK</span><span class="lang-en">Public SDK</span> ↗</a></p>
+      </section>
+    </div>
+  </section>
+
+  <section class="product-details" id="product-details" aria-labelledby="product-details-title">
+    <div class="section-heading">
+      <p class="product-eyebrow"><span class="lang-zh">深入了解</span><span class="lang-en">DETAILS</span></p>
+      <h2 id="product-details-title"><span class="lang-zh">版本、实现与复现</span><span class="lang-en">Release, implementation &amp; reproduction</span></h2>
+      <p><span class="lang-zh">展开查看冻结配置、实测和历史。</span><span class="lang-en">Expand for the frozen configuration, results and history.</span></p>
+    </div>
+    <div class="engine-detail-grid">
+      <details class="engine-fold">
+        <summary><span class="lang-zh">实测结果与方法</span><span class="lang-en">Measured results and methods</span></summary>
+        <section class="engine-section" id="verified">
+          <h2><span class="lang-zh">第八版引擎与请求限流控制器的配对实测</span><span class="lang-en">Paired measurements with Engine r8 and Request Throttling Controller</span></h2>
+          <p><span class="lang-zh">2026-11-18，RIDE 在独立 CPU 工作区启动请求限流控制器实例，连接独立运行的第八版引擎。实际托管的实例处理了 336 个请求，随后由 RIDE 停止。实测报告记录了与直连引擎的三轮轨迹回放对照，以及完整批次耗时。</span><span class="lang-en">On November 18, RIDE launched a Request Throttling Controller instance in a separate CPU workspace and connected it to an independently running Engine r8. The managed instance handled 336 requests and RIDE stopped it after the run. The results page provides the batch times from the paired three-turn replay against direct engine access.</span></p>
+        <a href="./controlplane/#results"><span class="lang-zh">查看实测及适用范围</span><span class="lang-en">Results and scope</span> ↗</a>
+        </section>
+      </details>
+      <details class="engine-fold">
+        <summary><span class="lang-zh">冻结 MOD 与资源配置</span><span class="lang-en">Frozen MODs and resource budgets</span></summary>
+        <section class="engine-section" id="components">
+          <h2><span class="lang-zh">本轮冻结组合</span><span class="lang-en">Frozen combination</span></h2>
+          <p><span class="lang-zh">第八版引擎独立运行在两张 Ascend 910B2 上。RIDE 在独立 CPU 工作区托管请求限流控制器实例。</span><span class="lang-en">Engine r8 runs independently on two Ascend 910B2 cards. RIDE manages the Request Throttling Controller instance in a separate CPU workspace.</span></p>
+          <div class="r8-mod-list"><span class="r8-mod-chip"><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span><strong><span class="lang-zh">本轮已包含</span><span class="lang-en">Included</span></strong></span></div>
+          <h2><span class="lang-zh">控制面 MOD 与职责</span><span class="lang-en">Control plane MODs and responsibilities</span></h2>
+          <p><span class="lang-zh">RIDE 管理模型服务和控制进程的生命周期。各控制器通过公共 SDK 观察和执行策略。</span><span class="lang-en">RIDE manages the lifecycle of model services and control processes. Controllers observe state and apply policies through the public SDK.</span></p>
+        <div class="engine-cards">
+          <article><h3><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></h3><p><span class="lang-zh">决定扩缩容、就绪后启用实例，以及缩容前的排空顺序。</span><span class="lang-en">Decides when to scale replicas, activates ready instances and coordinates draining before scale-down.</span></p><a href="https://github.com/yancanmao/instance-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a></article>
+          <article><h3><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></h3><p><span class="lang-zh">查询缓存后端能力，验证缓存操作并保护排空过程。当前实测后端仅支持只读查询。</span><span class="lang-en">Discovers cache backend capabilities, verifies actions and protects draining. The tested backend supports read-only queries.</span></p><a href="https://github.com/yancanmao/kv-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a></article>
+          <article><h3><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span></h3><p><span class="lang-zh">管理请求放行、多轮程序归属及请求排空。</span><span class="lang-en">Manages request admission, multi-turn program affinity and request draining.</span></p><a href="./controlplane/"><span class="lang-zh">组件详情</span><span class="lang-en">Component details</span> ↗</a> · <a href="./controlplane/#results"><span class="lang-zh">组件实测</span><span class="lang-en">Component results</span> ↗</a></article>
+        </div>
+        </section>
+      </details>
+      <details class="engine-fold">
+        <summary><span class="lang-zh">部署、接口与复现详情</span><span class="lang-en">Deployment, interfaces and reproduction</span></summary>
+        <section class="engine-section engine-release" id="architecture">
+          <div>
+            <h2><span class="lang-zh">管理面、执行层与推理引擎</span><span class="lang-en">Management, execution and inference</span></h2>
+            <p><span class="lang-zh">RIDE 持有作业身份、管理启停并记录状态。Ray 执行独立控制器和模型作业。推理请求由所选服务入口转发至引擎，RIDE 管理接口用于部署和运维。</span><span class="lang-en">RIDE tracks job identity, lifecycle and status. Ray executes independent controllers and model jobs. Inference flows from the serving endpoint to the engine, while RIDE’s management API handles deployment and operations.</span></p>
+        <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/architecture/INDEPENDENT_CONTROLLERS.md"><span class="lang-zh">系统设计</span><span class="lang-en">System design</span> ↗</a>
+            <div class="engine-actions">
+              <a class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md"><span class="lang-zh">安装与部署指南</span><span class="lang-en">Installation guide</span> ↗</a>
+              <a class="engine-button" href="https://github.com/vLLM-HUST/ride"><span class="lang-zh">源代码</span><span class="lang-en">Source code</span> ↗</a>
+              <a class="engine-button" href="./controlplane/#results"><span class="lang-zh">实测与复现材料</span><span class="lang-en">Results and reproduction materials</span> ↗</a>
+            </div>
+          </div>
+        </section>
+      </details>
+      <details class="engine-fold">
+        <summary><span class="lang-zh">历史报告</span><span class="lang-en">Historical reports</span></summary>
+        <section class="engine-section">
+          <h3><span class="lang-zh">历史验证：Ray 双模型实例部署</span><span class="lang-en">Earlier verification: two model instances on Ray</span></h3>
+        <p><span class="lang-zh">2026-11-06，在同一物理主机上的两个开发工作区运行两个 vLLM 模型实例。验证覆盖 9 次真实生成、管理进程重启接管和停止隔离。</span><span class="lang-en">On November 6, two devboxes on one physical host ran two vLLM instances. Verification covered nine real generations, management-process restart adoption and stop isolation.</span></p>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/427c452767d6f7a820da96f4de70dcca786198d8/reports/ride-control-plane-20261106/source/evidence/machine-deployment-20261106/summary.json"><span class="lang-zh">原始验证记录</span><span class="lang-en">Verification record</span> ↗</a>
+          <h3><span class="lang-zh">真实模型扩缩容验证</span><span class="lang-en">Model service scaling verification</span></h3>
+          <p><span class="lang-zh">实例控制器发起扩容，RIDE 启动准确的模型作业；新实例就绪后接收流量。缩容时先停止向目标实例分配新任务，等待在途请求和缓存动作排空，再由 RIDE 停止该作业。</span><span class="lang-en">The Instance Controller initiates scale-up and RIDE starts the specific model job. The new instance receives traffic once ready. Scale-down stops new assignments, waits for requests and cache operations to drain, and then stops that job.</span></p>
+        <p><span class="lang-zh">路线图记录了真实生成和扩缩过程。这项功能验证覆盖固定测试环境，跨物理主机、真实缓存迁移和性能收益各有独立验收。</span><span class="lang-en">The roadmap records real generation and scaling in the test environment. Cross-host operation, real cache migration and performance gains have separate acceptance criteria.</span></p>
+        <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/architecture/CONTROLLER_ROADMAP.md"><span class="lang-zh">查看完整路线图与证据</span><span class="lang-en">Roadmap and evidence</span> ↗</a>
+        </section>
+      </details>
+    </div>
+  </section>
+<section aria-labelledby="stack-title" class="product-stack" id="product-stack"><div class="section-heading"><p class="product-eyebrow">ONE INFERENCE ECOSYSTEM</p><h2 id="stack-title"><span><span class="lang-zh">执行、调度、工作环境，各司其职。</span><span class="lang-en">Execute. Coordinate. Continue.</span></span></h2><p><span><span class="lang-zh">三个产品均通过 MOD 扩展：执行优化、服务策略、上下文与沙箱。</span><span class="lang-en">MODs extend all three products: execution, service policies, context and sandboxes.</span></span></p></div><div class="stack-links"><a href="./engine.html"><span class="stack-number">01</span><strong data-i18n-common="navEngine">Engine</strong><span><span><span class="lang-zh">高效执行推理</span><span class="lang-en">Execute inference efficiently</span></span></span><span aria-hidden="true">↗</span></a><a href="./control-plane.html"><span class="stack-number">02</span><strong data-i18n-common="navControlPlane">Control Plane</strong><span><span><span class="lang-zh">组织推理服务</span><span class="lang-en">Coordinate inference services</span></span></span><span aria-hidden="true">↗</span></a><a href="./continuum.html"><span class="stack-number">03</span><strong data-i18n-common="navContinuum">Continuum</strong><span><span><span class="lang-zh">接续任务与工作环境</span><span class="lang-en">Continue tasks and their workspaces</span></span></span><span aria-hidden="true">↗</span></a></div></section>
 <!-- PRODUCT PUBLICATIONS START -->
 <section aria-labelledby="publications-title" class="product-publications" data-publication-source="https://github.com/ShuhaoZhangTony/shuhaozhangtony.github.io/blob/1afc79099c190cfaf19cd2ca3ea56cdcb51f3914/contents/publications.md" id="publications"><header class="publications-heading"><div><p class="publications-kicker">RESEARCH</p><h2 id="publications-title"><span class="lang-zh">相关论文</span><span class="lang-en">Related publications</span> <span class="publication-count">19</span></h2><p><span class="lang-zh">工作流编排、资源调度与服务状态管理的相关研究。</span><span class="lang-en">Research in workflow orchestration, resource scheduling and service state.</span></p></div><a class="publications-all" href="https://shuhaozhangtony.github.io/publications.html"><span class="lang-zh">完整发表列表</span><span class="lang-en">All publications</span> ↗</a></header><details class="publication-library"><summary><span class="lang-zh">浏览全部论文</span><span class="lang-en">Browse all publications</span> <span aria-hidden="true">↗</span></summary><div class="publication-library-body">
 <nav aria-label="Publication topics" class="publication-navigation"><a href="#publications-workflows"><span class="lang-zh">工作流与编排</span><span class="lang-en">Workflows and orchestration</span></a><a href="#publications-control"><span class="lang-zh">调度、迁移与恢复</span><span class="lang-en">Scheduling, migration and recovery</span></a></nav>
@@ -136,9 +243,40 @@
 </div></details></section>
 <!-- PRODUCT PUBLICATIONS END -->
 </main>
-  <footer class="site-footer"><span id="footer-copy">SAGE Control Plane · vLLM-HUST</span></footer>
-  <script src="./assets/site.js?v=products-20261118&amp;ui=product-workspace-20261118-r1"></script>
-  <script src="./assets/product-home.js?v=control-plane-name-20261119"></script>
+  <footer class="site-footer"><span id="footer-copy">RIDE 引擎控制面</span></footer>
+  <script>
+    window.vllmHustPageDict = {
+      zh: {
+        title: '引擎控制面 · vLLM-HUST',
+        'product-title': '引擎控制面',
+        'ride-owner': '负责人：毛言粲',
+        'ride-status': '固定起点 · 第八版引擎 + 请求限流控制器',
+        'ride-evidence-title': '第八版引擎 + 请求限流控制器',
+        'ride-model-label': '模型',
+        'ride-runtime-label': '本版组合',
+        'ride-runtime-value': 'RIDE 本地托管 · 请求限流控制器',
+        'ride-hardware-label': '硬件',
+        'ride-mod-badge': '1 项已验证的控制面 MOD ↗',
+        'ride-lead': '面向分布式推理引擎的分布式控制面。在已有集群上部署、观测和管理模型服务，协调引擎实例的上线、扩缩容和下线。',
+        'footer-copy': 'RIDE 引擎控制面'
+      },
+      en: {
+        title: 'RIDE Inference Engine Control Plane · vLLM-HUST',
+        'product-title': 'Inference Engine Control Plane',
+        'ride-owner': 'Maintainer: Yancan Mao',
+        'ride-status': 'Fixed starting point · Engine r8 + Request Throttling Controller',
+        'ride-evidence-title': 'Engine r8 + Request Throttling Controller',
+        'ride-model-label': 'Model',
+        'ride-runtime-label': 'Combination',
+        'ride-runtime-value': 'Locally managed by RIDE · Request Throttling Controller',
+        'ride-hardware-label': 'Hardware',
+        'ride-mod-badge': '1 verified control plane MOD ↗',
+        'ride-lead': 'A distributed control plane for inference engines. Deploy and observe model services, and coordinate instance activation, scaling and shutdown on existing clusters.',
+        'footer-copy': 'RIDE Inference Engine Control Plane'
+      }
+    };
+  </script>
+  <script src="./assets/site.js?v=ride-control-preview"></script>
   <script src="./assets/product-layout.js?v=product-anchors-20261119-r2"></script>
 </body>
 </html>
