@@ -34,7 +34,7 @@
   function render() {
     const zh = window.vllmHustSite?.getCurrentLang() === 'zh';
     const title = qualityPage
-      ? (zh ? 'MMLU-Pro · 同题质量回归' : 'MMLU-Pro · Paired quality')
+      ? (zh ? 'MMLU-Pro · 同题质量回归' : 'MMLU-Pro · Quality')
       : (zh ? 'MMLU-Pro · 服务性能摘要' : 'MMLU-Pro · Serving performance summary');
     if (!data || !reportData) {
       section.innerHTML = `<h2>${title}</h2><p>${failed
@@ -103,7 +103,7 @@
         : (zh ? '完整回答联合测量 · 同轮质量、性能与成本' : 'FULL-ANSWER JOINT MEASUREMENT · SAME-RUN QUALITY, PERFORMANCE & COST');
       section.querySelector('.result-boundary').textContent = zh
         ? 'B0：vLLM 0.18 / vLLM-Ascend 0.18。B1：0.28.1 / 0.25.1rc2 开发栈，4GiB/rank 主机状态预算。'
-        : 'B0: vLLM/Ascend 0.18. B1: 0.28.1/0.25.1rc2; host State 4GiB/rank.';
+        : 'B0: vLLM 0.18 / vLLM-Ascend 0.18. B1: 0.28.1 / 0.25.1rc2; State 4GiB/rank.';
       section.querySelector('.result-reference').innerHTML = `<a href="#midterm-m01-verdict">${zh ? 'M01 · 历史 out256 参考计算' : 'M01 · Archived out256 reference calculation'}</a><br><small>B0 ${reference.B0.own_C.toFixed(4)} · B1 ${reference.B1.own_C.toFixed(4)} TFLOPS/${zh ? '芯片 · 历史 out256 工况。' : 'chip · archived out256 workload.'}</small>`;
       section.querySelector('.result-context').textContent = 'Qwen3.5-35B-A3B · BF16 · TP2 · 200 ' + (zh ? '请求' : 'requests') + ' · out8192 · Ascend 910B2 × 2';
       section.querySelector('.result-comparison-note').textContent = zh
