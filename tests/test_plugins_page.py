@@ -924,7 +924,7 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
         for item in REGISTRY["components"]
         if item.get("public_surface", True) is not False
         and item.get("maintainers")
-        and item.get("canonical_repository", "").startswith(
+        and (item.get("canonical_repository") or "").startswith(
             "https://github.com/vLLM-HUST/"
         )
         and item["id"] in MOD_TAXONOMY["components"]
@@ -950,9 +950,9 @@ def test_every_workshop_mod_has_synced_maintainers_and_repository_metrics() -> N
     assert all(
         component_id in system_boundaries
         or not by_id(component_id).get("maintainers")
-        or not by_id(component_id)
-        .get("canonical_repository", "")
-        .startswith("https://github.com/vLLM-HUST/")
+        or not (by_id(component_id).get("canonical_repository") or "").startswith(
+            "https://github.com/vLLM-HUST/"
+        )
         for component_id in without_metrics
     )
     for plugin_id, plugin in WORKSHOP_METADATA["plugins"].items():
@@ -1193,7 +1193,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=product-mods-20261118" in PAGE
-    assert "plugins-page.js?v=product-workspace-20261118-r1" in PAGE
+    assert "plugins-page.js?v=engine-creators-sync-20261119" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES

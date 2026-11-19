@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -174,6 +175,50 @@ def check_people(page, components, metadata, lang):
     return checked
 
 
+def check_engine_catalog_consistency(page, context, base_url, components):
+    """Both product views publish the same release names and creator identities."""
+    row_data = """rows => rows.map(row => ({
+        id: row.dataset.r8ModId,
+        cells: [...row.cells].map(cell => cell.innerText.trim()),
+        creator: row.querySelector(".r8-mod-creator a").href
+    }))"""
+    catalog_rows = page.locator(".r8-catalog-stack tbody tr")
+    expect(catalog_rows).to_have_count(10)
+    engine = context.new_page()
+    try:
+        engine.goto(f"{base_url}/engine.html#r8-mods", wait_until="domcontentloaded")
+        expect(engine.locator("#r8-mods")).to_be_visible()
+        expected = engine.locator("#r8-mods tbody tr").evaluate_all(row_data)
+        assert catalog_rows.evaluate_all(row_data) == expected
+    finally:
+        engine.close()
+    aliases = {
+        "extension-manager": "vllm-hust-extension-manager",
+        "microflow": "prefill-microflow",
+        "kv-materialization": "kv-materialization-arrival-control",
+        "m01-correction": "hust-m01-correction",
+        "packed-host": "hust-joint-packed",
+    }
+    for row in expected:
+        name = row["cells"][0]
+        assert not re.search(r"\d", name)
+        component_id = aliases.get(row["id"], row["id"])
+        component = components.get(component_id)
+        if component is None:
+            continue
+        card = page.locator(f"#{component_id}.plugin-card")
+        if card.count() == 0:
+            continue
+        expect(card.locator(":scope > h3")).to_have_text(name)
+        creator = card.locator(f'.plugin-maintainer[href="{row["creator"]}"]')
+        expect(creator).to_be_visible()
+        login = row["creator"].rstrip("/").rsplit("/", 1)[1]
+        person = next(
+            p for p in component["maintainer_profiles"] if p["login"] == login
+        )
+        expect(creator).to_contain_text(person["name"])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
@@ -282,6 +327,9 @@ def main():
                         components,
                         payloads["plugin-workshop-metadata.json"]["plugins"],
                         lang,
+                    )
+                    check_engine_catalog_consistency(
+                        page, context, args.url, components
                     )
                     for card in page.locator(".plugin-card").all():
                         component = components[card.get_attribute("id")]

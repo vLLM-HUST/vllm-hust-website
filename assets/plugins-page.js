@@ -918,6 +918,7 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     const taxonomy = taxonomyProfile(item);
     const peopleText = [
       ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
+      ...(item.maintainer_profiles || []).flatMap((person) => [person.name, person.login]),
       ...(metadata.advisors || []).flatMap((advisor) => [
         advisor.name_en, advisor.name_zh, advisor.affiliation_en, advisor.affiliation_zh
       ])
@@ -1147,6 +1148,8 @@ vllm-hust-ext extension check ${extensionId}`
     people.append(element("span", "plugin-community-label", maintainerLabel));
     const list = element("div", "plugin-maintainer-list");
     metadata.maintainers.forEach((maintainer) => {
+      const profile = item.maintainer_profiles?.find((person) => person.login === maintainer.login);
+      const displayName = workshopMetadata[item.id] ? maintainer.name : (profile?.name || maintainer.name);
       const link = element("a", "plugin-maintainer");
       link.href = maintainer.profile_url;
       link.target = "_blank";
@@ -1159,7 +1162,7 @@ vllm-hust-ext extension check ${extensionId}`
       avatar.loading = "lazy";
       const identity = element("span", "plugin-maintainer-identity");
       identity.append(
-        element("strong", "", maintainer.name),
+        element("strong", "", displayName),
         element("small", "", `@${maintainer.login}`)
       );
       link.append(avatar, identity);
