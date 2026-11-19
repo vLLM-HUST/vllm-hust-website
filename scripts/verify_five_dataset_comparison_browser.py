@@ -31,22 +31,38 @@ def assert_current_compute_reference(root, entry, lang):
     dialog = root.locator("dialog")
     expect(dialog).to_be_visible()
     if reference:
-        expect(dialog.locator("tbody tr")).to_have_count(2)
+        supplement = reference.get("full_answer_supplement")
+        expect(dialog.locator("table")).to_have_count(2 if supplement else 1)
+        expect(dialog.locator("table").first.locator("tbody tr")).to_have_count(2)
         for role in ("B0", "B1"):
             expect(dialog).to_contain_text(reference["arms"][role]["T_seconds"])
-        expect(dialog).to_contain_text("8192")
+        expect(dialog.locator("p").first).to_contain_text(
+            str(reference["protocol"]["max_completion_tokens"])
+        )
+        if reference["protocol"]["formal_repetitions"] == 3:
+            expect(dialog.locator("p").first).to_contain_text(
+                "三轮" if lang == "zh" else "three formal"
+            )
         expect(dialog).to_contain_text(
             "精确效率未知" if lang == "zh" else "Exact efficiency is unknown"
         )
-        image = dialog.locator("img")
+        image = dialog.locator("img").first
         expect(image).to_be_visible()
         assert image.evaluate("el=>el.complete && el.naturalWidth>0")
         expect(dialog.locator("a").first).to_have_attribute(
             "href", "./" + reference["report"]["path"]
         )
-        expect(dialog.locator("a").last).to_have_attribute(
+        expect(dialog.locator("a").nth(1)).to_have_attribute(
             "href", reference["raw_asset"]["url"]
         )
+        if supplement:
+            panel = dialog.locator("details").last
+            panel.locator("summary").click()
+            expect(panel).to_contain_text("8192")
+            for role in ("B0", "B1"):
+                expect(panel).to_contain_text(supplement["arms"][role]["T_seconds"])
+            expect(panel.locator("img")).to_be_visible()
+            assert panel.locator("img").evaluate("el=>el.complete && el.naturalWidth>0")
     else:
         expect(dialog.locator("img")).to_have_count(0)
         expect(dialog).to_contain_text("尚无已发布" if lang == "zh" else "no published")

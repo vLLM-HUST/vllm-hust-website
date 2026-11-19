@@ -343,7 +343,7 @@
     const whole=scaled/10000n,tail=String(scaled%10000n).padStart(4,'0').replace(/0+$/,'');
     return String(whole)+(tail?'.'+tail:'');
   }
-  async function validateVersionComputeReference(entry, publication) {
+  async function validateVersionComputeReference(entry, publication, allowSupplement=true) {
     const a=entry.compute_reference;
     if(!a)return;
     const fail=()=>{throw Error('Invalid version-specific compute reference');};
@@ -381,13 +381,14 @@
          !close(Number(arm.reference_tflops_per_card_upper),high/(2*ref*1e12))||
          !close(Number(arm.efficiency_lower_percent),100*ref/time))fail();
       if(submission) {
-        if(arm.repetitions?.length!==3)fail();
+        if(arm.repetitions?.length!==3||new Set(arm.repetitions.map(row=>row.timing_sha256)).size!==3)fail();
         const totals={F:[0,0],time:0,reference:0};
         for(const [index,row] of arm.repetitions.entries()) {
           if(row.repetition!==index+1||row.F_interval?.length!==2||
              ![row.geometry_sha256,row.timing_sha256,row.work_sha256,row.graph_sha256].every(v=>/^[a-f0-9]{64}$/.test(v||'')))fail();
           const values=[...row.F_interval,row.T_seconds,row.reference_seconds_lower];
           if(!values.every(v=>typeof v==='string'&&Number.isFinite(Number(v))&&Number(v)>0)||Number(row.F_interval[0])>Number(row.F_interval[1]))fail();
+          values.forEach(v=>computeBound(v));
           totals.F[0]+=Number(row.F_interval[0]);totals.F[1]+=Number(row.F_interval[1]);
           totals.time+=Number(row.T_seconds);totals.reference+=Number(row.reference_seconds_lower);
         }
@@ -396,6 +397,10 @@
     }
     const current=Number(computeBound(a.arms.B1.efficiency_lower_percent));
     if(a.milestone_met!==(current>=50)||a.final_numeric_met!==(current>=90))fail();
+    if(a.full_answer_supplement) {
+      if(!allowSupplement||!submission||a.full_answer_supplement.accepted_scope!=='full_answer_max8192_single_formal_run')fail();
+      await validateVersionComputeReference({...entry,compute_reference:a.full_answer_supplement},publication,false);
+    }
     for(const asset of [a.chart,a.report]) {
       if(!asset||!/^data\/[A-Za-z0-9_/-]+\.(?:svg|html)$/.test(asset.path)||
          !/^[a-f0-9]{64}$/.test(asset.sha256)||!Number.isInteger(asset.bytes)||asset.bytes<=0)fail();
@@ -408,7 +413,7 @@
       if(digest!==asset.sha256||raw.byteLength!==asset.bytes)fail();
     }
   }
-  function versionComputeReferenceDetails(entry) {
+  function versionComputeReferenceDetails(entry, showSupplement=true) {
     const a=entry.compute_reference;
     if(!a)return `<p>${t('本版尚无已发布的有效算力参考核算。','This version has no published compute reference accounting.')}</p>`;
     const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
@@ -422,9 +427,10 @@
       <figure><img style="max-width:100%" src="./${esc(a.chart.path)}" alt="${t('B0/B1参考效率下界','B0/B1 reference efficiency lower bounds')}"></figure>
       ${table(t(['运行臂','原生时间 / s','必要算量 / FLOPs','每卡有效算力 / TFLOP/s','参考算力上界 / TFLOP/s','效率下界'],['Arm','Native time / s','Necessary work / FLOPs','Effective compute per card / TFLOP/s','Reference upper bound / TFLOP/s','Efficiency lower bound']),rows)}
       <p>${t('里程碑50%','50% milestone')}：${a.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')} · ${t('最终90%','90% final target')}：${a.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</p>
-      <p>${submission?t('精确效率未知。三轮必要算量、实测时间及参考时间下界分别求和后复算；不将三轮当作独立任务样本或置信区间。','Exact efficiency is unknown. Necessary work, measured time and reference time lower bounds are each summed across three runs before recomputation; the runs are not independent task samples or confidence intervals.'):t('精确效率未知。未达成表示本次下界尚低于目标；一轮测量不表示重复性或置信区间。','Exact efficiency is unknown. A target not met means this lower bound is below its threshold; one run does not measure repeatability or confidence intervals.')}</p>
+      <p>${submission?t('精确效率未知。三轮必要算量、实测时间及参考时间下界分别求和后复算；不将三轮当作独立任务样本或置信区间。未达成表示本次认证下界尚未证明达到目标。','Exact efficiency is unknown. Necessary work, measured time and reference time lower bounds are each summed across three runs before recomputation; the runs are not independent task samples or confidence intervals. A target not met means this certified lower bound has not proved its threshold.'):t('精确效率未知。未达成表示本次下界尚低于目标；一轮测量不表示重复性或置信区间。','Exact efficiency is unknown. A target not met means this lower bound is below its threshold; one run does not measure repeatability or confidence intervals.')}</p>
       <p>η ≥ 100 × T${t('参考下界','reference lower')} / T${t('原生','native')} · ${t('同一个实际必要F在配对比值中相消。','The same actual necessary F cancels in the matched ratio.')}</p>
-      <p><a href="./${esc(a.report.path)}">${t('完整报告、图表与复算来源','Full report, charts and recomputation sources')} ↗</a> · <a href="${esc(a.raw_asset.url)}">${t('完整原件（需仓库访问权限）','Complete originals (repository access required)')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>`;
+      <p><a href="./${esc(a.report.path)}">${t('完整报告、图表与复算来源','Full report, charts and recomputation sources')} ↗</a> · <a href="${esc(a.raw_asset.url)}">${t('完整原件（需仓库访问权限）','Complete originals (repository access required)')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>
+      ${showSupplement&&a.full_answer_supplement?`<details><summary>${t('8192 token 单轮补充核算','8192-token single-run supplementary accounting')}</summary><p>${t('以下补充保留原8192预算和单轮身份；送测三轮判定使用上方256预算的结果。','This supplement retains its original 8192 budget and single-run identity; the three-run submission decision uses the 256-budget result above.')}</p>${versionComputeReferenceDetails({...entry,compute_reference:a.full_answer_supplement},false)}</details>`:''}`;
   }
 
   let currentR8 = null;
