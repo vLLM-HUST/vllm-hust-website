@@ -43,6 +43,8 @@
     "name": "SAGE Control Plane",
     "zh": {
       "owner": "负责人：毛言粲",
+      "productName": "服务控制",
+      "controllerName": "请求限流控制器",
       "status": "网关与调度已有实现",
       "titleLine1": "把请求送到",
       "titleLine2": "合适的算力。",
@@ -101,6 +103,8 @@
     },
     "en": {
       "owner": "Lead: Yancan Mao (毛言粲)",
+      "productName": "Control Plane",
+      "controllerName": "Request Throttling Controller",
       "status": "Gateway & scheduler implemented",
       "titleLine1": "The right compute. ",
       "titleLine2": "For every request.",
@@ -301,7 +305,7 @@
   function render() {
     const lang = window.vllmHustSite?.getCurrentLang() === 'zh' ? 'zh' : 'en';
     const copy = {...shared[lang], ...product[lang]};
-    document.title = `${product.name} · vLLM-HUST`;
+    document.title = `${(lang === 'zh' && copy.productName) || product.name} · vLLM-HUST`;
     document.querySelector('meta[name="description"]').content = copy.lead;
     document.querySelectorAll('[data-copy]').forEach(element => { element.textContent = copy[element.dataset.copy]; });
     document.querySelectorAll('[data-copy-aria]').forEach(element => { element.setAttribute('aria-label', copy[element.dataset.copyAria]); });

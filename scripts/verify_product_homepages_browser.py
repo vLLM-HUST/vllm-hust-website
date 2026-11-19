@@ -198,6 +198,15 @@ def verify_product_layout(page, product, width, theme, language):
             else "Pick up where you left off.",
             use_inner_text=True,
         )
+    if product == "control-plane":
+        expect(page.locator("#product-title")).to_have_text(
+            "服务控制" if language == "zh" else "Control Plane"
+        )
+        expect(page).to_have_title(
+            "服务控制 · vLLM-HUST"
+            if language == "zh"
+            else "SAGE Control Plane · vLLM-HUST"
+        )
     if product == "continuum":
         expect(page.locator(".product-intro .product-eyebrow")).to_have_text(
             "智能体工作环境" if language == "zh" else "AGENT WORKSPACE",
@@ -813,7 +822,7 @@ def main():
                                     '.product-actions a[href="./controlplane/"]'
                                 )
                             ).to_have_text(
-                                "请求限流组件"
+                                "请求限流控制器"
                                 if language == "zh"
                                 else "Request Throttling Controller"
                             )
