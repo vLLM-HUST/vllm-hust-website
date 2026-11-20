@@ -381,6 +381,65 @@ def assert_model_integration(page, root, entry, url, lang):
             )
         page.keyboard.press("Escape")
 
+    button = root.locator('[data-detail="development"]')
+    expect(button).to_have_attribute("id", "development-comparison")
+    expect(root.locator('a[href$="#development-comparison"]')).to_have_count(1)
+    button.click()
+    dialog = root.locator("dialog")
+    expect(dialog).to_be_visible()
+    section = dialog.locator("[data-development-comparison]")
+    expect(section).to_have_attribute("data-development-comparison", entry["id"])
+    expect(dialog.locator("h2")).to_contain_text(
+        "非正式基线" if lang == "zh" else "not the formal baseline"
+    )
+    for arm in ("candidate", "reference"):
+        expect(section).to_contain_text(data[arm]["model"])
+    expect(section).to_contain_text("0.18")
+    expect(section).to_contain_text(data["tradeoffs_" + lang])
+    expect(section).to_contain_text(
+        f"{data['quality']['correct']}/{data['quality']['requests']}"
+    )
+    reference = data["reference"]["release"].split("-")[-1]
+    for i, row in enumerate(data["workloads"]):
+        for j, arm in enumerate(("reference", "candidate")):
+            a = row[arm]
+            values = [reference if arm == "reference" else entry["id"]]
+            for key, divisor in [
+                ("output_tokens_per_second", 1),
+                ("mean_ttft_ms", 1000),
+                ("mean_tpot_ms", 1),
+                ("ttft_p95_ms", 1),
+                ("ttft_p99_ms", 1),
+                ("tpot_p95_ms", 1),
+                ("tpot_p99_ms", 1),
+            ]:
+                values.append(f"{a[key] / divisor:.2f}" if key in a else "—")
+            expect(
+                section.locator("table")
+                .first.locator("tbody tr")
+                .nth(2 * i + j)
+                .locator("td")
+            ).to_have_text(values)
+        values = [
+            f"{row['change_percent'][key]:+.2f}%"
+            for key in ("output_tokens_per_second", "mean_ttft_ms", "mean_tpot_ms")
+        ]
+        expect(
+            section.locator("table").nth(1).locator("tbody tr").nth(i).locator("td")
+        ).to_have_text(values)
+    image = section.locator("img")
+    expect(image).to_have_attribute("src", "./" + descriptor["chart"]["path"])
+    assert image.evaluate("async el=>{await el.decode();return el.naturalWidth>0}")
+    expect(
+        section.locator('a[href="./' + descriptor["summary"]["path"] + '"]')
+    ).to_have_count(1)
+    expect(section.locator('a[href="' + entry["release_url"] + '"]')).to_have_count(1)
+    page.keyboard.press("Escape")
+    expect(button).to_be_focused()
+    expect(root.locator(".result-card strong")).to_have_text(["—"] * 4)
+    expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
+    expect(root.locator(".metric-grid .bar-fill")).to_have_count(0)
+
 
 def context_supplement(catalog):
     return next(row for row in catalog["entries"] if row["id"] == "r8")[
