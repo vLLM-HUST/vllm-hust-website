@@ -209,8 +209,12 @@ test('reference reuse rejects F cancellation, missing original repetitions and m
 
 test('latest frozen release ignores stale defaults, input order and lexicographic version sorting',()=>{
   const {latestFrozenRelease}=sandbox().computeTest;
-  assert.equal(latestFrozenRelease({default_release:'r6',order:['r6','r8','r7']}),'r8');
-  assert.equal(latestFrozenRelease({default_release:'r9',order:['r9','r100','r10']}),'r100');
+  const catalog=(order, candidate)=>({default_release:order[0],order,entries:order.map(id=>
+    id===candidate?{id,publication_status:'frozen-candidate'}:{id})});
+  assert.equal(latestFrozenRelease(catalog(['r6','r8','r7'])),'r8');
+  assert.equal(latestFrozenRelease(catalog(['r9','r100','r10'])),'r100');
+  assert.equal(latestFrozenRelease(catalog(['r9','r100','r10'],'r100')),'r10');
+  assert.throws(()=>latestFrozenRelease(catalog(['r10'],'r10')));
   assert.throws(()=>latestFrozenRelease({order:['r8','sr4']}));
   assert.throws(()=>latestFrozenRelease({order:[]}));
 });
