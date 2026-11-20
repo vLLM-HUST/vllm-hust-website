@@ -122,3 +122,8 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .supplement-workload-label span { font-size:13px;line-height:1.5;overflow-wrap:anywhere; }
 
 .comparison-dashboard[data-comparison="sr"] .bar-role { flex:0 0 43px; }
+
+.model-integration { margin-block: 2rem; }
+.model-integration-figure { margin: 1rem 0; overflow-x: auto; }
+.model-integration-figure img { display: block; width: 100%; min-width: 680px; height: auto; }
+.model-integration-tradeoffs { font-weight: 600; }
