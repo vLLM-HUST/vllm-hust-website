@@ -353,6 +353,8 @@ def assert_model_integration(page, root, entry, url, lang):
             assert "${" not in dialog.inner_text()
         page.keyboard.press("Escape")
     button = root.locator('[data-detail="development"]')
+    expect(button).to_have_attribute("id", "development-comparison")
+    expect(root.locator('a[href$="#development-comparison"]')).to_have_count(1)
     button.click()
     dialog = root.locator("dialog")
     expect(dialog).to_be_visible()
