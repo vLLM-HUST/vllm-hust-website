@@ -937,6 +937,44 @@ def verify(url, output):
         expect(root).to_have_attribute("data-release", "r8", timeout=30000)
         page.close()
         checks.append({"rejected": "corrupt-sr-publication", "r8_selectable": True})
+        reference = next(row for row in catalog["entries"] if row["id"] == "r8").get(
+            "compute_reference"
+        )
+        if reference:
+            report_path = reference["report"]["path"]
+            original = context.request.get(url + "/" + report_path).body()
+            beacon = b'<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v123abc" data-cf-beacon="public-site-id"></script>\n'
+            for altered in (False, True):
+                page = context.new_page()
+                report = (
+                    original.replace(b"meta", b"META", 1) if altered else original
+                ) + beacon
+                page.route(
+                    "**/" + report_path,
+                    lambda route, request, body=report: route.fulfill(
+                        body=body, content_type="text/html"
+                    ),
+                )
+                page.goto(url + "/b0-b1.html?release=r8")
+                root = page.locator("#five-dataset-comparison")
+                if altered:
+                    expect(root).to_have_attribute(
+                        "data-error", "publication-rejected", timeout=30000
+                    )
+                    expect(root.locator(".metric-chart")).to_have_count(0)
+                else:
+                    expect(root).to_have_attribute("data-release", "r8", timeout=30000)
+                    expect(
+                        root.locator(".result-card").first.locator("strong")
+                    ).not_to_have_text("—")
+                page.close()
+                checks.append(
+                    {
+                        "cdn_analytics_suffix": True,
+                        "original_report_altered": altered,
+                        "rejected": altered,
+                    }
+                )
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
     print(f"Verified {len(checks)} chart/dialog/source cases")

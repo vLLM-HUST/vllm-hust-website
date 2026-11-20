@@ -35,5 +35,5 @@ Agent 开始修改前阅读 [AGENTS.md](AGENTS.md) 和 benchmark 的
 实验报告进入 benchmark 后，将本版性能、质量、有效算力参考及其分母、上下文和租户资料接入 Release 目录。附件上传或目录登记不能代替结果接入。
 
 `Sync Reviewed Benchmark Publication` 每15分钟、手动或收到 `benchmark-publication` 事件时检查 benchmark main。源提交的
-lint、tests 和 cpu-correctness 均成功后，自动更新来源及策略锁定的 PR；网站当前 head 的检查全部通过后合并，再触发生产部署。写入使用已有
-`PAT_TOKEN`，不向网站提交数据副本。源检查未完成时保持现有锁定。
+lint、tests 及所有适用的 push 校验工作流均成功后（CPU smoke 按路径触发），自动更新来源及策略锁定的 PR；网站当前 head
+的检查全部通过后合并，再触发生产部署。写入使用已有 `PAT_TOKEN`，不向网站提交数据副本。源检查未完成时保持现有锁定。

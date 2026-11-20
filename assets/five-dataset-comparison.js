@@ -357,6 +357,15 @@
     const whole=scaled/10000n,tail=String(scaled%10000n).padStart(4,'0').replace(/0+$/,'');
     return String(whole)+(tail?'.'+tail:'');
   }
+  function transportAssetBytes(raw, asset) {
+    if(!asset.path.endsWith('.html')||raw.byteLength<=asset.bytes)return raw;
+    const suffix=new TextDecoder('utf-8',{fatal:true}).decode(new Uint8Array(raw,asset.bytes)).trim();
+    // Cloudflare may append one external analytics tag. The original prefix still
+    // has to match every declared byte and its SHA256; other modifications fail.
+    const beacon=/^<script(?:\s+(?:type="module"|defer(?:="")?|src="https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js(?:\/v[a-fA-F0-9]+)?"|integrity="sha(?:256|384|512)-[A-Za-z0-9+/=]+"|data-cf-beacon=(?:'[^'<>\r\n]*'|"[^"<>\r\n]*")|crossorigin="anonymous"))+\s*><\/script>$/;
+    if(suffix.length>2048||!beacon.test(suffix)||!suffix.includes('data-cf-beacon=')||(suffix.match(/\bsrc=/g)||[]).length!==1)return raw;
+    return raw.slice(0,asset.bytes);
+  }
   async function validateVersionComputeReference(entry, publication, allowSupplement=true) {
     const a=entry.compute_reference;
     if(!a)return;
@@ -438,7 +447,7 @@
       if(matches.length!==1||matches[0].sha256!==asset.sha256||matches[0].bytes!==asset.bytes)fail();
       const response=await fetch('./'+asset.path,{cache:'no-cache'});
       if(!response.ok)fail();
-      const raw=await response.arrayBuffer();
+      const raw=transportAssetBytes(await response.arrayBuffer(),asset);
       const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
       if(digest!==asset.sha256||raw.byteLength!==asset.bytes)fail();
       if(reuse&&asset===a.certificate) {
@@ -672,7 +681,7 @@
   let srEntries;
   async function loadSr() {
     if(srEntries)return;
-    const [meta, response]=await Promise.all([fetch('./data/benchmark-source-manifest.json'),fetch('./'+srPath)]);
+    const [meta, response]=await Promise.all([fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'}),fetch('./'+srPath,{cache:'no-cache'})]);
     if(!meta.ok||!response.ok)throw Error('SR publication unavailable');
     const publication=await meta.json();
     if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark'||publication.status!=='published-source'||!/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Invalid SR publication identity');
