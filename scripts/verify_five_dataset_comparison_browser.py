@@ -304,110 +304,52 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
 
 
 def assert_model_integration(page, root, entry, url, lang):
-    # Model adapters must populate the existing shared dashboard, never a second UI.
+    # Keep the same dashboard, showing actual B1 values without inventing a
+    # fixed-B0 pair or substituting an older optimized engine as the control.
     expect(root.locator("[data-model-integration]")).to_have_count(0)
     descriptor = entry.get("model_integration")
-    if not descriptor:
+    if not descriptor or entry.get("measurements") or entry.get("context_tenant_supplement"):
         return
     data = page.request.get(url + "/" + descriptor["summary"]["path"]).json()
-    reference = data["reference"]["release"].split("-")[-1]
-    expect(root).to_have_attribute("data-baseline-id", data["reference"]["release"])
+    expect(root).to_have_attribute("data-baseline-id", "original018-cann8.5.1")
+    expect(root.locator(".runtime-pair strong")).to_have_text(["B0", "B1 · " + entry["id"]])
+    expect(root.locator(".runtime-pair>div").first).to_contain_text("0.18")
+    expect(root.locator(".runtime-pair>div").first).to_contain_text("8.5.1")
+    expect(root.locator(".fixed-b0-identity")).to_contain_text("B0 · vLLM0.18 / Ascend0.18")
+    expect(page.locator("#comparison-title")).to_contain_text("B0 / B1 " + entry["id"])
+    expect(page.locator("#comparison-lead")).to_contain_text(data["candidate"]["model"])
     expect(root.locator(".metric-chart")).to_have_count(4)
-    expect(root.locator(".dataset-coverage [data-available='true']")).to_have_count(1)
+    expect(root.locator(".dataset-coverage [data-available='true']")).to_have_count(0)
+    expect(root.locator(".dataset-coverage [data-dataset=mmlu]")).to_contain_text(
+        "B1单臂实测" if lang == "zh" else "B1 single-arm measurement")
+    expect(root.locator(".result-card strong")).to_have_text(["—"] * 4)
     expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
     expect(root.locator(".metric-missing")).to_have_count(16)
-    ratios = [
-        r["candidate"]["output_tokens_per_second"]
-        / r["reference"]["output_tokens_per_second"]
-        for r in data["workloads"]
-    ]
-    context_row = next(r for r in data["workloads"] if r["id"] == "continuous-16k-c8")
-    context_ratio = (
-        context_row["candidate"]["output_tokens_per_second"]
-        / context_row["reference"]["output_tokens_per_second"]
-    )
-    expect(root.locator(".result-card strong")).to_have_text(
-        [
-            "—",
-            f"{max(ratios):.2f}×",
-            f"{context_ratio:.2f}×",
-            f"{100 * (1 - 1 / max(ratios)):.2f}%",
-        ]
-    )
-    expect(root.locator(".runtime-pair strong")).to_have_text([reference, entry["id"]])
-    expect(root.locator(".fixed-b0-identity")).to_have_attribute(
-        "href", data["reference"]["url"]
-    )
-    expect(root.locator(".fixed-b0-identity")).to_contain_text(
-        data["reference"]["model"]
-    )
-    expect(page.locator("#comparison-lead")).to_contain_text(data["candidate"]["model"])
-    expect(root.locator(".chart-scale-note").last).to_have_text(
-        data["tradeoffs_" + lang]
-    )
+    expect(root.locator("[data-observation=single-arm] .bar-fill")).to_have_count(0)
     for row in data["workloads"]:
-        profile = "mmlu" if row["id"] == "mmlu200" else row["id"]
-        for metric, divisor in [
-            ("output_tokens_per_second", 1),
-            ("mean_ttft_ms", 1000),
-            ("mean_tpot_ms", 1),
-            ("relative_cost_per_token", 1),
-        ]:
-            chart_row = root.locator(
-                f'[data-metric="{metric}"] [data-profile="{profile}"]'
-            )
-            values = (
-                [row[arm][metric] / divisor for arm in ("reference", "candidate")]
-                if metric != "relative_cost_per_token"
-                else [
-                    1,
-                    row["reference"]["output_tokens_per_second"]
-                    / row["candidate"]["output_tokens_per_second"],
-                ]
-            )
-            expect(chart_row.locator(".bar-value")).to_have_text(
-                [f"{v:.2f}" for v in values]
-            )
-            expect(chart_row.locator(".bar-role")).to_have_text(
-                [reference, entry["id"]]
-            )
-    supplement = root.locator("#context-tenant-supplement")
-    expect(supplement.locator(".supplement-highlights strong")).to_have_text(
-        [f"{context_ratio:.2f}×", "—", "—"]
-    )
-    image = supplement.locator("img")
-    expect(image).to_have_attribute("src", "./" + descriptor["chart"]["path"])
-    assert image.evaluate("async el=>{await el.decode();return el.naturalWidth>0}")
-    for detail in ("metrics", "quality", "methods", "supplement", "evidence"):
+        profile="mmlu" if row["id"]=="mmlu200" else row["id"]
+        for metric,divisor in [("output_tokens_per_second",1),("mean_ttft_ms",1000),("mean_tpot_ms",1),("relative_cost_per_token",1)]:
+            record=root.locator(f'[data-metric="{metric}"] [data-profile="{profile}"]')
+            value="—" if metric=="relative_cost_per_token" else f"{row['candidate'][metric]/divisor:.2f}"
+            expect(record.locator(".bar-value")).to_have_text(["—",value])
+            expect(record.locator(".bar-role")).to_have_text(["B0","B1"])
+    supplement=root.locator("#context-tenant-supplement")
+    expect(supplement.locator(".supplement-highlights strong")).to_have_text(["—"]*3)
+    for row in data["workloads"]:
+        if row["id"].startswith("continuous-"):
+            expect(supplement).to_contain_text(f"{row['candidate']['output_tokens_per_second']:.2f}")
+    for detail in ("metrics","quality","methods","supplement","evidence"):
         root.locator(f'[data-detail="{detail}"]').click()
-        dialog = root.locator("dialog")
-        expect(dialog).to_be_visible()
-        if detail == "quality":
-            expect(dialog).to_contain_text(
-                f"{data['quality']['correct']}/{data['quality']['requests']}"
-            )
+        dialog=root.locator("dialog");expect(dialog).to_be_visible()
+        if detail=="quality":
+            expect(dialog).to_contain_text(f"{data['quality']['correct']}/{data['quality']['requests']}")
             expect(dialog).to_contain_text("17")
             expect(dialog).to_contain_text("0 / 0")
-        elif detail == "metrics":
-            expect(dialog.locator("table")).to_have_count(4)
-            expect(dialog.locator("table").first.locator("thead")).to_contain_text(
-                reference
-            )
+        elif detail=="metrics":
             for row in data["workloads"]:
-                for arm in ("reference", "candidate"):
-                    expect(dialog).to_contain_text(
-                        f"{row[arm]['output_tokens_per_second']:.2f}"
-                    )
-        elif detail == "methods":
-            expect(dialog).to_contain_text(reference)
-            assert "${" not in dialog.inner_text()
-        elif detail == "supplement":
-            expect(dialog).to_contain_text(data["tradeoffs_" + lang])
-            expect(dialog).to_contain_text("32K")
-        else:
-            expect(dialog).to_contain_text(
-                f"{context_row['candidate']['ttft_p99_ms']:.2f}"
-            )
+                expect(dialog).to_contain_text(f"{row['candidate']['output_tokens_per_second']:.2f}")
+        elif detail=="evidence":
+            expect(dialog.locator("[data-development-evidence]")).to_have_attribute("href",entry["release_url"])
         page.keyboard.press("Escape")
 
 
