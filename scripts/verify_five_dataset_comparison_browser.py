@@ -13,6 +13,8 @@ from playwright.sync_api import expect, sync_playwright
 SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
 HISTORY = "data/engine-release-history-v1.json"
 SR = "data/sr-development-results-v1.json"
+CONTROLLER = "data/controller-product-results-v1.json"
+CONTROLLER_LATENCY = "data/controller-r8-latency-v1.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
@@ -121,7 +123,7 @@ def dashboard_layout(root):
           supplements:el.querySelectorAll('#context-tenant-supplement').length,
           supplementCards:el.querySelectorAll('.supplement-highlights>div').length,
           profiles:[...el.querySelectorAll('.dataset-coverage [data-dataset]')].map(row=>row.dataset.dataset),
-          chartProfiles:[...el.querySelectorAll('.metric-chart')].map(chart=>[...chart.querySelectorAll('.chart-row')].slice(0,5).map(row=>row.dataset.profile))})"""
+          chartProfiles:[...el.querySelectorAll('.metric-chart')].map(chart=>[...chart.querySelectorAll('.chart-row:not([data-profile=swe-smith-trajectory])')].slice(0,5).map(row=>row.dataset.profile))})"""
     )
 
 
@@ -183,6 +185,124 @@ def assert_sr(page, root, entry, layout, lang):
     page.keyboard.press("Escape")
 
 
+def assert_controller_special(page, root, entry, layout, lang, latency=None):
+    menu = root.locator("#comparison-release-select")
+    expect(root.locator(".release-selector select")).to_have_count(1)
+    expect(menu.locator('optgroup option[value="sr5"]')).to_have_text(
+        "B1-sr5 · 请求限流控制器"
+        if lang == "zh"
+        else "B1-sr5 · Request Throttling Controller"
+    )
+    menu.select_option("sr5")
+    expect(root).to_have_attribute("data-release", "sr5")
+    expect(menu).to_have_value("sr5")
+    expect(root).to_have_attribute("data-baseline-id", "B1-r8-adapted")
+    assert dashboard_layout(root) == layout
+    expect(root.locator('[data-dataset="hle"]')).to_have_attribute(
+        "data-available", "false"
+    )
+    tpot_chart = root.locator('[data-metric="mean_tpot_ms"]')
+    if latency:
+        profiles = latency["fixed_profiles_client"]
+        for dataset in profiles["direct"]:
+            row = tpot_chart.locator(f'[data-profile="{dataset}"]')
+            expect(row.locator(".bar-value")).to_have_text(
+                [
+                    f"{profiles[role][dataset]['mean_tpot_ms']:.2f}"
+                    for role in ("direct", "controller")
+                ]
+            )
+        expect(tpot_chart.locator(".metric-missing")).to_have_count(1)
+    else:
+        expect(tpot_chart.locator(".bar-fill")).to_have_count(0)
+    cost_chart = root.locator('[data-metric="relative_cost_per_token"]')
+    expect(cost_chart.locator(".metric-missing")).to_have_count(1)
+    for profile in entry["profiles"]:
+        if profile["status"] == "complete":
+            ratio = (
+                profile["direct"]["output_tokens_per_second"]
+                / profile["controller"]["output_tokens_per_second"]
+            )
+            row = cost_chart.locator(f'[data-profile="{profile["id"]}"]')
+            expect(row.locator(".bar-value")).to_have_text(["1.00", f"{ratio:.2f}"])
+    result = entry["result"]
+    a, b = result["direct"], result["request_throttling_controller"]
+    output_rates = [arm["output_tokens"] / arm["elapsed_seconds"] for arm in (a, b)]
+    throughput_change = 100 * (output_rates[1] / output_rates[0] - 1)
+    expect(root.locator(".result-card").nth(1).locator("strong")).to_have_text(
+        f"{throughput_change:+.2f}%"
+    )
+    evidence = root.locator("#controller-trajectory-result")
+    expect(evidence).to_contain_text("SWE Trace Heavy Load")
+    clarification = root.locator(".chart-scale-note").first
+    expect(clarification).to_contain_text("SWE trace64")
+    expect(clarification).to_contain_text("SWE Trace Heavy Load")
+    expect(clarification).not_to_contain_text("SWE-smith")
+    expect(evidence).to_contain_text(f"{result['time_reduction_percent']:.2f}%")
+    expect(evidence).to_contain_text(
+        f"{a['cached_input_percent']:.2f}% → {b['cached_input_percent']:.2f}%"
+    )
+    for chart in root.locator(".metric-chart").all():
+        expect(
+            chart.locator(
+                '[data-profile="swe"] + [data-profile="swe-smith-trajectory"]'
+            )
+        ).to_have_count(1)
+    row = root.locator(
+        '[data-metric="output_tokens_per_second"] [data-profile="swe-smith-trajectory"]'
+    )
+    expect(row.locator(".bar-value")).to_have_text(
+        [f"{rate:.2f}" for rate in output_rates]
+    )
+    cost_row = cost_chart.locator('[data-profile="swe-smith-trajectory"]')
+    expect(cost_row.locator(".bar-value")).to_have_text(
+        ["1.00", f"{output_rates[0] / output_rates[1]:.2f}"]
+    )
+    for metric, divisor in (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1)):
+        row = root.locator(
+            f'[data-metric="{metric}"] [data-profile="swe-smith-trajectory"]'
+        )
+        if latency:
+            engine = latency["multi_turn_engine"]
+            expect(row.locator(".metric-change")).to_contain_text(
+                "引擎侧" if lang == "zh" else "Engine-side"
+            )
+            expect(row.locator(".bar-value")).to_have_text(
+                [
+                    f"{engine[role][metric] / divisor:.2f}"
+                    for role in ("direct", "controller")
+                ]
+            )
+        else:
+            expect(row).to_have_attribute("data-missing", "true")
+    root.locator('[data-detail="metrics"]').click()
+    dialog = root.locator("dialog")
+    expect(dialog).to_be_visible()
+    expect(dialog.locator("tbody tr").nth(4)).to_contain_text("SWE Trace Heavy Load")
+    if latency:
+        engine = latency["multi_turn_engine"]
+        engine_table = dialog.locator("table").nth(1)
+        for index, (metric, divisor) in enumerate(
+            (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1))
+        ):
+            expect(
+                engine_table.locator("tbody tr").nth(index).locator("td")
+            ).to_have_text(
+                [
+                    f"{engine[role][metric] / divisor:.2f}"
+                    for role in ("direct", "controller")
+                ]
+            )
+    for profile in entry["profiles"]:
+        row = dialog.locator("tbody tr").filter(has_text=profile["label"])
+        if profile["status"] == "complete":
+            expect(row).to_contain_text(f"{profile['time_reduction_percent']:.2f}%")
+        else:
+            expect(row).to_contain_text(profile[f"reason_{lang}"])
+    page.keyboard.press("Escape")
+    expect(root.locator('[data-detail="metrics"]')).to_be_focused()
+
+
 def context_supplement(catalog):
     return next(row for row in catalog["entries"] if row["id"] == "r8")[
         "context_tenant_supplement"
@@ -210,6 +330,12 @@ def verify(url, output):
             url + "/data/r8-continuous-20261117/summary-v1.json"
         ).json()
         sr = context.request.get(url + "/" + SR).json()
+        controller_catalog = context.request.get(url + "/" + CONTROLLER).json()
+        latency_response = context.request.get(url + "/" + CONTROLLER_LATENCY)
+        controller_latency = latency_response.json() if latency_response.ok else None
+        controller_special = next(
+            row for row in controller_catalog["releases"] if row["id"] == "r8"
+        )
         for lang in ("zh", "en"):
             for width in (390, 1440):
                 for theme in ("light", "dark"):
@@ -379,14 +505,23 @@ def verify(url, output):
                         full_page=True,
                     )
                     expect(
-                        root.locator("#comparison-release-select option")
+                        root.locator("#comparison-release-select optgroup option")
                     ).to_have_count(
                         len(catalog["order"])
                         + len(catalog["attempt_order"])
                         + len(sr["entries"])
+                        + 1
                     )
                     for entry in sr["entries"]:
                         assert_sr(page, root, entry, r8_layout, lang)
+                    assert_controller_special(
+                        page,
+                        root,
+                        controller_special,
+                        r8_layout,
+                        lang,
+                        controller_latency,
+                    )
                     for release, controls, values in [
                         ("r1", [], []),
                         ("r2", [], []),
@@ -667,11 +802,13 @@ def verify(url, output):
         expect(root.locator(".metric-chart")).to_have_count(4)
         expect(root.locator(".metric-missing")).to_have_count(20)
         expect(root.locator(".bar-value")).to_have_count(0)
-        expect(root.locator("#comparison-release-select option")).to_have_count(
+        expect(
+            root.locator("#comparison-release-select optgroup option")
+        ).to_have_count(
             len(catalog["order"])
             + len(catalog["attempt_order"])
             + len(sr["entries"])
-            + 1
+            + 2
         )
         page.goto(url + "/b0-b1.html")
         expect(root).to_have_attribute("data-release", "r9", timeout=30000)

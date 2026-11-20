@@ -103,7 +103,7 @@
       if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
-      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${esc(labels[i])}${row.workloadLabel?`<small class="chart-workload-label">${esc(row.workloadLabel)}</small>`:''}</strong><span class="metric-change ${good?'favorable':'regression'}">${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
+      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${esc(labels[i])}${row.workloadLabel?`<small class="chart-workload-label">${esc(row.workloadLabel)}</small>`:''}</strong><span class="metric-change ${good?'favorable':'regression'}">${row.metricScope?esc(row.metricScope)+' · ':''}${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
         const value=row.arms[role][key]/divisor;
         return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${row.workloadLabel||''} ${roles[role]} ${n(value)} ${unit}`)}"><span class="bar-role">${esc(roles[role])}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
       }).join('')}</div>`;
@@ -197,6 +197,7 @@
     ];
     const source = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${controllerProgressCommit}/${d.report_path}`;
     return {title:t('限流层实验结果与更新记录', 'Request Throttling Controller results and changelog'),body:`
+      ${controllerSpecial?`<p><a href="./b0-b1.html?release=${controllerId}">B1-${controllerId} · ${controllerName()} ↗</a></p>`:''}
       <p><a href="./controlplane/">${t('查看第八版控制面完整结果','View the r8 control-plane results')} ↗</a></p><p>${t('以下为第六版历史配对，不代表第八版。','The following is the historical r6 pair, not r8.')}</p><p>${esc(d.updated)} · ${esc(d.model)} · ${esc(d.platform)}</p><p>${esc(d.engine_release)} · max_num_seqs=${d.max_num_seqs} · state_resident_seats=${d.state_resident_seats}</p>
       <p>${t('SWE-smith 三轮长度/等待微基准：整批耗时缩短 ', 'SWE-smith three-turn length/wait microbenchmark: batch time reduced by ')}<strong>${n(r.time_reduction_percent)}%</strong></p>
       ${table(t(['指标','直连 B1','B1 加原版 ThunderAgent'], ['Metric','B1 direct','B1 with original ThunderAgent']), metrics)}
@@ -289,8 +290,10 @@
   let attemptIds = [];
   let srIds = [];
   let selectableIds = [...releaseIds,...attemptIds,...srIds];
+  const controllerId = 'sr5';
+  const validRelease = id => /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(id||'');
   const requestedRelease = new URL(location.href).searchParams.get('release');
-  let selectedRelease = /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(requestedRelease||'') ? requestedRelease : null;
+  let selectedRelease = validRelease(requestedRelease) ? requestedRelease : null;
   let releaseCatalog = null;
   let catalogRequest = null;
   let releaseRequest = 0;
@@ -490,7 +493,25 @@
   let currentR8 = null;
   const currentR8Sha = 'c81cd8078a1c9ea61af84cb31c2b59c99fa94876ae1cfaa3a5a12180f9408c61'; // pragma: allowlist secret -- fixed public evidence digest
   function releaseMenu() {
-    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label><select id="comparison-release-select"><optgroup label="${t('冻结版本','Frozen releases')}">${releaseIds.map(id=>{const entry=releaseCatalog?.entries.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${attemptIds.map(id=>{const entry=releaseCatalog?.attempts.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('SR 实验版本','Experimental SR releases')}">${srIds.map(id=>`<option value="${id}" ${selectedRelease===id?'selected':''}>B1-${id}</option>`).join('')}</optgroup></select><a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
+    const option=(id,label)=>`<option value="${esc(id)}" ${selectedRelease===id?'selected':''}>${esc(label)}</option>`;
+    const engineOptions=(ids,entries)=>ids.map(id=>{
+      const entry=entries?.find(row=>row.id===id);
+      return option(id,entry?id+' · '+t(entry.label_zh,entry.label_en):id);
+    }).join('');
+    const specialIds=[...srIds,...(controllerSpecial?[controllerId]:[])].sort((a,b)=>BigInt(a.slice(2))>BigInt(b.slice(2))?-1:1);
+    return `<div class="comparison-meta release-selector">
+      <label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label>
+      <select id="comparison-release-select">
+        <optgroup label="${t('冻结版本','Frozen releases')}">${engineOptions(releaseIds,releaseCatalog?.entries)}</optgroup>
+        <optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${engineOptions(attemptIds,releaseCatalog?.attempts)}</optgroup>
+        <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
+          option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
+      </select>
+      <a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a>
+      <a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>
+      <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
+      <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
+    </div>`;
   }
   function bindMenu() {
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
@@ -677,6 +698,181 @@
     const tails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
     return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
   }
+  const controllerResultsPath = 'data/controller-product-results-v1.json';
+  const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
+  const controllerName = () => t('请求限流控制器','Request Throttling Controller');
+  let controllerSpecial;
+
+  async function loadControllerSpecial() {
+    if(controllerSpecial)return;
+    const [meta,response]=await Promise.all([fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'}),fetch('./'+controllerResultsPath,{cache:'no-cache'})]);
+    if(!meta.ok||!response.ok)throw Error('Controller special release unavailable');
+    const publication=await meta.json();
+    if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark'||publication.status!=='published-source'||!/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Invalid controller special release publisher');
+    const value=await readControllerPublication(publication,controllerResultsPath,response);
+    const entries=value.releases?.filter(entry=>entry.id==='r8');
+    if(value.schema!=='controller-product-results/v1'||entries?.length!==1)throw Error('Invalid controller special release identity');
+    const [entry]=entries;
+    const result=entry.result, a=result.direct, b=result.request_throttling_controller;
+    const positive=x=>Number.isFinite(x)&&x>0;
+    if(entry.repetitions_per_arm!==1||entry.engine_release!=='full-answer-b1-20261117-r8'||!/^reports\/controller-r8-\d{8}\/README[.]md$/.test(entry.report_path)
+       ||!result.completed_pair||[a,b].some(arm=>!positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||arm.completed_tasks!==arm.tasks||!positive(arm.successful_requests)||arm.failed_requests!==0
+          ||!Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100)
+       ||a.successful_requests!==b.successful_requests||a.input_tokens!==b.input_tokens||a.output_tokens!==b.output_tokens
+       ||!close(result.time_reduction_percent,100*(1-b.elapsed_seconds/a.elapsed_seconds)))throw Error('Invalid controller special release pair');
+    if(entry.profiles?.map(p=>p.id).join()!==fixedProfiles.map(([id])=>id).join())throw Error('Unexpected controller profile coverage');
+    for(const p of entry.profiles){
+      if(p.status==='deferred'||p.status==='not_run')continue;
+      if(p.status!=='complete'||!p.same_client_request_bodies||!p.same_per_case_engine_prompt_tokens
+         ||[p.direct,p.controller].some(arm=>!positive(arm.elapsed_seconds)||!positive(arm.planned)||arm.successful!==arm.planned
+           ||arm.release_errors!==0||!positive(arm.time_to_first_content_seconds?.mean)||!close(arm.output_tokens/arm.elapsed_seconds,arm.output_tokens_per_second))
+         ||p.direct.planned!==p.controller.planned
+         ||!close(p.time_reduction_percent,100*(1-p.controller.elapsed_seconds/p.direct.elapsed_seconds))
+         ||!close(p.output_token_change_percent,100*(p.controller.output_tokens/p.direct.output_tokens-1)))throw Error('Invalid controller profile pair');
+    }
+    const latency=await loadControllerLatency(publication,entry).catch(error=>{
+      console.warn('Controller latency supplement rejected',error);
+      return null;
+    });
+    controllerSpecial={entry,commit:publication.commit,latency};
+  }
+
+  async function readControllerPublication(publication,path,response) {
+    const bindings=publication.files.filter(file=>file.website_path===path);
+    if(bindings.length!==1||!response.ok)throw Error('Controller publication unavailable or ambiguous');
+    const bytes=await response.arrayBuffer();
+    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(bindings[0].bytes!==bytes.byteLength||bindings[0].sha256!==hash)throw Error('Controller publication checksum mismatch');
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+
+  async function loadControllerLatency(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerLatencyPath))return null;
+    const response=await fetch('./'+controllerLatencyPath,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,controllerLatencyPath,response);
+    const positive=x=>Number.isFinite(x)&&x>0;
+    if(value.schema!=='controller-r8-latency/v1'||value.engine_release!==entry.engine_release||value.report_path!==entry.report_path||!/^[a-f0-9]{40}$/.test(value.report_revision))
+      throw Error('Unmatched controller latency supplement');
+    const profiles=entry.profiles.filter(p=>p.status==='complete');
+    for(const arm of ['direct','controller']){
+      const client=value.fixed_profiles_client?.[arm];
+      if(!client||Object.keys(client).length!==profiles.length||profiles.some(p=>client[p.id]?.requests!==p[arm].successful||!positive(client[p.id]?.mean_tpot_ms)))
+        throw Error('Incomplete client latency coverage');
+      const engine=value.multi_turn_engine?.[arm];
+      const pair=entry.result[arm==='direct'?'direct':'request_throttling_controller'];
+      if(engine?.requests!==pair.successful_requests||!['mean_e2e_ms','mean_ttft_ms','mean_tpot_ms'].every(key=>positive(engine[key])))
+        throw Error('Incomplete multi-turn engine latency coverage');
+    }
+    return value;
+  }
+
+  function renderControllerSpecial() {
+    const {entry,commit,latency}=controllerSpecial;
+    const r=entry.result, a=r.direct, b=r.request_throttling_controller;
+    const roles={B0:t('B1 r8 直连','B1 r8 direct'),B1:'B1-sr5'};
+    const pairedMetrics=(direct,controller)=>{
+      const arms={
+        B0:{...direct,relative_cost_per_token:1},
+        B1:{...controller,relative_cost_per_token:direct.output_tokens_per_second/controller.output_tokens_per_second}
+      };
+      return {arms,changes_percent:Object.fromEntries(Object.keys(arms.B0)
+        .map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]))};
+    };
+    const rows=standardRows(entry.profiles.map(p=>{
+      if(p.status!=='complete')return {id:p.id,missingReason:t(p.reason_zh,p.reason_en)};
+      const metrics=['direct','controller'].map(role=>{
+        const arm=p[role];
+        return {output_tokens_per_second:arm.output_tokens_per_second,
+          mean_ttft_ms:1000*arm.time_to_first_content_seconds.mean,
+          ...(latency?{mean_tpot_ms:latency.fixed_profiles_client[role][p.id].mean_tpot_ms}:{})
+        };
+      });
+      return {id:p.id,...pairedMetrics(...metrics)};
+    }));
+    const trajectoryLabel='SWE Trace Heavy Load';
+    const trajectoryId='swe-smith-trajectory';
+    const trajectoryMetrics=[['direct',a],['controller',b]].map(([role,arm])=>{
+      const engine=latency?.multi_turn_engine[role];
+      return {output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,
+        ...(engine?{mean_ttft_ms:engine.mean_ttft_ms,mean_tpot_ms:engine.mean_tpot_ms}:{})
+      };
+    });
+    const trajectory={id:trajectoryId,label:trajectoryLabel,...pairedMetrics(...trajectoryMetrics)};
+    const trajectoryChange=trajectory.changes_percent.output_tokens_per_second;
+    const acceleratorCostChange=trajectory.changes_percent.relative_cost_per_token;
+    const engineLatency=()=>{
+      if(!latency)return '';
+      const {direct,controller}=latency.multi_turn_engine;
+      const rows=[
+        [t('引擎侧首 token 时延（秒）','Engine time to first token (s)'),n(direct.mean_ttft_ms/1000),n(controller.mean_ttft_ms/1000)],
+        [t('引擎侧逐 token 时延（毫秒）','Engine time per output token (ms)'),n(direct.mean_tpot_ms),n(controller.mean_tpot_ms)],
+        [t('引擎侧请求耗时（秒）','Engine request latency (s)'),n(direct.mean_e2e_ms/1000),n(controller.mean_e2e_ms/1000)],
+        [t('客户端从请求就绪到完成（秒）','Client request ready to completion (s)'),n(a.request_latency_seconds.mean),n(b.request_latency_seconds.mean)]
+      ];
+      return `<h3>${trajectoryLabel} · ${t('请求时延分解','Request latency breakdown')}</h3>
+        <p>${t(`两组各 ${direct.requests} 条请求。引擎侧从请求进入引擎开始计时，放行前等待计入客户端请求耗时。本轮客户端采用非流式接口，未记录首 token 到达时间。`,`${direct.requests} requests per arm. Engine timings start at engine admission. Client request latency includes waiting before admission. This run used non-streaming responses, so client first-token arrival was unobserved.`)}</p>
+        ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}`;
+    };
+    const batchTime=`${n(a.elapsed_seconds)} → ${n(b.elapsed_seconds)} s`;
+    const cacheHit=`${n(a.cached_input_percent)}% → ${n(b.cached_input_percent)}%`;
+    const chartRows=[...rows];
+    chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
+    const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
+    const resultLink=`<a href="./controlplane/?release=r8#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
+    const values=['—',(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%','—',(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
+    const notes=[t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
+    const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
+    const metricChart=(key,title,unit,divisor,reason)=>{
+      const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
+      const missing=reason||t('多轮回放使用非流式接口，未记录客户端首内容 token 到达时间','The non-streaming multi-turn replay has no client first content-token arrival timestamp');
+      const metricRows=chartRows.map(row=>Number.isFinite(row.arms?.B0?.[key])&&Number.isFinite(row.arms?.B1?.[key])
+        ?{...row,metricScope:scopedLatency&&row.id===trajectoryId?t('引擎侧','Engine-side'):null}
+        :{...row,arms:null,missingReason:row.missingReason||(key==='mean_tpot_ms'&&row.id!==trajectoryId
+          ?t('尚未发布客户端逐 token 时延补充数据','Client time per output token supplement is unpublished'):missing)});
+      return chart(key,title,unit,divisor,metricRows,chartRows.map(row=>row.label),roles);
+    };
+    const summaryRows=entry.profiles.map(p=>p.status==='complete'
+      ?[p.label,n(p.direct.elapsed_seconds),n(p.controller.elapsed_seconds),n(p.time_reduction_percent)+'%',n(p.output_token_change_percent)+'%']
+      :[p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
+    summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
+      [trajectoryLabel,n(a.elapsed_seconds),n(b.elapsed_seconds),n(r.time_reduction_percent)+'%',n(100*(b.output_tokens/a.output_tokens-1))+'%']);
+    document.getElementById('comparison-title').textContent=t('B1 r8 / B1-sr5 请求限流控制器','B1 r8 / B1-sr5 Request Throttling Controller');
+    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
+    root.innerHTML=`<section class="comparison-dashboard" data-comparison="controller-special">${releaseMenu()}
+      <div class="comparison-meta"><span>${t('控制面专项实验版本 · 两组使用同一份调整后的第八版引擎配置','Control plane special release · both arms share the same adapted r8 engine configuration')}</span>${resultLink}</div>
+      <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
+      <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
+        <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(r.time_reduction_percent)}%</strong></span>
+        <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
+      ${frozenProfile('r8',{B0:'9.1.0',B1:'9.1.0'},[controllerName()],settings)}${coverageView(rows)}
+      <div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('耗时与请求时延','Batch and request latency')} ↗</button></div>
+      <p class="chart-scale-note">${t(`以同配置的引擎直连为基准。SWE trace64 是固定公开轨迹请求回放，这轮按请求隔离缓存，无法验证跨轮复用。${trajectoryLabel} 按多轮程序回放，保留工具等待，续轮继承模型真实输出。`,`Bars use direct access to the same engine as the reference. SWE trace64 replays fixed public requests with isolated caches, so it cannot test cross-turn reuse in this run. ${trajectoryLabel} replays multi-turn programs, preserves tool waits, and uses actual model outputs in later turns.`)}</p>
+      <p class="chart-scale-note" id="controller-metric-scopes">${t('时延默认从客户端测量。标记「引擎侧」的数值从请求进入引擎开始计时。成本按相同加速卡费率估算，未计入控制器与宿主机。','Latencies are client-side unless marked Engine-side, where timing starts at engine admission. Cost estimates assume the same accelerator rate and exclude the controller and host.')}</p>
+      <div class="metric-grid">
+      ${metricChart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1)}
+      ${metricChart('mean_ttft_ms',t('首 token 时延 ↓','Time to first token ↓'),'s',1000)}
+      ${metricChart('mean_tpot_ms',t('逐 token 时延 ↓','Time per output token ↓'),'ms',1,t('此负载未记录客户端逐 token 时延','Client time per output token unavailable for this workload'))}
+      ${metricChart('relative_cost_per_token',t('单位输出 token 的加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1'),1)}</div>
+      ${versionSupplement(entry,values,roles.B0)}
+      <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    const runtime=root.querySelectorAll('.runtime-pair > div strong');
+    runtime[0].textContent=roles.B0;runtime[1].textContent=roles.B1;
+    root.querySelector('.runtime-pair > div:first-child span').textContent=root.querySelector('.runtime-pair > div:last-child span').textContent;
+    root.querySelector('[data-detail="controller-progress"]').remove();
+    bindMenu();bindDetails(key=>{
+      if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
+        `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
+        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}`};
+      if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
+      if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首内容 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first content-token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
+      if(key==='quality')return {title:t('质量与评分明细','Quality and grading'),body:table([t('指标','Metric'),roles.B0,roles.B1],entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]))+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
+      if(key==='supplement')return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:`<p>${t('本专项没有对应补测数据。','There are no corresponding supplementary measurements for this comparison.')}</p>`};
+      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p><p>${esc(t(entry.limitations_zh,entry.limitations_en))}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a> · ${resultLink}</p>`};
+    });
+    Object.assign(root.dataset,{baselineId:'B1-r8-adapted',release:controllerId,loaded:controllerId,layout:'release-dashboard-v1'});
+    root.setAttribute('aria-busy','false');
+  }
+
   const srPath = 'data/sr-development-results-v1.json';
   let srEntries;
   async function loadSr() {
@@ -782,6 +978,7 @@
   }
   function render() {
     if(!releaseCatalog||!selectedRelease||!selectableIds.includes(selectedRelease))return;
+    if(selectedRelease===controllerId&&controllerSpecial){renderControllerSpecial();return;}
     if(srIds.includes(selectedRelease)){if(srEntries)renderVersion();return;}
     if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}
     if(!data||!combination)return;
@@ -803,10 +1000,12 @@
     const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
-      const loaded=await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(), loadSr().then(()=>null,error=>error)]);
+      const loaded=await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(), loadSr().then(()=>null,error=>error), loadControllerSpecial().then(()=>null,error=>error)]);
       if(request!==releaseRequest)return;
       if(loaded[2]&&/^sr/.test(selectedRelease||''))throw loaded[2];
-      selectableIds=[...releaseIds,...attemptIds,...srIds];
+      if(srIds.includes(controllerId))controllerSpecial=null;
+      selectableIds=[...releaseIds,...attemptIds,...srIds,...(controllerSpecial?[controllerId]:[])];
+      if(loaded[3]&&selectedRelease===controllerId&&!srIds.includes(controllerId))throw loaded[3];
       if(!selectableIds.includes(selectedRelease))selectedRelease=latestFrozenRelease(releaseCatalog);
       if(srIds.includes(selectedRelease)&&!srEntries)await loadSr();
       else if(selectedRelease==='r8'&&!currentR8)await loadR8();
@@ -824,9 +1023,9 @@
   window.addEventListener('hashchange',openLinkedDetail);
   window.addEventListener('pageshow',event=>{
     if(!event.persisted)return;
-    releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];
+    releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];controllerSpecial=null;
     const requested=new URL(location.href).searchParams.get('release');
-    selectedRelease=/^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(requested||'')?requested:null;
+    selectedRelease=validRelease(requested)?requested:null;
     showRelease();
   });
   showRelease();
