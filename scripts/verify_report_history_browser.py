@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
@@ -14,9 +15,15 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     checks = []
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(
+            executable_path=os.environ.get("VLLMHUST_BROWSER_EXECUTABLE")
+        )
         context = browser.new_context()
         data = context.request.get(args.url + "/data/report-history-v1.json").json()
+        catalog = context.request.get(
+            args.url + "/data/engine-release-history-v1.json"
+        ).json()
+        latest = max(catalog["order"], key=lambda value: int(value[1:]))
         for lang in ("zh", "en"):
             for width in (390, 1440):
                 page = context.new_page()
@@ -26,7 +33,7 @@ def main():
                 )
                 page.goto(args.url + "/b0-b1.html")
                 expect(page.locator("#five-dataset-comparison")).to_have_attribute(
-                    "data-loaded", "r8-continuous-20261117"
+                    "data-release", latest, timeout=30000
                 )
                 expect(page.locator("#comparison")).to_have_count(0)
                 page.locator("#release-history-link").click()
@@ -76,6 +83,10 @@ def main():
                 )
                 expect(page.locator("#comparison-detail-dialog")).to_be_visible()
                 expect(page.locator("#comparison")).to_have_count(0)
+                page.goto(args.url + "/b0-b1.html?release=r8")
+                expect(page.locator("#five-dataset-comparison")).to_have_attribute(
+                    "data-loaded", "r8-continuous-20261117", timeout=30000
+                )
                 checks.append(
                     {"language": lang, "width": width, "entries": len(data["entries"])}
                 )
