@@ -67,7 +67,7 @@ def verify(args):
                         page.locator("#langToggle").click()
                     product_links = page.locator('[data-nav-group="products"] a')
                     expect(product_links).to_have_text(
-                        ["首页", "引擎", "服务控制", "智能体工作环境"]
+                        ["首页", "引擎", "控制面", "智能体工作环境"]
                         if language == "zh"
                         else ["Home", "Engine", "Control Plane", "Agent Workspace"]
                     )
@@ -80,7 +80,7 @@ def verify(args):
                         "href", "./control-plane.html"
                     )
                     expect(page).to_have_title(
-                        "请求限流控制器 · 服务控制 | vLLM-HUST"
+                        "请求限流控制器 · 引擎控制面 | vLLM-HUST"
                         if language == "zh"
                         else "Request Throttling Controller | vLLM-HUST"
                     )
@@ -186,6 +186,100 @@ def verify(args):
             assert root.locator(".control-summary").count() == 0
             receipts.append({"rejection": failure, "status": "passed"})
             context.close()
+        for width, theme in ((1440, "light"), (390, "dark")):
+            context = browser.new_context(
+                viewport={"width": width, "height": 1000}, color_scheme=theme
+            )
+            page = context.new_page()
+            page.goto(args.url.rstrip("/") + "/control-plane.html#kv-routing-results")
+            routing = page.locator("#kv-routing-results")
+            expect(routing).to_have_attribute("data-loaded", "0.1.6")
+            expect(routing.locator("tbody tr")).to_have_count(2)
+            expect(routing.locator("tbody tr").last).to_contain_text("+17.25%")
+            for language, verdict in (("zh", "通过"), ("en", "Passed")):
+                if page.locator("html").get_attribute("lang") != language:
+                    page.locator("#langToggle").click()
+                expect(
+                    routing.get_by_role("cell", name=verdict, exact=True)
+                ).to_be_visible()
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= innerWidth + 1"
+                )
+            page.goto(
+                args.url.rstrip("/") + "/control-plane.html#instance-scaling-results"
+            )
+            scaling = page.locator("#instance-scaling-results")
+            expect(scaling).to_have_attribute(
+                "data-loaded", "instance-controller-scaling/v1"
+            )
+            expect(scaling.locator("tbody tr")).to_have_count(2)
+            page.wait_for_function(
+                """() => {
+                    const nav = document.querySelector('.site-nav').getBoundingClientRect();
+                    const heading = document.querySelector('#instance-scaling-title').getBoundingClientRect();
+                    return heading.top >= nav.bottom && heading.bottom <= innerHeight;
+                }"""
+            )
+            publication = page.request.get(
+                args.url.rstrip("/") + "/data/instance-controller-scaling-v1.json"
+            ).json()
+            for index, scenario in enumerate(publication["scenarios"]):
+                row = scaling.locator("tbody tr").nth(index)
+                fixed, dynamic = scenario["fixed"], scenario["dynamic"]
+                expect(row).to_contain_text(f"{scenario['completed_per_arm']:,}")
+                expect(row).to_contain_text(
+                    f"{fixed['p95_latency_seconds']:.2f} → {dynamic['p95_latency_seconds']:.2f}"
+                )
+                expect(row).to_contain_text(
+                    f"{fixed['mean_reserved_replicas']:.3f} → {dynamic['mean_reserved_replicas']:.3f}"
+                )
+            for language, title in (
+                ("zh", "实例控制器扩缩容实测"),
+                ("en", "Instance Controller scaling benchmark"),
+            ):
+                if page.locator("html").get_attribute("lang") != language:
+                    page.locator("#langToggle").click()
+                expect(scaling.get_by_role("heading", name=title)).to_be_visible()
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= innerWidth + 1"
+                )
+            context.close()
+
+        page = browser.new_page()
+        page.route(
+            "**/data/kv-controller-routing-v1.json",
+            lambda route: route.fulfill(
+                status=200, content_type="application/json", body="{}"
+            ),
+        )
+        page.goto(args.url.rstrip("/") + "/control-plane.html#kv-routing-results")
+        routing = page.locator("#kv-routing-results")
+        expect(routing).to_have_attribute("aria-busy", "false")
+        expect(routing.locator("table")).to_have_count(0)
+        assert not routing.get_attribute("data-loaded")
+        receipts.append(
+            {
+                "kv_routing": "both languages, desktop/mobile and checksum rejection passed"
+            }
+        )
+        page.close()
+        page = browser.new_page()
+        page.route(
+            "**/data/instance-controller-scaling-v1.json",
+            lambda route: route.fulfill(
+                status=200, content_type="application/json", body="{}"
+            ),
+        )
+        page.goto(args.url.rstrip("/") + "/control-plane.html#instance-scaling-results")
+        scaling = page.locator("#instance-scaling-results")
+        expect(scaling).to_have_attribute("aria-busy", "false")
+        expect(scaling.locator("table")).to_have_count(0)
+        assert not scaling.get_attribute("data-loaded")
+        receipts.append(
+            {
+                "instance_scaling": "both languages, desktop/mobile and checksum rejection passed"
+            }
+        )
         browser.close()
     (args.output / "receipt.json").write_text(json.dumps(receipts, indent=2) + "\n")
     print(json.dumps(receipts, indent=2))

@@ -52,6 +52,21 @@ def verify_muxpd_links(page, output, stem):
     return {"links": results, "geometry": geometry, "external_navigation": False}
 
 
+def catalog_counts(registry, taxonomy):
+    """Count grouped public MODs and archive cards from the served source."""
+    active_kinds = {"runtime_mod", "connector_mod", "tool_mod", "control_plane"}
+    active, cards = set(), set()
+    for item in registry["components"]:
+        kind = taxonomy["components"].get(item["id"], {}).get("kind")
+        public = item.get("public_surface", True) is not False
+        project = item.get("catalog_project_id") or item["id"]
+        if public and kind in active_kinds:
+            active.add(project)
+        if (public or kind == "retired") and kind in active_kinds | {"retired"}:
+            cards.add(project)
+    return len(active), len(cards)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
@@ -152,12 +167,23 @@ def main():
                                 selectors += [".matrix-heading h1", ".matrix-heading p"]
                         elif name == "plugins":
                             expect(page.locator(".plugin-card").first).to_be_visible()
+                            responses = [
+                                context.request.get(f"{args.url}/data/{name}")
+                                for name in ("ecosystem.json", "mod-taxonomy.json")
+                            ]
+                            assert all(response.ok for response in responses)
+                            active_count, card_count = catalog_counts(
+                                *(response.json() for response in responses)
+                            )
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("50")
+                            ).to_contain_text(str(active_count))
                             expect(
                                 page.locator(".plugin-catalog-scope")
-                            ).to_contain_text("53")
+                            ).to_contain_text(str(card_count))
+                            expect(page.locator(".plugin-card")).to_have_count(
+                                card_count
+                            )
                             for component_id in (
                                 "hust-m01-correction",
                                 "hust-joint-packed",

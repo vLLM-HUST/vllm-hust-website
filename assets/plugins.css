@@ -548,3 +548,7 @@ body[data-page="plugins"] .mod-reference :is(.technical-highlights, .plugin-stan
   .mod-product-option a { margin: 14px; align-self: center; }
   body[data-page="plugins"] .mod-product-results-heading h2 { font-size: 25px; }
 }
+.plugin-upstream-creators { display: grid; gap: 8px; }
+.plugin-upstream-creator-list { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.plugin-upstream-creator { color: inherit; font-size: 12px; font-weight: 700; text-underline-offset: 3px; }
+#r8-mods { scroll-margin-top: 100px; }

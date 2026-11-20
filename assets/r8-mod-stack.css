@@ -5,3 +5,21 @@
 .r8-mod-chip:hover { border-color: #268867; }
 .r8-catalog-stack { margin-block: 24px; padding: 20px; border: 1px solid #bad2c5; border-radius: 10px; }
 .r8-catalog-stack h2 { color: #17372d; }
+/* Keep the Engine roster readable within the shared product layout. */
+.r8-mod-credits { margin-block: 20px; scroll-margin-top: 100px; }
+.r8-mod-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; line-height: 1.65; }
+.r8-mod-table caption { margin-bottom: 14px; color: var(--product-ink, #17312c); font-size: 15px; font-weight: 600; text-align: left; }
+.r8-mod-table th, .r8-mod-table td { padding: 14px 12px; border-bottom: 1px solid var(--product-line, #d5e0da); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.r8-mod-table thead th { color: var(--product-muted, #526861); background: var(--product-soft, #edf4ef); font-weight: 600; }
+.r8-mod-table thead th:first-child { width: 31%; }
+.r8-mod-table thead th:last-child { width: 18%; }
+.r8-mod-table tbody th { font-weight: 500; }
+.r8-mod-table .r8-mod-chip { flex-wrap: wrap; padding: 0; border: 0; border-radius: 0; font-size: inherit; }
+.r8-mod-creator a { color: var(--product-accent, #14624e); text-decoration: underline; text-underline-offset: 3px; }
+.r8-mod-creator a:focus-visible { outline: 2px solid var(--product-accent, #14624e); outline-offset: 4px; border-radius: 2px; }
+@media (max-width: 680px) {
+  .r8-mod-table { font-size: 12px; }
+  .r8-mod-table th, .r8-mod-table td { padding: 12px 6px; }
+  .r8-mod-table thead th:first-child { width: 34%; }
+  .r8-mod-table thead th:last-child { width: 22%; }
+}

@@ -16,7 +16,7 @@ function sandbox() {
     location: { href: 'https://example.test/b0-b1.html', hash: '', search: '' }, document: { getElementById: () => ({}) },
     window: { addEventListener() {}, vllmHustSite: { getCurrentLang: () => 'en' } } };
   vm.createContext(context);
-  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails };\n})();'), context);
+  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey };\n})();'), context);
   return context;
 }
 
@@ -146,4 +146,82 @@ test('wrong workload, foreign baseline, incomplete proof, inconsistent math and 
   const context = sandbox(), { entry, publication, assets } = fixture(context);
   assets.set(entry.compute_reference.chart.path, 'changed image');
   await assert.rejects(context.computeTest.validateVersionComputeReference(entry, publication));
+});
+
+function reuseFixture() {
+  const context=sandbox(), value=fixture(context, '75'), a=value.entry.compute_reference;
+  Object.assign(a,{accepted_scope:'topic4_submission_v2_fixed200_max256_three_formal_runs',
+    certificate_kind:'qualified_full_reference_denominator_reuse/v1',original_reference_work_and_time_retained:true,
+    original_efficiency_used:false,shared_work_cancellation_used:false,source_and_workload_applicability_qualified:true,
+    clean_native_clock_source_qualified:true,full_reference_denominator_qualified:true,
+    recomputation_url:'https://github.com/DeepLinkNext/DeepLinkEngine/blob/'+'a'.repeat(40)+'/benchmark/reports/example/README.md'});
+  a.protocol.max_completion_tokens=256;a.protocol.formal_repetitions=3;
+  for(const arm of Object.values(a.arms)) {
+    Object.assign(arm,{F_interval:['3000000000000','6000000000000'],T_seconds:'3',reference_F_interval:['9000000000000','12000000000000'],
+      reference_seconds_lower:'9',reference_tflops_per_card_upper:String(2/3),shared_work_cancellation_used:false});
+    arm.repetitions=Array.from({length:3},(_,i)=>({repetition:i+1,F_interval:[1000000000000,2000000000000],T_seconds:'1',
+      geometry_sha256:'1'.repeat(64),timing_sha256:String(i+2).repeat(64),work_sha256:'3'.repeat(64),native_source_seal_sha256:'4'.repeat(64)}));
+    arm.original_reference_repetitions=Array.from({length:3},(_,i)=>({name:'reference-'+i,F_interval:[3000000000000,4000000000000],Tref_lower_seconds:'3',
+      requests:200,input_tokens:282265,output_tokens:51200,source_sha256:String(i+5).repeat(64)}));
+  }
+  function addAsset(path, data) {
+    const raw=JSON.stringify(data);value.assets.set(path,raw);
+    const asset={path,sha256:createHash('sha256').update(raw).digest('hex'),bytes:Buffer.byteLength(raw)};
+    value.publication.files.push({website_path:path,sha256:asset.sha256,bytes:asset.bytes});return asset;
+  }
+  const stats={schema:'qualified-reference-denominator/v1',original_efficiency_used:false,target_times_used:false,
+    scope:{requests:200,input_tokens:282265,output_tokens:51200,max_completion_tokens:256,dtype:'BF16',tp:2,accelerator:'Ascend 910B2',frontend:'native_inproc',timing:'dual_rank_synchronized_after_warmup'},calculation:{chips:2},arms:{}};
+  for(const role of ['B0','B1']){const arm=a.arms[role];stats.arms[role]={effective_flops_interval:arm.reference_F_interval.map(Number),sum_reference_seconds_lower:arm.reference_seconds_lower,reference_tflops_per_card_upper:arm.reference_tflops_per_card_upper,reference_repetitions:arm.original_reference_repetitions};}
+  a.reference_statistics=addAsset('data/compute-test/statistics.json',stats);
+  const pair={certificate_kind:a.certificate_kind,full_model_certificate:true,full_reference_denominator_qualified:true,
+    clean_native_clock_source_qualified:true,original_efficiency_used:false,original_reference_work_and_time_retained:true,
+    shared_work_cancellation_used:false,qualified_full_reference_statistics_sha256:a.reference_statistics.sha256,arms:structuredClone(a.arms)};
+  a.certificate=addAsset('data/compute-test/pair.json',pair);a.source_pair_sha256=a.certificate.sha256;
+  return {context,...value};
+}
+
+test('complete-reference reuse preserves different F and validates both original evidence documents', async()=>{
+  const {context,entry,publication}=reuseFixture();
+  await context.computeTest.validateVersionComputeReference(entry,publication);
+  const html=context.computeTest.versionComputeReferenceDetails(entry);
+  assert.ok(html.includes('≥75%'));assert.ok(html.includes('Same-condition reference denominator'));
+  assert.ok(html.includes('without cancellation'));assert.ok(html.includes('finish(v)'));
+  assert.ok(!html.includes('The same actual necessary F cancels'));
+});
+
+test('reference reuse rejects F cancellation, missing original repetitions and mismatched source documents', async()=>{
+  for(const change of [
+    a=>{a.arms.B1.efficiency_lower_percent='300';a.final_numeric_met=true;},
+    a=>{a.arms.B1.reference_F_interval=[...a.arms.B1.F_interval];},
+    a=>{a.arms.B1.original_reference_repetitions.pop();},
+    a=>{a.arms.B1.original_reference_repetitions[0].input_tokens=1;},
+    a=>{a.arms.B1.repetitions[0].work_sha256='9'.repeat(64);},
+    a=>{a.original_efficiency_used=true;},
+    a=>{a.shared_work_cancellation_used=true;},
+    a=>{a.reference_statistics.sha256='9'.repeat(64);},
+    a=>{a.source_pair_sha256='9'.repeat(64);},
+  ]) {
+    const {context,entry,publication}=reuseFixture();change(entry.compute_reference);
+    await assert.rejects(context.computeTest.validateVersionComputeReference(entry,publication));
+  }
+});
+
+
+test('latest frozen release ignores stale defaults, input order and lexicographic version sorting',()=>{
+  const {latestFrozenRelease}=sandbox().computeTest;
+  assert.equal(latestFrozenRelease({default_release:'r6',order:['r6','r8','r7']}),'r8');
+  assert.equal(latestFrozenRelease({default_release:'r9',order:['r9','r100','r10']}),'r100');
+  assert.throws(()=>latestFrozenRelease({order:['r8','sr4']}));
+  assert.throws(()=>latestFrozenRelease({order:[]}));
+});
+
+
+test('main-page legacy anchors address current-release details without redirecting to archived results',()=>{
+  const {linkedDetailKey}=sandbox().computeTest;
+  assert.equal(linkedDetailKey('#method-1'),'compute');
+  assert.equal(linkedDetailKey('#current-qualified-compute'),'compute');
+  assert.equal(linkedDetailKey('#metric-3'),'supplement');
+  assert.equal(linkedDetailKey('#method-b0'),'configuration');
+  const source=fs.readFileSync(path.join(__dirname,'..','assets','five-dataset-comparison.js'),'utf8');
+  assert.ok(!source.includes("location.replace('./b0-b1-legacy.html'"));
 });

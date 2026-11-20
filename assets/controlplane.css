@@ -21,3 +21,12 @@ body[data-page="controlplane"] .engine-hero h1 { font-size:clamp(2.3rem,5.4vw,4.
 .control-error { padding:20px; border:2px solid var(--engine-line); }
 @media(max-width:760px) { .control-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .control-bar-line { grid-template-columns:80px 1fr 85px; gap:6px; } .control-chart { padding:16px 10px; } }
 @media(max-width:390px) { .control-summary { grid-template-columns:1fr; } }
+
+body[data-page="control-plane"] .product-details .engine-detail-grid {
+  grid-template-columns:minmax(0,1fr);
+}
+
+#kv-routing-results, #instance-scaling-results {
+  margin-top:24px;
+  scroll-margin-top:96px;
+}

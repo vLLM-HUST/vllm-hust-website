@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -86,11 +87,9 @@ def check_product_views(page, taxonomy):
                 set(cards.evaluate_all("nodes => nodes.map(n => n.id)"))
                 == (expected[product])
             )
+        expect(page.locator(".r8-catalog-stack")).to_have_count(0)
         if product != "engine":
-            expect(page.locator(".r8-catalog-stack")).to_be_hidden()
             expect(page.locator("[data-plugin-model]")).to_be_hidden()
-        else:
-            expect(page.locator(".r8-catalog-stack")).to_be_visible()
         # Language changes keep the selected product rather than restoring all.
         page.locator("#langToggle").click()
         expect(button).to_have_attribute("aria-pressed", "true")
@@ -142,8 +141,8 @@ def check_people(page, components, metadata, lang):
         if component.get("advisors") == []:
             advisors = []
         expect(card.locator("details[open]")).to_have_count(0)
-        if not logins and not advisors:
-            continue
+        upstream = component.get("upstream_creators", [])
+        assert logins or upstream, f"Missing creator attribution: {component['id']}"
         panel = card.locator(":scope > .plugin-community")
         expect(panel).to_be_visible()
         expect(panel.locator(".plugin-maintainer")).to_have_count(len(logins))
@@ -154,8 +153,21 @@ def check_people(page, components, metadata, lang):
             )
             expect(link).to_be_visible()
             expect(link).to_contain_text(f"@{login}")
-            if person.get("name"):
-                expect(link).to_contain_text(person["name"])
+            declared = next(
+                (
+                    p
+                    for p in component.get("maintainer_profiles", [])
+                    if p["login"] == login
+                ),
+                {},
+            )
+            name = person.get("name") or declared.get("name")
+            assert name, f"Missing creator name: {login}"
+            expect(link).to_contain_text(name)
+        for group in upstream:
+            link = panel.locator(f'a.plugin-upstream-creator[href="{group["url"]}"]')
+            expect(link).to_be_visible()
+            expect(link).to_have_text(group[f"name_{lang}"])
         for advisor in advisors:
             selector = (
                 ".plugin-external-advisors"
@@ -172,6 +184,46 @@ def check_people(page, components, metadata, lang):
         checked.append(component["id"])
     assert "simllm-migration" in checked
     return checked
+
+
+def check_engine_catalog_consistency(page, context, base_url, components):
+    """Engine components share their names and creators with ordinary MOD cards."""
+    expect(page.locator(".r8-catalog-stack")).to_have_count(0)
+    engine = context.new_page()
+    try:
+        engine.goto(f"{base_url}/engine.html#r8-mods", wait_until="domcontentloaded")
+        expect(engine.locator("#r8-mods")).to_be_visible()
+        expected = engine.locator("#r8-mods tbody tr").evaluate_all(
+            """rows => rows.map(row => ({
+                id: row.dataset.r8ModId,
+                name: row.cells[0].innerText.trim(),
+                creator: row.querySelector(".r8-mod-creator a").href
+            }))"""
+        )
+    finally:
+        engine.close()
+    assert len(expected) == 10
+    aliases = {
+        "extension-manager": "vllm-hust-extension-manager",
+        "microflow": "prefill-microflow",
+        "kv-materialization": "kv-materialization-arrival-control",
+        "m01-correction": "hust-m01-correction",
+        "packed-host": "hust-joint-packed",
+    }
+    for row in expected:
+        assert not re.search(r"\d", row["name"])
+        component_id = aliases.get(row["id"], row["id"])
+        component = components[component_id]
+        card = page.locator(f"#{component_id}.plugin-card")
+        expect(card).to_be_visible()
+        expect(card.locator(":scope > h3")).to_have_text(row["name"])
+        creator = card.locator(f'.plugin-maintainer[href="{row["creator"]}"]')
+        expect(creator).to_be_visible()
+        login = row["creator"].rstrip("/").rsplit("/", 1)[1]
+        person = next(
+            p for p in component["maintainer_profiles"] if p["login"] == login
+        )
+        expect(creator).to_contain_text(person["name"])
 
 
 def main():
@@ -282,6 +334,9 @@ def main():
                         components,
                         payloads["plugin-workshop-metadata.json"]["plugins"],
                         lang,
+                    )
+                    check_engine_catalog_consistency(
+                        page, context, args.url, components
                     )
                     for card in page.locator(".plugin-card").all():
                         component = components[card.get_attribute("id")]

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/product-home.css?v=20261118" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
-  <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
+  <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-creators-sync-20261119" />
   <link rel="stylesheet" href="./assets/product-publications.css?v=20261118" />
   <link rel="stylesheet" href="./assets/product-layout.css?v=product-layout-20261118-r1" />
 </head>
@@ -54,7 +54,7 @@
 <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
 <div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>H2D async copy · E36/R54 · Tail256</strong></div>
 <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
-<p class="engine-mod-chips"><a href="#r8-mods" id="engine-mod-badge-link" style="color:inherit">10 MODs · r8 included ↗</a></p>
+<p class="engine-mod-chips"><a href="#r8-mods" id="engine-mod-badge-link" style="color:inherit">10 MODs and their creators ↗</a></p>
 </aside></section><section aria-label="Engine capabilities" class="product-capabilities"><article><h3><span class="lang-zh">冻结可复现</span><span class="lang-en">Frozen &amp; reproducible</span></h3><p><span class="lang-zh">固定运行时、配置与版本，提供一键测试。</span><span class="lang-en">Pinned runtime, configuration and one-command evaluation.</span></p></article><article><h3><span class="lang-zh">优化执行</span><span class="lang-en">Optimized execution</span></h3><p><span class="lang-zh">组合执行图、调度与 KV 数据通路优化。</span><span class="lang-en">Combined graph, scheduling and KV data-path optimizations.</span></p></article><article><h3><span class="lang-zh">MOD 扩展</span><span class="lang-en">Extend with MODs</span></h3><p><span class="lang-zh">以冻结版本为对照，组合和验证新优化。</span><span class="lang-en">Build and validate new optimizations against a frozen release.</span></p></article></section><section class="product-workspace" id="workflow"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2><span class="lang-zh">安装，运行，继续优化。</span><span class="lang-en">Install. Run. Build on it.</span></h2></div><div class="product-start-grid"><section aria-labelledby="engine-install-title" class="engine-section" id="install-runtime" style="scroll-margin-top:96px">
 <h2 id="engine-install-title">Install and replace the official packages</h2>
 <p id="engine-install-copy">Run one command in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The fixed SHA256-checked manifest installs all four engine packages and replaces vllm and vllm-ascend.</p>
@@ -81,10 +81,27 @@
 <p id="engine-current-method-copy">Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.</p>
 <p><a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip" id="engine-current-raw">Original streams and portable CPU replay ↗</a> · <a href="./data/r8-continuous-20261117/summary-v1.json" id="engine-current-stats">Statistics and tail latency ↗</a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json" id="engine-current-manifest">Current release manifest ↗</a></p>
 </details>
-</section></details><details class="engine-fold"><summary><span id="engine-config-summary">Frozen MODs and resource budgets</span></summary> <section aria-labelledby="engine-stack-title" class="engine-section" id="composition">
+</section></details><details class="engine-fold"><summary><span id="engine-config-summary">MODs, creators and resource budgets</span></summary> <section aria-labelledby="engine-stack-title" class="engine-section" id="composition">
 <h2 id="engine-stack-title">What is frozen in r8</h2>
 <p id="engine-mod-badge-copy">Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.</p>
-<div class="r8-mod-list" id="r8-mods"><span class="r8-mod-chip" data-r8-mod-id="extension-manager"><span>Extension Manager</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="betterscale"><span>BetterScale</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="microflow"><span>Microflow</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="kv-materialization"><span>KV materialization</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="m01-correction"><span>M01 correction</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="packed-host"><span>Packed host state</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="sealed-serving-warmup"><span>Sealed serving warmup</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="guarded-progress-async"><span>Guarded progress async</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="capacity-tuning"><span>Capacity tuning</span><strong>r8</strong></span><span class="r8-mod-chip" data-r8-mod-id="short-prefill-tail"><span>Short prefill tail</span><strong>r8</strong></span></div>
+<div class="r8-mod-credits" id="r8-mods">
+<table class="r8-mod-table">
+<caption><span class="lang-zh">r8 已包含的 MOD 与制作者</span><span class="lang-en">Included r8 MODs and their creators</span></caption>
+<thead><tr><th scope="col">MOD</th><th scope="col"><span class="lang-zh">作用</span><span class="lang-en">Role</span></th><th scope="col"><span class="lang-zh">制作者</span><span class="lang-en">Creator</span></th></tr></thead>
+<tbody>
+<tr data-r8-mod-id="extension-manager"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">扩展发现与启用管理</span><span class="lang-en">Extension Manager</span></span></th><td><span class="lang-zh">扩展发现、依赖检查与统一启用</span><span class="lang-en">Extension discovery, dependency checks and activation</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+<tr data-r8-mod-id="betterscale"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">BetterScale 执行与状态调度</span><span class="lang-en">BetterScale Execution and State Scheduling</span></span></th><td><span class="lang-zh">执行席位、状态调度与图执行</span><span class="lang-en">Execution seats, state scheduling and graph execution</span></td><td class="r8-mod-creator"><a href="https://github.com/CubeLander" target="_blank" rel="noopener noreferrer"><span class="lang-zh">田景远</span><span class="lang-en">Jingyuan Tian</span></a></td></tr>
+<tr data-r8-mod-id="microflow"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">Microflow 预填充流水线</span><span class="lang-en">Microflow Prefill Pipeline</span></span></th><td><span class="lang-zh">Prefill 分片与流水线执行</span><span class="lang-en">Prefill chunking and pipelined execution</span></td><td class="r8-mod-creator"><a href="https://github.com/CubeLander" target="_blank" rel="noopener noreferrer"><span class="lang-zh">田景远</span><span class="lang-en">Jingyuan Tian</span></a></td></tr>
+<tr data-r8-mod-id="kv-materialization"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">KV 物化与重算</span><span class="lang-en">KV Materialization and Recomputation</span></span></th><td><span class="lang-zh">请求级 KV 物化与重算控制</span><span class="lang-en">Request-scoped KV materialization and recomputation</span></td><td class="r8-mod-creator"><a href="https://github.com/healer-positive" target="_blank" rel="noopener noreferrer"><span class="lang-zh">何维</span><span class="lang-en">Wei He</span></a></td></tr>
+<tr data-r8-mod-id="m01-correction"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">请求状态校正</span><span class="lang-en">Request State Correction</span></span></th><td><span class="lang-zh">请求状态快照与因果校正</span><span class="lang-en">Request-state snapshots and causal correction</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+<tr data-r8-mod-id="packed-host"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">锁页主机状态合并</span><span class="lang-en">Packed Pinned-Host State</span></span></th><td><span class="lang-zh">按状态对象与 dtype 合并锁页内存</span><span class="lang-en">Pinned host allocation grouped by state object and dtype</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+<tr data-r8-mod-id="sealed-serving-warmup"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">服务预热与编译封锁</span><span class="lang-en">Serving Warmup and Compilation Sealing</span></span></th><td><span class="lang-zh">服务预热与 Torch/Triton 编译封锁</span><span class="lang-en">Serving warmup and Torch/Triton compilation sealing</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+<tr data-r8-mod-id="guarded-progress-async"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">受保护的异步进度复制</span><span class="lang-en">Guarded Asynchronous Progress Copy</span></span></th><td><span class="lang-zh">受保护的 H2D 异步进度复制</span><span class="lang-en">Guarded asynchronous H2D progress copy</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+<tr data-r8-mod-id="capacity-tuning"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">执行与常驻席位调优</span><span class="lang-en">Execution and Resident Capacity Tuning</span></span></th><td><span class="lang-zh">执行席位与常驻席位容量调优</span><span class="lang-en">Execution and resident seat capacity tuning</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+<tr data-r8-mod-id="short-prefill-tail"><th scope="row"><span class="r8-mod-chip"><span class="lang-zh">短预填充尾段优先调度</span><span class="lang-en">Short Prefill Tail Scheduling</span></span></th><td><span class="lang-zh">短 Prefill 尾段优先调度</span><span class="lang-en">Priority scheduling for short prefill tails</span></td><td class="r8-mod-creator"><a href="https://github.com/ShuhaoZhangTony" target="_blank" rel="noopener noreferrer"><span class="lang-zh">张书豪</span><span class="lang-en">Shuhao Zhang</span></a></td></tr>
+</tbody>
+</table>
+</div>
 <div class="engine-cards">
 <article><h3 id="engine-base-title">Inherited serving stack</h3><p id="engine-base-copy">CorrectedWorker, BetterScale, Microflow, KV materialization, MTP2 and FULL graphs. Request-scoped KV recomputation and packed host allocation remain enabled.</p></article>
 <article><h3 id="engine-mod-title">Three combined changes</h3><p id="engine-mod-copy">Guarded asynchronous H2D progress copy; E36/R54; priority for existing eligible 1–256-token prefill tails.</p></article>
@@ -350,14 +367,14 @@
     "engine-task-reverse-mean_tpot_ms": "Mean TPOT (ms)",
     "engine-hero-download": "Download r8 runner ↗",
     "engine-short-status": "Fixed starting point: r8 · E36/R54 · async H2D · Tail256",
-    "engine-config-summary": "Frozen MODs and resource budgets",
+    "engine-config-summary": "MODs, creators and resource budgets",
     "engine-context-summary": "4K / 16K comparisons",
     "engine-download-summary": "Downloads, checksums and reproduction",
     "engine-archive-summary": "Historical reports",
     "engine-try-title": "Build on frozen r8",
     "engine-try-copy": "Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.",
     "engine-try-scope": "The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.",
-    "engine-mod-badge-link": "10 MODs · r8 included ↗",
+    "engine-mod-badge-link": "10 MODs and their creators ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
     "engine-current-title": "B0 → r8 · current 4K / 16K continuous load",
     "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.",
@@ -442,14 +459,14 @@
     "engine-task-reverse-mean_tpot_ms": "平均TPOT（毫秒）",
     "engine-hero-download": "下载 r8 一键脚本 ↗",
     "engine-short-status": "固定起点：r8 · E36/R54 · 异步 H2D · Tail256",
-    "engine-config-summary": "冻结 MOD 与资源配置",
+    "engine-config-summary": "MOD、制作者与资源配置",
     "engine-context-summary": "4K / 16K 对照图",
     "engine-download-summary": "下载、校验与复现详情",
     "engine-archive-summary": "历史报告",
     "engine-try-title": "基于 r8 继续优化",
     "engine-try-copy": "下载脚本，填写固定B1 Python与设备号即可运行。新增优化单独做成MOD，保留固定r8对照和原始结果。",
     "engine-try-scope": "默认跑固定五项；快速测试追加 --datasets mmlu。启动后自动跟随日志。",
-    "engine-mod-badge-link": "10项MOD · r8已包含 ↗",
+    "engine-mod-badge-link": "10 项 MOD 与制作者 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
     "engine-current-title": "B0 → r8 · 新一轮 4K / 16K 连续负载",
     "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项配对结果见 B0/B1 对比页面。",
@@ -464,7 +481,7 @@
   }
 };
   </script>
-  <script src="./assets/site.js?v=engine-navigation-20261117&amp;ui=product-workspace-20261118-r1"></script>
+  <script src="./assets/site.js?v=engine-navigation-20261117&amp;ui=product-workspace-20261119-r1"></script>
   <script src="./assets/product-layout.js?v=product-anchors-20261119-r2"></script>
 </body>
 </html>

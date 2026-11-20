@@ -66,15 +66,16 @@
     searchPlaceholder: "搜索 MOD、宿主、平台或仓库",
     evidence: "证据",
     ownership: "维护",
-    maintainers: "原负责人",
+    maintainers: "原制作者",
     planes: "执行面",
     delivery: "交付",
     contracts: "版本化契约",
     surfaces: "现有接入面",
     compatibility: "兼容性",
-    maintainers: "负责人",
-    adaptationMaintainers: "国产化适配维护者",
+    maintainers: "制作者",
+    adaptationMaintainers: "国产化适配制作者",
     advisors: "指导老师",
+    upstreamCreators: "上游制作者",
     advisorUnknown: "暂无指导老师记录",
     externalAdvisor: "校外指导",
     externalContributor: "项目外援",
@@ -174,15 +175,16 @@
     searchPlaceholder: "Search MOD, host, platform, or repository",
     evidence: "Evidence",
     ownership: "Ownership",
-    maintainers: "Original maintainers",
+    maintainers: "Original creators",
     planes: "Planes",
     delivery: "Delivery",
     contracts: "Versioned contracts",
     surfaces: "Existing surfaces",
     compatibility: "Compatibility",
-    maintainers: "Maintainers",
-    adaptationMaintainers: "Localization maintainers",
+    maintainers: "Creators",
+    adaptationMaintainers: "Localization creators",
     advisors: "Advisors",
+    upstreamCreators: "Upstream creators",
     advisorUnknown: "Advisor not listed",
     externalAdvisor: "External advisor",
     externalContributor: "External contributor",
@@ -465,7 +467,7 @@
       : 'Browse by existing component role; each entry retains its host and integration status.';
     const planned = selectedProduct === 'continuum';
     document.querySelectorAll('.plugin-controls, .workload-navigation').forEach(node => { node.hidden = planned; });
-    document.querySelectorAll('.r8-catalog-stack, .workshop-scope-note').forEach(node => { node.hidden = !['all', 'engine'].includes(selectedProduct); });
+    document.querySelectorAll('.workshop-scope-note').forEach(node => { node.hidden = !['all', 'engine'].includes(selectedProduct); });
     if (modelSelect) modelSelect.closest('label').hidden = ['continuum', 'control-plane'].includes(selectedProduct);
   }
 
@@ -507,6 +509,7 @@
     unsupported: { en: "Unsupported", zh: "不支持" }
   };
   const publicEffectLabels = {
+    functional: { en: "Functional checks", zh: "功能验证" },
     measured: { en: "Measured", zh: "公开实测" },
     validated: { en: "Validated", zh: "已验证" },
     inconclusive: { en: "Inconclusive", zh: "效果未定" },
@@ -918,6 +921,8 @@ vllm-hust-ext run -- python -m vllm.entrypoints.cli.main serve /path/to/model \\
     const taxonomy = taxonomyProfile(item);
     const peopleText = [
       ...(metadata.maintainers || []).flatMap((person) => [person.name, person.login]),
+      ...(item.maintainer_profiles || []).flatMap((person) => [person.name, person.login]),
+      ...(item.upstream_creators || []).flatMap((group) => [group.name_zh, group.name_en]),
       ...(metadata.advisors || []).flatMap((advisor) => [
         advisor.name_en, advisor.name_zh, advisor.affiliation_en, advisor.affiliation_zh
       ])
@@ -1128,7 +1133,7 @@ vllm-hust-ext extension check ${extensionId}`
   }
 
   function communityPanel(item) {
-    const metadata = workshopMetadata[item.id] || ((item.maintainers?.length || item.advisors?.length) ? {
+    const metadata = workshopMetadata[item.id] || ((item.maintainers?.length || item.advisors?.length || item.upstream_creators?.length) ? {
       maintainers: (item.maintainers || []).map((login) =>
         Object.values(workshopMetadata).flatMap((record) => record.maintainers || [])
           .find((person) => person.login === login) || {
@@ -1147,6 +1152,8 @@ vllm-hust-ext extension check ${extensionId}`
     people.append(element("span", "plugin-community-label", maintainerLabel));
     const list = element("div", "plugin-maintainer-list");
     metadata.maintainers.forEach((maintainer) => {
+      const profile = item.maintainer_profiles?.find((person) => person.login === maintainer.login);
+      const displayName = workshopMetadata[item.id] ? maintainer.name : (profile?.name || maintainer.name);
       const link = element("a", "plugin-maintainer");
       link.href = maintainer.profile_url;
       link.target = "_blank";
@@ -1159,7 +1166,7 @@ vllm-hust-ext extension check ${extensionId}`
       avatar.loading = "lazy";
       const identity = element("span", "plugin-maintainer-identity");
       identity.append(
-        element("strong", "", maintainer.name),
+        element("strong", "", displayName),
         element("small", "", `@${maintainer.login}`)
       );
       link.append(avatar, identity);
@@ -1205,7 +1212,21 @@ vllm-hust-ext extension check ${extensionId}`
       link.append(element("strong", "", value == null ? "—" : String(value)), element("span", "", label));
       metrics.append(link);
     });
-    panel.append(people);
+    if (metadata.maintainers.length) panel.append(people);
+    if (item.upstream_creators?.length) {
+      const upstream = element("div", "plugin-upstream-creators");
+      upstream.append(element("span", "plugin-community-label", copy().upstreamCreators));
+      const groups = element("div", "plugin-upstream-creator-list");
+      item.upstream_creators.forEach((group) => {
+        const link = element("a", "plugin-upstream-creator", local(group, "name"));
+        link.href = group.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        groups.append(link);
+      });
+      upstream.append(groups);
+      panel.append(upstream);
+    }
     if (!noAdvisor && (internalAdvisors.length || !externalAdvisors.length)) panel.append(advisors);
     if (externalAdvisors.length) panel.append(externalRelationships);
     if (metadata.metrics && metadata.repository_url) panel.append(metrics);
@@ -1669,7 +1690,6 @@ vllm-hust-ext extension check ${extensionId}`
       element("strong", "workshop-cover-mark", initials)
     );
     const top = element("div", "plugin-card-top");
-    top.append(element("span", "plugin-code", item.id));
     const launcher = quickStart(item);
     if (launcher) top.append(launcher);
     const badges = element("div", "plugin-badges");

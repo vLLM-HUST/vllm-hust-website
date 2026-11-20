@@ -32,7 +32,11 @@ def assert_current_compute_reference(root, entry, lang):
     expect(dialog).to_be_visible()
     if reference:
         supplement = reference.get("full_answer_supplement")
-        expect(dialog.locator("table")).to_have_count(2 if supplement else 1)
+        reuse = (
+            reference["certificate_kind"]
+            == "qualified_full_reference_denominator_reuse/v1"
+        )
+        expect(dialog.locator("table")).to_have_count(2 if supplement or reuse else 1)
         expect(dialog.locator("table").first.locator("tbody tr")).to_have_count(2)
         for role in ("B0", "B1"):
             expect(dialog).to_contain_text(reference["arms"][role]["T_seconds"])
@@ -43,18 +47,31 @@ def assert_current_compute_reference(root, entry, lang):
             expect(dialog.locator("p").first).to_contain_text(
                 "三轮" if lang == "zh" else "three formal"
             )
-        expect(dialog).to_contain_text(
-            "精确效率未知" if lang == "zh" else "Exact efficiency is unknown"
-        )
+        if reuse:
+            for role in ("B0", "B1"):
+                expect(dialog).to_contain_text(
+                    reference["arms"][role]["reference_seconds_lower"]
+                )
+                expect(dialog).to_contain_text(
+                    reference["arms"][role]["reference_tflops_per_card_upper"]
+                )
+            expect(dialog).to_contain_text("finish(v)")
+            expect(dialog).to_contain_text(
+                "不约分" if lang == "zh" else "without cancellation"
+            )
+        else:
+            expect(dialog).to_contain_text(
+                "精确效率未知" if lang == "zh" else "Exact efficiency is unknown"
+            )
         image = dialog.locator("img").first
         expect(image).to_be_visible()
         assert image.evaluate("el=>el.complete && el.naturalWidth>0")
-        expect(dialog.locator("a").first).to_have_attribute(
-            "href", "./" + reference["report"]["path"]
-        )
-        expect(dialog.locator("a").nth(1)).to_have_attribute(
-            "href", reference["raw_asset"]["url"]
-        )
+        expect(
+            dialog.locator('a[href="./' + reference["report"]["path"] + '"]')
+        ).to_have_attribute("href", "./" + reference["report"]["path"])
+        expect(
+            dialog.locator('a[href="' + reference["raw_asset"]["url"] + '"]')
+        ).to_have_attribute("href", reference["raw_asset"]["url"])
         if supplement:
             panel = dialog.locator("details").last
             panel.locator("summary").click()
@@ -160,7 +177,9 @@ def assert_sr(page, root, entry, layout, lang):
     page.keyboard.press("Escape")
     expect(button).to_be_focused()
     root.locator('[data-detail="quality"]').click()
-    expect(dialog).to_contain_text("151/200" if release == "sr1" else "144/200")
+    scored = next(row for row in entry["rows"] if row["id"] == "mmlu")
+    for arm in scored["arms"]:
+        expect(dialog).to_contain_text(f"{arm['correct']}/{arm['requests']}")
     page.keyboard.press("Escape")
 
 
@@ -361,7 +380,11 @@ def verify(url, output):
                     )
                     expect(
                         root.locator("#comparison-release-select option")
-                    ).to_have_count(10)
+                    ).to_have_count(
+                        len(catalog["order"])
+                        + len(catalog["attempt_order"])
+                        + len(sr["entries"])
+                    )
                     for entry in sr["entries"]:
                         assert_sr(page, root, entry, r8_layout, lang)
                     for release, controls, values in [
@@ -594,7 +617,8 @@ def verify(url, output):
                         }
                     )
                     page.close()
-        for release in ("r1", "r2", "r3", "r4", "r5", "r7", "sr1", "sr2"):
+        sr_ids = [entry["id"] for entry in sr["entries"]]
+        for release in ("r1", "r2", "r3", "r4", "r5", "r7", *sr_ids):
             page = context.new_page()
             page.goto(url + "/b0-b1.html?release=" + release)
             root = page.locator("#five-dataset-comparison")
@@ -619,7 +643,9 @@ def verify(url, output):
         )
         future["entries"].append(entry)
         future["order"].insert(0, "r9")
-        future["default_release"] = "r9"
+        future["default_release"] = (
+            "r8"  # A stale advisory default must not pin the main URL.
+        )
         raw = (json.dumps(future, ensure_ascii=False) + "\n").encode()
         updated = copy.deepcopy(manifest)
         published = next(
@@ -641,9 +667,18 @@ def verify(url, output):
         expect(root.locator(".metric-chart")).to_have_count(4)
         expect(root.locator(".metric-missing")).to_have_count(20)
         expect(root.locator(".bar-value")).to_have_count(0)
-        expect(root.locator("#comparison-release-select option")).to_have_count(11)
+        expect(root.locator("#comparison-release-select option")).to_have_count(
+            len(catalog["order"])
+            + len(catalog["attempt_order"])
+            + len(sr["entries"])
+            + 1
+        )
         page.goto(url + "/b0-b1.html")
         expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        page.goto(url + "/b0-b1.html?release=latest")
+        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        page.goto(url + "/b0-b1.html?release=r6")
+        expect(root).to_have_attribute("data-release", "r6", timeout=30000)
         page.close()
         checks.append(
             {"catalog_only_new_release": "r9", "uniform_empty_dashboard": True}

@@ -3,10 +3,6 @@
   // Update this committed source path only after the new benchmark report is audited.
   const summaryPath = 'data/five-datasets-r6-20261114/summary-public-v3.json';
   const supplementAnalysisSha = '0e3947af17badfa7edb244a2ca397c5367480678eeb416bb1c1f886d02c08c5f'; // pragma: allowlist secret -- fixed public evidence digest
-  if (/^#(?:method-[1-4]|method-b0|metric-[1-4]|current-qualified-compute|b0-baseline|acceptance-stages|comparison)$/.test(location.hash)) {
-    location.replace('./b0-b1-legacy.html'+location.hash);
-    return;
-  }
   const root = document.getElementById('five-dataset-comparison');
   if (!root) return;
   const combinationPath = 'data/five-datasets-r6-20261114/frozen-combination-v1.json';
@@ -245,6 +241,21 @@
     root.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
     dialog.addEventListener('click',event=>{if(event.target===dialog && event.clientX>=dialog.getBoundingClientRect().right)dialog.close();});
   }
+  function linkedDetailKey(hash) {
+    if(/^#(?:method-1|metric-1|current-qualified-compute)$/.test(hash))return 'compute';
+    if(/^#(?:method-3|metric-3)$/.test(hash))return 'supplement';
+    if(/^#(?:method-[24]|metric-[24])$/.test(hash))return 'methods';
+    if(/^#(?:method-b0|b0-baseline)$/.test(hash))return 'configuration';
+    if(hash==='#acceptance-stages')return 'evidence';
+    return null;
+  }
+  function openLinkedDetail() {
+    let key=linkedDetailKey(location.hash);
+    if(key==='compute'&&selectedRelease==='r6')key='goal-3.4.1';
+    if(!key||root.getAttribute('aria-busy')==='true')return;
+    const button=root.querySelector(`[data-detail="${key}"]`),dialog=root.querySelector('dialog');
+    if(button&&dialog&&!dialog.open)button.click();
+  }
   function frozenProfile(release, cann, mods, settings) {
     return `<section class="frozen-profile"><div class="section-heading"><h2>${t('本轮冻结组合','Frozen combination')}</h2><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button><button type="button" data-detail="controller-progress">${t('限流层实验与更新记录','Controller experiments and changelog')} ↗</button></div><div class="runtime-pair"><div><strong>B0</strong><span>vLLM 0.18 / Ascend 0.18 · CANN ${esc(cann.B0)}</span></div><div><strong>B1 · ${esc(release)}</strong><span>vLLM 0.28.1 / Ascend 0.25.1rc2 · CANN ${esc(cann.B1)}</span></div></div><div class="mod-tags">${mods.map(c=>`<span>${esc(c)}</span>`).join('')}</div><p class="frozen-settings">${esc(settings)}</p></section>`;
   }
@@ -274,16 +285,20 @@
     if(combo.schema!=='vllm-hust-frozen-combination/v1' || combo.run_id!==value.run_id || combo.engine_release!==value.runtime.engine_release || combo.components?.length!==8 || combo.worker!==value.runtime.actual_worker || combo.settings?.max_num_seqs!==24 || combo.settings.resident_seats!==36)throw Error('Frozen combination differs from measured profile');
     data=value;manifest=m;combination=combo;
   }
-  let releaseIds = ['r8','r7','r6','r5','r4'];
-  let attemptIds = ['r3','r2','r1'];
-  const srIds = ['sr2','sr1'];
+  let releaseIds = [];
+  let attemptIds = [];
+  let srIds = [];
   let selectableIds = [...releaseIds,...attemptIds,...srIds];
   const requestedRelease = new URL(location.href).searchParams.get('release');
-  let selectedRelease = /^(?:r[1-9][0-9]*|sr[12])$/.test(requestedRelease||'') ? requestedRelease : null;
+  let selectedRelease = /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(requestedRelease||'') ? requestedRelease : null;
   let releaseCatalog = null;
   let catalogRequest = null;
   let releaseRequest = 0;
   const historyPath = 'data/engine-release-history-v1.json';
+  function latestFrozenRelease(catalog) {
+    if(!Array.isArray(catalog.order)||!catalog.order.length||catalog.order.some(id=>!/^r[1-9][0-9]*$/.test(id)))throw Error('Invalid frozen release order');
+    return catalog.order.reduce((latest,id)=>BigInt(id.slice(1))>BigInt(latest.slice(1))?id:latest);
+  }
   async function loadReleaseCatalog() {
     if (releaseCatalog) return;
     if (catalogRequest) return catalogRequest;
@@ -324,7 +339,6 @@
         if (matches.length!==1 || matches[0].kind!=='pre-freeze-attempt' || matches[0].status!=='failed' || matches[0].measurements?.length!==0 || !matches[0].source?.url) throw Error('Invalid early-attempt identity');
       }
       releaseIds=[...value.order];attemptIds=[...value.attempt_order];selectableIds=[...releaseIds,...attemptIds,...srIds];
-      if(!selectableIds.includes(selectedRelease))selectedRelease=value.default_release;
       releaseCatalog=value;
     })();
     try { await catalogRequest; } finally { catalogRequest=null; }
@@ -350,10 +364,11 @@
     const protocol=a.protocol;
     const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
     const legacy=a.accepted_scope==='full_answer_max8192_single_formal_run';
+    const reuse=a.certificate_kind==='qualified_full_reference_denominator_reuse/v1';
     if(a.schema!=='engine-current-compute-reference/v1'||a.engine_release!==entry.release||
        a.baseline_id!==entry.baseline_id||a.status!=='measured'||a.full_model_certificate!==true||
        (!submission&&!legacy)||
-       a.certificate_kind!=='matched_complete_necessary_work_and_full_reference_lower_bound'||
+       (!reuse&&a.certificate_kind!=='matched_complete_necessary_work_and_full_reference_lower_bound')||
        a.efficiency_exact_percent!==null||a.hardware_peak_utilization_percent!==null||
        a.model!=='Qwen3.5-35B-A3B'||a.precision!=='BF16'||a.tensor_parallel_size!==2||
        a.chip_model!=='Ascend 910B2'||protocol?.requests!==200||protocol.max_completion_tokens!==(submission?256:8192)||
@@ -361,9 +376,10 @@
        protocol.quality_plan_sha256!=='f4ed4ce5956c9ed08f360400b5a996ef92a217ce295d50648d4dc06443db768e'|| // pragma: allowlist secret -- fixed public workload digest
        !/^[a-f0-9]{64}$/.test(a.source_status_sha256||'')||
        !/^[a-f0-9]{64}$/.test(a.source_pair_sha256||'')||
-       !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-engine\/releases\/download\//.test(a.raw_asset?.url||'')||
+       !/^https:\/\/github\.com\/(?:vLLM-HUST\/vllm-hust-engine|DeepLinkNext\/DeepLinkEngine)\/releases\/download\//.test(a.raw_asset?.url||'')||
        !/^[a-f0-9]{64}$/.test(a.raw_asset?.sha256||'')||!Number.isInteger(a.raw_asset?.bytes)||a.raw_asset.bytes<=0||
        !Number.isInteger(a.raw_asset?.asset_id)||a.raw_asset.asset_id<=0||a.raw_asset.redownload_verified!==true)fail();
+    if(reuse&&(!/^https:\/\/github\.com\/DeepLinkNext\/DeepLinkEngine\/blob\/[a-f0-9]{40}\//.test(a.recomputation_url||'')||a.certificate?.sha256!==a.source_pair_sha256||!submission||a.original_reference_work_and_time_retained!==true||a.original_efficiency_used!==false||a.shared_work_cancellation_used!==false||a.source_and_workload_applicability_qualified!==true||a.clean_native_clock_source_qualified!==true||a.full_reference_denominator_qualified!==true))fail();
     for(const role of ['B0','B1']) {
       const arm=a.arms?.[role];
       if(!arm||arm.F_interval?.length!==2||arm.achieved_tflops_per_card_interval?.length!==2||
@@ -376,23 +392,37 @@
       if(!numbers.every(v=>typeof v==='string'&&Number.isFinite(Number(v))&&Number(v)>0))fail();
       numbers.forEach(v=>computeBound(v));
       const [low,high]=arm.F_interval.map(Number),time=Number(arm.T_seconds),ref=Number(arm.reference_seconds_lower);
+      const referenceHigh=reuse?Number(arm.reference_F_interval?.[1]):high;
       if(low>high||!close(Number(arm.achieved_tflops_per_card_interval[0]),low/(2*time*1e12))||
          !close(Number(arm.achieved_tflops_per_card_interval[1]),high/(2*time*1e12))||
-         !close(Number(arm.reference_tflops_per_card_upper),high/(2*ref*1e12))||
-         !close(Number(arm.efficiency_lower_percent),100*ref/time))fail();
+         !close(Number(arm.reference_tflops_per_card_upper),referenceHigh/(2*ref*1e12))||
+         !close(Number(arm.efficiency_lower_percent),reuse?100*(low/(2*time*1e12))/Number(arm.reference_tflops_per_card_upper):100*ref/time))fail();
+      if(reuse) {
+        if(arm.reference_F_interval?.length!==2||!arm.reference_F_interval.every(v=>typeof v==='string'&&Number(v)>0)||Number(arm.reference_F_interval[0])>referenceHigh||arm.shared_work_cancellation_used!==false||arm.original_reference_repetitions?.length!==3)fail();
+        const sums={F:[0,0],time:0};
+        const refs=arm.original_reference_repetitions;
+        if(new Set(refs.map(row=>row.source_sha256)).size!==3)fail();
+        for(const row of refs) {
+          if(row.F_interval?.length!==2||row.requests!==200||row.input_tokens!==282265||row.output_tokens!==51200||!/^[a-f0-9]{64}$/.test(row.source_sha256||''))fail();
+          const values=[...row.F_interval,row.Tref_lower_seconds];
+          if(!values.every(v=>Number.isFinite(Number(v))&&Number(v)>0)||Number(row.F_interval[0])>Number(row.F_interval[1]))fail();
+          sums.F[0]+=Number(row.F_interval[0]);sums.F[1]+=Number(row.F_interval[1]);sums.time+=Number(row.Tref_lower_seconds);
+        }
+        if(!close(sums.F[0],Number(arm.reference_F_interval[0]))||!close(sums.F[1],referenceHigh)||!close(sums.time,ref))fail();
+      }
       if(submission) {
         if(arm.repetitions?.length!==3||new Set(arm.repetitions.map(row=>row.timing_sha256)).size!==3)fail();
         const totals={F:[0,0],time:0,reference:0};
         for(const [index,row] of arm.repetitions.entries()) {
           if(row.repetition!==index+1||row.F_interval?.length!==2||
-             ![row.geometry_sha256,row.timing_sha256,row.work_sha256,row.graph_sha256].every(v=>/^[a-f0-9]{64}$/.test(v||'')))fail();
-          const values=[...row.F_interval,row.T_seconds,row.reference_seconds_lower];
-          if(!values.every(v=>typeof v==='string'&&Number.isFinite(Number(v))&&Number(v)>0)||Number(row.F_interval[0])>Number(row.F_interval[1]))fail();
+             ![row.geometry_sha256,row.timing_sha256,row.work_sha256,reuse?row.native_source_seal_sha256:row.graph_sha256].every(v=>/^[a-f0-9]{64}$/.test(v||'')))fail();
+          const values=[...row.F_interval,row.T_seconds,...(reuse?[]:[row.reference_seconds_lower])];
+          if(!values.every(v=>(typeof v==='string'||(reuse&&Number.isSafeInteger(v)))&&Number.isFinite(Number(v))&&Number(v)>0)||Number(row.F_interval[0])>Number(row.F_interval[1]))fail();
           values.forEach(v=>computeBound(v));
           totals.F[0]+=Number(row.F_interval[0]);totals.F[1]+=Number(row.F_interval[1]);
-          totals.time+=Number(row.T_seconds);totals.reference+=Number(row.reference_seconds_lower);
+          totals.time+=Number(row.T_seconds);if(!reuse)totals.reference+=Number(row.reference_seconds_lower);
         }
-        if(!close(low,totals.F[0])||!close(high,totals.F[1])||!close(time,totals.time)||!close(ref,totals.reference))fail();
+        if(!close(low,totals.F[0])||!close(high,totals.F[1])||!close(time,totals.time)||(!reuse&&!close(ref,totals.reference)))fail();
       }
     }
     const current=Number(computeBound(a.arms.B1.efficiency_lower_percent));
@@ -401,8 +431,8 @@
       if(!allowSupplement||!submission||a.full_answer_supplement.accepted_scope!=='full_answer_max8192_single_formal_run')fail();
       await validateVersionComputeReference({...entry,compute_reference:a.full_answer_supplement},publication,false);
     }
-    for(const asset of [a.chart,a.report]) {
-      if(!asset||!/^data\/[A-Za-z0-9_/-]+\.(?:svg|html)$/.test(asset.path)||
+    for(const asset of [a.chart,a.report,...(reuse?[a.certificate,a.reference_statistics]:[])]) {
+      if(!asset||!/^data\/[A-Za-z0-9_/-]+\.(?:svg|html|json)$/.test(asset.path)||
          !/^[a-f0-9]{64}$/.test(asset.sha256)||!Number.isInteger(asset.bytes)||asset.bytes<=0)fail();
       const matches=publication.files.filter(row=>row.website_path===asset.path);
       if(matches.length!==1||matches[0].sha256!==asset.sha256||matches[0].bytes!==asset.bytes)fail();
@@ -411,12 +441,27 @@
       const raw=await response.arrayBuffer();
       const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
       if(digest!==asset.sha256||raw.byteLength!==asset.bytes)fail();
+      if(reuse&&asset===a.certificate) {
+        const pair=JSON.parse(new TextDecoder().decode(raw));
+        if(pair.certificate_kind!==a.certificate_kind||pair.full_model_certificate!==true||pair.full_reference_denominator_qualified!==true||pair.clean_native_clock_source_qualified!==true||pair.original_efficiency_used!==false||pair.original_reference_work_and_time_retained!==true||pair.shared_work_cancellation_used!==false||pair.qualified_full_reference_statistics_sha256!==a.reference_statistics.sha256)fail();
+        for(const role of ['B0','B1'])for(const key of ['F_interval','T_seconds','reference_F_interval','reference_seconds_lower','reference_tflops_per_card_upper','efficiency_lower_percent','original_reference_repetitions','repetitions']) {
+          const source=pair.arms?.[role]?.[key],value=a.arms[role][key];
+          if(Array.isArray(source)&&key.endsWith('_interval')){if(source.map(String).join()!==value.join())fail();}
+          else if(JSON.stringify(source)!==JSON.stringify(value))fail();
+        }
+      }
+      if(reuse&&asset===a.reference_statistics) {
+        const stats=JSON.parse(new TextDecoder().decode(raw));
+        if(stats.schema!=='qualified-reference-denominator/v1'||stats.original_efficiency_used!==false||stats.target_times_used!==false||stats.scope?.max_completion_tokens!==256||stats.scope.requests!==200||stats.scope.input_tokens!==282265||stats.scope.output_tokens!==51200||stats.scope.dtype!=='BF16'||stats.scope.tp!==2||stats.scope.accelerator!=='Ascend 910B2'||stats.scope.frontend!=='native_inproc'||stats.scope.timing!=='dual_rank_synchronized_after_warmup'||stats.calculation?.chips!==2)fail();
+        for(const role of ['B0','B1']){const ref=stats.arms?.[role],arm=a.arms[role];if(ref?.effective_flops_interval?.map(String).join()!==arm.reference_F_interval.join()||ref.sum_reference_seconds_lower!==arm.reference_seconds_lower||ref.reference_tflops_per_card_upper!==arm.reference_tflops_per_card_upper||JSON.stringify(ref.reference_repetitions)!==JSON.stringify(arm.original_reference_repetitions))fail();}
+      }
     }
   }
   function versionComputeReferenceDetails(entry, showSupplement=true) {
     const a=entry.compute_reference;
     if(!a)return `<p>${t('本版尚无已发布的有效算力参考核算。','This version has no published compute reference accounting.')}</p>`;
     const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
+    const reuse=a.certificate_kind==='qualified_full_reference_denominator_reuse/v1';
     const rows=['B0','B1'].map(role=>{
       const arm=a.arms[role];
       return [role,arm.T_seconds,'['+arm.F_interval.join(', ')+']',
@@ -427,16 +472,16 @@
       <figure><img style="max-width:100%" src="./${esc(a.chart.path)}" alt="${t('B0/B1参考效率下界','B0/B1 reference efficiency lower bounds')}"></figure>
       ${table(t(['运行臂','原生时间 / s','必要算量 / FLOPs','每卡有效算力 / TFLOP/s','参考算力上界 / TFLOP/s','效率下界'],['Arm','Native time / s','Necessary work / FLOPs','Effective compute per card / TFLOP/s','Reference upper bound / TFLOP/s','Efficiency lower bound']),rows)}
       <p>${t('里程碑50%','50% milestone')}：${a.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')} · ${t('最终90%','90% final target')}：${a.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</p>
-      <p>${submission?t('精确效率未知。三轮必要算量、实测时间及参考时间下界分别求和后复算；不将三轮当作独立任务样本或置信区间。未达成表示本次认证下界尚未证明达到目标。','Exact efficiency is unknown. Necessary work, measured time and reference time lower bounds are each summed across three runs before recomputation; the runs are not independent task samples or confidence intervals. A target not met means this certified lower bound has not proved its threshold.'):t('精确效率未知。未达成表示本次下界尚低于目标；一轮测量不表示重复性或置信区间。','Exact efficiency is unknown. A target not met means this lower bound is below its threshold; one run does not measure repeatability or confidence intervals.')}</p>
-      <p>η ≥ 100 × T${t('参考下界','reference lower')} / T${t('原生','native')} · ${t('同一个实际必要F在配对比值中相消。','The same actual necessary F cancels in the matched ratio.')}</p>
-      <p><a href="./${esc(a.report.path)}">${t('完整报告、图表与复算来源','Full report, charts and recomputation sources')} ↗</a> · <a href="${esc(a.raw_asset.url)}">${t('完整原件（需仓库访问权限）','Complete originals (repository access required)')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>
+      ${reuse?`<h3>${t('同工况参考分母统计','Same-condition reference denominator')}</h3>${table(t(['参考域','ΣF参区间 / FLOPs','ΣT参下界 / 秒','参考上界 / TFLOP/s/卡'],['Reference domain','ΣFref interval / FLOPs','ΣTref lower / s','Reference upper / TFLOP/s/card']),['B0','B1'].map(role=>{const arm=a.arms[role];return [role,'['+arm.reference_F_interval.join(', ')+']',arm.reference_seconds_lower,arm.reference_tflops_per_card_upper];}))}<p>C<sub>current,lower</sub> = ΣF<sub>current,lower</sub> / (k × ΣT<sub>current</sub> × 10¹²)<br>C<sub>ref,upper</sub> = ΣF<sub>ref,upper</sub> / (k × ΣT<sub>ref,lower</sub> × 10¹²)<br>η<sub>lower</sub> = 100 × C<sub>current,lower</sub> / C<sub>ref,upper</sub> · k = 2</p><p>${t('参考时间下界由独立组件标定和保留依赖图最长路径计算：finish(v) = duration(v) + max(finish(parent))。参考统计保留全部三轮。本轮与参考的F不同，分别核算，不约分。','Independent component calibration and the longest retained dependency path give the reference-time lower bound: finish(v) = duration(v) + max(finish(parent)). All three reference runs are retained. Current and reference work differ and are accounted separately, without cancellation.')}</p><p><a href="./${esc(a.certificate.path)}">${t('六轮原生统计与来源哈希','Six native runs and source hashes')}</a> · <a href="./${esc(a.reference_statistics.path)}">${t('完整参考分母与构造公式','Complete reference denominator and construction formulas')}</a> · <a href="${esc(a.recomputation_url)}">${t('公开复算入口','Public recomputation entry')}</a></p>`:`<p>${submission?t('精确效率未知。三轮必要算量、实测时间及参考时间下界分别求和后复算；不将三轮当作独立任务样本或置信区间。未达成表示本次认证下界尚未证明达到目标。','Exact efficiency is unknown. Necessary work, measured time and reference time lower bounds are each summed across three runs before recomputation; the runs are not independent task samples or confidence intervals. A target not met means this certified lower bound has not proved its threshold.'):t('精确效率未知。未达成表示本次下界尚低于目标；一轮测量不表示重复性或置信区间。','Exact efficiency is unknown. A target not met means this lower bound is below its threshold; one run does not measure repeatability or confidence intervals.')}</p>
+      <p>η ≥ 100 × T${t('参考下界','reference lower')} / T${t('原生','native')} · ${t('同一个实际必要F在配对比值中相消。','The same actual necessary F cancels in the matched ratio.')}</p>`}
+      <p><a href="./${esc(a.report.path)}">${t('完整报告、图表与复算来源','Full report, charts and recomputation sources')} ↗</a> · <a href="${esc(a.raw_asset.url)}">${t('算量与计时原件','Work and timing originals')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>
       ${showSupplement&&a.full_answer_supplement?`<details><summary>${t('8192 token 单轮补充核算','8192-token single-run supplementary accounting')}</summary><p>${t('以下补充保留原8192预算和单轮身份；送测三轮判定使用上方256预算的结果。','This supplement retains its original 8192 budget and single-run identity; the three-run submission decision uses the 256-budget result above.')}</p>${versionComputeReferenceDetails({...entry,compute_reference:a.full_answer_supplement},false)}</details>`:''}`;
   }
 
   let currentR8 = null;
   const currentR8Sha = 'c81cd8078a1c9ea61af84cb31c2b59c99fa94876ae1cfaa3a5a12180f9408c61'; // pragma: allowlist secret -- fixed public evidence digest
   function releaseMenu() {
-    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label><select id="comparison-release-select"><optgroup label="${t('冻结版本','Frozen releases')}">${releaseIds.map(id=>{const entry=releaseCatalog?.entries.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${attemptIds.map(id=>{const entry=releaseCatalog?.attempts.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('SR 实验版本','Experimental SR releases')}">${srIds.map(id=>`<option value="${id}" ${selectedRelease===id?'selected':''}>B1-${id}</option>`).join('')}</optgroup></select><a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
+    return `<div class="comparison-meta release-selector"><label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label><select id="comparison-release-select"><optgroup label="${t('冻结版本','Frozen releases')}">${releaseIds.map(id=>{const entry=releaseCatalog?.entries.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${attemptIds.map(id=>{const entry=releaseCatalog?.attempts.find(row=>row.id===id);return `<option value="${id}" ${selectedRelease===id?'selected':''}>${id}${entry?' · '+esc(t(entry.label_zh,entry.label_en)):''}</option>`;}).join('')}</optgroup><optgroup label="${t('SR 实验版本','Experimental SR releases')}">${srIds.map(id=>`<option value="${id}" ${selectedRelease===id?'selected':''}>B1-${id}</option>`).join('')}</optgroup></select><a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a><a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a><a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a><a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a></div>`;
   }
   function bindMenu() {
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
@@ -626,23 +671,28 @@
   const srPath = 'data/sr-development-results-v1.json';
   let srEntries;
   async function loadSr() {
+    if(srEntries)return;
     const [meta, response]=await Promise.all([fetch('./data/benchmark-source-manifest.json'),fetch('./'+srPath)]);
     if(!meta.ok||!response.ok)throw Error('SR publication unavailable');
     const publication=await meta.json();
+    if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark'||publication.status!=='published-source'||!/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Invalid SR publication identity');
     const binding=publication.files.filter(file=>file.website_path===srPath);
     const raw=await response.arrayBuffer();
     const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
     if(binding.length!==1||binding[0].sha256!==digest||binding[0].bytes!==raw.byteLength)throw Error('SR publication checksum mismatch');
     const value=JSON.parse(new TextDecoder().decode(raw));
-    if(value.schema!=='vllm-hust-sr-development/v1'||value.control!=='B1-r8'||value.entries?.length!==srIds.length)throw Error('Invalid SR publication scope');
-    for(const id of srIds){
+    if(value.schema!=='vllm-hust-sr-development/v1'||value.control!=='B1-r8'||!Array.isArray(value.entries)||!value.entries.length)throw Error('Invalid SR publication scope');
+    const ids=value.entries.map(entry=>entry.id);
+    if(new Set(ids).size!==ids.length||ids.some(id=>!/^sr[1-9][0-9]*$/.test(id)))throw Error('Invalid SR identity');
+    for(const id of ids){
       const entries=value.entries.filter(entry=>entry.id===id);
       if(entries.length!==1)throw Error('Invalid SR identity');
       const entry=entries[0];
       const url=new URL(entry.release_url);
       if(url.origin!=='https://github.com'||!url.pathname.startsWith('/vLLM-HUST/vllm-hust-engine/releases/tag/b1-'+id+'-'))throw Error('Invalid SR evidence link');
       const expected=id==='sr1'?['mmlu','4096-formal','16384-formal']:[...fixedProfiles.map(([id])=>id),'4096-formal','16384-formal'];
-      if(entry.rows.length!==expected.length||expected.some(id=>entry.rows.filter(row=>row.id===id).length!==1))throw Error('Invalid SR row coverage');
+      if(entry.rows.some(row=>/^(?:4096|16384)-repeat$/.test(row.id)))expected.push('4096-repeat','16384-repeat');
+      if(expected.some(id=>entry.rows.filter(row=>row.id===id).length!==1)||new Set(entry.rows.map(row=>row.id)).size!==entry.rows.length||entry.rows.some(row=>!expected.includes(row.id)&&!/^(?:4096|16384)-repeat$/.test(row.id)))throw Error('Invalid SR row coverage');
       for(const row of entry.rows){
         if(row.arms?.length!==2||row.cards?.length!==2||row.cards.some(cards=>cards.length!==2||!cards.every(Number.isInteger)))throw Error('Invalid SR arm identity');
         for(const arm of row.arms){
@@ -652,6 +702,7 @@
       }
     }
     srEntries=value.entries;
+    srIds=ids.sort((a,b)=>BigInt(a.slice(2))>BigInt(b.slice(2))?-1:1);
   }
   function srRows(entry) {
     return entry.rows.map(row=>{
@@ -659,14 +710,15 @@
       const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
       const workloadLabel=[row.variant,crossCard?t('跨卡位对照','Different card positions'):t('同卡对照','Matched cards')].filter(Boolean).join(' · ');
-      return {...row,arms,changes_percent,crossCard,workloadLabel};
+      const label=row.id.endsWith('-repeat')?row.label+' · '+t('复测','Repeat'):row.label;
+      return {...row,label,arms,changes_percent,crossCard,workloadLabel};
     });
   }
   function srDetails(entry,rows,key,roles) {
     const measurements=rows.filter(row=>row.arms);
     const settings='E36/R54 · MTP2 · FULL · TP2';
     if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.name)} · ${settings} · BF16 · Qwen3.5-35B-A3B</p><p><a href="${esc(entry.release_url)}">B1-${entry.id} Release ↗</a></p>`};
-    if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${t('各场景各记录一次对照。吞吐为输出 token 除以批次耗时，含排空。TTFT 和 TPOT 为逐请求均值。成本比按同费率计算，为 B1-r8 吞吐除以候选吞吐。','Each scenario reports one comparison. Throughput is output tokens divided by batch duration including drain. TTFT and TPOT are request means. Equal-rate cost is B1-r8 throughput divided by candidate throughput.')}</p>`};
+    if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${t('各行单独列出对应轮次。吞吐为输出 token 除以批次耗时，含排空。TTFT 和 TPOT 为逐请求均值。成本比按同费率计算，为 B1-r8 吞吐除以候选吞吐。','Each row reports its corresponding run. Throughput is output tokens divided by batch duration including drain. TTFT and TPOT are request means. Equal-rate cost is B1-r8 throughput divided by candidate throughput.')}</p>`};
     if(key==='quality'){
       const scored=measurements.filter(row=>Number.isInteger(row.arms.B1.correct));
       return {title:t('质量与评分明细','Quality and grading'),body:table(t(['场景','版本','正确 / 总数','长度终止','未判定'],['Profile','Version','Correct / total','Length stops','Unresolved']),scored.flatMap(row=>['B0','B1'].map(role=>{const arm=row.arms[role];return [row.label,roles[role],`${arm.correct}/${arm.requests}`,arm.truncated,arm.unresolved];})))+`<p>${t('SWE 与 Terminal 回放仅统计请求性能。','SWE and Terminal replays measure request performance only.')}</p>`};
@@ -686,14 +738,14 @@
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id));
     const reference=sr?null:entry.compute_reference;
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
-    const notes=[reference?t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound'):t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
+    const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
     document.getElementById('comparison-title').textContent=sr?t(`B1-r8 / B1-${entry.id} 实测对比`,`B1-r8 / B1-${entry.id} measured comparison`):t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
     document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
     const settings=sr?'E36/R54 · MTP2 · FULL · TP2':attempt?t('本次尝试未形成冻结配置','This attempt did not produce a frozen configuration'):`E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · TP2 · host ${entry.settings.state_gib_per_rank} GiB/rank · KV ${entry.settings.kv_gib_per_rank} GiB/rank`;
     const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
     const scope=attempt?reason:t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
-    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small></article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`条形按 ${roles.B0} = 1 归一，右侧为实测值。— 表示缺少本版配对数据。`,`Bars normalize ${roles.B0} to 1. Labels show measured values. — indicates missing version-specific paired data.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small>${i===0&&reference?`<small>${t('里程碑50%','50% milestone')}：${reference.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')}<br>${t('最终90%','90% final')}：${reference.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</small>`:''}</article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`条形按 ${roles.B0} = 1 归一，右侧为实测值。— 表示缺少本版配对数据。`,`Bars normalize ${roles.B0} to 1. Labels show measured values. — indicates missing version-specific paired data.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
     if(sr){
       const control=root.querySelector('.runtime-pair>div:first-child');
       control.querySelector('strong').textContent=roles.B0;
@@ -720,7 +772,7 @@
     return {title:t('原始证据','Original evidence'),body:`<p>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。固定五项配对结果见本页图表与质量详情。','C8 closed loop · 871 measured requests, zero failures · one run per arm. The five-profile pairs are included in this page’s charts and quality details.')}</p><p><a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="${esc(currentR8.evidence.raw.url)}">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p><figure class="comparison-source-plot"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" alt="${t('B0与r8连续负载原始对照图','Original B0 and r8 continuous-load chart')}"></a></figure>`};
   }
   function render() {
-    if(!releaseCatalog)return;
+    if(!releaseCatalog||!selectedRelease||!selectableIds.includes(selectedRelease))return;
     if(srIds.includes(selectedRelease)){if(srEntries)renderVersion();return;}
     if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}
     if(!data||!combination)return;
@@ -742,13 +794,16 @@
     const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
-      await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress()]);
+      const loaded=await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(), loadSr().then(()=>null,error=>error)]);
       if(request!==releaseRequest)return;
+      if(loaded[2]&&/^sr/.test(selectedRelease||''))throw loaded[2];
+      selectableIds=[...releaseIds,...attemptIds,...srIds];
+      if(!selectableIds.includes(selectedRelease))selectedRelease=latestFrozenRelease(releaseCatalog);
       if(srIds.includes(selectedRelease)&&!srEntries)await loadSr();
       else if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();
       if(request!==releaseRequest)return;
-      render();
+      render();openLinkedDetail();
     } catch(error) {
       if(request!==releaseRequest)return;
       delete root.dataset.loaded;delete root.dataset.release;delete root.dataset.baselineId;
@@ -757,5 +812,13 @@
     }
   }
   window.addEventListener('vllm-hust:langchange',render);
+  window.addEventListener('hashchange',openLinkedDetail);
+  window.addEventListener('pageshow',event=>{
+    if(!event.persisted)return;
+    releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];
+    const requested=new URL(location.href).searchParams.get('release');
+    selectedRelease=/^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(requested||'')?requested:null;
+    showRelease();
+  });
   showRelease();
 })();
