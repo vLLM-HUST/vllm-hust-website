@@ -9,7 +9,7 @@ from update_benchmark_publication import WORKFLOWS, render
 from verify_release_sources import BENCHMARK, WEBSITE, read_json, revision
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_CHECKS = {"lint", "tests", "cpu-correctness"}
+SOURCE_CHECKS = {"lint", "tests"}
 WEBSITE_CHECKS = {
     "validate",
     "browser",
@@ -39,7 +39,26 @@ def checks_pass(payload, required):
 def reviewed_source(read=read_json):
     head = revision(read(BENCHMARK + "/commits/main")["sha"])
     checks = read(BENCHMARK + "/commits/" + head + "/check-runs?per_page=100")
-    return head if checks_pass(checks, SOURCE_CHECKS) else None
+    if not checks_pass(checks, SOURCE_CHECKS):
+        return None
+    runs = read(
+        BENCHMARK + "/actions/runs?head_sha=" + head + "&event=push&per_page=100"
+    )
+    if runs.get("total_count", 0) > 100:
+        return None
+    applicable = [
+        run
+        for run in runs.get("workflow_runs", [])
+        if run["name"] in {"CI", "Workload data CPU correctness smoke"}
+    ]
+    # CPU smoke is path-filtered. A queued applicable workflow still blocks
+    # publication even before its individual check runs have been created.
+    if not any(run["name"] == "CI" for run in applicable) or any(
+        run["status"] != "completed" or run["conclusion"] != "success"
+        for run in applicable
+    ):
+        return None
+    return head
 
 
 def advance(root, candidate):

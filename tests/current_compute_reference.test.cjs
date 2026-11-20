@@ -16,7 +16,7 @@ function sandbox() {
     location: { href: 'https://example.test/b0-b1.html', hash: '', search: '' }, document: { getElementById: () => ({}) },
     window: { addEventListener() {}, vllmHustSite: { getCurrentLang: () => 'en' } } };
   vm.createContext(context);
-  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey };\n})();'), context);
+  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey, transportAssetBytes };\n})();'), context);
   return context;
 }
 
@@ -224,4 +224,21 @@ test('main-page legacy anchors address current-release details without redirecti
   assert.equal(linkedDetailKey('#method-b0'),'configuration');
   const source=fs.readFileSync(path.join(__dirname,'..','assets','five-dataset-comparison.js'),'utf8');
   assert.ok(!source.includes("location.replace('./b0-b1-legacy.html'"));
+});
+
+
+const cfBeacon='<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v123abc" integrity="sha512-YWJjZA==" data-cf-beacon=\'{"version":"2024.11.0","token":"public-site-id"}\' crossorigin="anonymous"></script>\n';
+
+test('a Cloudflare analytics suffix preserves exact original HTML and still rejects altered evidence',async()=>{
+  for(const suffix of [cfBeacon,'<script src="https://example.com/beacon.min.js"></script>',cfBeacon+'<p>extra</p>',cfBeacon.replace('crossorigin="anonymous"','onload="alert(1)"')]) {
+    const context=sandbox(),{entry,publication,assets}=fixture(context);
+    const path=entry.compute_reference.report.path;
+    assets.set(path,assets.get(path)+suffix);
+    if(suffix===cfBeacon)await context.computeTest.validateVersionComputeReference(entry,publication);
+    else await assert.rejects(context.computeTest.validateVersionComputeReference(entry,publication));
+  }
+  const context=sandbox(),{entry,publication,assets}=fixture(context);
+  const path=entry.compute_reference.report.path;
+  assets.set(path,assets.get(path).replace('fixture','altered')+cfBeacon);
+  await assert.rejects(context.computeTest.validateVersionComputeReference(entry,publication));
 });

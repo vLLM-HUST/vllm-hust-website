@@ -32,11 +32,15 @@ def checks(names, **updates):
 
 def test_only_successful_merged_source_is_selected(helper):
     def read(path):
-        return (
-            {"sha": "a" * 40}
-            if path.endswith("/main")
-            else checks(helper["SOURCE_CHECKS"])
-        )
+        if path.endswith("/main"):
+            return {"sha": "a" * 40}
+        if "/actions/runs?" in path:
+            return {
+                "workflow_runs": [
+                    {"name": "CI", "status": "completed", "conclusion": "success"}
+                ]
+            }
+        return checks(helper["SOURCE_CHECKS"])
 
     assert helper["reviewed_source"](read) == "a" * 40
     for update in (
@@ -83,3 +87,25 @@ def test_merging_rejects_changed_pr_head_or_failed_current_checks(helper):
     assert not helper["checks_pass"](
         checks(helper["WEBSITE_CHECKS"], conclusion="failure"), helper["WEBSITE_CHECKS"]
     )
+
+
+def test_path_filtered_cpu_smoke_is_optional_but_queued_applicable_workflow_blocks(
+    helper,
+):
+    def read(path):
+        if path.endswith("/main"):
+            return {"sha": "a" * 40}
+        if "/actions/runs?" in path:
+            return {
+                "workflow_runs": [
+                    {"name": "CI", "status": "completed", "conclusion": "success"},
+                    {
+                        "name": "Workload data CPU correctness smoke",
+                        "status": "queued",
+                        "conclusion": None,
+                    },
+                ]
+            }
+        return checks(helper["SOURCE_CHECKS"])
+
+    assert helper["reviewed_source"](read) is None
