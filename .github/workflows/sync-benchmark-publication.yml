@@ -1,0 +1,68 @@
+name: Sync Reviewed Benchmark Publication
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [benchmark-publication]
+  schedule:
+    - cron: '*/15 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reviewed-benchmark-publication
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare locks from merged benchmark with successful source CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/refresh_benchmark_publication.py
+          python scripts/update_benchmark_publication.py --check
+      - name: Create or update the publication PR
+        id: publication
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          branch: automation/reviewed-benchmark-publication
+          base: main
+          add-paths: |
+            .github/benchmark-publication.toml
+            .github/workflows/ci.yml
+            .github/workflows/deploy-benchmark-pages.yml
+            .github/workflows/leaderboard-runs.yml
+            .github/workflows/midterm-browser.yml
+            .github/workflows/plugin-effects-browser.yml
+            .github/workflows/sync-plugin-workshop-metadata.yml
+            .github/workflows/sync-version-meta.yml
+          commit-message: 'build: advance reviewed benchmark publication locks'
+          title: 'build: publish latest reviewed benchmark results'
+          body: |
+            Advance source and policy locks to a merged benchmark revision whose CI passed.
+            Website data is generated during deployment from that fixed commit.
+            Current-head website checks must pass before merge; production deployment follows.
+      - name: Wait for and verify the current PR checks, then merge
+        if: steps.publication.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PUBLICATION_PR: ${{ steps.publication.outputs.pull-request-number }}
+        run: |
+          publication_head=$(gh pr view "$PUBLICATION_PR" --json headRefOid --jq .headRefOid)
+          sleep 15
+          gh pr checks "$PUBLICATION_PR" --watch --interval 30 --fail-fast
+          python scripts/refresh_benchmark_publication.py \
+            --check-pr "$PUBLICATION_PR" --expected-head "$publication_head"
+          gh pr merge "$PUBLICATION_PR" --squash --match-head-commit "$publication_head"

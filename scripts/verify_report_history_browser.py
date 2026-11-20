@@ -66,14 +66,16 @@ def main():
                     "Report archive" if lang == "zh" else "历史报告"
                 )
                 page.goto(args.url + "/b0-b1.html#method-1")
-                expect(page).to_have_url(args.url + "/b0-b1-legacy.html#method-1")
-                expect(page.locator("#comparison")).to_have_attribute(
-                    "data-loaded", "V1.03"
+                expect(page).to_have_url(args.url + "/b0-b1.html#method-1")
+                catalog = context.request.get(
+                    args.url + "/data/engine-release-history-v1.json"
+                ).json()
+                latest = max(catalog["order"], key=lambda value: int(value[1:]))
+                expect(page.locator("#five-dataset-comparison")).to_have_attribute(
+                    "data-release", latest, timeout=30000
                 )
-                expect(page.locator("#five-dataset-comparison")).to_have_count(0)
-                expect(page.locator("#comparison-lead")).to_contain_text(
-                    "历史材料合集" if lang == "zh" else "Historical collection"
-                )
+                expect(page.locator("#comparison-detail-dialog")).to_be_visible()
+                expect(page.locator("#comparison")).to_have_count(0)
                 checks.append(
                     {"language": lang, "width": width, "entries": len(data["entries"])}
                 )

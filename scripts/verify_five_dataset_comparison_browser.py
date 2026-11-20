@@ -5,6 +5,7 @@ import copy
 import hashlib
 import json
 import os
+from decimal import Decimal, ROUND_FLOOR
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -13,6 +14,77 @@ SUMMARY = "data/five-datasets-r6-20261114/summary-public-v3.json"
 HISTORY = "data/engine-release-history-v1.json"
 SR = "data/sr-development-results-v1.json"
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
+
+
+def assert_current_compute_reference(root, entry, lang):
+    reference = entry.get("compute_reference")
+    card = root.locator(".result-card").first
+    if reference:
+        lower = Decimal(reference["arms"]["B1"]["efficiency_lower_percent"])
+        value = format(lower.quantize(Decimal("0.0001"), rounding=ROUND_FLOOR), ".4f")
+        value = value.rstrip("0").rstrip(".")
+        expect(card.locator("strong")).to_have_text("≥" + value + "%")
+    else:
+        expect(card.locator("strong")).to_have_text("—")
+    button = root.locator('[data-detail="compute"]')
+    button.click()
+    dialog = root.locator("dialog")
+    expect(dialog).to_be_visible()
+    if reference:
+        supplement = reference.get("full_answer_supplement")
+        reuse = (
+            reference["certificate_kind"]
+            == "qualified_full_reference_denominator_reuse/v1"
+        )
+        expect(dialog.locator("table")).to_have_count(2 if supplement or reuse else 1)
+        expect(dialog.locator("table").first.locator("tbody tr")).to_have_count(2)
+        for role in ("B0", "B1"):
+            expect(dialog).to_contain_text(reference["arms"][role]["T_seconds"])
+        expect(dialog.locator("p").first).to_contain_text(
+            str(reference["protocol"]["max_completion_tokens"])
+        )
+        if reference["protocol"]["formal_repetitions"] == 3:
+            expect(dialog.locator("p").first).to_contain_text(
+                "三轮" if lang == "zh" else "three formal"
+            )
+        if reuse:
+            for role in ("B0", "B1"):
+                expect(dialog).to_contain_text(
+                    reference["arms"][role]["reference_seconds_lower"]
+                )
+                expect(dialog).to_contain_text(
+                    reference["arms"][role]["reference_tflops_per_card_upper"]
+                )
+            expect(dialog).to_contain_text("finish(v)")
+            expect(dialog).to_contain_text(
+                "不约分" if lang == "zh" else "without cancellation"
+            )
+        else:
+            expect(dialog).to_contain_text(
+                "精确效率未知" if lang == "zh" else "Exact efficiency is unknown"
+            )
+        image = dialog.locator("img").first
+        expect(image).to_be_visible()
+        assert image.evaluate("el=>el.complete && el.naturalWidth>0")
+        expect(
+            dialog.locator('a[href="./' + reference["report"]["path"] + '"]')
+        ).to_have_attribute("href", "./" + reference["report"]["path"])
+        expect(
+            dialog.locator('a[href="' + reference["raw_asset"]["url"] + '"]')
+        ).to_have_attribute("href", reference["raw_asset"]["url"])
+        if supplement:
+            panel = dialog.locator("details").last
+            panel.locator("summary").click()
+            expect(panel).to_contain_text("8192")
+            for role in ("B0", "B1"):
+                expect(panel).to_contain_text(supplement["arms"][role]["T_seconds"])
+            expect(panel.locator("img")).to_be_visible()
+            assert panel.locator("img").evaluate("el=>el.complete && el.naturalWidth>0")
+    else:
+        expect(dialog.locator("img")).to_have_count(0)
+        expect(dialog).to_contain_text("尚无已发布" if lang == "zh" else "no published")
+    dialog.locator(".dialog-close").click()
+    expect(button).to_be_focused()
 
 
 def assert_release_control_readable(page, root):
@@ -105,12 +177,9 @@ def assert_sr(page, root, entry, layout, lang):
     page.keyboard.press("Escape")
     expect(button).to_be_focused()
     root.locator('[data-detail="quality"]').click()
-    candidate_mmlu = next(row for row in entry["rows"] if row["id"] == "mmlu")["arms"][
-        1
-    ]
-    expect(dialog).to_contain_text(
-        f"{candidate_mmlu['correct']}/{candidate_mmlu['requests']}"
-    )
+    scored = next(row for row in entry["rows"] if row["id"] == "mmlu")
+    for arm in scored["arms"]:
+        expect(dialog).to_contain_text(f"{arm['correct']}/{arm['requests']}")
     page.keyboard.press("Escape")
 
 
@@ -223,6 +292,7 @@ def verify(url, output):
                     published_r8 = next(
                         row for row in catalog["entries"] if row["id"] == "r8"
                     )
+                    assert_current_compute_reference(root, published_r8, lang)
                     expect(
                         root.locator('.dataset-coverage [data-available="true"]')
                     ).to_have_count(5)
@@ -573,7 +643,9 @@ def verify(url, output):
         )
         future["entries"].append(entry)
         future["order"].insert(0, "r9")
-        future["default_release"] = "r9"
+        future["default_release"] = (
+            "r8"  # A stale advisory default must not pin the main URL.
+        )
         raw = (json.dumps(future, ensure_ascii=False) + "\n").encode()
         updated = copy.deepcopy(manifest)
         published = next(
@@ -596,10 +668,17 @@ def verify(url, output):
         expect(root.locator(".metric-missing")).to_have_count(20)
         expect(root.locator(".bar-value")).to_have_count(0)
         expect(root.locator("#comparison-release-select option")).to_have_count(
-            len(future["order"]) + len(future["attempt_order"]) + len(sr["entries"])
+            len(catalog["order"])
+            + len(catalog["attempt_order"])
+            + len(sr["entries"])
+            + 1
         )
         page.goto(url + "/b0-b1.html")
         expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        page.goto(url + "/b0-b1.html?release=latest")
+        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        page.goto(url + "/b0-b1.html?release=r6")
+        expect(root).to_have_attribute("data-release", "r6", timeout=30000)
         page.close()
         checks.append(
             {"catalog_only_new_release": "r9", "uniform_empty_dashboard": True}
