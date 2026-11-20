@@ -400,6 +400,11 @@ def assert_model_integration(page, root, entry, url, lang):
         if detail == "compute":
             expect(dialog.locator("[data-fixed-b0-compute]")).to_have_count(1)
             expect(dialog).to_contain_text(str(baseline["compute"]["arm"]["T_seconds"]))
+            efficiency = Decimal(
+                baseline["compute"]["arm"]["efficiency_lower_percent"]
+            ).quantize(Decimal("0.0001"), rounding=ROUND_FLOOR)
+            expect(dialog).to_contain_text(str(efficiency.normalize()) + "%")
+            expect(dialog.locator("[data-fixed-b0-compute]")).not_to_contain_text("—%")
         elif detail == "quality":
             expect(dialog).to_contain_text(
                 f"{data['quality']['correct']}/{data['quality']['requests']}"
