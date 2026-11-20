@@ -101,6 +101,11 @@
   function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames(), roles = {B0:'B0',B1:'B1'}) {
     const maximum = Math.max(1,...rows.filter(row=>row.arms?.B0&&row.arms?.B1).map(d=>d.arms.B1[key]/d.arms.B0[key]));
     return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">${esc(roles.B0)}</span><span class="legend-b1">${esc(roles.B1)}</span></div>${rows.map((row,i)=>{
+      if(row.observation){
+        const raw=key==='relative_cost_per_token'?null:row.observation[key];
+        const value=Number.isFinite(raw)?n(raw/divisor):'—';
+        return `<div class="chart-row" data-profile="${esc(row.id)}" data-observation="single-arm"><div class="chart-row-heading"><strong>${esc(labels[i])}<small class="chart-workload-label">${esc(row.model)} · ${t('单臂实测','Single-arm measurement')}</small></strong><span>${t('原值','Measured value')}</span></div><div class="bar-line"><span class="bar-role">B0</span><span class="bar-track"></span><span class="bar-value">—</span></div><div class="bar-line"><span class="bar-role">B1</span><span class="bar-track"></span><span class="bar-value">${value}</span></div></div>`;
+      }
       if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
@@ -404,26 +409,16 @@
     modelIntegrationResults.set(entry.id,data);
   }
 
-  function referenceComparison(entry) {
-    const result=modelIntegrationResults.get(entry.id);
-    return result&&!entry.measurements.length&&!entry.context_tenant_supplement?result:null;
+  function comparisonRoles() { return {B0:'B0',B1:'B1'}; }
+  function singleArmObservation(entry) {
+    const value=modelIntegrationResults.get(entry.id);
+    return value&&!entry.measurements.length&&!entry.context_tenant_supplement?value:null;
   }
-  function comparisonRoles(entry) {
-    const reference=referenceComparison(entry);
-    return reference?{B0:reference.reference.release.split('-').at(-1),B1:entry.id}:{B0:'B0',B1:'B1'};
-  }
-  function referenceComparisonRows(entry) {
-    const result=referenceComparison(entry);
-    if(!result)return [];
-    // Map the existing chart slots; preserve the real release labels, never create an Original018 pair.
-    return result.workloads.map(row=>{
-      const arms={B0:{...row.reference,relative_cost_per_token:1},
-        B1:{...row.candidate,relative_cost_per_token:row.reference.output_tokens_per_second/row.candidate.output_tokens_per_second}};
-      const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
-      const band=row.id.match(/^continuous-(\d+k)-c\d+$/)?.[1];
-      return {id:row.id,label:t(row.label_zh,row.label_en),arms,changes_percent,contextBand:band,
-        workloadLabel:t('已发布参考对照','Published-reference comparison')};
-    });
+  function observationRows(entry) {
+    const value=singleArmObservation(entry);
+    return value?value.workloads.map(row=>({id:row.id,label:t(row.label_zh,row.label_en),
+      observation:row.candidate,model:value.candidate.model,
+      workloadLabel:t('B1单臂实测','B1 single-arm measurement')})):[];
   }
 
   function computeBound(value, upper=false) {
@@ -611,7 +606,7 @@
   function coverageView(rows, qualityOnly=false, referenceLabel=null) {
     return `<section class="dataset-coverage" aria-labelledby="dataset-coverage-title"><div class="section-heading"><h2 id="dataset-coverage-title">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
       const row=rows.find(row=>row.id===id),available=!!row?.arms;
-      const status=available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
+      const status=row?.observation?t('B1单臂实测','B1 single-arm measurement'):available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
       return `<article data-dataset="${id}" data-available="${available}"><strong>${label}</strong><span>${status}</span></article>`;
     }).join('')}</div></section>`;
   }
@@ -725,8 +720,8 @@
   }
   function versionSupplement(entry, values, control = 'B0') {
     const a=entry.context_tenant_supplement;
-    const integration=referenceComparison(entry);
-    if(!a&&integration)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文对照图，可横向滚动','Context comparison chart; scroll horizontally')}"><img src="./${esc(entry.model_integration.chart.path)}" alt="${esc(t('本轮实测与已发布参考的吞吐和时延','Current measurements and published-reference throughput and latency'))}"></div><figcaption>${t('本轮完成4K、16K连续负载；32K与四租户尚未测量，利用率尚未核算。','This run measured continuous 4K and16K loads;32K and four tenants were not measured, and utilization has not been computed.')}</figcaption></figure></section>`;
+    const observed=observationRows(entry).filter(row=>row.id.startsWith('continuous-'));
+    if(!a&&observed.length)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>—</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot" style="background:transparent">${table(t(['工况','B1 token/s','B1 TTFT / s','B1 TPOT / ms'],['Scenario','B1 token/s','B1 TTFT / s','B1 TPOT / ms']),observed.map(row=>[row.label,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))}</div></section>`;
     if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot missing-plot">${t('本版未发布完整的上下文与四租户补测图。','This version has no published complete context and four-tenant supplement chart.')}</div></section>`;
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
@@ -736,11 +731,8 @@
   }
   function versionSupplementDetails(entry) {
     const a=entry.context_tenant_supplement;
-    const integration=referenceComparison(entry);
-    if(!a&&integration){
-      const roles=comparisonRoles(entry),rows=referenceComparisonRows(entry).filter(row=>row.contextBand);
-      return `<p>${esc(t(entry.method_zh,entry.method_en))}</p>${table(t(['工况',`${roles.B0} token/s`,`${roles.B1} token/s`,'吞吐比','本轮P95 TTFT ms','本轮P99 TTFT ms'],['Scenario',`${roles.B0} token/s`,`${roles.B1} token/s`,'Throughput ratio','Current P95 TTFT ms','Current P99 TTFT ms']),rows.map(row=>[row.label,n(row.arms.B0.output_tokens_per_second),n(row.arms.B1.output_tokens_per_second),n(row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second)+'×',n(row.arms.B1.ttft_p95_ms),n(row.arms.B1.ttft_p99_ms)]))}<p>${esc(t(integration.tradeoffs_zh,integration.tradeoffs_en))}</p><p>${t('32K与四租户尚未测量，利用率尚未核算。','32K and four tenants were not measured; utilization has not been computed.')}</p>`;
-    }
+    const observed=observationRows(entry).filter(row=>row.id.startsWith('continuous-'));
+    if(!a&&observed.length)return table(t(['工况','请求数','B1 token/s','TTFT P95 / ms','TTFT P99 / ms'],['Scenario','Requests','B1 token/s','TTFT P95 / ms','TTFT P99 / ms']),observed.map(row=>[row.label,row.observation.requests,n(row.observation.output_tokens_per_second),n(row.observation.ttft_p95_ms),n(row.observation.ttft_p99_ms)]));
     if(!a)return null;
     const rows=a.comparisons.map(row=>[supplementLabel(a,row),row.B0.metrics.requests+' / '+row.B1.metrics.requests,
       n(row.B0.metrics.output_tokens_per_second)+' / '+n(row.B1.metrics.output_tokens_per_second),
@@ -754,7 +746,8 @@
       <p><a href="${esc(a.raw_asset.url)}">${t('完整原件、全部窗口与复算入口','Complete originals, all windows and reproduction')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>`;
   }
   function versionRows(entry) {
-    if(referenceComparison(entry))return referenceComparisonRows(entry);
+    const observations=observationRows(entry);
+    if(observations.length)return observations;
     const rows=entry.measurements.map(row=>{
       const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
@@ -765,26 +758,30 @@
     return rows.map(row=>entry.id==='r8'&&['4096-formal','16384-formal'].includes(row.id)?{...row,workloadLabel:continuousWorkloadLabel()}:row);
   }
   function versionDetails(entry, rows, key, attempt) {
-    const roles=comparisonRoles(entry),integration=referenceComparison(entry);
+    const roles=comparisonRoles(entry);
     const title={compute:t('有效算力参考','Compute reference'),configuration:t('冻结配置与MOD','Configuration and MODs'),methods:t('计算公式与比较方式','Formulas and comparison'),metrics:t('完整数值','Complete metrics'),quality:t('质量与评分明细','Quality and grading'),evidence:t('原始证据','Original evidence'),supplement:t('上下文与四租户补测','Context and four-tenant supplement')}[key];
     if(attempt)return {title,body:`<p>${esc(t(entry.reason_zh,entry.reason_en))}</p><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号；本次未形成完整配对报告。','r1–r3 identify attempts preceding frozen r4; this attempt did not produce a complete paired report.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><code>${esc(entry.source.sha256)}</code>`};
     if(key==='compute')return {title,body:versionComputeReferenceDetails(entry)};
     if(key==='supplement')return {title,body:versionSupplementDetails(entry)||`<p>${t('本版已发布的连续负载仅在图中列出实测档位。尚缺32K及四租户的完整补测数据；不从其他版本迁入成绩。','Published continuous-load measurements cover the plotted context bands. Complete 32K and four-tenant supplement data are missing for this version; scores are not transferred from another version.')}</p>`};
     if(key==='configuration')return {title,body:`<p>${esc(entry.release)}</p><div class="mod-tags">${entry.mods.map(name=>`<span>${esc(name)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p><a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>`};
+    if(key==='methods'&&singleArmObservation(entry))return {title,body:`<p>${t('B1书生三组单臂记录：MMLU200保留8192输出预算；4K/C8、16K/C8各预热60秒、正式提交300秒并排空，输出256。吞吐为输出token数除以含排空的批次秒数；TTFT、TPOT为逐请求均值。固定B0的配对结果单独核验。','Three B1 Intern-S2 single-arm records: MMLU200 retains its8192 output budget;4K/C8 and16K/C8 use60s warmup,300s formal submissions plus drain and256 outputs. Throughput divides output tokens by batch seconds including drain; TTFT and TPOT are request means. Fixed-B0 paired results are audited separately.')}</p>`};
     if(key==='methods')return {title,body:`<p>${esc(t(entry.method_zh||'方法见本版原件',entry.method_en||'See this version’s originals for its protocol'))}</p><dl class="method-list"><dt>${t('吞吐','Throughput')}</dt><dd>${t('完成输出token / 包含排空的批次秒数','Output tokens / batch seconds including drain')}</dd><dt>TTFT / TPOT</dt><dd>${t('逐请求均值；历史预热和输出预算保持原样。','Request means; original warmup and output budgets retained.')}</dd><dt>${t('同费率成本','Equal-rate cost')}</dt><dd>${t(`相同费率与卡数下，单位token成本比 = ${roles.B0}吞吐 / ${roles.B1}吞吐；${roles.B0} = 1。`,`At equal rates and device counts, unit token cost ratio = ${roles.B0} throughput / ${roles.B1} throughput; ${roles.B0} = 1.`)}</dd></dl>`};
-    if(key==='metrics'&&!rows.some(row=>row.arms))return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p>`};
+    if(key==='metrics'&&!rows.some(row=>row.arms||row.observation))return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p>`};
+    if(key==='metrics'&&rows.some(row=>row.observation))return {title,body:table(t(['工况','版本','请求数','token/s','TTFT / s','TPOT / ms'],['Scenario','Arm','Requests','token/s','TTFT / s','TPOT / ms']),rows.filter(row=>row.observation).map(row=>[row.label,'B1 '+entry.id+' · '+row.model,row.observation.requests,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))};
     if(key==='metrics')return {title,body:['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map((field,i)=>`<h3>${[t('吞吐 · token/s','Throughput · token/s'),'TTFT · s','TPOT · ms',t(`同费率成本 · ${roles.B0} = 1`,`Equal-rate cost · ${roles.B0} = 1`)][i]}</h3>${table(t(['场景',roles.B0,roles.B1,'变化'],['Scenario',roles.B0,roles.B1,'Change']),rows.map(row=>[row.label,row.arms?n(row.arms.B0[field]/(i===1?1000:1)):'—',row.arms?n(row.arms.B1[field]/(i===1?1000:1)):'—',row.arms?n(row.changes_percent[field])+'%':'—']))}`).join('')};
     if(key==='quality'){
       const quality=entry.quality;
       const qualityView=quality?`<p class="historical-quality">MMLU200 · ${quality.correct}/${quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${quality.historical_screen_minimum}/${quality.requests} · ${quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';
+      const measured=rows.filter(row=>Number.isInteger(row.observation?.correct));
+      if(measured.length)return {title,body:table(t(['工况','版本','正确 / 总数','长度终止','失败 / 未解析'],['Scenario','Arm','Correct / total','Length stops','Failed / unparsed']),measured.map(row=>[row.label,'B1 '+entry.id+' · '+row.model,`${row.observation.correct}/${row.observation.requests}`,row.observation.truncated,`${row.observation.failed} / ${row.observation.unparsed}`]))};
       const qualityRows=rows.filter(row=>row.arms).flatMap(row=>['B0','B1'].filter(role=>Number.isInteger(row.arms[role].correct)).map(role=>[row.label,role==='B1'?entry.id:roles.B0,`${row.arms[role].correct}/${row.arms[role].requests}`,row.arms[role].truncated]));
-      return {title,body:(integration?`<p>MMLU200 · ${integration.quality.correct}/${integration.quality.requests} ${t('正确','correct')} · ${t('长度终止','Length stops')} ${integration.quality.truncated} · ${t('失败 / 未解析','Failed / unparsed')} ${integration.quality.failed} / ${integration.quality.unparsed}</p>`:'')+(entry.quality_note_zh?`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`:'')+qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止'],['Scenario','Version','Correct','Length stops']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
+      return {title,body:(entry.quality_note_zh&&!entry.model_integration?`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`:'')+qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止'],['Scenario','Version','Correct','Length stops']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
     }
     const development=entry.development_measurements||[];
     const developmentRows=development.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms)]));
     const measuredTails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
-    const tails=integration?rows.filter(row=>row.arms).flatMap(row=>['B0','B1'].filter(role=>Number.isFinite(row.arms[role].ttft_p95_ms)).map(role=>[row.label,roles[role],n(row.arms[role].ttft_p95_ms),n(row.arms[role].ttft_p99_ms)])):measuredTails;
-    return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
+    const tails=measuredTails;
+    return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
   }
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
@@ -1023,7 +1020,6 @@
     const attempt=attemptIds.includes(selectedRelease);
     const sr=srIds.includes(selectedRelease);
     const entry=sr?srEntries.find(row=>row.id===selectedRelease):attempt?releaseCatalog.attempts.find(row=>row.id===selectedRelease):releaseEntry();
-    const integration=referenceComparison(entry);
     const roles=sr?{B0:'B1-r8',B1:'B1-'+entry.id}:comparisonRoles(entry);
     const reason=attempt?t(entry.reason_zh,entry.reason_en):entry.id==='r5'?t(entry.scope_zh,entry.scope_en):'';
     const missingNote=attempt||entry.id==='r5'?t('运行未完成，无配对数据','Run incomplete; no paired data'):'';
@@ -1033,22 +1029,14 @@
     const reference=sr?null:entry.compute_reference;
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
     const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
-    if(integration){notes[1]=t(`相对 ${roles.B0} 的最高吞吐比`,`Highest throughput ratio vs ${roles.B0}`);notes[3]=t('同费率单位token成本降低；利用率尚未核算','Equal-rate token cost reduction; utilization not computed');}
-    document.getElementById('comparison-title').textContent=integration?t(`${roles.B0} / ${roles.B1} 实测对比`,`${roles.B0} / ${roles.B1} measured comparison`):sr?t(`B1-r8 / B1-${entry.id} 实测对比`,`B1-r8 / B1-${entry.id} measured comparison`):t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
-    document.getElementById('comparison-lead').textContent=(integration?integration.candidate.model:'Qwen3.5-35B-A3B')+' · Ascend 910B2 × 2 · BF16';
+    const observation=singleArmObservation(entry);
+    document.getElementById('comparison-title').textContent=sr?t(`B1-r8 / B1-${entry.id} 实测对比`,`B1-r8 / B1-${entry.id} measured comparison`):observation?t(`B0 / B1 ${entry.id} 测试记录`,`B0 / B1 ${entry.id} test records`):t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
+    document.getElementById('comparison-lead').textContent=(observation?'B1 '+entry.id+' · '+observation.candidate.model:'Qwen3.5-35B-A3B')+' · Ascend 910B2 × 2 · BF16';
     const settings=sr?'E36/R54 · MTP2 · FULL · TP2':attempt?t('本次尝试未形成冻结配置','This attempt did not produce a frozen configuration'):`E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · TP2 · host ${entry.settings.state_gib_per_rank} GiB/rank · KV ${entry.settings.kv_gib_per_rank} GiB/rank`;
-    const config=frozenProfile(entry.id,{B0:integration?'9.1.0':releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
-    const scope=attempt?reason:integration?t(`${integration.candidate.model}，对照已发布 ${roles.B0}；${integration.workloads.map(row=>row.label_zh).join('、')}`,`${integration.candidate.model} vs published ${roles.B0}; ${integration.workloads.map(row=>row.label_en).join(', ')}`):t(entry.scope_zh,entry.scope_en);
+    const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
+    const scope=attempt?reason:observation?t('B1单臂实测：MMLU200、4K/C8、16K/C8','B1 single-arm measurements: MMLU200,4K/C8,16K/C8'):t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
-    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small>${i===0&&reference?`<small>${t('里程碑50%','50% milestone')}：${reference.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')}<br>${t('最终90%','90% final')}：${reference.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</small>`:''}</article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality,integration?roles.B0:null)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`条形按 ${roles.B0} = 1 归一，右侧为实测值。— 表示缺少本版配对数据。`,`Bars normalize ${roles.B0} to 1. Labels show measured values. — indicates missing version-specific paired data.`)}</p>${integration?`<p class="chart-scale-note">${esc(t(integration.tradeoffs_zh,integration.tradeoffs_en))}</p>`:''}<div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
-    if(integration){
-      const control=root.querySelector('.runtime-pair>div:first-child');
-      control.querySelector('strong').textContent=roles.B0;
-      control.querySelector('span').textContent=root.querySelector('.runtime-pair>div:last-child span').textContent;
-      root.querySelector('.runtime-pair>div:last-child strong').textContent=roles.B1;
-      const link=root.querySelector('.fixed-b0-identity');link.href=integration.reference.url;
-      link.textContent=roles.B0+' · '+integration.reference.model;
-    }
+    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small>${i===0&&reference?`<small>${t('里程碑50%','50% milestone')}：${reference.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')}<br>${t('最终90%','90% final')}：${reference.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</small>`:''}</article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`配对条形按 ${roles.B0} = 1 归一；单臂记录显示原值。`,`Paired bars normalize ${roles.B0} to 1; single-arm records show measured values.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
     if(sr){
       const control=root.querySelector('.runtime-pair>div:first-child');
       control.querySelector('strong').textContent=roles.B0;
@@ -1056,8 +1044,8 @@
       root.querySelector('.runtime-pair>div:last-child strong').textContent=roles.B1;
       root.querySelector('[data-detail="controller-progress"]').remove();
     }
-    if(!sr&&!integration&&!attempt&&!['r4','r5','r7','r8'].includes(entry.id))root.querySelector('.runtime-pair>div:last-child span').textContent=t('运行时身份见配置详情','See configuration details for runtime identity');
-    if(attempt){const config=root.querySelector('.frozen-profile');config.querySelector('h2').textContent=t('本次运行配置','Run configuration');config.querySelector('.runtime-pair>div:last-child span').textContent=t('冻结前尝试，运行时身份见原件','Pre-freeze attempt; see originals for runtime identity');config.querySelector('.mod-tags').textContent=t('未形成冻结MOD组合','No frozen MOD stack');config.dataset.historyAttempt=entry.id;delete root.dataset.baselineId;}else{root.querySelector('.frozen-profile').dataset.historyRelease=entry.id;root.dataset.baselineId=integration?integration.reference.release:sr?'B1-r8':releaseCatalog.baseline.id;}
+    if(!sr&&!attempt&&!['r4','r5','r7','r8'].includes(entry.id))root.querySelector('.runtime-pair>div:last-child span').textContent=t('运行时身份见配置详情','See configuration details for runtime identity');
+    if(attempt){const config=root.querySelector('.frozen-profile');config.querySelector('h2').textContent=t('本次运行配置','Run configuration');config.querySelector('.runtime-pair>div:last-child span').textContent=t('冻结前尝试，运行时身份见原件','Pre-freeze attempt; see originals for runtime identity');config.querySelector('.mod-tags').textContent=t('未形成冻结MOD组合','No frozen MOD stack');config.dataset.historyAttempt=entry.id;delete root.dataset.baselineId;}else{root.querySelector('.frozen-profile').dataset.historyRelease=entry.id;root.dataset.baselineId=sr?'B1-r8':releaseCatalog.baseline.id;}
     bindMenu();bindDetails(key=>sr?srDetails(entry,rows,key,roles):versionDetails(entry,rows,key,attempt));root.dataset.release=entry.id;root.dataset.loaded=entry.id==='r8'?'r8-continuous-20261117':attempt?'engine-release-attempt-'+entry.id:'engine-release-history-'+entry.id;root.dataset.layout='release-dashboard-v1';root.setAttribute('aria-busy','false');
   }
   const r8Mods = ['Extension Manager','BetterScale','Microflow','KV materialization','M01 correction','Packed host state','Sealed serving warmup','Guarded progress async','Capacity tuning','Short prefill tail'];
