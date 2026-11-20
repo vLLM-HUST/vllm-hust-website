@@ -303,6 +303,45 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
     expect(root.locator('[data-detail="metrics"]')).to_be_focused()
 
 
+def assert_model_integration(page, root, entry, url, lang):
+    descriptor = entry.get("model_integration")
+    section = root.locator("[data-model-integration]")
+    if not descriptor:
+        expect(section).to_have_count(0)
+        return
+    data = page.request.get(url + "/" + descriptor["summary"]["path"]).json()
+    expect(section).to_have_attribute("data-model-integration", entry["id"])
+    expect(section).to_contain_text(data["candidate"]["model"])
+    for index, row in enumerate(data["workloads"]):
+        values = [f"{row['candidate']['output_tokens_per_second']:.2f}"]
+        values += [
+            f"{row['change_percent'][metric]:+.2f}%"
+            for metric in ("output_tokens_per_second", "mean_ttft_ms", "mean_tpot_ms")
+        ]
+        expect(section.locator("tbody tr").nth(index).locator("td")).to_have_text(
+            values
+        )
+    expect(section).to_contain_text(
+        f"{data['quality']['correct']}/{data['quality']['requests']}"
+    )
+    expect(section.locator(".model-integration-tradeoffs")).to_have_text(
+        data["tradeoffs_" + lang]
+    )
+    assert section.locator("img").evaluate(
+        "async el=>{await el.decode();return el.naturalWidth>0}"
+    )
+    if (
+        not entry["measurements"]
+        and not entry.get("compute_reference")
+        and not entry.get("context_tenant_supplement")
+    ):
+        expect(root.locator(".result-card strong")).to_have_text(["—"] * 4)
+        expect(root.locator(".metric-grid .bar-value")).to_have_count(0)
+        expect(root.locator(".dataset-coverage [data-available='true']")).to_have_count(
+            0
+        )
+
+
 def context_supplement(catalog):
     return next(row for row in catalog["entries"] if row["id"] == "r8")[
         "context_tenant_supplement"
@@ -348,6 +387,24 @@ def verify(url, output):
                     errors = []
                     page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
                     page.goto(url + "/b0-b1.html")
+                    root = page.locator("#five-dataset-comparison")
+                    latest = max(catalog["order"], key=lambda value: int(value[1:]))
+                    expect(root).to_have_attribute(
+                        "data-release", latest, timeout=30000
+                    )
+                    current = next(
+                        row for row in catalog["entries"] if row["id"] == latest
+                    )
+                    assert_model_integration(page, root, current, url, lang)
+                    assert_release_control_readable(page, root)
+                    assert page.evaluate(
+                        "document.documentElement.scrollWidth <= innerWidth+1"
+                    )
+                    page.screenshot(
+                        path=str(output / f"latest-{lang}-{width}-{theme}.png"),
+                        full_page=True,
+                    )
+                    page.goto(url + "/b0-b1.html?release=r8")
                     root = page.locator("#five-dataset-comparison")
                     expect(root).to_have_attribute("data-release", "r8", timeout=30000)
                     expect(root.locator(".goal-card")).to_have_count(0)
@@ -599,6 +656,31 @@ def verify(url, output):
                             path=str(output / f"{release}-{lang}-{width}-{theme}.png"),
                             full_page=True,
                         )
+                    for entry in catalog["entries"]:
+                        if entry["id"] in {"r4", "r5", "r6", "r7", "r8"}:
+                            continue
+                        root.locator("#comparison-release-select").select_option(
+                            entry["id"]
+                        )
+                        expect(root).to_have_attribute(
+                            "data-release", entry["id"], timeout=30000
+                        )
+                        assert dashboard_layout(root) == r8_layout
+                        assert_model_integration(page, root, entry, url, lang)
+                        assert_release_control_readable(page, root)
+                        expect(root.locator(".metric-missing .bar-fill")).to_have_count(
+                            0
+                        )
+                        page.screenshot(
+                            path=str(
+                                output / f"{entry['id']}-{lang}-{width}-{theme}.png"
+                            ),
+                            full_page=True,
+                        )
+                    # Rapid switching must not leave the integration data on another version.
+                    root.locator("#comparison-release-select").select_option("r8")
+                    expect(root).to_have_attribute("data-release", "r8", timeout=30000)
+                    expect(root.locator("[data-model-integration]")).to_have_count(0)
                     root.locator("#comparison-release-select").select_option("r6")
                     expect(root).to_have_attribute("data-release", "r6", timeout=30000)
                     expect(page.locator("#comparison-title")).to_contain_text("r6")
@@ -753,7 +835,7 @@ def verify(url, output):
                     )
                     page.close()
         sr_ids = [entry["id"] for entry in sr["entries"]]
-        for release in ("r1", "r2", "r3", "r4", "r5", "r7", *sr_ids):
+        for release in (*catalog["attempt_order"], *catalog["order"], *sr_ids):
             page = context.new_page()
             page.goto(url + "/b0-b1.html?release=" + release)
             root = page.locator("#five-dataset-comparison")
@@ -768,16 +850,17 @@ def verify(url, output):
             checks.append({"direct_release": release, "language_switch": True})
         # A new catalog-only release keeps the same empty dashboard without a JS edit.
         future = copy.deepcopy(context.request.get(url + "/" + HISTORY).json())
+        future_id = "r" + str(max(int(value[1:]) for value in catalog["order"]) + 1)
         entry = copy.deepcopy(
             next(row for row in future["entries"] if row["id"] == "r5")
         )
         entry.update(
-            id="r9",
-            release="full-answer-b1-catalog-test-r9",
-            release_url="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/catalog-test-r9",
+            id=future_id,
+            release=f"full-answer-b1-catalog-test-{future_id}",
+            release_url=f"https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/catalog-test-{future_id}",
         )
         future["entries"].append(entry)
-        future["order"].insert(0, "r9")
+        future["order"].insert(0, future_id)
         future["default_release"] = (
             "r8"  # A stale advisory default must not pin the main URL.
         )
@@ -796,9 +879,9 @@ def verify(url, output):
             "**/data/benchmark-source-manifest.json",
             lambda route: route.fulfill(json=updated),
         )
-        page.goto(url + "/b0-b1.html?release=r9")
+        page.goto(url + "/b0-b1.html?release=" + future_id)
         root = page.locator("#five-dataset-comparison")
-        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        expect(root).to_have_attribute("data-release", future_id, timeout=30000)
         expect(root.locator(".metric-chart")).to_have_count(4)
         expect(root.locator(".metric-missing")).to_have_count(20)
         expect(root.locator(".bar-value")).to_have_count(0)
@@ -811,14 +894,14 @@ def verify(url, output):
             + 2
         )
         page.goto(url + "/b0-b1.html")
-        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        expect(root).to_have_attribute("data-release", future_id, timeout=30000)
         page.goto(url + "/b0-b1.html?release=latest")
-        expect(root).to_have_attribute("data-release", "r9", timeout=30000)
+        expect(root).to_have_attribute("data-release", future_id, timeout=30000)
         page.goto(url + "/b0-b1.html?release=r6")
         expect(root).to_have_attribute("data-release", "r6", timeout=30000)
         page.close()
         checks.append(
-            {"catalog_only_new_release": "r9", "uniform_empty_dashboard": True}
+            {"catalog_only_new_release": future_id, "uniform_empty_dashboard": True}
         )
         page = context.new_page()
         page.add_init_script("""{
@@ -827,7 +910,7 @@ def verify(url, output):
                 ? new Promise((resolve, reject) => setTimeout(() => reject(Error('Delayed old request failure')), 200))
                 : original(path, ...args);
         }""")
-        page.goto(url + "/b0-b1.html")
+        page.goto(url + "/b0-b1.html?release=r8")
         root = page.locator("#five-dataset-comparison")
         expect(root).to_have_attribute("data-release", "r8", timeout=30000)
         page.evaluate("""async () => {
@@ -1042,12 +1125,130 @@ def verify(url, output):
             expect(root.locator(".metric-chart")).to_have_count(0)
             checks.append({"rejected": label})
             page.close()
+        # A valid source hash cannot turn a model integration into project acceptance.
+        for integration_entry in catalog["entries"]:
+            descriptor = integration_entry.get("model_integration")
+            if not descriptor:
+                continue
+            summary_path = descriptor["summary"]["path"]
+            original_summary = context.request.get(url + "/" + summary_path).json()
+            for label, mutate, resign in [
+                (
+                    "integration-summary-tamper",
+                    lambda d: d["candidate"].update(model="tampered"),
+                    False,
+                ),
+                (
+                    "integration-foreign-release",
+                    lambda d: d["candidate"].update(release="foreign"),
+                    True,
+                ),
+                (
+                    "integration-claimed-original018",
+                    lambda d: d["scope"].update(original018_pair=True),
+                    True,
+                ),
+                (
+                    "integration-claimed-full-five",
+                    lambda d: d["scope"].update(project_full_five=True),
+                    True,
+                ),
+                (
+                    "integration-fabricated-throughput",
+                    lambda d: d["workloads"][0]["candidate"].update(
+                        output_tokens_per_second=1
+                    ),
+                    True,
+                ),
+                (
+                    "integration-wrong-delta",
+                    lambda d: d["workloads"][0]["change_percent"].update(
+                        mean_ttft_ms=99
+                    ),
+                    True,
+                ),
+                (
+                    "integration-failed-request",
+                    lambda d: d["workloads"][0]["candidate"].update(failed=1),
+                    True,
+                ),
+                (
+                    "integration-quality-mismatch",
+                    lambda d: d["quality"].update(correct=0),
+                    True,
+                ),
+            ]:
+                altered = copy.deepcopy(original_summary)
+                mutate(altered)
+                raw = json.dumps(altered).encode()
+                changed = copy.deepcopy(catalog)
+                updated = copy.deepcopy(manifest)
+                if resign:
+                    selected = next(
+                        row
+                        for row in changed["entries"]
+                        if row["id"] == integration_entry["id"]
+                    )
+                    selected["model_integration"]["summary"].update(
+                        sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw)
+                    )
+                    for binding in updated["files"]:
+                        if binding["website_path"] == summary_path:
+                            binding.update(
+                                sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw)
+                            )
+                    history_raw = json.dumps(changed).encode()
+                    for binding in updated["files"]:
+                        if binding["website_path"] == HISTORY:
+                            binding.update(
+                                sha256=hashlib.sha256(history_raw).hexdigest(),
+                                bytes=len(history_raw),
+                            )
+                page = context.new_page()
+                page.route(
+                    "**/" + summary_path,
+                    lambda route, request, raw=raw: route.fulfill(
+                        body=raw, content_type="application/json"
+                    ),
+                )
+                if resign:
+                    page.route(
+                        "**/" + HISTORY,
+                        lambda route, request, body=history_raw: route.fulfill(
+                            body=body, content_type="application/json"
+                        ),
+                    )
+                    page.route(
+                        "**/data/benchmark-source-manifest.json",
+                        lambda route, request, value=updated: route.fulfill(json=value),
+                    )
+                page.goto(url + "/b0-b1.html?release=" + integration_entry["id"])
+                root = page.locator("#five-dataset-comparison")
+                expect(root).to_have_attribute(
+                    "data-error", "publication-rejected", timeout=30000
+                )
+                expect(root.locator(".model-integration")).to_have_count(0)
+                page.close()
+                checks.append({"rejected": label, "release": integration_entry["id"]})
+            page = context.new_page()
+            page.route(
+                "**/" + descriptor["chart"]["path"],
+                lambda route: route.fulfill(
+                    body="<svg/>", content_type="image/svg+xml"
+                ),
+            )
+            page.goto(url + "/b0-b1.html?release=" + integration_entry["id"])
+            expect(page.locator("#five-dataset-comparison")).to_have_attribute(
+                "data-error", "publication-rejected", timeout=30000
+            )
+            page.close()
+            checks.append({"rejected": "integration-chart-tamper"})
         page = context.new_page()
         page.route(
             "**/data/r8-continuous-20261117/summary-v1.json",
             lambda route: route.fulfill(json={"corrupted": True}),
         )
-        page.goto(url + "/b0-b1.html")
+        page.goto(url + "/b0-b1.html?release=r8")
         root = page.locator("#five-dataset-comparison")
         expect(root).to_have_attribute(
             "data-error", "publication-rejected", timeout=30000

@@ -3,6 +3,7 @@
 import argparse
 import json
 import math
+import os
 import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -36,7 +37,16 @@ def main():
     receipts = []
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(args=["--no-sandbox"])
+            browser = pw.chromium.launch(
+                args=["--no-sandbox"],
+                executable_path=os.environ.get("VLLMHUST_BROWSER_EXECUTABLE"),
+            )
+            catalog = (
+                browser.new_context()
+                .request.get(base + "/data/engine-release-history-v1.json")
+                .json()
+            )
+            latest = max(catalog["order"], key=lambda value: int(value[1:]))
             for width in (390, 1440):
                 for language in ("zh", "en"):
                     for theme in ("light", "dark"):
@@ -180,8 +190,9 @@ def main():
                                 expect(
                                     page.locator("#five-dataset-comparison")
                                 ).to_have_attribute(
-                                    "data-loaded",
-                                    "r8-continuous-20261117",
+                                    "data-release",
+                                    latest,
+                                    timeout=30000,
                                 )
                                 expect(page.locator("#comparison")).to_have_count(0)
                                 expect(
@@ -379,8 +390,9 @@ def main():
                                 expect(
                                     page.locator("#five-dataset-comparison")
                                 ).to_have_attribute(
-                                    "data-loaded",
-                                    "r8-continuous-20261117",
+                                    "data-release",
+                                    latest,
+                                    timeout=30000,
                                 )
                             else:
                                 page.locator("#plan-options input").first.wait_for()
