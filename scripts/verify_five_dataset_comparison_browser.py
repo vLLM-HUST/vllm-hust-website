@@ -490,6 +490,17 @@ def assert_model_integration(page, root, entry, url, lang):
     expect(root.locator(".metric-change")).to_have_count(0)
 
 
+def latest_official_release(catalog):
+    return max(
+        (
+            entry["id"]
+            for entry in catalog["entries"]
+            if entry.get("publication_status") != "frozen-candidate"
+        ),
+        key=lambda value: int(value[1:]),
+    )
+
+
 def assert_paired_version(page, root, entry, catalog):
     expect(root).to_have_attribute("data-baseline-id", catalog["baseline"]["id"])
     fixed = {"mmlu", "hle", "frontier", "swe", "terminal"}
@@ -562,14 +573,7 @@ def verify(url, output):
                     page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
                     page.goto(url + "/b0-b1.html")
                     root = page.locator("#five-dataset-comparison")
-                    latest = max(
-                        (
-                            entry["id"]
-                            for entry in catalog["entries"]
-                            if entry.get("publication_status") != "frozen-candidate"
-                        ),
-                        key=lambda value: int(value[1:]),
-                    )
+                    latest = latest_official_release(catalog)
                     expect(root).to_have_attribute(
                         "data-release", latest, timeout=30000
                     )

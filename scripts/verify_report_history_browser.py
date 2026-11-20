@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 from playwright.sync_api import expect, sync_playwright
 
+from verify_five_dataset_comparison_browser import latest_official_release
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -23,7 +25,7 @@ def main():
         catalog = context.request.get(
             args.url + "/data/engine-release-history-v1.json"
         ).json()
-        latest = max(catalog["order"], key=lambda value: int(value[1:]))
+        latest = latest_official_release(catalog)
         for lang in ("zh", "en"):
             for width in (390, 1440):
                 page = context.new_page()
@@ -77,7 +79,7 @@ def main():
                 catalog = context.request.get(
                     args.url + "/data/engine-release-history-v1.json"
                 ).json()
-                latest = max(catalog["order"], key=lambda value: int(value[1:]))
+                latest = latest_official_release(catalog)
                 expect(page.locator("#five-dataset-comparison")).to_have_attribute(
                     "data-release", latest, timeout=30000
                 )
