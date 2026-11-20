@@ -942,7 +942,9 @@ def main():
                     expect(page.locator("#engine-install-title")).to_be_visible()
                     kit_url = "https://github.com/DeepLinkNext/DeepLinkEngine/archive/refs/heads/main.zip"
                     for selector in ("#engine-hero-download", "#engine-release-link"):
-                        expect(page.locator(selector)).to_have_attribute("href", kit_url)
+                        expect(page.locator(selector)).to_have_attribute(
+                            "href", kit_url
+                        )
                     commands = page.locator("#try-r8 pre").inner_text()
                     assert "python run_all.py --config evaluation.json" in commands
                     assert "benchmark/run-all.example.json" in commands
@@ -1019,4 +1021,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
