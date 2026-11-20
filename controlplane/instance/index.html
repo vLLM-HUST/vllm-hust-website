@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="../../">
+  <meta name="description" content="Instance Controller responsibilities, measured results and deployment on RIDE.">
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/controlplane/instance/">
+  <link rel="icon" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="stylesheet" href="./assets/site.css?v=controlplane-20261118">
+  <link rel="stylesheet" href="./assets/engine.css?v=controlplane-20261118">
+  <link rel="stylesheet" href="./assets/controlplane.css?v=controller-pages-20261120">
+  <title>Instance Controller | vLLM-HUST</title>
+</head>
+<body data-page="controlplane">
+  <nav class="site-nav"><div class="site-shell site-nav-inner"><a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a><div class="nav-links"><a href="./engine.html">Engine</a><a href="./controlplane/">Control plane</a></div></div></nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+  <main>
+    <section class="engine-hero">
+      <div class="engine-shell engine-hero-grid">
+        <div>
+          <p class="engine-kicker"><span class="lang-zh">控制面组件</span><span class="lang-en">Control Plane component</span></p>
+          <h1><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></h1>
+          <p class="engine-lede"><span class="lang-zh">决定扩缩容、就绪后启用实例，以及缩容前的排空顺序。</span><span class="lang-en">Decides when to scale replicas, activates ready instances and coordinates draining before scale-down.</span></p>
+          <div class="engine-actions">
+            <a href="./control-plane.html" class="engine-button"><span class="lang-zh">控制面总览</span><span class="lang-en">Control Plane overview</span></a>
+            <a href="./controlplane/instance/#results" class="engine-button engine-button-primary"><span class="lang-zh">组件实测</span><span class="lang-en">Measured results</span></a>
+            <a href="./controlplane/instance/#deploy" class="engine-button"><span class="lang-zh">部署</span><span class="lang-en">Deployment</span></a>
+            <a href="https://github.com/yancanmao/instance-controller" class="engine-button"><span class="lang-zh">源代码</span><span class="lang-en">Source code</span></a>
+          </div>
+        </div>
+        <aside class="engine-profile">
+          <p class="engine-kicker"><span class="lang-zh">运行流程</span><span class="lang-en">How it works</span></p>
+          <div class="engine-layer"><span><span class="lang-zh">观测</span><span class="lang-en">Observe</span></span><strong><span class="lang-zh">请求压力与副本就绪状态</span><span class="lang-en">Request pressure and replica readiness</span></strong></div>
+          <div class="engine-layer"><span><span class="lang-zh">扩容</span><span class="lang-en">Scale up</span></span><strong><span class="lang-zh">新副本就绪后接单</span><span class="lang-en">Activate replicas once ready</span></strong></div>
+          <div class="engine-layer"><span><span class="lang-zh">缩容</span><span class="lang-en">Scale down</span></span><strong><span class="lang-zh">先停止接单，再排空</span><span class="lang-en">Stop assignments and drain</span></strong></div>
+        </aside>
+      </div>
+    </section>
+    <div class="engine-shell">
+      <nav class="controller-navigation" aria-label="Control Plane components">
+        <a href="./controlplane/instance/" aria-current="page"><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></a>
+        <a href="./controlplane/kv/"><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></a>
+        <a href="./controlplane/"><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span></a>
+      </nav>
+      <section class="engine-section" aria-labelledby="responsibilities-title">
+        <h2 id="responsibilities-title"><span class="lang-zh">职责</span><span class="lang-en">Responsibilities</span></h2>
+        <p><span class="lang-zh">RIDE 启停模型作业。新副本具备接单条件后才加入路由，缩容时等待在途请求排空。</span><span class="lang-en">RIDE starts and stops model jobs. Replicas join routing once ready, and in-flight requests drain before scale-down.</span></p>
+      </section>
+      <section id="results" class="engine-section" aria-labelledby="results-title">
+        <h2 id="results-title"><span class="lang-zh">实测结果</span><span class="lang-en">Measured results</span></h2>
+          <div id="instance-scaling-results" role="region" aria-labelledby="instance-scaling-title" aria-busy="true">
+            <h3 id="instance-scaling-title"><span class="lang-zh">实例控制器扩缩容实测</span><span class="lang-en">Instance Controller scaling benchmark</span></h3>
+            <div id="instance-scaling-measurements"></div>
+          </div>
+      </section>
+      <section id="deploy" class="engine-section" aria-labelledby="deploy-title">
+        <h2 id="deploy-title"><span class="lang-zh">部署与复现</span><span class="lang-en">Deployment and reproduction</span></h2>
+        <p><span class="lang-zh">已验证的部署使用 RIDE 管理作业、Ray 执行作业。部署前核对副本的就绪和排空接口。</span><span class="lang-en">The measured deployment uses RIDE to manage jobs and Ray to execute them. Verify replica readiness and drain interfaces before deployment.</span></p>
+        <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md"><span class="lang-zh">RIDE 安装与部署</span><span class="lang-en">Install and deploy RIDE</span></a> · <a href="https://github.com/yancanmao/instance-controller"><span class="lang-zh">组件实现</span><span class="lang-en">Implementation</span></a>
+      </section>
+      <details class="engine-section"><summary><span class="lang-zh">历史验证</span><span class="lang-en">Earlier verification</span></summary>
+          <h3 id="historical-verification"><span class="lang-zh">历史验证：Ray 双模型实例部署</span><span class="lang-en">Earlier verification: two model instances on Ray</span></h3>
+        <p><span class="lang-zh">2026-11-06，在同一物理主机上的两个开发工作区运行两个 vLLM 模型实例。验证覆盖 9 次真实生成、管理进程重启接管和停止隔离。</span><span class="lang-en">On November 6, two devboxes on one physical host ran two vLLM instances. Verification covered nine real generations, management-process restart adoption and stop isolation.</span></p>
+        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/427c452767d6f7a820da96f4de70dcca786198d8/reports/ride-control-plane-20261106/source/evidence/machine-deployment-20261106/summary.json"><span class="lang-zh">原始验证记录</span><span class="lang-en">Verification record</span> ↗</a>
+          <h3><span class="lang-zh">真实模型扩缩容验证</span><span class="lang-en">Model service scaling verification</span></h3>
+          <p><span class="lang-zh">实例控制器发起扩容，RIDE 启动准确的模型作业；新实例就绪后接收流量。缩容时先停止向目标实例分配新任务，等待在途请求和缓存动作排空，再由 RIDE 停止该作业。</span><span class="lang-en">The Instance Controller initiates scale-up and RIDE starts the specific model job. The new instance receives traffic once ready. Scale-down stops new assignments, waits for requests and cache operations to drain, and then stops that job.</span></p>
+        <p><span class="lang-zh">路线图记录了真实生成和扩缩过程。这项功能验证覆盖固定测试环境，跨物理主机、真实缓存迁移和性能收益各有独立验收。</span><span class="lang-en">The roadmap records real generation and scaling in the test environment. Cross-host operation, real cache migration and performance gains have separate acceptance criteria.</span></p>
+        <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/architecture/CONTROLLER_ROADMAP.md"><span class="lang-zh">查看完整路线图与证据</span><span class="lang-en">Roadmap and evidence</span> ↗</a>
+      </details>
+    </div>
+  </main>
+  <footer class="engine-footer site-footer"><div class="engine-shell engine-footer-inner"><span>vLLM-HUST · RIDE</span><a href="./control-plane.html"><span class="lang-zh">控制面总览</span><span class="lang-en">Control Plane overview</span> ↗</a></div></footer>
+  <script src="./assets/site.js?v=controlplane-20261119-nav&amp;ui=product-workspace-20261118-r1"></script>
+  <script src="./assets/instance-scaling-results.js" defer></script>
+</body>
+</html>

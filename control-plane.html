@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/product-home.css?v=20261118" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
-  <link rel="stylesheet" href="./assets/controlplane.css?v=instance-scaling-20261120" />
+  <link rel="stylesheet" href="./assets/controlplane.css?v=controller-pages-20261120" />
   <link rel="stylesheet" href="./assets/r8-mod-stack.css?v=r8-included-20261117" />
   <link rel="stylesheet" href="./assets/product-publications.css?v=20261118" />
   <link rel="stylesheet" href="./assets/product-layout.css?v=product-layout-20261118-r1" />
@@ -36,7 +36,7 @@
       <div class="product-actions">
         <a class="product-button" href="#workflow"><span class="lang-zh">开始部署 ↓</span><span class="lang-en">Deploy RIDE ↓</span></a>
         <a class="product-text-link publications-shortcut" href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span> ↓</a>
-        <a class="product-text-link" href="./controlplane/#results"><span class="lang-zh">控制面实测</span><span class="lang-en">Control plane results</span> ↗</a>
+        <a class="product-text-link" href="./control-plane.html#components"><span class="lang-zh">控制器与实测</span><span class="lang-en">Controllers and results</span> ↗</a>
       </div>
     </div>
     <aside class="product-diagram engine-profile" aria-labelledby="ride-evidence-title">
@@ -91,10 +91,6 @@ ride logs model-service MODEL_NAME</code></pre>
           <h2><span class="lang-zh">第八版引擎与请求限流控制器的配对实测</span><span class="lang-en">Paired measurements with Engine r8 and Request Throttling Controller</span></h2>
           <p><span class="lang-zh">2026-11-18，RIDE 在独立 CPU 工作区启动请求限流控制器实例，连接独立运行的第八版引擎。实际托管的实例处理了 336 个请求，随后由 RIDE 停止。实测报告记录了与直连引擎的三轮轨迹回放对照，以及完整批次耗时。</span><span class="lang-en">On November 18, RIDE launched a Request Throttling Controller instance in a separate CPU workspace and connected it to an independently running Engine r8. The managed instance handled 336 requests and RIDE stopped it after the run. The results page provides the batch times from the paired three-turn replay against direct engine access.</span></p>
           <a href="./controlplane/#results"><span class="lang-zh">查看实测及适用范围</span><span class="lang-en">Results and scope</span> ↗</a>
-          <div id="kv-routing-results" role="region" aria-labelledby="kv-routing-title" aria-busy="true">
-            <h3 id="kv-routing-title"><span class="lang-zh">缓存控制器路由实测</span><span class="lang-en">KV Controller routing benchmark</span></h3>
-            <div id="kv-routing-measurements"></div>
-          </div>
         </section>
       </details>
       <details class="engine-fold">
@@ -106,14 +102,10 @@ ride logs model-service MODEL_NAME</code></pre>
           <h2><span class="lang-zh">控制面 MOD 与职责</span><span class="lang-en">Control plane MODs and responsibilities</span></h2>
           <p><span class="lang-zh">RIDE 管理模型服务和控制进程的生命周期。各控制器通过公共 SDK 观察和执行策略。</span><span class="lang-en">RIDE manages the lifecycle of model services and control processes. Controllers observe state and apply policies through the public SDK.</span></p>
         <div class="engine-cards">
-          <article><h3><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></h3><p><span class="lang-zh">决定扩缩容、就绪后启用实例，以及缩容前的排空顺序。</span><span class="lang-en">Decides when to scale replicas, activates ready instances and coordinates draining before scale-down.</span></p><a href="https://github.com/yancanmao/instance-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a> · <a href="#instance-scaling-results"><span class="lang-zh">扩缩容实测</span><span class="lang-en">Scaling benchmark</span> ↗</a></article>
-          <article><h3><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></h3><p><span class="lang-zh">查询缓存后端能力，验证缓存操作并保护排空过程。可依据缓存覆盖和预计在途工作量选择副本。</span><span class="lang-en">Discovers cache backend capabilities, verifies actions and protects draining. Selects replicas using estimated cache coverage and in-flight work.</span></p><a href="https://github.com/yancanmao/kv-controller"><span class="lang-zh">实现</span><span class="lang-en">Implementation</span> ↗</a> · <a href="#kv-routing-results"><span class="lang-zh">实测</span><span class="lang-en">Benchmark</span> ↗</a></article>
-          <article><h3><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span></h3><p><span class="lang-zh">管理请求放行、多轮程序归属及请求排空。</span><span class="lang-en">Manages request admission, multi-turn program affinity and request draining.</span></p><a href="./controlplane/"><span class="lang-zh">组件详情</span><span class="lang-en">Component details</span> ↗</a> · <a href="./controlplane/#results"><span class="lang-zh">组件实测</span><span class="lang-en">Component results</span> ↗</a></article>
+          <article><h3><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></h3><p><span class="lang-zh">决定扩缩容、就绪后启用实例，以及缩容前的排空顺序。</span><span class="lang-en">Decides when to scale replicas, activates ready instances and coordinates draining before scale-down.</span></p><a href="./controlplane/instance/"><span class="lang-zh">组件详情</span><span class="lang-en">Component details</span></a> · <a href="./controlplane/instance/#results"><span class="lang-zh">组件实测</span><span class="lang-en">Component results</span></a></article>
+          <article><h3><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></h3><p><span class="lang-zh">查询缓存后端能力，验证缓存操作并保护排空过程。可依据缓存覆盖和预计在途工作量选择副本。</span><span class="lang-en">Discovers cache backend capabilities, verifies actions and protects draining. Selects replicas using estimated cache coverage and in-flight work.</span></p><a href="./controlplane/kv/"><span class="lang-zh">组件详情</span><span class="lang-en">Component details</span></a> · <a href="./controlplane/kv/#results"><span class="lang-zh">组件实测</span><span class="lang-en">Component results</span></a></article>
+          <article><h3><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span></h3><p><span class="lang-zh">管理请求放行、多轮程序归属及请求排空。</span><span class="lang-en">Manages request admission, multi-turn program affinity and request draining.</span></p><a href="./controlplane/"><span class="lang-zh">组件详情</span><span class="lang-en">Component details</span></a> · <a href="./controlplane/#results"><span class="lang-zh">组件实测</span><span class="lang-en">Component results</span></a></article>
         </div>
-          <div id="instance-scaling-results" role="region" aria-labelledby="instance-scaling-title" aria-busy="true">
-            <h3 id="instance-scaling-title"><span class="lang-zh">实例控制器扩缩容实测</span><span class="lang-en">Instance Controller scaling benchmark</span></h3>
-            <div id="instance-scaling-measurements"></div>
-          </div>
         </section>
       </details>
       <details class="engine-fold">
@@ -126,7 +118,7 @@ ride logs model-service MODEL_NAME</code></pre>
             <div class="engine-actions">
               <a class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md"><span class="lang-zh">安装与部署指南</span><span class="lang-en">Installation guide</span> ↗</a>
               <a class="engine-button" href="https://github.com/vLLM-HUST/ride"><span class="lang-zh">源代码</span><span class="lang-en">Source code</span> ↗</a>
-              <a class="engine-button" href="./controlplane/#results"><span class="lang-zh">实测与复现材料</span><span class="lang-en">Results and reproduction materials</span> ↗</a>
+              <a class="engine-button" href="./control-plane.html#components"><span class="lang-zh">各组件实测</span><span class="lang-en">Component results</span> ↗</a>
             </div>
           </div>
         </section>
@@ -134,13 +126,7 @@ ride logs model-service MODEL_NAME</code></pre>
       <details class="engine-fold">
         <summary><span class="lang-zh">历史报告</span><span class="lang-en">Historical reports</span></summary>
         <section class="engine-section">
-          <h3><span class="lang-zh">历史验证：Ray 双模型实例部署</span><span class="lang-en">Earlier verification: two model instances on Ray</span></h3>
-        <p><span class="lang-zh">2026-11-06，在同一物理主机上的两个开发工作区运行两个 vLLM 模型实例。验证覆盖 9 次真实生成、管理进程重启接管和停止隔离。</span><span class="lang-en">On November 6, two devboxes on one physical host ran two vLLM instances. Verification covered nine real generations, management-process restart adoption and stop isolation.</span></p>
-        <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/427c452767d6f7a820da96f4de70dcca786198d8/reports/ride-control-plane-20261106/source/evidence/machine-deployment-20261106/summary.json"><span class="lang-zh">原始验证记录</span><span class="lang-en">Verification record</span> ↗</a>
-          <h3><span class="lang-zh">真实模型扩缩容验证</span><span class="lang-en">Model service scaling verification</span></h3>
-          <p><span class="lang-zh">实例控制器发起扩容，RIDE 启动准确的模型作业；新实例就绪后接收流量。缩容时先停止向目标实例分配新任务，等待在途请求和缓存动作排空，再由 RIDE 停止该作业。</span><span class="lang-en">The Instance Controller initiates scale-up and RIDE starts the specific model job. The new instance receives traffic once ready. Scale-down stops new assignments, waits for requests and cache operations to drain, and then stops that job.</span></p>
-        <p><span class="lang-zh">路线图记录了真实生成和扩缩过程。这项功能验证覆盖固定测试环境，跨物理主机、真实缓存迁移和性能收益各有独立验收。</span><span class="lang-en">The roadmap records real generation and scaling in the test environment. Cross-host operation, real cache migration and performance gains have separate acceptance criteria.</span></p>
-        <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/architecture/CONTROLLER_ROADMAP.md"><span class="lang-zh">查看完整路线图与证据</span><span class="lang-en">Roadmap and evidence</span> ↗</a>
+          <p><a href="./controlplane/instance/#historical-verification"><span class="lang-zh">双模型部署与扩缩容历史验证</span><span class="lang-en">Earlier verification of two-model deployment and scaling</span> ↗</a></p>
         </section>
       </details>
     </div>
@@ -286,8 +272,7 @@ ride logs model-service MODEL_NAME</code></pre>
     };
   </script>
   <script src="./assets/site.js?v=ride-control-preview"></script>
-  <script src="./assets/kv-routing-results.js" defer></script>
-  <script src="./assets/instance-scaling-results.js" defer></script>
+  <script src="./assets/control-plane-result-links.js"></script>
   <script src="./assets/product-layout.js?v=product-anchors-20261119-r2"></script>
 </body>
 </html>

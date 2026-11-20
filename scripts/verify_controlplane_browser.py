@@ -191,7 +191,30 @@ def verify(args):
                 viewport={"width": width, "height": 1000}, color_scheme=theme
             )
             page = context.new_page()
-            page.goto(args.url.rstrip("/") + "/control-plane.html#kv-routing-results")
+            root_url = args.url.rstrip("/")
+            page.goto(root_url + "/control-plane.html#components")
+            cards = page.locator("#components .engine-cards article")
+            expect(cards).to_have_count(3)
+            expect(
+                page.locator("#instance-scaling-results, #kv-routing-results")
+            ).to_have_count(0)
+            for index, path in enumerate(
+                ("controlplane/instance/", "controlplane/kv/", "controlplane/")
+            ):
+                card = cards.nth(index)
+                expect(card.locator("a").first).to_have_attribute("href", f"./{path}")
+                expect(card.locator("a").last).to_have_attribute(
+                    "href", f"./{path}#results"
+                )
+                card.locator("a").last.click()
+                expect(
+                    page.locator(".controller-navigation a[aria-current=page]")
+                ).to_have_attribute("href", f"./{path}")
+                expect(page.locator("#results")).to_be_visible()
+                expect(page.locator("#deploy")).to_be_visible()
+                page.go_back()
+            page.goto(root_url + "/control-plane.html#kv-routing-results")
+            expect(page).to_have_url(root_url + "/controlplane/kv/#results")
             routing = page.locator("#kv-routing-results")
             expect(routing).to_have_attribute("data-loaded", "0.1.6")
             expect(routing.locator("tbody tr")).to_have_count(2)
@@ -208,6 +231,7 @@ def verify(args):
             page.goto(
                 args.url.rstrip("/") + "/control-plane.html#instance-scaling-results"
             )
+            expect(page).to_have_url(root_url + "/controlplane/instance/#results")
             scaling = page.locator("#instance-scaling-results")
             expect(scaling).to_have_attribute(
                 "data-loaded", "instance-controller-scaling/v1"
@@ -216,7 +240,7 @@ def verify(args):
             page.wait_for_function(
                 """() => {
                     const nav = document.querySelector('.site-nav').getBoundingClientRect();
-                    const heading = document.querySelector('#instance-scaling-title').getBoundingClientRect();
+                    const heading = document.querySelector('#results-title').getBoundingClientRect();
                     return heading.top >= nav.bottom && heading.bottom <= innerHeight;
                 }"""
             )
@@ -252,7 +276,7 @@ def verify(args):
                 status=200, content_type="application/json", body="{}"
             ),
         )
-        page.goto(args.url.rstrip("/") + "/control-plane.html#kv-routing-results")
+        page.goto(args.url.rstrip("/") + "/controlplane/kv/#results")
         routing = page.locator("#kv-routing-results")
         expect(routing).to_have_attribute("aria-busy", "false")
         expect(routing.locator("table")).to_have_count(0)
@@ -270,7 +294,7 @@ def verify(args):
                 status=200, content_type="application/json", body="{}"
             ),
         )
-        page.goto(args.url.rstrip("/") + "/control-plane.html#instance-scaling-results")
+        page.goto(args.url.rstrip("/") + "/controlplane/instance/#results")
         scaling = page.locator("#instance-scaling-results")
         expect(scaling).to_have_attribute("aria-busy", "false")
         expect(scaling.locator("table")).to_have_count(0)
