@@ -41,7 +41,7 @@
 <h1 id="engine-title">vLLM-HUST Engine</h1>
 <p class="product-owner" id="engine-owner">负责人：张书豪</p>
 <p class="product-lead" id="engine-lede">Frozen r8 is available for reproduction, MOD development and further optimization.</p>
-<div class="product-actions"><a class="product-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v3.py" id="engine-hero-download">Download r8 runner ↗</a>
+<div class="product-actions"><a class="product-button" href="https://github.com/DeepLinkNext/DeepLinkEngine/archive/refs/heads/main.zip" id="engine-hero-download">Download complete test kit ↗</a>
 <a class="product-text-link publications-shortcut" href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span> ↓</a>
 <a class="product-text-link" href="./b0-b1.html" id="engine-hero-benchmark">B0 / B1 results ↗</a>
 
@@ -68,12 +68,14 @@
 </details>
 </section><section aria-labelledby="engine-try-title" class="engine-section" id="try-r8">
 <h2 id="engine-try-title">Build on frozen r8</h2>
-<p id="engine-try-copy">Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.</p>
-<pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>python3 download-and-run-r8-full-v3.py \
-  --b1-python /absolute/path/to/fixed-b1-sdk/bin/python \
-  --physical-devices 0,1 --out ./runs/r8-full-five</code></pre>
-<p class="engine-note" id="engine-try-scope">The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.</p>
-</section></div></section><section class="product-details" id="product-details"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">深入了解</span><span class="lang-en">DETAILS</span></p><h2><span class="lang-zh">版本、实现与复现</span><span class="lang-en">Release, implementation &amp; reproduction</span></h2><p><span class="lang-zh">展开查看冻结配置、原件与历史。</span><span class="lang-en">Expand for the frozen stack, artifacts and history.</span></p></div><div class="engine-detail-grid"><details class="engine-fold"><summary><span class="lang-zh">实测图表与计算方式</span><span class="lang-en">Measurements &amp; methodology</span></summary><section aria-labelledby="engine-current-title" class="engine-section" id="r8-current-results" style="scroll-margin-top:96px">
+<p id="engine-try-copy">Download the complete DeepLinkEngine repository. Set the model, physical device IDs, cache and new output directory in evaluation.json, then run the command below. The entry prepares the fixed environment and engine automatically.</p>
+<pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>git clone https://github.com/DeepLinkNext/DeepLinkEngine.git
+cd DeepLinkEngine
+cp benchmark/run-all.example.json evaluation.json
+# Set model, physical_devices, cache and out in evaluation.json
+python run_all.py --config evaluation.json</code></pre>
+<p class="engine-note" id="engine-try-scope">The full run includes all five fixed profiles, the compute reference, 4K/16K/32K and four tenants. Cache cleanup and warmup run automatically; logs follow in the terminal. The repository guide also describes MMLU200 quick mode.</p>
+<p><a href="https://github.com/DeepLinkNext/DeepLinkEngine/blob/main/benchmark/README.md"><span class="lang-zh">完整测试、快速模式与中断接续指南 ↗</span><span class="lang-en">Full tests, quick mode and recovery guide ↗</span></a></p></section></div></section><section class="product-details" id="product-details"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">深入了解</span><span class="lang-en">DETAILS</span></p><h2><span class="lang-zh">版本、实现与复现</span><span class="lang-en">Release, implementation &amp; reproduction</span></h2><p><span class="lang-zh">展开查看冻结配置、原件与历史。</span><span class="lang-en">Expand for the frozen stack, artifacts and history.</span></p></div><div class="engine-detail-grid"><details class="engine-fold"><summary><span class="lang-zh">实测图表与计算方式</span><span class="lang-en">Measurements &amp; methodology</span></summary><section aria-labelledby="engine-current-title" class="engine-section" id="r8-current-results" style="scroll-margin-top:96px">
 <span aria-hidden="true" id="results"></span><h2 id="engine-current-title">B0 → r8 · current 4K / 16K continuous load</h2>
 <p id="engine-current-performance-copy">Throughput 3.06× / 2.68×; mean TTFT −52.8% / −48.4%, TPOT −68.5% / −65.4%. Zero failed requests.</p>
 <figure style="margin:20px 0"><a aria-label="Open full-size comparison chart" href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K" height="1440" src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" style="display:block;width:100%;height:auto" width="2160"/></a><figcaption class="engine-note" id="engine-current-caption">C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.</figcaption></figure>
@@ -111,7 +113,7 @@
 <div>
 <p class="engine-kicker" id="engine-release-kicker">2026-11-17 · Frozen release</p><h2 id="engine-release-title">Download B1 r8</h2><p id="engine-release-copy">One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.</p>
 <div class="engine-actions">
-<a class="engine-button engine-button-primary" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/download-and-run-r8-full-v3.py" id="engine-release-link">Download one-click runner ↗</a>
+<a class="engine-button engine-button-primary" href="https://github.com/DeepLinkNext/DeepLinkEngine/archive/refs/heads/main.zip" id="engine-release-link">Download complete test kit ↗</a>
 <a class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8" id="engine-profile-link">Release and checksums ↗</a>
 <a class="engine-button" href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261117-r8" id="engine-hero-release">r8 sources and artifacts ↗</a></div>
 <p class="engine-note" id="engine-access">Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.</p>
@@ -322,7 +324,7 @@
     "engine-release-kicker": "2026-11-17 · Frozen release",
     "engine-release-title": "Download B1 r8",
     "engine-release-copy": "One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.",
-    "engine-release-link": "Download one-click runner ↗",
+    "engine-release-link": "Download complete test kit ↗",
     "engine-profile-link": "Release and checksums ↗",
     "engine-access": "Quick: MMLU200. Full: the five fixed profiles. Both use the original answer budgets and scoring.",
     "engine-status-title": "Measurements and tradeoffs",
@@ -365,15 +367,15 @@
     "engine-task-reverse-output_tokens_per_second": "Output throughput (tok/s)",
     "engine-task-reverse-mean_ttft_ms": "Mean TTFT (s)",
     "engine-task-reverse-mean_tpot_ms": "Mean TPOT (ms)",
-    "engine-hero-download": "Download r8 runner ↗",
+    "engine-hero-download": "Download complete test kit ↗",
     "engine-short-status": "Fixed starting point: r8 · E36/R54 · async H2D · Tail256",
     "engine-config-summary": "MODs, creators and resource budgets",
     "engine-context-summary": "4K / 16K comparisons",
     "engine-download-summary": "Downloads, checksums and reproduction",
     "engine-archive-summary": "Historical reports",
     "engine-try-title": "Build on frozen r8",
-    "engine-try-copy": "Download the runner and supply the fixed B1 Python and device IDs. Package new optimizations as MODs and retain the frozen r8 control and raw results.",
-    "engine-try-scope": "The default runs all five fixed profiles; add --datasets mmlu for a quick run. Logs follow automatically.",
+    "engine-try-copy": "Download the complete DeepLinkEngine repository. Set the model, physical device IDs, cache and new output directory in evaluation.json, then run the command below. The entry prepares the fixed environment and engine automatically.",
+    "engine-try-scope": "The full run includes all five fixed profiles, the compute reference, 4K/16K/32K and four tenants. Cache cleanup and warmup run automatically; logs follow in the terminal. The repository guide also describes MMLU200 quick mode.",
     "engine-mod-badge-link": "10 MODs and their creators ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
     "engine-current-title": "B0 → r8 · current 4K / 16K continuous load",
@@ -414,7 +416,7 @@
     "engine-release-kicker": "2026-11-17 · 冻结版本",
     "engine-release-title": "下载 B1 r8",
     "engine-release-copy": "单文件入口恢复固定工具与运行时源码，完成推理、评分和出图，并实时跟随日志。私有 GitHub 凭据从 .env 或环境变量读取。",
-    "engine-release-link": "下载单文件一键入口 ↗",
+    "engine-release-link": "下载完整测试套件 ↗",
     "engine-profile-link": "Release 与校验信息 ↗",
     "engine-access": "快速测试：MMLU200。全量测试：固定五项。均保留原完整回答预算与评分规则。",
     "engine-status-title": "实测与性能取舍",
@@ -457,15 +459,15 @@
     "engine-task-reverse-output_tokens_per_second": "输出吞吐（tok/s）",
     "engine-task-reverse-mean_ttft_ms": "平均TTFT（秒）",
     "engine-task-reverse-mean_tpot_ms": "平均TPOT（毫秒）",
-    "engine-hero-download": "下载 r8 一键脚本 ↗",
+    "engine-hero-download": "下载完整测试套件 ↗",
     "engine-short-status": "固定起点：r8 · E36/R54 · 异步 H2D · Tail256",
     "engine-config-summary": "MOD、制作者与资源配置",
     "engine-context-summary": "4K / 16K 对照图",
     "engine-download-summary": "下载、校验与复现详情",
     "engine-archive-summary": "历史报告",
     "engine-try-title": "基于 r8 继续优化",
-    "engine-try-copy": "下载脚本，填写固定B1 Python与设备号即可运行。新增优化单独做成MOD，保留固定r8对照和原始结果。",
-    "engine-try-scope": "默认跑固定五项；快速测试追加 --datasets mmlu。启动后自动跟随日志。",
+    "engine-try-copy": "下载完整 DeepLinkEngine 仓库，在 evaluation.json 中填写模型、两张物理卡、缓存和新的输出目录，再运行下方命令。入口自动准备固定环境和引擎。",
+    "engine-try-scope": "完整测试包含固定五项、有效算力参考、4K/16K/32K 和四租户；自动清理缓存并预热，终端持续显示日志。MMLU200 快速模式见仓库测试指南。",
     "engine-mod-badge-link": "10 项 MOD 与制作者 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
     "engine-current-title": "B0 → r8 · 新一轮 4K / 16K 连续负载",
@@ -485,3 +487,4 @@
   <script src="./assets/product-layout.js?v=product-anchors-20261119-r2"></script>
 </body>
 </html>
+
