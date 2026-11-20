@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="../../">
+  <meta name="description" content="KV Controller responsibilities, measured results and deployment on RIDE.">
+  <link rel="canonical" href="https://vllm-hust.sage.org.ai/controlplane/kv/">
+  <link rel="icon" href="./assets/brand/vllm-hust-icon.png">
+  <link rel="stylesheet" href="./assets/site.css?v=controlplane-20261118">
+  <link rel="stylesheet" href="./assets/engine.css?v=controlplane-20261118">
+  <link rel="stylesheet" href="./assets/controlplane.css?v=controller-pages-20261120">
+  <title>KV Controller | vLLM-HUST</title>
+</head>
+<body data-page="controlplane">
+  <nav class="site-nav"><div class="site-shell site-nav-inner"><a class="brand-link" href="./index.html"><span class="brand-mark">V</span><span class="brand-copy">vLLM-HUST<small>Domestic-compute inference engine</small></span></a><div class="nav-links"><a href="./engine.html">Engine</a><a href="./controlplane/">Control plane</a></div></div></nav>
+  <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
+  <main>
+    <section class="engine-hero">
+      <div class="engine-shell engine-hero-grid">
+        <div>
+          <p class="engine-kicker"><span class="lang-zh">控制面组件</span><span class="lang-en">Control Plane component</span></p>
+          <h1><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></h1>
+          <p class="engine-lede"><span class="lang-zh">查询缓存后端能力，验证缓存操作并保护排空过程。可依据缓存覆盖和预计在途工作量选择副本。</span><span class="lang-en">Discovers cache backend capabilities, verifies actions and protects draining. Selects replicas using estimated cache coverage and in-flight work.</span></p>
+          <div class="engine-actions">
+            <a href="./control-plane.html" class="engine-button"><span class="lang-zh">控制面总览</span><span class="lang-en">Control Plane overview</span></a>
+            <a href="./controlplane/kv/#results" class="engine-button engine-button-primary"><span class="lang-zh">组件实测</span><span class="lang-en">Measured results</span></a>
+            <a href="./controlplane/kv/#deploy" class="engine-button"><span class="lang-zh">部署</span><span class="lang-en">Deployment</span></a>
+            <a href="https://github.com/yancanmao/kv-controller" class="engine-button"><span class="lang-zh">源代码</span><span class="lang-en">Source code</span></a>
+          </div>
+        </div>
+        <aside class="engine-profile">
+          <p class="engine-kicker"><span class="lang-zh">运行流程</span><span class="lang-en">How it works</span></p>
+          <div class="engine-layer"><span><span class="lang-zh">检查</span><span class="lang-en">Inspect</span></span><strong><span class="lang-zh">后端支持的缓存操作</span><span class="lang-en">Supported backend cache operations</span></strong></div>
+          <div class="engine-layer"><span><span class="lang-zh">选路</span><span class="lang-en">Route</span></span><strong><span class="lang-zh">缓存覆盖与在途工作量</span><span class="lang-en">Cache coverage and in-flight work</span></strong></div>
+          <div class="engine-layer"><span><span class="lang-zh">保护</span><span class="lang-en">Protect</span></span><strong><span class="lang-zh">排空与在途缓存操作</span><span class="lang-en">Draining and in-flight cache operations</span></strong></div>
+        </aside>
+      </div>
+    </section>
+    <div class="engine-shell">
+      <nav class="controller-navigation" aria-label="Control Plane components">
+        <a href="./controlplane/instance/"><span class="lang-zh">实例控制器</span><span class="lang-en">Instance Controller</span></a>
+        <a href="./controlplane/kv/" aria-current="page"><span class="lang-zh">缓存控制器</span><span class="lang-en">KV Controller</span></a>
+        <a href="./controlplane/"><span class="lang-zh">请求限流控制器</span><span class="lang-en">Request Throttling Controller</span></a>
+      </nav>
+      <section class="engine-section" aria-labelledby="responsibilities-title">
+        <h2 id="responsibilities-title"><span class="lang-zh">职责</span><span class="lang-en">Responsibilities</span></h2>
+        <p><span class="lang-zh">控制器检查缓存后端和可用操作，再结合缓存覆盖与在途工作量选择副本。</span><span class="lang-en">The controller checks cache backend capabilities and selects replicas using cache coverage and in-flight work.</span></p>
+      </section>
+      <section id="results" class="engine-section" aria-labelledby="results-title">
+        <h2 id="results-title"><span class="lang-zh">实测结果</span><span class="lang-en">Measured results</span></h2>
+          <div id="kv-routing-results" role="region" aria-labelledby="kv-routing-title" aria-busy="true">
+            <h3 id="kv-routing-title"><span class="lang-zh">缓存控制器路由实测</span><span class="lang-en">KV Controller routing benchmark</span></h3>
+            <div id="kv-routing-measurements"></div>
+          </div>
+      </section>
+      <section id="deploy" class="engine-section" aria-labelledby="deploy-title">
+        <h2 id="deploy-title"><span class="lang-zh">部署与复现</span><span class="lang-en">Deployment and reproduction</span></h2>
+        <p><span class="lang-zh">接入时检查后端的缓存能力、路由接口与排空保护。实测报告列出已验证的后端和适用范围。</span><span class="lang-en">Check backend cache capabilities, routing interfaces and drain protection during integration. The benchmark report records the measured backend and scope.</span></p>
+        <a href="https://github.com/vLLM-HUST/ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md"><span class="lang-zh">RIDE 安装与部署</span><span class="lang-en">Install and deploy RIDE</span></a> · <a href="https://github.com/yancanmao/kv-controller"><span class="lang-zh">组件实现</span><span class="lang-en">Implementation</span></a>
+      </section>
+    </div>
+  </main>
+  <footer class="engine-footer site-footer"><div class="engine-shell engine-footer-inner"><span>vLLM-HUST · RIDE</span><a href="./control-plane.html"><span class="lang-zh">控制面总览</span><span class="lang-en">Control Plane overview</span> ↗</a></div></footer>
+  <script src="./assets/site.js?v=controlplane-20261119-nav&amp;ui=product-workspace-20261118-r1"></script>
+  <script src="./assets/kv-routing-results.js" defer></script>
+</body>
+</html>

@@ -861,12 +861,12 @@ def main():
                         if slug == "control-plane":
                             expect(
                                 page.locator(
-                                    '.product-actions a[href="./controlplane/#results"]'
+                                    '.product-actions a[href="./control-plane.html#components"]'
                                 )
                             ).to_have_text(
-                                "控制面实测 ↗"
+                                "控制器与实测 ↗"
                                 if language == "zh"
-                                else "Control plane results ↗",
+                                else "Controllers and results ↗",
                                 use_inner_text=True,
                             )
                         page.screenshot(
