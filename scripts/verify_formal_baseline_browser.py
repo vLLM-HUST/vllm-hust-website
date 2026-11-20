@@ -109,37 +109,60 @@ def verify(url, output):
         poisoned = source.replace(marker, marker + injected)
         guard = "if(!attempt&&!sr)assertFormalBaselineIsolation(entry,rows);"
         assert poisoned.count(guard) == 1
-        for protected in (False, True):
-            body = poisoned if protected else poisoned.replace(guard, "")
-            page = context.new_page()
-            page.route(
-                "**/assets/five-dataset-comparison.js*",
-                lambda route, request, body=body: route.fulfill(
-                    body=body, content_type="text/javascript"
-                ),
-            )
-            page.goto(url + "/b0-b1.html?release=" + entries[0]["id"])
-            root = page.locator("#five-dataset-comparison")
-            if protected:
-                expect(root).to_have_attribute(
-                    "data-error", "publication-rejected", timeout=30000
+        assert source.count("observation:row.candidate") == 1
+        reference_as_candidate = source.replace(
+            "observation:row.candidate", "observation:row.reference"
+        )
+        reference_data = context.request.get(
+            url + "/" + entries[0]["model_integration"]["summary"]["path"]
+        ).json()
+        for kind, contaminated in [
+            ("paired-reference", poisoned),
+            ("reference-as-candidate", reference_as_candidate),
+        ]:
+            for protected in (False, True):
+                body = contaminated if protected else contaminated.replace(guard, "")
+                page = context.new_page()
+                page.route(
+                    "**/assets/five-dataset-comparison.js*",
+                    lambda route, request, body=body: route.fulfill(
+                        body=body, content_type="text/javascript"
+                    ),
                 )
-                expect(root.locator(".metric-chart")).to_have_count(0)
-                assert root.get_attribute("data-baseline-id") is None
-            else:
-                expect(root).to_have_attribute(
-                    "data-release", entries[0]["id"], timeout=30000
+                page.goto(url + "/b0-b1.html?release=" + entries[0]["id"])
+                root = page.locator("#five-dataset-comparison")
+                if protected:
+                    expect(root).to_have_attribute(
+                        "data-error", "publication-rejected", timeout=30000
+                    )
+                    expect(root.locator(".metric-chart")).to_have_count(0)
+                    assert root.get_attribute("data-baseline-id") is None
+                else:
+                    expect(root).to_have_attribute(
+                        "data-release", entries[0]["id"], timeout=30000
+                    )
+                    expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
+                    if kind == "paired-reference":
+                        expect(root.locator(".metric-grid .bar-fill")).to_have_count(24)
+                    else:
+                        row = root.locator(
+                            '[data-metric="output_tokens_per_second"] [data-profile="mmlu"] .bar-value'
+                        )
+                        expect(row).to_have_text(
+                            [
+                                "—",
+                                f"{reference_data['workloads'][0]['reference']['output_tokens_per_second']:.2f}",
+                            ]
+                        )
+                page.close()
+                checks.append(
+                    dict(
+                        historical_bug_injected=True,
+                        contamination=kind,
+                        guard_enabled=protected,
+                        rejected=protected,
+                    )
                 )
-                expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
-                expect(root.locator(".result-card strong").nth(1)).not_to_have_text("—")
-            page.close()
-            checks.append(
-                dict(
-                    historical_bug_injected=True,
-                    guard_enabled=protected,
-                    rejected=protected,
-                )
-            )
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
     print(f"Verified {len(checks)} formal-baseline isolation cases")
