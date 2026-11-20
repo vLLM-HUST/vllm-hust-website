@@ -101,6 +101,13 @@
   function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames(), roles = {B0:'B0',B1:'B1'}) {
     const maximum = Math.max(1,...rows.filter(row=>row.arms?.B0&&row.arms?.B1).map(d=>d.arms.B1[key]/d.arms.B0[key]));
     return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">${esc(roles.B0)}</span><span class="legend-b1">${esc(roles.B1)}</span></div>${rows.map((row,i)=>{
+      if(row.baselineObservation){
+        const base=row.baselineObservation;
+        const candidate=key==='relative_cost_per_token'?null:row.observation?.[key];
+        const before=base[key],limit=Math.max(1,before,Number.isFinite(candidate)?candidate:0);
+        const line=(role,value)=>`<div class="bar-line"><span class="bar-role">${role}</span><span class="bar-track">${Number.isFinite(value)?`<span class="bar-fill ${role.toLowerCase()}" style="width:${100*value/limit}%"></span>`:''}</span><span class="bar-value">${n(Number.isFinite(value)?value/divisor:null)}</span></div>`;
+        return `<div class="chart-row" data-profile="${esc(row.id)}" data-baseline-observation="verified"${row.observation?' data-observation="single-arm"':''}><div class="chart-row-heading"><strong>${esc(labels[i])}<small class="chart-workload-label">B0 · ${esc(row.baselineModel)}${row.observation?' / B1 · '+esc(row.model):''}</small></strong><span>${row.observation?t('分别实测','Separate measurements'):t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished')}</span></div>${line('B0',before)}${line('B1',candidate)}</div>`;
+      }
       if(row.observation){
         const raw=key==='relative_cost_per_token'?null:row.observation[key];
         const value=Number.isFinite(raw)?n(raw/divisor):'—';
@@ -302,9 +309,52 @@
   const requestedRelease = new URL(location.href).searchParams.get('release');
   let selectedRelease = validRelease(requestedRelease) ? requestedRelease : null;
   let releaseCatalog = null;
+  let fixedBaseline = null;
   let catalogRequest = null;
   let releaseRequest = 0;
   const historyPath = 'data/engine-release-history-v1.json';
+  async function loadFixedBaseline(baseline, publication) {
+    const descriptor=baseline.observations;
+    const fail=()=>{throw Error('Invalid fixed B0 observations');};
+    if(descriptor?.schema!=='vllm-hust-fixed-baseline-descriptor/v1' || descriptor.path!=='data/fixed-b0-original018-v1.json')fail();
+    const source=publication.files.filter(row=>row.website_path===descriptor.path);
+    if(source.length!==1||source[0].sha256!==descriptor.sha256||source[0].bytes!==descriptor.bytes)fail();
+    const response=await fetch('./'+descriptor.path,{cache:'no-cache'});
+    if(!response.ok)fail();
+    const raw=await response.arrayBuffer();
+    const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(digest!==descriptor.sha256||raw.byteLength!==descriptor.bytes)fail();
+    const value=JSON.parse(new TextDecoder().decode(raw));
+    if(value.schema!=='vllm-hust-fixed-baseline-observations/v1'||value.model!=='Qwen3.5-35B-A3B'||value.precision!=='BF16'||value.tensor_parallel_size!==2||value.chip_model!=='Ascend 910B2')fail();
+    for(const field of ['id','vllm','vllm_ascend','cann','image_digest','sdk_source_map_sha256'])if(value.baseline?.[field]!==baseline[field])fail();
+    const ids=['mmlu','hle','frontier','swe','terminal'],counts=[200,200,160,64,48];
+    if(value.profiles?.length!==ids.length)fail();
+    value.profiles.forEach((row,i)=>{
+      const arm=row.arm;
+      if(row.id!==ids[i]||arm?.role!=='B0'||arm.requests!==counts[i]||arm.failed!==0||!/^[a-f0-9]{64}$/.test(arm.source_seal_sha256||''))fail();
+      if(![arm.output_tokens_per_second,arm.mean_ttft_ms,arm.mean_tpot_ms,arm.output_tokens,arm.duration_seconds].every(x=>Number.isFinite(x)&&x>0)||!close(arm.output_tokens/arm.duration_seconds,arm.output_tokens_per_second))fail();
+    });
+    if(value.context?.observations?.length!==4||!value.compute?.arm?.source_and_timing_qualified)fail();
+    for(const row of value.context.observations)if(row.B1||row.B0?.status!=='completed'||row.B0.metrics?.failed!==0||row.B0.windows?.length!==5)fail();
+    return value;
+  }
+  function withFixedBaseline(rows) {
+    return rows.map(row=>{
+      if(row.arms)return row;
+      const original=fixedBaseline?.profiles.find(record=>record.id===row.id);
+      return original?{...row,baselineObservation:{...original.arm,relative_cost_per_token:1},baselineModel:fixedBaseline.model}:row;
+    });
+  }
+  function fixedBaselineContext() {
+    const a=fixedBaseline?.context;
+    if(!a)return '';
+    return `<div data-fixed-b0-context><h3>${t('固定 B0 · 上下文与四租户','Fixed B0 · context and four tenants')}</h3><p>${esc(fixedBaseline.model)} · ${esc(a.report_date)} · ${esc(t(a.workload_label_zh,a.workload_label_en))}</p>${table(t(['工况','请求','B0 token/s','TTFT P99 / ms','TPOT P99 / ms'],['Scenario','Requests','B0 token/s','TTFT P99 / ms','TPOT P99 / ms']),a.observations.map(row=>[row.phase,row.B0.metrics.requests,n(row.B0.metrics.output_tokens_per_second),n(row.B0.metrics.ttft_ms.p99),n(row.B0.metrics.tpot_ms.p99)]))}</div>`;
+  }
+  function fixedBaselineCompute() {
+    const a=fixedBaseline?.compute,arm=a?.arm;
+    if(!arm)return '';
+    return `<div data-fixed-b0-compute><h3>${t('固定 B0 · 有效算力原始核算','Fixed B0 · original compute accounting')}</h3><p>${esc(a.model)} · MMLU200/out256 · ${t('三轮原生计时','Three native timing runs')}</p>${table(t(['运行臂','ΣF / FLOPs','ΣT / s','参考算力上界 / TFLOP/s/卡','效率下界'],['Arm','ΣF / FLOPs','ΣT / s','Reference upper / TFLOP/s/card','Efficiency lower bound']),[['B0','['+arm.F_interval.join(', ')+']',arm.T_seconds,arm.reference_tflops_per_card_upper,n(arm.efficiency_lower_percent)+'%']])}<p>${t('参考分母','Reference denominator')}: ΣFref = [${esc(arm.reference_F_interval.join(', '))}], ΣTref,lower = ${esc(arm.reference_seconds_lower)} s</p><p>Ccurrent,lower = ΣFcurrent,lower / (2 × ΣTcurrent × 10¹²)<br>Cref,upper = ΣFref,upper / (2 × ΣTref,lower × 10¹²)<br>ηlower = 100 × Ccurrent,lower / Cref,upper</p><p><a href="./${esc(a.certificate.path)}">${t('原始证书','Original certificate')}</a> · <a href="./${esc(a.reference_statistics.path)}">${t('参考分母统计','Reference denominator statistics')}</a></p></div>`;
+  }
   function latestFrozenRelease(catalog) {
     if(!Array.isArray(catalog.order)||!catalog.order.length||catalog.order.some(id=>!/^r[1-9][0-9]*$/.test(id)))throw Error('Invalid frozen release order');
     return catalog.order.reduce((latest,id)=>BigInt(id.slice(1))>BigInt(latest.slice(1))?id:latest);
@@ -328,6 +378,7 @@
       if (value.schema!=='vllm-hust-engine-release-history/v1' || !Array.isArray(value.order) || !value.order.length || value.order.some(id=>!/^r[1-9][0-9]*$/.test(id)) || new Set(value.order).size!==value.order.length || !value.order.includes(value.default_release) || value.entries?.length!==value.order.length) throw Error('Invalid release catalog scope');
       const baseline=value.baseline;
       if (baseline?.id!=='original018-cann8.5.1' || baseline.vllm!=='0.18.0' || baseline.vllm_ascend!=='0.18.0' || baseline.cann!=='8.5.1' || baseline.sdk_source_map_sha256!=='a357ad8cf1ff6f8797fb2d6476e71a0deef5ee0899a55ea32ed65f07fe7773bc' || baseline.image_digest!=='sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa') throw Error('Unexpected fixed B0 identity'); // pragma: allowlist secret -- fixed public B0 image and SDK digests
+      fixedBaseline=await loadFixedBaseline(baseline,publication);
       for (const id of value.order) {
         const matches = value.entries.filter(row=>row.id===id);
         if(matches.length!==1) throw Error('Ambiguous release identity');
@@ -566,7 +617,7 @@
   }
   function versionComputeReferenceDetails(entry, showSupplement=true) {
     const a=entry.compute_reference;
-    if(!a)return `<p>${t('本版尚无已发布的有效算力参考核算。','This version has no published compute reference accounting.')}</p>`;
+    if(!a)return fixedBaselineCompute()+`<p>${t('本版 B1 尚未发布有效算力核算。','Compute accounting for this B1 is unpublished.')}</p>`;
     const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
     const reuse=a.certificate_kind==='qualified_full_reference_denominator_reuse/v1';
     const rows=['B0','B1'].map(role=>{
@@ -628,8 +679,8 @@
   function coverageView(rows, qualityOnly=false, referenceLabel=null) {
     return `<section class="dataset-coverage" aria-labelledby="dataset-coverage-title"><div class="section-heading"><h2 id="dataset-coverage-title">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
       const row=rows.find(row=>row.id===id),available=!!row?.arms;
-      const status=row?.observation?t('B1单臂实测','B1 single-arm measurement'):available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
-      return `<article data-dataset="${id}" data-available="${available}"><strong>${label}</strong><span>${status}</span></article>`;
+      const status=row?.baselineObservation?(row.observation?t('B0 已测 · B1 已测（分别列示）','B0 measured · B1 measured (separate)'):t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished')):row?.observation?t('B1单臂实测','B1 single-arm measurement'):available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
+      return `<article data-dataset="${id}" data-available="${available}" data-b0-available="${!!(row?.arms?.B0||row?.baselineObservation)}" data-b1-available="${!!(row?.arms?.B1||row?.observation)}"><strong>${label}</strong><span>${status}</span></article>`;
     }).join('')}</div></section>`;
   }
   async function validateVersionSupplement(entry, publication) {
@@ -743,8 +794,8 @@
   function versionSupplement(entry, values, control = 'B0') {
     const a=entry.context_tenant_supplement;
     const observed=observationRows(entry).filter(row=>row.id.startsWith('continuous-'));
-    if(!a&&observed.length)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>—</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot" style="background:transparent">${table(t(['工况','B1 token/s','B1 TTFT / s','B1 TPOT / ms'],['Scenario','B1 token/s','B1 TTFT / s','B1 TPOT / ms']),observed.map(row=>[row.label,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))}</div></section>`;
-    if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div><div class="supplement-plot missing-plot">${t('本版未发布完整的上下文与四租户补测图。','This version has no published complete context and four-tenant supplement chart.')}</div></section>`;
+    if(!a&&observed.length)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>—</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${fixedBaselineContext()}<div class="supplement-plot" style="background:transparent">${table(t(['工况','B1 token/s','B1 TTFT / s','B1 TPOT / ms'],['Scenario','B1 token/s','B1 TTFT / s','B1 TPOT / ms']),observed.map(row=>[row.label,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))}</div></section>`;
+    if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${/^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():''}<div class="supplement-plot missing-plot">${t('本版 B1 尚未发布完整补测结果。','Complete supplement results for this B1 are unpublished.')}</div></section>`;
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · ${esc(t(a.workload_label_zh,a.workload_label_en))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
@@ -754,8 +805,8 @@
   function versionSupplementDetails(entry) {
     const a=entry.context_tenant_supplement;
     const observed=observationRows(entry).filter(row=>row.id.startsWith('continuous-'));
-    if(!a&&observed.length)return table(t(['工况','请求数','B1 token/s','TTFT P95 / ms','TTFT P99 / ms'],['Scenario','Requests','B1 token/s','TTFT P95 / ms','TTFT P99 / ms']),observed.map(row=>[row.label,row.observation.requests,n(row.observation.output_tokens_per_second),n(row.observation.ttft_p95_ms),n(row.observation.ttft_p99_ms)]));
-    if(!a)return null;
+    if(!a&&observed.length)return fixedBaselineContext()+table(t(['工况','请求数','B1 token/s','TTFT P95 / ms','TTFT P99 / ms'],['Scenario','Requests','B1 token/s','TTFT P95 / ms','TTFT P99 / ms']),observed.map(row=>[row.label,row.observation.requests,n(row.observation.output_tokens_per_second),n(row.observation.ttft_p95_ms),n(row.observation.ttft_p99_ms)]));
+    if(!a)return /^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():null;
     const rows=a.comparisons.map(row=>[supplementLabel(a,row),row.B0.metrics.requests+' / '+row.B1.metrics.requests,
       n(row.B0.metrics.output_tokens_per_second)+' / '+n(row.B1.metrics.output_tokens_per_second),
       n(row.throughput_ratio)+'×',n(row.B0.metrics.ttft_ms.p99)+' / '+n(row.B1.metrics.ttft_ms.p99),
@@ -786,6 +837,10 @@
       ...(entry.id==='r8'&&currentR8?['4096-formal','16384-formal']:[])];
     const permitted=new Set(standardRows(ids.map(id=>({id,sourceRecord:true}))).filter(row=>row.sourceRecord).map(row=>row.id));
     if(rows.some(row=>row.arms&&!permitted.has(row.id)))throw Error('Development data cannot enter formal B0/B1 charts');
+    for(const row of rows.filter(row=>row.baselineObservation)){
+      const original=fixedBaseline.profiles.find(record=>record.id===row.id);
+      if(row.arms||!original||row.baselineModel!==fixedBaseline.model||Object.keys(original.arm).some(key=>row.baselineObservation[key]!==original.arm[key])||row.baselineObservation.relative_cost_per_token!==1)throw Error('Fixed B0 observation differs from its verified original');
+    }
     const integration=modelIntegrationResults.get(entry.id);
     const observed=new Map(standardRows((integration?.workloads||[]).map(row=>({id:row.id,sourceObservation:row.candidate}))).filter(row=>row.sourceObservation).map(row=>[row.id,row.sourceObservation]));
     for(const row of rows.filter(row=>row.observation)){
@@ -804,9 +859,11 @@
     if(key==='configuration')return {title,body:`<p>${esc(entry.release)}</p><div class="mod-tags">${entry.mods.map(name=>`<span>${esc(name)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p><a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>`};
     if(key==='methods'&&singleArmObservation(entry))return {title,body:`<p>${t('B1书生三组单臂记录：MMLU200保留8192输出预算；4K/C8、16K/C8各预热60秒、正式提交300秒并排空，输出256。吞吐为输出token数除以含排空的批次秒数；TTFT、TPOT为逐请求均值。固定B0的配对结果单独核验。','Three B1 Intern-S2 single-arm records: MMLU200 retains its8192 output budget;4K/C8 and16K/C8 use60s warmup,300s formal submissions plus drain and256 outputs. Throughput divides output tokens by batch seconds including drain; TTFT and TPOT are request means. Fixed-B0 paired results are audited separately.')}</p>`};
     if(key==='methods')return {title,body:`<p>${esc(t(entry.method_zh||'方法见本版原件',entry.method_en||'See this version’s originals for its protocol'))}</p><dl class="method-list"><dt>${t('吞吐','Throughput')}</dt><dd>${t('完成输出token / 包含排空的批次秒数','Output tokens / batch seconds including drain')}</dd><dt>TTFT / TPOT</dt><dd>${t('逐请求均值；历史预热和输出预算保持原样。','Request means; original warmup and output budgets retained.')}</dd><dt>${t('同费率成本','Equal-rate cost')}</dt><dd>${t(`相同费率与卡数下，单位token成本比 = ${roles.B0}吞吐 / ${roles.B1}吞吐；${roles.B0} = 1。`,`At equal rates and device counts, unit token cost ratio = ${roles.B0} throughput / ${roles.B1} throughput; ${roles.B0} = 1.`)}</dd></dl>`};
+    if(key==='metrics'&&rows.some(row=>row.baselineObservation))return {title,body:table(t(['工况','运行臂','模型','请求数','token/s','TTFT / s','TPOT / ms'],['Scenario','Arm','Model','Requests','token/s','TTFT / s','TPOT / ms']),rows.flatMap(row=>{const arms=row.arms?[['B0',row.arms.B0,fixedBaseline.model],['B1',row.arms.B1,fixedBaseline.model]]:[['B0',row.baselineObservation,row.baselineModel],['B1 '+entry.id,row.observation,row.model]];return arms.filter(([,arm])=>arm).map(([role,arm,model])=>[row.label,role,model,arm.requests,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms)]);}))+`<p><a href="./${esc(releaseCatalog.baseline.observations.path)}">${t('固定 B0 原值、工况与封存来源','Fixed B0 values, workloads and sealed sources')}</a></p>`};
     if(key==='metrics'&&!rows.some(row=>row.arms||row.observation))return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p>`};
     if(key==='metrics'&&rows.some(row=>row.observation))return {title,body:table(t(['工况','版本','请求数','token/s','TTFT / s','TPOT / ms'],['Scenario','Arm','Requests','token/s','TTFT / s','TPOT / ms']),rows.filter(row=>row.observation).map(row=>[row.label,'B1 '+entry.id+' · '+row.model,row.observation.requests,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))};
     if(key==='metrics')return {title,body:['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map((field,i)=>`<h3>${[t('吞吐 · token/s','Throughput · token/s'),'TTFT · s','TPOT · ms',t(`同费率成本 · ${roles.B0} = 1`,`Equal-rate cost · ${roles.B0} = 1`)][i]}</h3>${table(t(['场景',roles.B0,roles.B1,'变化'],['Scenario',roles.B0,roles.B1,'Change']),rows.map(row=>[row.label,row.arms?n(row.arms.B0[field]/(i===1?1000:1)):'—',row.arms?n(row.arms.B1[field]/(i===1?1000:1)):'—',row.arms?n(row.changes_percent[field])+'%':'—']))}`).join('')};
+    if(key==='quality'&&rows.some(row=>row.baselineObservation)){const historical=entry.quality?`<p class="historical-quality">MMLU200 · ${entry.quality.correct}/${entry.quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${entry.quality.historical_screen_minimum}/${entry.quality.requests} · ${entry.quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';const measured=rows.flatMap(row=>(row.arms?[['B0',row.arms.B0,fixedBaseline.model],['B1 '+entry.id,row.arms.B1,fixedBaseline.model]]:[['B0',row.baselineObservation,row.baselineModel],['B1 '+entry.id,row.observation,row.model]]).filter(([,arm])=>Number.isInteger(arm?.correct)).map(([role,arm,model])=>[row.label,role,model,`${arm.correct}/${arm.requests}`,arm.truncated,`${arm.failed??'—'} / ${arm.unparsed??'—'}`,arm.unresolved??arm.unparsed??'—']));return {title,body:table(t(['工况','运行臂','模型','正确 / 总数','长度终止','失败 / 未解析','未判定'],['Scenario','Arm','Model','Correct / total','Length stops','Failed / unparsed','Unresolved']),measured)+historical+`<p>${t('沿用各次原始评分与裁判来源，见原件。','Original grading and judge provenance are retained in the sources.')}</p>`};}
     if(key==='quality'){
       const quality=entry.quality;
       const qualityView=quality?`<p class="historical-quality">MMLU200 · ${quality.correct}/${quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${quality.historical_screen_minimum}/${quality.requests} · ${quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';
@@ -819,7 +876,8 @@
     const developmentRows=development.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms)]));
     const measuredTails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
     const tails=measuredTails;
-    return {title,body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
+    const baselineEvidence=fixedBaseline?`<h3>${t('固定 B0 原始记录','Fixed B0 original observations')}</h3><p>${esc(fixedBaseline.model)} · ${t('来源报告完成时间','Source report completed')} ${esc(fixedBaseline.source_report_completed_utc)} · <a href="./${esc(releaseCatalog.baseline.observations.path)}">${t('五项原值、原始算力分母与逐臂封存来源','Five original profiles, compute denominator and arm seals')}</a></p>`:'';
+    return {title,body:`${baselineEvidence}<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
   }
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
@@ -1061,22 +1119,23 @@
     const roles=sr?{B0:'B1-r8',B1:'B1-'+entry.id}:comparisonRoles(entry);
     const reason=attempt?t(entry.reason_zh,entry.reason_en):entry.id==='r5'?t(entry.scope_zh,entry.scope_en):'';
     const missingNote=attempt||entry.id==='r5'?t('运行未完成，无配对数据','Run incomplete; no paired data'):'';
-    const rows=standardRows(attempt?[]:sr?srRows(entry):versionRows(entry),missingNote),available=rows.filter(row=>row.arms);
+    const originalRows=standardRows(attempt?[]:sr?srRows(entry):versionRows(entry),missingNote);
+    const rows=attempt||sr?originalRows:withFixedBaseline(originalRows),available=rows.filter(row=>row.arms);
     if(!attempt&&!sr)assertFormalBaselineIsolation(entry,rows);
     const throughput=available.length?Math.max(...available.filter(row=>!row.crossCard).map(row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second)):null;
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id)||row.contextBand==='16k');
     const reference=sr?null:entry.compute_reference;
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
-    const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('缺少本版有效算力核算','No version-specific compute accounting'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('缺少配对吞吐与时延','Paired throughput and latency missing'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('缺少上下文配对观测','Paired context observations missing'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('缺少成本与利用率观测','Cost and utilization observations missing')];
+    const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('B0 核算见详情；本版 B1 尚未发布','B0 accounting in details; current B1 unpublished'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('固定 B0 已保留；本版 B1 暂无测量','Fixed B0 retained; current B1 measurements unpublished'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('固定 B0 已保留；本版 B1 暂无补测','Fixed B0 retained; current B1 supplement unpublished'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('本版 B1 成本与利用率尚未汇总','Current B1 cost and utilization are unpublished')];
     const observation=singleArmObservation(entry);
-    if(observation){notes[1]=t('B1单臂原值见下图；尚无固定B0同模型配对','B1 single-arm values below; same-model fixed-B0 pair unavailable');notes[2]=t('4K/16K已测；尚无固定B0配对','4K/16K measured; fixed-B0 pair unavailable');notes[3]=t('尚无固定B0配对成本与利用率核算','No fixed-B0 paired cost or utilization accounting');}
+    if(observation){notes[1]=t('固定 B0 与本版 B1 原值见下图','Fixed B0 and current B1 measurements below');notes[2]=t('B0 原测记录及本版 B1 4K/16K 实测见下方','Original B0 and current B1 4K/16K measurements below');notes[3]=t('本版 B1 成本与利用率尚未汇总','Current B1 cost and utilization are unpublished');}
     document.getElementById('comparison-title').textContent=sr?t(`B1-r8 / B1-${entry.id} 实测对比`,`B1-r8 / B1-${entry.id} measured comparison`):observation?t(`B0 / B1 ${entry.id} 测试记录`,`B0 / B1 ${entry.id} test records`):t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
     document.getElementById('comparison-lead').textContent=(observation?'B1 '+entry.id+' · '+observation.candidate.model:'Qwen3.5-35B-A3B')+' · Ascend 910B2 × 2 · BF16';
     const settings=sr?'E36/R54 · MTP2 · FULL · TP2':attempt?t('本次尝试未形成冻结配置','This attempt did not produce a frozen configuration'):`E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · TP2 · host ${entry.settings.state_gib_per_rank} GiB/rank · KV ${entry.settings.kv_gib_per_rank} GiB/rank`;
     const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
-    const scope=attempt?reason:observation?t(`B1书生单臂实测：${observation.workloads.map(row=>row.label_zh).join('、')}；原件已上传，尚无固定0.18基线的同模型配对。Qwen R8仅列于开发对照详情。`,`B1 Intern single-arm measurements: ${observation.workloads.map(row=>row.label_en).join(', ')}; originals uploaded, with no same-model pair against the fixed 0.18 baseline. Qwen R8 appears only in development details.`):t(entry.scope_zh,entry.scope_en);
+    const scope=attempt?reason:observation?t(`固定 B0 保留原测记录；B1 书生实测：${observation.workloads.map(row=>row.label_zh).join('、')}。模型与工况分别标注。`,`Fixed B0 observations are retained. Current B1 Intern measurements: ${observation.workloads.map(row=>row.label_en).join(', ')}. Models and workloads are labeled separately.`):t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
-    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small>${i===0&&reference?`<small>${t('里程碑50%','50% milestone')}：${reference.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')}<br>${t('最终90%','90% final')}：${reference.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</small>`:''}</article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`配对条形按 ${roles.B0} = 1 归一；单臂记录显示原值。`,`Paired bars normalize ${roles.B0} to 1; single-arm records show measured values.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),...(modelIntegrationResults.has(entry.id)?[['development',t('书生适配开发对照（非正式基线）','Intern adaptation development comparison (not the formal baseline)')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button"${key==='development'?' id="development-comparison"':''} data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small>${i===0&&reference?`<small>${t('里程碑50%','50% milestone')}：${reference.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')}<br>${t('最终90%','90% final')}：${reference.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</small>`:''}</article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`配对条形按 ${roles.B0} = 1 归一；独立记录按原值显示，模型和工况见详情。`,`Paired bars normalize ${roles.B0} to 1; independent records show raw values. Models and workloads are in details.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),...(modelIntegrationResults.has(entry.id)?[['development',t('书生适配开发对照（非正式基线）','Intern adaptation development comparison (not the formal baseline)')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button"${key==='development'?' id="development-comparison"':''} data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
     if(observation)root.querySelector('.runtime-pair>div:last-child span').textContent+=' · '+observation.candidate.model;
     if(sr){
       const control=root.querySelector('.runtime-pair>div:first-child');

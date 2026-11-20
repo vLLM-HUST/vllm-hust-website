@@ -329,12 +329,19 @@ def assert_model_integration(page, root, entry, url, lang):
     expect(root.locator(".metric-chart")).to_have_count(4)
     expect(root.locator(".dataset-coverage [data-available='true']")).to_have_count(0)
     expect(root.locator(".dataset-coverage [data-dataset=mmlu]")).to_contain_text(
-        "B1单臂实测" if lang == "zh" else "B1 single-arm measurement"
+        "B0 已测 · B1 已测" if lang == "zh" else "B0 measured · B1 measured"
     )
     expect(root.locator(".result-card strong")).to_have_text(["—"] * 4)
-    expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
-    expect(root.locator(".metric-missing")).to_have_count(16)
-    expect(root.locator("[data-observation=single-arm] .bar-fill")).to_have_count(0)
+    catalog = page.request.get(url + "/" + HISTORY).json()
+    baseline = page.request.get(
+        url + "/" + catalog["baseline"]["observations"]["path"]
+    ).json()
+    originals = {row["id"]: row["arm"] for row in baseline["profiles"]}
+    expect(root.locator(".dataset-coverage [data-b0-available=true]")).to_have_count(5)
+    expect(root.locator(".metric-grid .bar-value")).to_have_count(56)
+    expect(root.locator(".metric-missing")).to_have_count(0)
+    expect(root.locator("[data-baseline-observation=verified]")).to_have_count(20)
+    expect(root.locator("[data-fixed-b0-context]")).to_have_count(1)
     for row in data["workloads"]:
         profile = "mmlu" if row["id"] == "mmlu200" else row["id"]
         for metric, divisor in [
@@ -351,8 +358,27 @@ def assert_model_integration(page, root, entry, url, lang):
                 if metric == "relative_cost_per_token"
                 else f"{row['candidate'][metric] / divisor:.2f}"
             )
-            expect(record.locator(".bar-value")).to_have_text(["—", value])
+            original = originals.get(profile)
+            before = (
+                f"{1 if metric == 'relative_cost_per_token' else original[metric] / divisor:.2f}"
+                if original
+                else "—"
+            )
+            expect(record.locator(".bar-value")).to_have_text([before, value])
             expect(record.locator(".bar-role")).to_have_text(["B0", "B1"])
+    for profile, original in originals.items():
+        for metric, divisor in [
+            ("output_tokens_per_second", 1),
+            ("mean_ttft_ms", 1000),
+            ("mean_tpot_ms", 1),
+        ]:
+            record = root.locator(
+                f'[data-metric="{metric}"] [data-profile="{profile}"]'
+            )
+            expect(record.locator(".bar-value").first).to_have_text(
+                f"{original[metric] / divisor:.2f}"
+            )
+            expect(record.locator(".bar-fill.b0")).to_have_count(1)
     supplement = root.locator("#context-tenant-supplement")
     expect(supplement.locator(".supplement-highlights strong")).to_have_text(["—"] * 3)
     for row in data["workloads"]:
@@ -360,11 +386,21 @@ def assert_model_integration(page, root, entry, url, lang):
             expect(supplement).to_contain_text(
                 f"{row['candidate']['output_tokens_per_second']:.2f}"
             )
-    for detail in ("metrics", "quality", "methods", "supplement", "evidence"):
+    for detail in (
+        "metrics",
+        "quality",
+        "methods",
+        "supplement",
+        "evidence",
+        "compute",
+    ):
         root.locator(f'[data-detail="{detail}"]').click()
         dialog = root.locator("dialog")
         expect(dialog).to_be_visible()
-        if detail == "quality":
+        if detail == "compute":
+            expect(dialog.locator("[data-fixed-b0-compute]")).to_have_count(1)
+            expect(dialog).to_contain_text(str(baseline["compute"]["arm"]["T_seconds"]))
+        elif detail == "quality":
             expect(dialog).to_contain_text(
                 f"{data['quality']['correct']}/{data['quality']['requests']}"
             )
@@ -437,8 +473,16 @@ def assert_model_integration(page, root, entry, url, lang):
     page.keyboard.press("Escape")
     expect(button).to_be_focused()
     expect(root.locator(".result-card strong")).to_have_text(["—"] * 4)
-    expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
-    expect(root.locator(".metric-grid .bar-fill")).to_have_count(0)
+    catalog = page.request.get(url + "/" + HISTORY).json()
+    baseline = page.request.get(
+        url + "/" + catalog["baseline"]["observations"]["path"]
+    ).json()
+    originals = {row["id"]: row["arm"] for row in baseline["profiles"]}
+    expect(root.locator(".dataset-coverage [data-b0-available=true]")).to_have_count(5)
+    expect(root.locator(".metric-grid .bar-value")).to_have_count(56)
+    expect(root.locator(".metric-grid .bar-fill.b0")).to_have_count(20)
+    expect(root.locator(".metric-grid .bar-fill.b1")).to_have_count(3)
+    expect(root.locator(".metric-change")).to_have_count(0)
 
 
 def context_supplement(catalog):
@@ -712,22 +756,34 @@ def verify(url, output):
                             chart = root.locator(
                                 '[data-metric="output_tokens_per_second"]'
                             )
-                            expect(chart.locator(".bar-role").nth(0)).to_have_text(
-                                controls[0]
-                            )
-                            expect(chart.locator(".bar-role").nth(1)).to_have_text(
-                                controls[1]
-                            )
-                            expect(chart.locator(".bar-value").nth(0)).to_have_text(
-                                values[0]
-                            )
-                            expect(chart.locator(".bar-value").nth(1)).to_have_text(
-                                values[1]
-                            )
+                            expect(
+                                chart.locator(
+                                    ".chart-row:not([data-baseline-observation]) .bar-role"
+                                ).nth(0)
+                            ).to_have_text(controls[0])
+                            expect(
+                                chart.locator(
+                                    ".chart-row:not([data-baseline-observation]) .bar-role"
+                                ).nth(1)
+                            ).to_have_text(controls[1])
+                            expect(
+                                chart.locator(
+                                    ".chart-row:not([data-baseline-observation]) .bar-value"
+                                ).nth(0)
+                            ).to_have_text(values[0])
+                            expect(
+                                chart.locator(
+                                    ".chart-row:not([data-baseline-observation]) .bar-value"
+                                ).nth(1)
+                            ).to_have_text(values[1])
                         else:
                             expect(root.locator(".metric-chart")).to_have_count(4)
-                            expect(root.locator(".metric-missing")).to_have_count(20)
-                            expect(root.locator(".bar-value")).to_have_count(0)
+                            expect(root.locator(".metric-missing")).to_have_count(
+                                0 if release == "r5" else 20
+                            )
+                            expect(root.locator(".bar-value")).to_have_count(
+                                40 if release == "r5" else 0
+                            )
                             if release == "r5":
                                 expect(root).to_contain_text(
                                     "ready" if lang == "zh" else "readiness"
@@ -988,8 +1044,9 @@ def verify(url, output):
         root = page.locator("#five-dataset-comparison")
         expect(root).to_have_attribute("data-release", future_id, timeout=30000)
         expect(root.locator(".metric-chart")).to_have_count(4)
-        expect(root.locator(".metric-missing")).to_have_count(20)
-        expect(root.locator(".bar-value")).to_have_count(0)
+        expect(root.locator(".metric-missing")).to_have_count(0)
+        expect(root.locator("[data-baseline-observation=verified]")).to_have_count(20)
+        expect(root.locator(".bar-value")).to_have_count(40)
         expect(
             root.locator("#comparison-release-select optgroup option")
         ).to_have_count(

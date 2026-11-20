@@ -141,16 +141,16 @@ def verify(url, output):
                     expect(root).to_have_attribute(
                         "data-release", entries[0]["id"], timeout=30000
                     )
-                    expect(root.locator(".metric-grid .bar-value")).to_have_count(24)
+                    expect(root.locator(".metric-grid .bar-value")).to_have_count(56)
                     if kind == "paired-reference":
-                        expect(root.locator(".metric-grid .bar-fill")).to_have_count(24)
+                        expect(root.locator(".metric-grid .bar-fill")).to_have_count(40)
                     else:
                         row = root.locator(
                             '[data-metric="output_tokens_per_second"] [data-profile="mmlu"] .bar-value'
                         )
                         expect(row).to_have_text(
                             [
-                                "—",
+                                "506.24",
                                 f"{reference_data['workloads'][0]['reference']['output_tokens_per_second']:.2f}",
                             ]
                         )
@@ -163,6 +163,22 @@ def verify(url, output):
                         rejected=protected,
                     )
                 )
+        # A valid catalog must never make changed fixed-B0 bytes renderable.
+        descriptor = catalog["baseline"]["observations"]
+        corrupted = context.request.get(url + "/" + descriptor["path"]).json()
+        corrupted["profiles"][0]["arm"]["role"] = "r8"
+        page = context.new_page()
+        page.route(
+            "**/" + descriptor["path"], lambda route: route.fulfill(json=corrupted)
+        )
+        page.goto(url + "/b0-b1.html")
+        root = page.locator("#five-dataset-comparison")
+        expect(root).to_have_attribute(
+            "data-error", "publication-rejected", timeout=30000
+        )
+        expect(root.locator(".metric-chart")).to_have_count(0)
+        page.close()
+        checks.append(dict(changed_fixed_b0_rejected=True))
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
     print(f"Verified {len(checks)} formal-baseline isolation cases")
