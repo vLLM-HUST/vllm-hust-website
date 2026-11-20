@@ -16,7 +16,7 @@ function sandbox() {
     location: { href: 'https://example.test/b0-b1.html', hash: '', search: '' }, document: { getElementById: () => ({}) },
     window: { addEventListener() {}, vllmHustSite: { getCurrentLang: () => 'en' } } };
   vm.createContext(context);
-  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey, transportAssetBytes };\n})();'), context);
+  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey, transportAssetBytes, loadFixedBaseline, withFixedBaseline, setFixedBaseline: value=>{fixedBaseline=value;} };\n})();'), context);
   return context;
 }
 
@@ -83,7 +83,7 @@ test('missing reference leaves a specific missing-data explanation', async () =>
   const context = sandbox();
   await context.computeTest.validateVersionComputeReference({}, { files: [] });
   const html = context.computeTest.versionComputeReferenceDetails({});
-  assert.ok(html.includes('no published compute reference accounting'));
+  assert.ok(html.includes('Compute accounting for this B1 is unpublished'));
   assert.ok(!html.includes('<img'));
 });
 
@@ -241,4 +241,48 @@ test('a Cloudflare analytics suffix preserves exact original HTML and still reje
   const path=entry.compute_reference.report.path;
   assets.set(path,assets.get(path).replace('fixture','altered')+cfBeacon);
   await assert.rejects(context.computeTest.validateVersionComputeReference(entry,publication));
+});
+
+
+function baselineFixture(context, mutate=()=>{}) {
+  // Synthetic fixtures only: the production values come from benchmark.
+  const baseline={id:'original018-cann8.5.1',vllm:'0.18.0',vllm_ascend:'0.18.0',cann:'8.5.1',image_digest:'sha256:'+'a'.repeat(64),sdk_source_map_sha256:'b'.repeat(64)};
+  const ids=['mmlu','hle','frontier','swe','terminal'],counts=[200,200,160,64,48];
+  const value={schema:'vllm-hust-fixed-baseline-observations/v1',baseline,model:'Qwen3.5-35B-A3B',precision:'BF16',tensor_parallel_size:2,chip_model:'Ascend 910B2',
+    profiles:ids.map((id,i)=>({id,arm:{role:'B0',requests:counts[i],failed:0,output_tokens:1000,duration_seconds:10,output_tokens_per_second:100,mean_ttft_ms:20,mean_tpot_ms:5,source_seal_sha256:'c'.repeat(64)}})),
+    context:{observations:ids.slice(0,4).map(phase=>({phase,B0:{status:'completed',metrics:{failed:0},windows:[{},{},{},{},{}]}}))},compute:{arm:{source_and_timing_qualified:true}}};
+  mutate(value);
+  const raw=Buffer.from(JSON.stringify(value));
+  const descriptor={schema:'vllm-hust-fixed-baseline-descriptor/v1',path:'data/fixed-b0-original018-v1.json',sha256:createHash('sha256').update(raw).digest('hex'),bytes:raw.length};
+  baseline.observations=descriptor;
+  context.fetch=async()=>({ok:true,arrayBuffer:async()=>raw.buffer.slice(raw.byteOffset,raw.byteOffset+raw.byteLength)});
+  return {baseline,value,publication:{files:[{website_path:descriptor.path,sha256:descriptor.sha256,bytes:descriptor.bytes}]}};
+}
+
+test('an empty future candidate retains five original B0 records without creating paired results',async()=>{
+  const context=sandbox(),f=baselineFixture(context);
+  const baseline=await context.computeTest.loadFixedBaseline(f.baseline,f.publication);
+  context.computeTest.setFixedBaseline(baseline);
+  const rows=context.computeTest.withFixedBaseline(baseline.profiles.map(row=>({id:row.id})));
+  assert.equal(rows.length,5);
+  for(const row of rows){assert.equal(row.baselineObservation.role,'B0');assert.equal(row.baselineObservation.output_tokens_per_second,100);assert.equal(row.baselineModel,baseline.model);assert.equal(row.arms,undefined);assert.equal(row.changes_percent,undefined);}
+  const paired={id:'mmlu',arms:{B0:{output_tokens_per_second:42},B1:{output_tokens_per_second:84}}};
+  assert.equal(context.computeTest.withFixedBaseline([paired])[0],paired);
+  const candidate={id:'mmlu',observation:{output_tokens_per_second:150},model:'Synthetic other model'};
+  const observed=context.computeTest.withFixedBaseline([candidate])[0];
+  assert.equal(observed.observation,candidate.observation);assert.equal(observed.arms,undefined);
+});
+
+test('fixed B0 loader rejects an optimized arm or foreign model even after valid manifest signing',async()=>{
+  for(const mutate of [v=>{v.profiles[0].arm.role='r8';},v=>{v.model='Foreign model';},v=>{v.profiles[0].arm.requests=1;},v=>{v.profiles[0].arm.output_tokens_per_second=200;}]){
+    const context=sandbox(),f=baselineFixture(context,mutate);
+    await assert.rejects(context.computeTest.loadFixedBaseline(f.baseline,f.publication));
+  }
+});
+
+test('changed fixed-B0 bytes cannot pass the catalog descriptor',async()=>{
+  const context=sandbox(),f=baselineFixture(context);
+  f.baseline.observations.sha256='d'.repeat(64);
+  f.publication.files[0].sha256=f.baseline.observations.sha256;
+  await assert.rejects(context.computeTest.loadFixedBaseline(f.baseline,f.publication));
 });
