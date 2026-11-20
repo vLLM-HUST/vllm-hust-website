@@ -286,3 +286,15 @@ test('changed fixed-B0 bytes cannot pass the catalog descriptor',async()=>{
   f.publication.files[0].sha256=f.baseline.observations.sha256;
   await assert.rejects(context.computeTest.loadFixedBaseline(f.baseline,f.publication));
 });
+
+
+test('original B0 compute efficiency retains decimal precision when the current candidate has no certificate',()=>{
+  const context=sandbox(),f=fixture(context,'49.99999999999999999');
+  const arm=f.entry.compute_reference.arms.B0;
+  arm.reference_F_interval=[...arm.F_interval];
+  context.computeTest.setFixedBaseline({compute:{model:'Synthetic original model',arm,certificate:{path:'data/synthetic/certificate.json'},reference_statistics:{path:'data/synthetic/reference.json'}}});
+  const html=context.computeTest.versionComputeReferenceDetails({});
+  assert.ok(html.includes('49.9999%'));assert.ok(!html.includes('—%'));assert.ok(!html.includes('50%'));
+  assert.ok(html.includes('Compute accounting for this B1 is unpublished'));
+  assert.equal(arm.efficiency_lower_percent,'49.99999999999999999');
+});
