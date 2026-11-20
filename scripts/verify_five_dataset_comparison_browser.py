@@ -490,6 +490,43 @@ def assert_model_integration(page, root, entry, url, lang):
     expect(root.locator(".metric-change")).to_have_count(0)
 
 
+def latest_official_release(catalog):
+    return max(
+        (
+            entry["id"]
+            for entry in catalog["entries"]
+            if entry.get("publication_status") != "frozen-candidate"
+        ),
+        key=lambda value: int(value[1:]),
+    )
+
+
+def assert_paired_version(page, root, entry, catalog):
+    expect(root).to_have_attribute("data-baseline-id", catalog["baseline"]["id"])
+    fixed = {"mmlu", "hle", "frontier", "swe", "terminal"}
+    expect(root.locator('.dataset-coverage [data-available="true"]')).to_have_count(
+        sum(row["id"] in fixed for row in entry["measurements"])
+    )
+    chart = root.locator('[data-metric="output_tokens_per_second"]')
+    for row in entry["measurements"]:
+        expect(chart.locator(f'[data-profile="{row["id"]}"] .bar-value')).to_have_text(
+            [f"{arm['output_tokens_per_second']:.2f}" for arm in row["arms"]]
+        )
+    root.locator('[data-detail="quality"]').click()
+    dialog = root.locator("dialog")
+    for row in entry["measurements"]:
+        for arm in row["arms"]:
+            if "correct" in arm:
+                expect(dialog).to_contain_text(f"{arm['correct']}/{arm['requests']}")
+    page.keyboard.press("Escape")
+    root.locator('[data-detail="evidence"]').click()
+    for row in entry["measurements"]:
+        for arm in row["arms"]:
+            if "ttft_p99_ms" in arm:
+                expect(dialog).to_contain_text(f"{arm['ttft_p99_ms']:.2f}")
+    page.keyboard.press("Escape")
+
+
 def context_supplement(catalog):
     return next(row for row in catalog["entries"] if row["id"] == "r8")[
         "context_tenant_supplement"
@@ -536,14 +573,17 @@ def verify(url, output):
                     page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
                     page.goto(url + "/b0-b1.html")
                     root = page.locator("#five-dataset-comparison")
-                    latest = max(catalog["order"], key=lambda value: int(value[1:]))
+                    latest = latest_official_release(catalog)
                     expect(root).to_have_attribute(
                         "data-release", latest, timeout=30000
                     )
                     current = next(
                         row for row in catalog["entries"] if row["id"] == latest
                     )
-                    assert_model_integration(page, root, current, url, lang)
+                    if current.get("model_integration"):
+                        assert_model_integration(page, root, current, url, lang)
+                    else:
+                        assert_paired_version(page, root, current, catalog)
                     assert_release_control_readable(page, root)
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth+1"
@@ -825,8 +865,11 @@ def verify(url, output):
                         expect(root).to_have_attribute(
                             "data-release", entry["id"], timeout=30000
                         )
-                        assert dashboard_layout(root) == r8_layout
-                        assert_model_integration(page, root, entry, url, lang)
+                        if entry.get("model_integration"):
+                            assert dashboard_layout(root) == r8_layout
+                            assert_model_integration(page, root, entry, url, lang)
+                        else:
+                            assert_paired_version(page, root, entry, catalog)
                         assert_release_control_readable(page, root)
                         expect(root.locator(".metric-missing .bar-fill")).to_have_count(
                             0

@@ -355,9 +355,12 @@
     if(!arm)return '';
     return `<div data-fixed-b0-compute><h3>${t('固定 B0 · 有效算力原始核算','Fixed B0 · original compute accounting')}</h3><p>${esc(a.model)} · MMLU200/out256 · ${t('三轮原生计时','Three native timing runs')}</p>${table(t(['运行臂','ΣF / FLOPs','ΣT / s','参考算力上界 / TFLOP/s/卡','效率下界'],['Arm','ΣF / FLOPs','ΣT / s','Reference upper / TFLOP/s/card','Efficiency lower bound']),[['B0','['+arm.F_interval.join(', ')+']',arm.T_seconds,arm.reference_tflops_per_card_upper,computeBound(arm.efficiency_lower_percent)+'%']])}<p>${t('参考分母','Reference denominator')}: ΣFref = [${esc(arm.reference_F_interval.join(', '))}], ΣTref,lower = ${esc(arm.reference_seconds_lower)} s</p><p>Ccurrent,lower = ΣFcurrent,lower / (2 × ΣTcurrent × 10¹²)<br>Cref,upper = ΣFref,upper / (2 × ΣTref,lower × 10¹²)<br>ηlower = 100 × Ccurrent,lower / Cref,upper</p><p><a href="./${esc(a.certificate.path)}">${t('原始证书','Original certificate')}</a> · <a href="./${esc(a.reference_statistics.path)}">${t('参考分母统计','Reference denominator statistics')}</a></p></div>`;
   }
+  const isFrozenCandidate = entry => entry.publication_status==='frozen-candidate';
   function latestFrozenRelease(catalog) {
     if(!Array.isArray(catalog.order)||!catalog.order.length||catalog.order.some(id=>!/^r[1-9][0-9]*$/.test(id)))throw Error('Invalid frozen release order');
-    return catalog.order.reduce((latest,id)=>BigInt(id.slice(1))>BigInt(latest.slice(1))?id:latest);
+    const official=catalog.order.filter(id=>!isFrozenCandidate(catalog.entries.find(entry=>entry.id===id)));
+    if(!official.length)throw Error('No official frozen release');
+    return official.reduce((latest,id)=>BigInt(id.slice(1))>BigInt(latest.slice(1))?id:latest);
   }
   async function loadReleaseCatalog() {
     if (releaseCatalog) return;
@@ -849,6 +852,7 @@
     }
 
   }
+  const versionRecordLabel = entry => entry.release_url.includes('/releases/tag/') ? `${entry.id} Release` : t(`${entry.id} 版本记录`,`${entry.id} version record`);
   function versionDetails(entry, rows, key, attempt) {
     if(key==='development')return modelIntegrationDetails(entry);
     const roles=comparisonRoles(entry);
@@ -877,7 +881,7 @@
     const measuredTails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
     const tails=measuredTails;
     const baselineEvidence=fixedBaseline?`<h3>${t('固定 B0 原始记录','Fixed B0 original observations')}</h3><p>${esc(fixedBaseline.model)} · ${t('来源报告完成时间','Source report completed')} ${esc(fixedBaseline.source_report_completed_utc)} · <a href="./${esc(releaseCatalog.baseline.observations.path)}">${t('五项原值、原始算力分母与逐臂封存来源','Five original profiles, compute denominator and arm seals')}</a></p>`:'';
-    return {title,body:`${baselineEvidence}<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${entry.id} Release ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
+    return {title,body:`${baselineEvidence}<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${versionRecordLabel(entry)} ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
   }
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';

@@ -11,6 +11,8 @@ from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
 
+from verify_five_dataset_comparison_browser import latest_official_release
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output/playwright/performance-navigation"
 PAGES = ("index.html", "dataset-introductions.html", "b0-b1.html", "serving-plan.html")
@@ -46,7 +48,7 @@ def main():
                 .request.get(base + "/data/engine-release-history-v1.json")
                 .json()
             )
-            latest = max(catalog["order"], key=lambda value: int(value[1:]))
+            latest = latest_official_release(catalog)
             for width in (390, 1440):
                 for language in ("zh", "en"):
                     for theme in ("light", "dark"):
