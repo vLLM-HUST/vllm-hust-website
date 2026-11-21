@@ -97,6 +97,34 @@ def download_selection(page):
         raise
 
 
+def read_export_blob(page):
+    # Verify each pairing's actual link and Blob without repeated native download events.
+    name, payload = page.locator("#comparison-export").evaluate(
+        """button=>new Promise((resolve,reject)=>{
+          const controller=new AbortController();
+          const timer=setTimeout(()=>{
+            controller.abort();
+            reject(new Error('Export did not emit a download link'));
+          },5000);
+          document.addEventListener('click',async event=>{
+            const link=event.target.closest('a[download]');
+            if(!link||!link.href.startsWith('blob:'))return;
+            event.preventDefault();
+            clearTimeout(timer);
+            controller.abort();
+            try {
+              const response=await fetch(link.href);
+              if(!response.ok)throw Error('Export Blob unreadable');
+              resolve([link.download,await response.json()]);
+            } catch(error) { reject(error); }
+          },{capture:true,signal:controller.signal});
+          button.click();
+        })"""
+    )
+    assert name == f"{payload['baseline']}-B1-{payload['candidate']}.json"
+    return payload
+
+
 def context_contrasts(page):
     return page.locator(
         "#context-tenant-supplement th,#context-tenant-supplement td"
@@ -132,7 +160,7 @@ def verify_development_priority(page, releases, baselines):
             arg=value,
         )
 
-    def verify_original():
+    def verify_original(native=False):
         page.wait_for_function(
             '(id)=>document.querySelector("#five-dataset-comparison").dataset.baselineId===id',
             arg=original,
@@ -142,7 +170,7 @@ def verify_development_priority(page, releases, baselines):
         assert page.locator(".metric-change").count() == 0
         assert page.locator("[data-baseline-observation]").count() > 0
         assert "comparison" not in parse_qs(urlparse(page.url).query)
-        exported = download_selection(page)
+        exported = download_selection(page) if native else read_export_blob(page)
         assert exported["baseline"] == original and exported["candidate"] == sr[0]
         assert exported["paired"] is False
 
@@ -160,7 +188,7 @@ def verify_development_priority(page, releases, baselines):
     page.select_option("#comparison-release-select", sr[0])
     wait_release(sr[0])
     page.select_option("#comparison-baseline-select", original)
-    verify_original()
+    verify_original(native=True)
     page.reload()
     verify_original()
     page.goto(
@@ -264,11 +292,20 @@ with sync_playwright() as playwright:
                 check_baseline = (
                     release in ("r8", "r10") and baseline in independent_baselines
                 )
-                payload = (
-                    download_selection(page)
-                    if check_candidate or check_baseline
-                    else None
-                )
+                payload = None
+                if check_candidate or check_baseline:
+                    if (
+                        check_baseline
+                        and baseline == "official-0.23.0"
+                        and release == "r10"
+                    ):
+                        payload = download_selection(page)
+                    else:
+                        payload = read_export_blob(page)
+                    assert (payload["baseline"], payload["candidate"]) == (
+                        baseline,
+                        release,
+                    )
                 if check_candidate:
                     assert (
                         expected_models[release]
@@ -337,6 +374,12 @@ with sync_playwright() as playwright:
                         == 0
                     )
             assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
+        page.close()
+        # Exercise deep links in a fresh download context after the version matrix.
+        page = browser.new_page(
+            viewport={"width": width, "height": 900}, color_scheme=scheme
+        )
+        observe_exports(page)
         verify_development_priority(page, releases, baselines)
         print(
             "PASS",

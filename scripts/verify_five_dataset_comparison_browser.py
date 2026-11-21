@@ -191,22 +191,54 @@ def assert_sr(page, root, entry, layout, lang):
 
 
 def assert_controller_special(page, root, entry, layout, lang, latency=None):
-    page.goto(
-        page.url.split("?")[0].split("#")[0] + "?release=sr5&comparison=development"
-    )
-    expect(root.locator("#comparison-release-select")).to_be_visible(timeout=30000)
+    base = page.url.split("?")[0].split("#")[0]
+    canonical = base + "?release=r8&controlplane=request-throttling"
     menu = root.locator("#comparison-release-select")
-    expect(root.locator(".release-selector select")).to_have_count(1)
-    expect(menu.locator('optgroup option[value="sr5"]')).to_have_text(
-        "B1-sr5 · 请求限流控制器"
-        if lang == "zh"
-        else "B1-sr5 · Request Throttling Controller"
+    baseline = root.locator("#comparison-baseline-select")
+    control = root.locator("#comparison-controlplane-select")
+    panel = root.locator("#controller-comparison")
+    page.goto(base + "?release=r8")
+    expect(control).to_have_value("")
+    expect(menu.locator('option[value="sr5"]')).to_have_count(0)
+    expect(panel).to_have_count(0)
+    original = baseline.input_value()
+    control.select_option("request-throttling")
+    expect(page).to_have_url(canonical)
+    expect(panel).to_have_attribute("data-engine-release", "r8")
+    expect(root.locator(".release-selector + #controller-comparison")).to_have_count(1)
+    expect(menu).to_have_value("r8")
+    expect(baseline).to_have_value(original)
+    menu.select_option("r6")
+    expect(panel).to_have_attribute("data-engine-release", "r6")
+    expect(panel.locator("#controller-trajectory-result")).to_contain_text("30.06%")
+    menu.select_option("r9")
+    expect(panel).not_to_have_attribute("data-engine-release", "r8")
+    expect(panel).to_contain_text("B1 r9")
+    expect(panel.locator(".metric-chart")).to_have_count(0)
+    expect(control).to_have_value("request-throttling")
+    expect(baseline).to_have_value(original)
+    menu.select_option("r8")
+    expect(panel).to_have_attribute("data-engine-release", "r8")
+    alternate = next(
+        value
+        for value in baseline.locator("option").evaluate_all(
+            "options=>options.map(option=>option.value)"
+        )
+        if value != original
     )
-    menu.select_option("sr5")
-    expect(root).to_have_attribute("data-release", "sr5")
-    expect(menu).to_have_value("sr5")
-    expect(root).to_have_attribute("data-baseline-id", "B1-r8-adapted")
-    assert dashboard_layout(root) == layout
+    baseline.select_option(alternate)
+    expect(baseline).to_have_value(alternate)
+    expect(panel).to_have_attribute("data-engine-release", "r8")
+    control.select_option("")
+    expect(panel).to_have_count(0)
+    expect(baseline).to_have_value(alternate)
+
+    for old in ("?release=sr5", "?release=sr5&comparison=development"):
+        page.goto(base + old)
+        expect(page).to_have_url(canonical)
+        expect(panel).to_have_attribute("data-engine-release", "r8")
+        expect(menu.locator('option[value="sr5"]')).to_have_count(0)
+    root = panel
     expect(root.locator('[data-dataset="hle"]')).to_have_attribute(
         "data-available", "false"
     )
@@ -310,6 +342,10 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
             expect(row).to_contain_text(profile[f"reason_{lang}"])
     page.keyboard.press("Escape")
     expect(root.locator('[data-detail="metrics"]')).to_be_focused()
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+    control.select_option("")
+    expect(panel).to_have_count(0)
+    assert dashboard_layout(page.locator("#five-dataset-comparison")) == layout
 
 
 def assert_model_integration(page, root, entry, url, lang):
@@ -764,7 +800,6 @@ def verify(url, output):
                         len(catalog["order"])
                         + len(catalog["attempt_order"])
                         + len(sr["entries"])
-                        + 1
                     )
                     for entry in sr["entries"]:
                         assert_sr(page, root, entry, r8_layout, lang)
@@ -1110,7 +1145,7 @@ def verify(url, output):
             len(catalog["order"])
             + len(catalog["attempt_order"])
             + len(sr["entries"])
-            + 2
+            + 1
         )
         page.goto(url + "/b0-b1.html")
         expect(root).to_have_attribute("data-release", future_id, timeout=30000)
