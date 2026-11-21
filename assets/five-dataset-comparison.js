@@ -1229,7 +1229,7 @@
       ...(observed?.profiles.some(item=>item.id===row.id)?{baselineObservation:{...observed.profiles.find(item=>item.id===row.id).arm,relative_cost_per_token:null},baselineModel:baseline.model}:{})}));
     const context=rows.filter(row=>!['mmlu','hle','frontier','swe','terminal'].includes(row.id));
     const roles={B0:baseline.label,B1:'B1-'+entry.id};
-    document.getElementById('comparison-title').textContent=baseline.label+' / B1 '+entry.id;
+    document.getElementById('comparison-title').textContent=t(baseline.label+' / B1 '+entry.id+' 测试记录',baseline.label+' / B1 '+entry.id+' test records');
     document.getElementById('comparison-lead').textContent='B0: '+baseline.model+' · B1: '+candidateModel;
     const note=t('同模型不代表可配对；须核验设备、驱动、权重、输入、预算和计时协议。','The same model alone does not establish a matched pair: devices, drivers, weights, inputs, budgets and timing must be verified.');
     const scores=rows.flatMap(row=>[['B0',row.baselineObservation],['B1 '+entry.id,row.observation]].filter(([,arm])=>Number.isInteger(arm?.correct)&&Number.isInteger(arm?.requests)).map(([role,arm])=>[row.label,role,arm.correct+'/'+arm.requests,arm.failed??'—',arm.truncated??'—']));
