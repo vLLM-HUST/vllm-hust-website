@@ -201,6 +201,107 @@ def verify_development_priority(page, releases, baselines):
     verify_original()
 
 
+def verify_full_baseline_details(page, source, label, width, scheme):
+    """Read the two existing dialogs; do not invent paired goals or grades."""
+    expected_tracks = [
+        [
+            label,
+            row.get("label", row["id"]),
+            track,
+            str(grade["successes"]) + "/" + str(grade["total"]),
+            str(grade["graded"]),
+            str(grade.get("unresolved", grade.get("judge_unresolved", "—"))),
+        ]
+        for row in source["profiles"]
+        for track, grade in (row.get("quality") or {}).get("tracks", {}).items()
+        if row.get("quality")
+    ]
+    page.evaluate("window.scrollTo(0,0)")
+    page.screenshot(
+        path=str(args.output / f"layout-{width}-{scheme}.png"), full_page=True
+    )
+    page.locator('[data-detail="quality"]').click()
+    dialog = page.locator("#comparison-detail-dialog")
+    assert dialog.is_visible()
+    actual_tracks = (
+        dialog.locator("table")
+        .nth(1)
+        .locator("tbody tr")
+        .evaluate_all(
+            "rows=>rows.map(row=>[...row.cells].map(cell=>cell.textContent.trim()))"
+        )
+    )
+    assert actual_tracks == expected_tracks
+    text = dialog.inner_text()
+    hle = next(row for row in source["profiles"] if row["id"] == "hle")
+    scope = hle["execution_scope"]
+    assert (
+        "B0 HLE " + str(scope["selected_tasks"]) + "/" + str(scope["source_tasks"])
+        in text
+    )
+    assert hle["quality"]["judge_model"] in text
+    assert "替代裁判" in text or "substitute judge" in text
+    assert "SWE/Terminal" in text and ("轨迹推理" in text or "trace inference" in text)
+    page.screenshot(
+        path=str(args.output / f"quality-{width}-{scheme}.png"), full_page=True
+    )
+    if width == 390:
+        last_grade = (
+            dialog.locator("table").nth(1).locator("tbody tr").last.locator("td").last
+        )
+        last_grade.scroll_into_view_if_needed()
+        bounds, frame = last_grade.bounding_box(), dialog.bounding_box()
+        assert (
+            frame["x"] <= bounds["x"]
+            and bounds["x"] + bounds["width"] <= frame["x"] + frame["width"]
+        )
+        dialog.locator("p").last.scroll_into_view_if_needed()
+        page.screenshot(
+            path=str(args.output / f"quality-right-{width}-{scheme}.png"),
+            full_page=True,
+        )
+    dialog.locator(".dialog-close").click()
+    assert not dialog.is_visible()
+    page.locator('[data-detail="compute"]').click()
+    assert dialog.is_visible()
+    actual_native = dialog.locator("tbody tr").evaluate_all(
+        "rows=>rows.map(row=>[...row.cells].map(cell=>cell.textContent.trim()))"
+    )
+    native = source["native_timing"]
+    assert len(actual_native) == len(native["repetitions"]) == 3
+    for actual, expected in zip(actual_native, native["repetitions"], strict=True):
+        assert int(actual[0]) == expected["repetition"]
+        assert float(actual[1]) == expected["T_seconds"]
+        assert int(actual[2]) == expected["output_tokens"]
+    assert source["F"] is source["efficiency_percent"] is native["F_interval"] is None
+    assert source["automatic_ft_audit"]["status"] == "ineligible"
+    text = dialog.inner_text()
+    assert "F 与效率未计算" in text or "F and efficiency are uncomputed" in text
+    assert (
+        "算量适用性未通过" in text or "Arithmetic applicability is ineligible" in text
+    )
+    page.screenshot(
+        path=str(args.output / f"compute-{width}-{scheme}.png"), full_page=True
+    )
+    if width == 390:
+        tokens = dialog.locator("tbody tr").last.locator("td").last
+        tokens.scroll_into_view_if_needed()
+        bounds, frame = tokens.bounding_box(), dialog.bounding_box()
+        assert (
+            frame["x"] <= bounds["x"]
+            and bounds["x"] + bounds["width"] <= frame["x"] + frame["width"]
+        )
+        page.screenshot(
+            path=str(args.output / f"compute-right-{width}-{scheme}.png"),
+            full_page=True,
+        )
+    dialog.locator(".dialog-close").click()
+    assert not dialog.is_visible()
+
+
+checked_matrix = []
+args.output.mkdir(parents=True, exist_ok=True)
+
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(
         headless=True, executable_path=os.environ.get("VLLMHUST_BROWSER_EXECUTABLE")
@@ -263,6 +364,22 @@ with sync_playwright() as playwright:
                     assert page.locator('[data-comparison="selected-b0"]').count() == 1
                     assert page.locator(".metric-change").count() == 0
                     assert page.locator("[data-baseline-observation]").count() > 0
+                    checked_matrix.append([width, scheme, baseline, release])
+                for release in (item for item in releases if not item.startswith("sr")):
+                    page.select_option("#comparison-release-select", release)
+                    page.wait_for_function(
+                        '(id)=>document.querySelector("#five-dataset-comparison").dataset.release===id',
+                        arg=release,
+                    )
+                    assert (
+                        page.locator("#comparison-baseline-select").input_value()
+                        == baseline
+                    )
+                    assert (
+                        page.locator("#comparison-release-select").input_value()
+                        == release
+                    )
+                    checked_matrix.append([width, scheme, baseline, release])
                 continue
             for release in releases:
                 page.select_option("#comparison-release-select", release)
@@ -337,7 +454,14 @@ with sync_playwright() as playwright:
                         is None
                         for row in payload["rows"]
                     )
+                checked_matrix.append([width, scheme, baseline, release])
                 if check_baseline:
+                    assert payload["native_timing"] == independent_baselines[
+                        baseline
+                    ].get("native_timing")
+                    assert payload["automatic_ft_audit"] == independent_baselines[
+                        baseline
+                    ].get("automatic_ft_audit")
                     assert payload["paired"] is False
                     contrasts = context_contrasts(page)
                     if contrasts:
@@ -353,6 +477,10 @@ with sync_playwright() as playwright:
                             matches[0]["baselineObservation"][key] == value
                             for key, value in original["arm"].items()
                         )
+                        assert matches[0]["baselineQuality"] == original.get("quality")
+                        assert matches[0]["baselineExecutionScope"] == original.get(
+                            "execution_scope"
+                        )
                         if original.get("workload_kind") == "continuous-synthetic":
                             assert original["id"] in ("4096-formal", "16384-formal")
                             assert (
@@ -366,6 +494,19 @@ with sync_playwright() as playwright:
                                 == 1
                             )
                             assert "C8" in matches[0]["label"]
+                if baseline == "official-0.23.0" and release == "r10":
+                    descriptor = next(
+                        item
+                        for item in catalog["comparison_baselines"]
+                        if item["id"] == baseline
+                    )
+                    verify_full_baseline_details(
+                        page,
+                        independent_baselines[baseline],
+                        descriptor["label"],
+                        width,
+                        scheme,
+                    )
                 if baseline != "original018-cann8.5.1":
                     assert (
                         page.locator(
@@ -392,3 +533,25 @@ with sync_playwright() as playwright:
         )
         page.close()
     browser.close()
+
+assert len(checked_matrix) == 4 * 13 * 4
+assert len(set(map(tuple, checked_matrix))) == len(checked_matrix)
+(args.output / "matrix-verification.json").write_text(
+    json.dumps(
+        dict(
+            status="passed",
+            checked_combinations=checked_matrix,
+            combinations=len(checked_matrix),
+            themes=["light", "dark"],
+            widths=[1366, 390],
+            real_downloads_preserved=True,
+            baseline_quality_and_scope_export_verified=True,
+            native_and_automatic_audit_export_verified=True,
+            quality_and_compute_dialogs_verified=True,
+            model_requests=0,
+        ),
+        indent=2,
+    )
+    + "\n",
+    encoding="utf-8",
+)
