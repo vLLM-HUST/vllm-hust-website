@@ -194,6 +194,11 @@ with sync_playwright() as playwright:
                         == 0
                     )
             assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
+        page.close()
+        # Exercise deep links in a fresh download context after the version matrix.
+        page = browser.new_page(
+            viewport={"width": width, "height": 900}, color_scheme=scheme
+        )
         verify_development_priority(page, releases, baselines)
         print(
             "PASS",
