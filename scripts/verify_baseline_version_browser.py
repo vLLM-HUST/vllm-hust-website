@@ -10,7 +10,91 @@ from playwright.sync_api import sync_playwright
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--base-url", default="http://127.0.0.1:8000")
+parser.add_argument(
+    "--output", type=Path, default=Path("output/playwright/baseline-version")
+)
 args = parser.parse_args()
+export_events = {}
+
+
+def observe_exports(page):
+    events = []
+    export_events[page] = events
+    page.on(
+        "console",
+        lambda message: events.append(
+            {"kind": "console", "type": message.type, "text": message.text}
+        ),
+    )
+    page.on(
+        "pageerror",
+        lambda error: events.append({"kind": "pageerror", "text": str(error)}),
+    )
+    page.on(
+        "download",
+        lambda download: events.append(
+            {"kind": "download", "filename": download.suggested_filename}
+        ),
+    )
+    cdp = page.context.new_cdp_session(page)
+    cdp.send("Log.enable")
+    cdp.on(
+        "Log.entryAdded",
+        lambda event: events.append({"kind": "browser-log", "entry": event}),
+    )
+    page.add_init_script("""(()=>{
+      const probe=window.__comparisonExportProbe=[];
+      const save=(kind,value={})=>{probe.push({kind,at:performance.now(),...value});if(probe.length>100)probe.shift()};
+      document.addEventListener('click',event=>{const button=event.target.closest?.('#comparison-export');
+        if(button)save('click',{trusted:event.isTrusted,onclickBound:typeof button.onclick==='function'})},true);
+      const create=URL.createObjectURL,revoke=URL.revokeObjectURL,click=HTMLAnchorElement.prototype.click;
+      URL.createObjectURL=function(blob){const url=create.call(this,blob);save('blob-created',{url,bytes:blob.size});return url};
+      URL.revokeObjectURL=function(url){save('blob-revoked',{url});return revoke.call(this,url)};
+      HTMLAnchorElement.prototype.click=function(){if(this.download)save('anchor-click',{url:this.href,filename:this.download});return click.call(this)};
+    })()""")
+
+
+def download_selection(page):
+    def state():
+        try:
+            return page.evaluate("""()=>({url:location.href,root:{...document.querySelector('#five-dataset-comparison').dataset},
+          baseline:document.querySelector('#comparison-baseline-select')?.value,
+          release:document.querySelector('#comparison-release-select')?.value,
+          onclickBound:typeof document.querySelector('#comparison-export')?.onclick==='function',
+          events:window.__comparisonExportProbe||[]})""")
+        except Exception as error:
+            return {"url": page.url, "state_error": str(error)}
+
+    before = state()
+    stage = "click-and-wait-for-download"
+    try:
+        with page.expect_download() as download:
+            page.locator("#comparison-export").click()
+        stage = "download-started"
+        failure = download.value.failure()
+        assert failure is None, "Export download failed: " + str(failure)
+        stage = "download-completed"
+        return json.loads(Path(download.value.path()).read_bytes())
+    except Exception as error:
+        args.output.mkdir(parents=True, exist_ok=True)
+        evidence = {
+            "stage": stage,
+            "before": before,
+            "after": state(),
+            "error": str(error),
+            "browser_events": export_events[page],
+        }
+        (args.output / "export-failure.json").write_text(
+            json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        print("EXPORT_FAILURE", json.dumps(evidence, ensure_ascii=False), flush=True)
+        try:
+            page.screenshot(
+                path=str(args.output / "export-failure.png"), full_page=True
+            )
+        except Exception as screenshot_error:
+            print("Export screenshot failed:", screenshot_error, flush=True)
+        raise
 
 
 def context_contrasts(page):
@@ -58,9 +142,7 @@ def verify_development_priority(page, releases, baselines):
         assert page.locator(".metric-change").count() == 0
         assert page.locator("[data-baseline-observation]").count() > 0
         assert "comparison" not in parse_qs(urlparse(page.url).query)
-        with page.expect_download() as download:
-            page.locator("#comparison-export").click()
-        exported = json.loads(Path(download.value.path()).read_bytes())
+        exported = download_selection(page)
         assert exported["baseline"] == original and exported["candidate"] == sr[0]
         assert exported["paired"] is False
 
@@ -104,6 +186,7 @@ with sync_playwright() as playwright:
         page = browser.new_page(
             viewport={"width": width, "height": 900}, color_scheme=scheme
         )
+        observe_exports(page)
         page.goto(args.base_url.rstrip("/") + "/b0-b1.html?release=r8")
         page.wait_for_selector("#comparison-baseline-select", timeout=60000)
 
@@ -177,14 +260,20 @@ with sync_playwright() as playwright:
                         '[data-metric="relative_cost_per_token"] .chart-row-heading>span'
                     ).all_text_contents()
                 )
-                if release in ("r6", "r9", "r10"):
+                check_candidate = release in ("r6", "r9", "r10")
+                check_baseline = (
+                    release in ("r8", "r10") and baseline in independent_baselines
+                )
+                payload = (
+                    download_selection(page)
+                    if check_candidate or check_baseline
+                    else None
+                )
+                if check_candidate:
                     assert (
                         expected_models[release]
                         in page.locator("#comparison-lead").inner_text()
                     )
-                    with page.expect_download() as download:
-                        page.locator("#comparison-export").click()
-                    payload = json.loads(Path(download.value.path()).read_bytes())
                     assert (
                         payload["baseline"] == baseline
                         and payload["candidate"] == release
@@ -211,10 +300,7 @@ with sync_playwright() as playwright:
                         is None
                         for row in payload["rows"]
                     )
-                if release in ("r8", "r10") and baseline in independent_baselines:
-                    with page.expect_download() as download:
-                        page.locator("#comparison-export").click()
-                    payload = json.loads(Path(download.value.path()).read_bytes())
+                if check_baseline:
                     assert payload["paired"] is False
                     contrasts = context_contrasts(page)
                     if contrasts:

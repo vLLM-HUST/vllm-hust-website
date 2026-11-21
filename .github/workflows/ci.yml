@@ -159,6 +159,7 @@ jobs:
             output/playwright/b1-definition/
             output/playwright/five-dataset-comparison/
             output/playwright/formal-baseline-isolation/
+            output/playwright/baseline-version/
             output/playwright/optimization-exploration/
             output/playwright/capacity-layout/
             output/playwright/report-history/
