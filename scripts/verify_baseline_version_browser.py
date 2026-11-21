@@ -49,12 +49,7 @@ def verify_development_priority(page, releases, baselines):
     if len(sr) > 1:
         page.select_option("#comparison-release-select", sr[1])
         wait_release(sr[1])
-        params = parse_qs(urlparse(page.url).query)
-        if sr[1] == "sr5":
-            assert params == {"release": ["sr5"]}
-            assert page.locator('[data-comparison="controller-special"]').count() == 1
-        else:
-            assert params["comparison"] == ["development"]
+        assert parse_qs(urlparse(page.url).query)["comparison"] == ["development"]
     page.select_option("#comparison-release-select", "r10")
     wait_release("r10")
     assert "comparison" not in parse_qs(urlparse(page.url).query)

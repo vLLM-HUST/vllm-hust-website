@@ -210,7 +210,6 @@
     ];
     const source = `https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${controllerProgressCommit}/${d.report_path}`;
     return {title:t('限流层实验结果与更新记录', 'Request Throttling Controller results and changelog'),body:`
-      ${controllerSpecial?`<p><a href="./b0-b1.html?release=${controllerId}">B1-${controllerId} · ${controllerName()} ↗</a></p>`:''}
       <p><a href="./controlplane/">${t('查看第八版控制面完整结果','View the r8 control-plane results')} ↗</a></p><p>${t('以下为第六版历史配对，不代表第八版。','The following is the historical r6 pair, not r8.')}</p><p>${esc(d.updated)} · ${esc(d.model)} · ${esc(d.platform)}</p><p>${esc(d.engine_release)} · max_num_seqs=${d.max_num_seqs} · state_resident_seats=${d.state_resident_seats}</p>
       <p>${t('SWE-smith 三轮长度/等待微基准：整批耗时缩短 ', 'SWE-smith three-turn length/wait microbenchmark: batch time reduced by ')}<strong>${n(r.time_reduction_percent)}%</strong></p>
       ${table(t(['指标','直连 B1','B1 加原版 ThunderAgent'], ['Metric','B1 direct','B1 with original ThunderAgent']), metrics)}
@@ -241,18 +240,18 @@
     if(!close(result.time_reduction_percent,100*(1-result.request_throttling_controller.elapsed_seconds/result.direct.elapsed_seconds))) throw Error('Controller arithmetic mismatch');
     controllerProgress=value;controllerProgressCommit=publication.commit;
   }
-  function detailDialog() {
-    return `<dialog id="comparison-detail-dialog" class="comparison-dialog" aria-labelledby="comparison-dialog-title"><div class="dialog-header"><h2 id="comparison-dialog-title"></h2><button type="button" class="dialog-close" aria-label="${t('关闭详情','Close details')}">×</button></div><div id="comparison-dialog-body"></div></dialog>`;
+  function detailDialog(prefix='comparison') {
+    return `<dialog id="${prefix}-detail-dialog" class="comparison-dialog" aria-labelledby="${prefix}-dialog-title"><div class="dialog-header"><h2 id="${prefix}-dialog-title"></h2><button type="button" class="dialog-close" aria-label="${t('关闭详情','Close details')}">×</button></div><div id="${prefix}-dialog-body"></div></dialog>`;
   }
-  function bindDetails(content) {
-    const dialog=root.querySelector('dialog');
-    root.querySelectorAll('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
+  function bindDetails(content, scope=root) {
+    const dialog=scope.querySelector('dialog');
+    scope.querySelectorAll('[data-detail]').forEach(button=>button.addEventListener('click',()=>{
       const value=button.dataset.detail==='controller-progress' ? controllerProgressContent() : content(button.dataset.detail);
-      root.querySelector('#comparison-dialog-title').textContent=value.title;
-      root.querySelector('#comparison-dialog-body').innerHTML=value.body;
+      dialog.querySelector('.dialog-header h2').textContent=value.title;
+      dialog.lastElementChild.innerHTML=value.body;
       dialog.showModal();
     }));
-    root.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
+    scope.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
     dialog.addEventListener('click',event=>{if(event.target===dialog && event.clientX>=dialog.getBoundingClientRect().right)dialog.close();});
   }
   function linkedDetailKey(hash) {
@@ -304,20 +303,30 @@
   let attemptIds = [];
   let srIds = [];
   let selectableIds = [...releaseIds,...attemptIds,...srIds];
-  const controllerId = 'sr5';
+  const controllerOption = 'request-throttling';
   const validRelease = id => /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(id||'');
-  const requestedRelease = new URL(location.href).searchParams.get('release');
-  let selectedRelease = validRelease(requestedRelease) ? requestedRelease : null;
-  let selectedBaseline = new URL(location.href).searchParams.get('b0') || 'original018-cann8.5.1';
+  let selectedRelease, selectedBaseline, selectedController;
+  function readComparisonLocation() {
+    const url=new URL(location.href), params=url.searchParams;
+    if(params.get('release')==='sr5'){
+      params.set('release','r8');
+      params.set('controlplane',controllerOption);
+      params.delete('comparison');
+      history.replaceState(null,'',url);
+    }
+    const requested=params.get('release');
+    selectedRelease=validRelease(requested)?requested:null;
+    selectedBaseline=params.get('b0')||'original018-cann8.5.1';
+    selectedController=params.get('controlplane')===controllerOption?controllerOption:'';
+  }
+  readComparisonLocation();
   let comparisonBaselines = [];
   const baselineObservations = new Map();
   const originalBaselineSelected = () => selectedBaseline === 'original018-cann8.5.1';
-  const developmentRelease = () => srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial);
-  const controllerReleaseSelected = () => selectedRelease===controllerId&&controllerSpecial;
+  const developmentRelease = () => srIds.includes(selectedRelease);
   const developmentComparison = () => {
-    const params = new URL(location.href).searchParams;
-    return originalBaselineSelected()&&!params.has('b0')&&
-      (controllerReleaseSelected()||(params.get('comparison')==='development'&&developmentRelease()));
+    const params=new URL(location.href).searchParams;
+    return originalBaselineSelected()&&!params.has('b0')&&params.get('comparison')==='development'&&developmentRelease();
   };
   let releaseCatalog = null;
   let fixedBaseline = null;
@@ -699,24 +708,41 @@
       const entry=entries?.find(row=>row.id===id);
       return option(id,entry?id+' · '+t(entry.label_zh,entry.label_en):id);
     }).join('');
-    const specialIds=[...srIds,...(controllerSpecial?[controllerId]:[])].sort((a,b)=>BigInt(a.slice(2))>BigInt(b.slice(2))?-1:1);
+    const specialIds=[...srIds].sort((a,b)=>BigInt(a.slice(2))>BigInt(b.slice(2))?-1:1);
     return `<div class="comparison-meta release-selector">
+      <div class="release-fields"><div class="release-field">
       <label for="comparison-release-select">${t('B1 版本 / 运行记录','B1 version / run history')}</label>
       <select id="comparison-release-select">
         <optgroup label="${t('冻结版本','Frozen releases')}">${engineOptions(releaseIds,releaseCatalog?.entries)}</optgroup>
         <optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${engineOptions(attemptIds,releaseCatalog?.attempts)}</optgroup>
         <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
-          option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
+          option(id,'B1-'+id)).join('')}</optgroup>
       </select>
-      ${developmentComparison()?(controllerReleaseSelected()?'':`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`):`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
-      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
-      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
+      </div>
+      ${developmentComparison()?'':`<div class="release-field"><label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
+      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select></div>`}
+      <div class="release-field"><label for="comparison-controlplane-select">${t('控制面','Control plane')}</label>
+      <select id="comparison-controlplane-select">
+        <option value="">${t('无','None')}</option>
+        <option value="${controllerOption}" ${selectedController?'selected':''}>${controllerName()}</option>
+      </select></div></div>
+      <div class="release-links">
+      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:
+      `<a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
-    </div>`;
+    </div></div>`;
   }
   function bindMenu() {
+    root.querySelector('#comparison-controlplane-select').addEventListener('change',event=>{
+      selectedController=event.target.value;
+      const url=new URL(location.href);
+      if(selectedController)url.searchParams.set('controlplane',selectedController);
+      else url.searchParams.delete('controlplane');
+      history.replaceState(null,'',url);
+      renderControllerPanel();
+    });
     root.querySelector('#comparison-baseline-select')?.addEventListener('change',event=>{
       selectedBaseline=event.target.value;
       const url=new URL(location.href);url.searchParams.set('b0',selectedBaseline);url.searchParams.delete('comparison');history.replaceState(null,'',url);
@@ -738,8 +764,8 @@
     });
     return [...fixed,...rows.filter(row=>!used.has(row))];
   }
-  function coverageView(rows, qualityOnly=false, referenceLabel=null) {
-    return `<section class="dataset-coverage" aria-labelledby="dataset-coverage-title"><div class="section-heading"><h2 id="dataset-coverage-title">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
+  function coverageView(rows, qualityOnly=false, referenceLabel=null, heading='dataset-coverage-title') {
+    return `<section class="dataset-coverage" aria-labelledby="${heading}"><div class="section-heading"><h2 id="${heading}">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
       const row=rows.find(row=>row.id===id),available=!!row?.arms;
       const status=row?.baselineObservation?(row.observation?t('B0 已测 · B1 已测（分别列示）','B0 measured · B1 measured (separate)'):t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished')):row?.observation?t('B1单臂实测','B1 single-arm measurement'):available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
       return `<article data-dataset="${id}" data-available="${available}" data-b0-available="${!!(row?.arms?.B0||row?.baselineObservation)}" data-b1-available="${!!(row?.arms?.B1||row?.observation)}"><strong>${label}</strong><span>${status}</span></article>`;
@@ -945,21 +971,34 @@
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
-  let controllerSpecial;
+  let controllerResults;
 
-  async function loadControllerSpecial() {
-    if(controllerSpecial)return;
+  async function loadControllerResults() {
+    if(controllerResults)return;
     const [meta,response]=await Promise.all([fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'}),fetch('./'+controllerResultsPath,{cache:'no-cache'})]);
-    if(!meta.ok||!response.ok)throw Error('Controller special release unavailable');
+    if(!meta.ok||!response.ok)throw Error('Controller results unavailable');
     const publication=await meta.json();
-    if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark'||publication.status!=='published-source'||!/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Invalid controller special release publisher');
+    if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark'||publication.status!=='published-source'||!/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Invalid controller results publisher');
     const value=await readControllerPublication(publication,controllerResultsPath,response);
-    const entries=value.releases?.filter(entry=>entry.id==='r8');
-    if(value.schema!=='controller-product-results/v1'||entries?.length!==1)throw Error('Invalid controller special release identity');
-    const [entry]=entries;
+    if(value.schema!=='controller-product-results/v1'||!Array.isArray(value.releases))throw Error('Invalid controller results');
+    const results=new Map();
+    for(const entry of value.releases){
+      if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
+      validateControllerPair(entry);
+      results.set(entry.id,{entry,commit:publication.commit,latency:null});
+    }
+    const r8=results.get('r8');
+    if(r8)r8.latency=await loadControllerLatency(publication,r8.entry).catch(error=>{
+      console.warn('Controller latency supplement rejected',error);
+      return null;
+    });
+    controllerResults=results;
+  }
+
+  function validateControllerPair(entry) {
     const result=entry.result, a=result.direct, b=result.request_throttling_controller;
     const positive=x=>Number.isFinite(x)&&x>0;
-    if(entry.repetitions_per_arm!==1||entry.engine_release!=='full-answer-b1-20261117-r8'||!/^reports\/controller-r8-\d{8}\/README[.]md$/.test(entry.report_path)
+    if(entry.repetitions_per_arm!==1||entry.engine_release?.split('-').pop()!==entry.id||!/^reports\/controller-[a-z0-9-]+\/README[.]md$/.test(entry.report_path)
        ||!result.completed_pair||[a,b].some(arm=>!positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||arm.completed_tasks!==arm.tasks||!positive(arm.successful_requests)||arm.failed_requests!==0
           ||!Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100)
        ||a.successful_requests!==b.successful_requests||a.input_tokens!==b.input_tokens||a.output_tokens!==b.output_tokens
@@ -974,11 +1013,6 @@
          ||!close(p.time_reduction_percent,100*(1-p.controller.elapsed_seconds/p.direct.elapsed_seconds))
          ||!close(p.output_token_change_percent,100*(p.controller.output_tokens/p.direct.output_tokens-1)))throw Error('Invalid controller profile pair');
     }
-    const latency=await loadControllerLatency(publication,entry).catch(error=>{
-      console.warn('Controller latency supplement rejected',error);
-      return null;
-    });
-    controllerSpecial={entry,commit:publication.commit,latency};
   }
 
   async function readControllerPublication(publication,path,response) {
@@ -1010,10 +1044,27 @@
     return value;
   }
 
-  function renderControllerSpecial() {
-    const {entry,commit,latency}=controllerSpecial;
+  function renderControllerPanel() {
+    root.querySelector('#controller-comparison')?.remove();
+    if(!selectedController)return;
+    const selector=root.querySelector('.release-selector');
+    if(!selector)return;
+    const panel=document.createElement('section');
+    panel.id='controller-comparison';
+    panel.setAttribute('aria-labelledby','controller-comparison-title');
+    selector.after(panel);
+    const heading=`<h2 id="controller-comparison-title">${t('控制面实测','Control plane measurements')} · ${controllerName()}</h2>`;
+    const pair=controllerResults?.get(selectedRelease);
+    if(!pair){
+      const message=controllerResults
+        ?t(`B1 ${selectedRelease} 暂无这款控制器的配对实测。`,`No published pair for this controller on B1 ${selectedRelease}.`)
+        :t('控制面实测数据加载或校验失败。','Control plane measurements unavailable or verification failed.');
+      panel.innerHTML=heading+`<p>${esc(message)}</p>`;
+      return;
+    }
+    const {entry,commit,latency}=pair;
     const r=entry.result, a=r.direct, b=r.request_throttling_controller;
-    const roles={B0:t('B1 r8 直连','B1 r8 direct'),B1:'B1-sr5'};
+    const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
     const pairedMetrics=(direct,controller)=>{
       const arms={
         B0:{...direct,relative_cost_per_token:1},
@@ -1062,7 +1113,7 @@
     const chartRows=[...rows];
     chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
-    const resultLink=`<a href="./controlplane/?release=r8#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
+    const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
     const values=['—',(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%','—',(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
     const notes=[t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
@@ -1080,15 +1131,15 @@
       :[p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
     summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
       [trajectoryLabel,n(a.elapsed_seconds),n(b.elapsed_seconds),n(r.time_reduction_percent)+'%',n(100*(b.output_tokens/a.output_tokens-1))+'%']);
-    document.getElementById('comparison-title').textContent=t('B1 r8 / B1-sr5 请求限流控制器','B1 r8 / B1-sr5 Request Throttling Controller');
-    document.getElementById('comparison-lead').textContent='Qwen3.5-35B-A3B · Ascend 910B2 × 2 · BF16';
-    root.innerHTML=`<section class="comparison-dashboard" data-comparison="controller-special">${releaseMenu()}
-      <div class="comparison-meta"><span>${t('控制面专项实验版本 · 两组使用同一份调整后的第八版引擎配置','Control plane special release · both arms share the same adapted r8 engine configuration')}</span>${resultLink}</div>
+    panel.innerHTML=`${heading}
+      <div class="comparison-meta"><span>${t(`两组使用同一份 B1 ${entry.id} 引擎配置`,`Both arms share the same B1 ${entry.id} engine configuration`)}</span>${resultLink}</div>
       <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
         <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(r.time_reduction_percent)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
-      ${frozenProfile('r8',{B0:'9.1.0',B1:'9.1.0'},[controllerName()],settings)}${coverageView(rows)}
+      <section class="frozen-profile"><div class="section-heading"><h3>${t('控制面实验配置','Control plane experiment configuration')}</h3><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div>
+      <p>${esc(entry.engine_release)}</p><p class="frozen-settings">${esc(settings)}</p></section>
+      ${coverageView(rows,false,null,'controller-coverage-title')}
       <div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('耗时与请求时延','Batch and request latency')} ↗</button></div>
       <p class="chart-scale-note">${t(`以同配置的引擎直连为基准。SWE trace64 是固定公开轨迹请求回放，这轮按请求隔离缓存，无法验证跨轮复用。${trajectoryLabel} 按多轮程序回放，保留工具等待，续轮继承模型真实输出。`,`Bars use direct access to the same engine as the reference. SWE trace64 replays fixed public requests with isolated caches, so it cannot test cross-turn reuse in this run. ${trajectoryLabel} replays multi-turn programs, preserves tool waits, and uses actual model outputs in later turns.`)}</p>
       <p class="chart-scale-note" id="controller-metric-scopes">${t('时延默认从客户端测量。标记「引擎侧」的数值从请求进入引擎开始计时。成本按相同加速卡费率估算，未计入控制器与宿主机。','Latencies are client-side unless marked Engine-side, where timing starts at engine admission. Cost estimates assume the same accelerator rate and exclude the controller and host.')}</p>
@@ -1097,13 +1148,8 @@
       ${metricChart('mean_ttft_ms',t('首 token 时延 ↓','Time to first token ↓'),'s',1000)}
       ${metricChart('mean_tpot_ms',t('逐 token 时延 ↓','Time per output token ↓'),'ms',1,t('此负载未记录客户端逐 token 时延','Client time per output token unavailable for this workload'))}
       ${metricChart('relative_cost_per_token',t('单位输出 token 的加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1'),1)}</div>
-      ${versionSupplement(entry,values,roles.B0)}
-      <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
-    const runtime=root.querySelectorAll('.runtime-pair > div strong');
-    runtime[0].textContent=roles.B0;runtime[1].textContent=roles.B1;
-    root.querySelector('.runtime-pair > div:first-child span').textContent=root.querySelector('.runtime-pair > div:last-child span').textContent;
-    root.querySelector('[data-detail="controller-progress"]').remove();
-    bindMenu();bindDetails(key=>{
+      <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
+    bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
         `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
         <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}`};
@@ -1112,9 +1158,8 @@
       if(key==='quality')return {title:t('质量与评分明细','Quality and grading'),body:table([t('指标','Metric'),roles.B0,roles.B1],entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]))+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
       if(key==='supplement')return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:`<p>${t('本专项没有对应补测数据。','There are no corresponding supplementary measurements for this comparison.')}</p>`};
       return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p><p>${esc(t(entry.limitations_zh,entry.limitations_en))}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a> · ${resultLink}</p>`};
-    });
-    Object.assign(root.dataset,{baselineId:'B1-r8-adapted',release:controllerId,loaded:controllerId,layout:'release-dashboard-v1'});
-    root.setAttribute('aria-busy','false');
+    },panel);
+    panel.dataset.engineRelease=entry.id;
   }
 
   const srPath = 'data/sr-development-results-v1.json';
@@ -1232,9 +1277,7 @@
     const observed=originalBaselineSelected()?{...fixedBaseline,runtime:fixedBaseline.baseline,hardware:{chip_model:fixedBaseline.chip_model,driver_version:fixedBaseline.driver_version??null},profiles:[...fixedBaseline.profiles,...fixedBaseline.context.observations.map(row=>({id:'real-context-'+row.phase,label:row.phase,arm:{...row.B0.metrics,mean_ttft_ms:row.B0.metrics.ttft_ms.mean,mean_tpot_ms:row.B0.metrics.tpot_ms.mean}}))]}:baselineObservations.get(baseline.id);
     const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
     const candidateModel=modelIntegrationResults.get(entry.id)?.candidate.model||(typeof entry.model==='string'?entry.model:fixedBaseline.model);
-    const controllerRows=selectedRelease===controllerId&&controllerSpecial?controllerSpecial.entry.profiles.map(row=>({id:row.id,observation:row.status==='complete'?{output_tokens_per_second:row.controller.output_tokens_per_second,mean_ttft_ms:1000*row.controller.time_to_first_content_seconds.mean,mean_tpot_ms:controllerSpecial.latency?.fixed_profiles_client.controller[row.id]?.mean_tpot_ms}:undefined})):null;
-    if(controllerRows){const arm=controllerSpecial.entry.result.request_throttling_controller,latency=controllerSpecial.latency?.multi_turn_engine.controller;controllerRows.push({id:'swe-smith-trajectory',label:'SWE Trace Heavy Load',observation:{output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,mean_ttft_ms:latency?.mean_ttft_ms,mean_tpot_ms:latency?.mean_tpot_ms}});}
-    const sourceRows=controllerRows|| (attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry));
+    const sourceRows=attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
     const allRows=[...sourceRows];
     for(const row of observed?.profiles||[])if(!allRows.some(item=>item.id===row.id))allRows.push({id:row.id,label:row.label||row.id});
     const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:candidateModel,
@@ -1250,7 +1293,7 @@
     const scores=rows.flatMap(row=>[['B0',row.baselineObservation],['B1 '+entry.id,row.observation]].filter(([,arm])=>Number.isInteger(arm?.correct)&&Number.isInteger(arm?.requests)).map(([role,arm])=>[row.label,role,arm.correct+'/'+arm.requests,arm.failed??'—',arm.truncated??'—']));
     const detail=key=>key==='metrics'||key==='supplement'?table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],(key==='supplement'?context:rows).map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)])):
       key==='quality'?table(t(['工况','运行臂','正确 / 请求','失败','截断'],['Scenario','Arm','Correct / requests','Failed','Truncated']),scores)+'<p>'+esc(t('独立原评分；完整评分与裁判来源见各自原件。','Independent original grades; complete grading and judge provenance remain in each source.'))+'</p><a href="'+esc(entry.release_url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a>':
-      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>'+((srIds.includes(entry.id)||entry.id===controllerId)?'<p><a href="./b0-b1.html?release='+esc(entry.id)+(controllerReleaseSelected()?'':'&amp;comparison=development')+'">'+t('B1-r8 开发对照（独立页面）','B1-r8 development comparison (separate view)')+'</a></p>':'');
+      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>'+(srIds.includes(entry.id)?'<p><a href="./b0-b1.html?release='+esc(entry.id)+'&amp;comparison=development'+'">'+t('B1-r8 开发对照（独立页面）','B1-r8 development comparison (separate view)')+'</a></p>':'');
     root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
       <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${t('所选组合暂无核验配对','No verified pair for the selected combination')}</small></article>`).join('')}</div>
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],t('配置以各自来源为准','See each source for configuration'))}
@@ -1277,14 +1320,12 @@
   }
   function render() {
     if(!releaseCatalog||!selectedRelease||!selectableIds.includes(selectedRelease))return;
-    if(developmentComparison()){
-      if(selectedRelease===controllerId&&controllerSpecial)renderControllerSpecial();
-      else renderVersion();
-      return;
-    }
-    if(!originalBaselineSelected()||srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial)){renderSelectedBaseline();return;}
-    if(selectedRelease===controllerId&&controllerSpecial){renderControllerSpecial();return;}
-    if(srIds.includes(selectedRelease)){if(srEntries)renderVersion();return;}
+    renderEngineComparison();
+    renderControllerPanel();
+  }
+  function renderEngineComparison() {
+    if(developmentComparison()){renderVersion();return;}
+    if(!originalBaselineSelected()||srIds.includes(selectedRelease)){renderSelectedBaseline();return;}
     if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}
     if(!data||!combination)return;
     renderR6();root.querySelector('.comparison-dashboard').insertAdjacentHTML('afterbegin',releaseMenu());
@@ -1305,12 +1346,10 @@
     const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
-      const loaded=await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(), loadSr().then(()=>null,error=>error), loadControllerSpecial().then(()=>null,error=>error)]);
+      const loaded=await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(), loadSr().then(()=>null,error=>error), loadControllerResults().catch(error=>console.warn('Controller results rejected',error))]);
       if(request!==releaseRequest)return;
       if(loaded[2]&&/^sr/.test(selectedRelease||''))throw loaded[2];
-      if(srIds.includes(controllerId))controllerSpecial=null;
-      selectableIds=[...releaseIds,...attemptIds,...srIds,...(controllerSpecial?[controllerId]:[])];
-      if(loaded[3]&&selectedRelease===controllerId&&!srIds.includes(controllerId))throw loaded[3];
+      selectableIds=[...releaseIds,...attemptIds,...srIds];
       if(!selectableIds.includes(selectedRelease))selectedRelease=latestFrozenRelease(releaseCatalog);
       if(srIds.includes(selectedRelease)&&!srEntries)await loadSr();
       else if(selectedRelease==='r8'&&!currentR8)await loadR8();
@@ -1318,7 +1357,7 @@
       if(request!==releaseRequest)return;
       if(!comparisonBaselines.some(item=>item.id===selectedBaseline))throw Error('Unknown B0 version');
       const url=new URL(location.href);
-      if((url.searchParams.has('b0')||controllerReleaseSelected()||!developmentRelease())&&url.searchParams.has('comparison')){url.searchParams.delete('comparison');history.replaceState(null,'',url);}
+      if((url.searchParams.has('b0')||!developmentRelease())&&url.searchParams.has('comparison')){url.searchParams.delete('comparison');history.replaceState(null,'',url);}
       render();openLinkedDetail();
     } catch(error) {
       if(request!==releaseRequest)return;
@@ -1329,13 +1368,11 @@
   }
   window.addEventListener('vllm-hust:langchange',render);
   window.addEventListener('hashchange',openLinkedDetail);
-  window.addEventListener('popstate',()=>{const url=new URL(location.href);selectedRelease=validRelease(url.searchParams.get('release'))?url.searchParams.get('release'):null;selectedBaseline=url.searchParams.get('b0')||'original018-cann8.5.1';showRelease();});
+  window.addEventListener('popstate',()=>{readComparisonLocation();showRelease();});
   window.addEventListener('pageshow',event=>{
     if(!event.persisted)return;
-    releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];controllerSpecial=null;
-    const requested=new URL(location.href).searchParams.get('release');
-    selectedRelease=validRelease(requested)?requested:null;
-    selectedBaseline=new URL(location.href).searchParams.get('b0')||'original018-cann8.5.1';
+    releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];controllerResults=null;
+    readComparisonLocation();
     showRelease();
   });
   showRelease();
