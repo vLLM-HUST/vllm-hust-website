@@ -150,6 +150,11 @@ def assert_controller_progress(page, root, publication, lang):
 
 def assert_sr(page, root, entry, layout, lang):
     release = entry["id"]
+    page.goto(
+        page.url.split("?")[0].split("#")[0]
+        + f"?release={release}&comparison=development"
+    )
+    expect(root.locator("#comparison-release-select")).to_be_visible(timeout=30000)
     root.locator("#comparison-release-select").select_option(release)
     expect(root).to_have_attribute("data-release", release, timeout=30000)
     expect(root).to_have_attribute("data-baseline-id", "B1-r8")
@@ -186,6 +191,10 @@ def assert_sr(page, root, entry, layout, lang):
 
 
 def assert_controller_special(page, root, entry, layout, lang, latency=None):
+    page.goto(
+        page.url.split("?")[0].split("#")[0] + "?release=sr5&comparison=development"
+    )
+    expect(root.locator("#comparison-release-select")).to_be_visible(timeout=30000)
     menu = root.locator("#comparison-release-select")
     expect(root.locator(".release-selector select")).to_have_count(1)
     expect(menu.locator('optgroup option[value="sr5"]')).to_have_text(

@@ -312,6 +312,7 @@
   let comparisonBaselines = [];
   const baselineObservations = new Map();
   const originalBaselineSelected = () => selectedBaseline === 'original018-cann8.5.1';
+  const developmentComparison = () => originalBaselineSelected()&&new URL(location.href).searchParams.get('comparison')==='development'&&(srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial));
   let releaseCatalog = null;
   let fixedBaseline = null;
   let catalogRequest = null;
@@ -694,16 +695,16 @@
         <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
           option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
       </select>
-      <label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
+      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
       <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(item.label)}${item.status==='candidate-pending'?t(' · 候选版，待发布结果',' · candidate, results pending'):item.status==='pending'?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
-      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>
+      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
     </div>`;
   }
   function bindMenu() {
-    root.querySelector('#comparison-baseline-select').addEventListener('change',event=>{
+    root.querySelector('#comparison-baseline-select')?.addEventListener('change',event=>{
       selectedBaseline=event.target.value;
       const url=new URL(location.href);url.searchParams.set('b0',selectedBaseline);history.replaceState(null,'',url);
       showRelease();
@@ -1212,12 +1213,15 @@
     return {title:t('原始证据','Original evidence'),body:`<p>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。固定五项配对结果见本页图表与质量详情。','C8 closed loop · 871 measured requests, zero failures · one run per arm. The five-profile pairs are included in this page’s charts and quality details.')}</p><p><a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="${esc(currentR8.evidence.raw.url)}">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p><figure class="comparison-source-plot"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" alt="${t('B0与r8连续负载原始对照图','Original B0 and r8 continuous-load chart')}"></a></figure>`};
   }
   function renderSelectedBaseline() {
-    const baseline=comparisonBaselines.find(item=>item.id===selectedBaseline);
+    const selected=comparisonBaselines.find(item=>item.id===selectedBaseline);
+    const baseline={...selected,model:selected.model||fixedBaseline.model};
     const entry=releaseEntry()||releaseCatalog.attempts.find(item=>item.id===selectedRelease)||srEntries?.find(item=>item.id===selectedRelease)||{id:selectedRelease,mods:[],measurements:[],release_url:'./report-history.html'};
-    const observed=baselineObservations.get(baseline.id);
+    const observed=originalBaselineSelected()?{...fixedBaseline,runtime:fixedBaseline.baseline,hardware:{chip_model:fixedBaseline.chip_model,driver_version:fixedBaseline.driver_version??null},profiles:[...fixedBaseline.profiles,...fixedBaseline.context.observations.map(row=>({id:'real-context-'+row.phase,label:row.phase,arm:{...row.B0.metrics,mean_ttft_ms:row.B0.metrics.ttft_ms.mean,mean_tpot_ms:row.B0.metrics.tpot_ms.mean}}))]}:baselineObservations.get(baseline.id);
     const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
     const candidateModel=singleArmObservation(entry)?.candidate.model||'Qwen3.5-35B-A3B';
-    const sourceRows=attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
+    const controllerRows=selectedRelease===controllerId&&controllerSpecial?controllerSpecial.entry.profiles.map(row=>({id:row.id,observation:row.status==='complete'?{output_tokens_per_second:row.controller.output_tokens_per_second,mean_ttft_ms:1000*row.controller.time_to_first_content_seconds.mean,mean_tpot_ms:controllerSpecial.latency?.fixed_profiles_client.controller[row.id]?.mean_tpot_ms}:undefined})):null;
+    if(controllerRows){const arm=controllerSpecial.entry.result.request_throttling_controller,latency=controllerSpecial.latency?.multi_turn_engine.controller;controllerRows.push({id:'swe-smith-trajectory',label:'SWE Trace Heavy Load',observation:{output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,mean_ttft_ms:latency?.mean_ttft_ms,mean_tpot_ms:latency?.mean_tpot_ms}});}
+    const sourceRows=controllerRows|| (attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry));
     const allRows=[...sourceRows];
     for(const row of observed?.profiles||[])if(!allRows.some(item=>item.id===row.id))allRows.push({id:row.id,label:row.label||row.id});
     const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:candidateModel,
@@ -1228,9 +1232,10 @@
     document.getElementById('comparison-title').textContent=baseline.label+' / B1 '+entry.id;
     document.getElementById('comparison-lead').textContent='B0: '+baseline.model+' · B1: '+candidateModel;
     const note=t('同模型不代表可配对；须核验设备、驱动、权重、输入、预算和计时协议。','The same model alone does not establish a matched pair: devices, drivers, weights, inputs, budgets and timing must be verified.');
+    const scores=rows.flatMap(row=>[['B0',row.baselineObservation],['B1 '+entry.id,row.observation]].filter(([,arm])=>Number.isInteger(arm?.correct)&&Number.isInteger(arm?.requests)).map(([role,arm])=>[row.label,role,arm.correct+'/'+arm.requests,arm.failed??'—',arm.truncated??'—']));
     const detail=key=>key==='metrics'||key==='supplement'?table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],(key==='supplement'?context:rows).map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)])):
-      key==='quality'?'<p>'+esc(t('所选 B1 评分见其版本原件；尚无所选 B0 的配对评分。','See the selected B1 evidence for grading; paired grades for the selected B0 are unpublished.'))+'</p><a href="'+esc(entry.release_url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a>':
-      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>';
+      key==='quality'?table(t(['工况','运行臂','正确 / 请求','失败','截断'],['Scenario','Arm','Correct / requests','Failed','Truncated']),scores)+'<p>'+esc(t('独立原评分；完整评分与裁判来源见各自原件。','Independent original grades; complete grading and judge provenance remain in each source.'))+'</p><a href="'+esc(entry.release_url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a>':
+      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>'+((srIds.includes(entry.id)||entry.id===controllerId)?'<p><a href="./b0-b1.html?release='+esc(entry.id)+'&amp;comparison=development">'+t('B1-r8 开发对照（独立页面）','B1-r8 development comparison (separate view)')+'</a></p>':'');
     root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
       <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${t('所选组合暂无核验配对','No verified pair for the selected combination')}</small></article>`).join('')}</div>
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],t('配置以各自来源为准','See each source for configuration'))}
@@ -1257,7 +1262,12 @@
   }
   function render() {
     if(!releaseCatalog||!selectedRelease||!selectableIds.includes(selectedRelease))return;
-    if(!originalBaselineSelected()){renderSelectedBaseline();return;}
+    if(developmentComparison()){
+      if(selectedRelease===controllerId&&controllerSpecial)renderControllerSpecial();
+      else renderVersion();
+      return;
+    }
+    if(!originalBaselineSelected()||srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial)){renderSelectedBaseline();return;}
     if(selectedRelease===controllerId&&controllerSpecial){renderControllerSpecial();return;}
     if(srIds.includes(selectedRelease)){if(srEntries)renderVersion();return;}
     if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}

@@ -23,9 +23,16 @@ with sync_playwright() as playwright:
         assert "original018-cann8.5.1" in baselines
         for baseline in baselines:
             page.select_option("#comparison-baseline-select", baseline)
-            # Existing formal/development browser suites cover the legacy
-            # selector default. This suite covers additional official versions.
             if baseline == "original018-cann8.5.1":
+                for release in (item for item in releases if item.startswith("sr")):
+                    page.select_option("#comparison-release-select", release)
+                    page.wait_for_function(
+                        '(id)=>document.querySelector("#five-dataset-comparison").dataset.release===id',
+                        arg=release,
+                    )
+                    assert page.locator('[data-comparison="selected-b0"]').count() == 1
+                    assert page.locator(".metric-change").count() == 0
+                    assert page.locator("[data-baseline-observation]").count() > 0
                 continue
             for release in releases:
                 page.select_option("#comparison-release-select", release)
