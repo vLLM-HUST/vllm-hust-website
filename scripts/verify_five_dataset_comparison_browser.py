@@ -572,6 +572,90 @@ def assert_paired_version(page, root, entry, catalog):
     page.keyboard.press("Escape")
 
 
+def assert_submission_assessment(page, root, entry, url, lang):
+    descriptor = entry["submission_assessment"]
+    response = page.request.get(url + "/" + descriptor["path"])
+    assert response.ok
+    payload = response.body()
+    assert hashlib.sha256(payload).hexdigest() == descriptor["sha256"]
+    targets = json.loads(payload)["targets"]
+    coverage = root.locator(".dataset-coverage")
+    expect(coverage.locator("[data-available=true]")).to_have_count(5)
+    expect(root.locator(".release-coverage-summary")).to_contain_text("5/5")
+    chart = root.locator('[data-metric="output_tokens_per_second"]')
+    for row in entry["measurements"]:
+        before, after = (arm["physical_cards"] for arm in row["arms"])
+        values = f"B0 {before} → B1 {after}"
+        mode = "matched" if set(before) == set(after) else "cross-card"
+        record = chart.locator(f'[data-profile="{row["id"]}"]')
+        expect(record).to_have_attribute("data-card-comparison", mode)
+        expect(record).to_contain_text(values)
+        if row["id"] in {"mmlu", "hle", "frontier", "swe", "terminal"}:
+            cell = coverage.locator(f'[data-dataset="{row["id"]}"]')
+            expect(cell).to_have_attribute("data-card-comparison", mode)
+            expect(cell).to_contain_text(values)
+    for row in entry["context_tenant_supplement"]["comparisons"]:
+        before, after = (row[role]["physical_cards"] for role in ("B0", "B1"))
+        record = chart.locator(f'[data-profile="real-context-{row["phase"]}"]')
+        expect(record).to_have_attribute(
+            "data-card-comparison",
+            "matched" if set(before) == set(after) else "cross-card",
+        )
+        expect(record).to_contain_text(f"B0 {before} → B1 {after}")
+    supplement = root.locator("#context-tenant-supplement")
+    expect(supplement).to_have_attribute("data-source-release", entry["id"])
+    image = supplement.locator("img")
+    assert image.evaluate("async el=>{await el.decode();return el.naturalWidth>0}")
+
+    assessment = root.locator("#submission-v2")
+    for index, goal in enumerate(("4.1", "4.2", "4.3", "4.4")):
+        cells = (
+            assessment.locator("table")
+            .first.locator("tbody tr")
+            .nth(index)
+            .locator("td")
+        )
+        for column, stage in enumerate(("milestone", "final")):
+            passed = targets[goal][stage]["met"]
+            status = (
+                ("达成目标" if passed else "未达成目标")
+                if lang == "zh"
+                else ("Target met" if passed else "Target not met")
+            )
+            cell = cells.nth(column)
+            expect(cell).to_contain_text(status)
+            if passed and lang == "zh":
+                expect(cell).not_to_contain_text("未达成目标")
+
+    panel = assessment.locator("details[data-rental-cost]")
+    panel.locator("summary").click()
+    quote = targets["4.4"]["rental_quote"]
+    expect(panel.get_by_role("link")).to_have_attribute("href", quote["url"])
+    expect(panel).to_contain_text(quote["provider"])
+    expect(panel).to_contain_text(quote["checked_date"])
+    expect(panel).to_contain_text(f"{float(quote['cny_per_card_month']):.2f}")
+    for index, workload in enumerate(("mmlu", "four_tenant")):
+        evidence = targets["4.4"]["formal_cost"][workload]
+        row = panel.locator("tbody tr").nth(index)
+        for role in ("B0", "B1"):
+            arm = evidence["arms"][role]
+            unit = (
+                1e6
+                * float(quote["cny_per_card_month"])
+                * arm["occupied_cards"]
+                * float(arm["window_seconds"])
+                / (30 * 86400 * arm["successful_output_tokens"])
+            )
+            expect(row).to_contain_text(f"{unit:.2f}")
+        expect(row).to_contain_text(f"{float(evidence['reduction_percent']):.2f}%")
+    panel.locator("summary").click()
+    if entry.get("submission_report"):
+        expect(
+            assessment.locator('[href="./' + entry["submission_report"]["path"] + '"]')
+        ).to_be_visible()
+    assert_current_compute_reference(root, entry, lang)
+
+
 def context_supplement(catalog):
     return next(row for row in catalog["entries"] if row["id"] == "r8")[
         "context_tenant_supplement"
@@ -627,8 +711,12 @@ def verify(url, output):
                     )
                     if current.get("model_integration"):
                         assert_model_integration(page, root, current, url, lang)
-                    else:
+                    if current.get("measurements") or not current.get(
+                        "model_integration"
+                    ):
                         assert_paired_version(page, root, current, catalog)
+                    if current.get("submission_assessment"):
+                        assert_submission_assessment(page, root, current, url, lang)
                     assert_release_control_readable(page, root)
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth+1"
@@ -912,8 +1000,12 @@ def verify(url, output):
                         if entry.get("model_integration"):
                             assert dashboard_layout(root) == r8_layout
                             assert_model_integration(page, root, entry, url, lang)
-                        else:
+                        if entry.get("measurements") or not entry.get(
+                            "model_integration"
+                        ):
                             assert_paired_version(page, root, entry, catalog)
+                        if entry.get("submission_assessment") and entry["id"] != latest:
+                            assert_submission_assessment(page, root, entry, url, lang)
                         assert_release_control_readable(page, root)
                         expect(root.locator(".metric-missing .bar-fill")).to_have_count(
                             0
@@ -1497,6 +1589,25 @@ def verify(url, output):
             )
             page.close()
             checks.append({"rejected": "integration-chart-tamper"})
+        for entry in catalog["entries"]:
+            descriptor = entry.get("submission_assessment")
+            if not descriptor:
+                continue
+            page = context.new_page()
+            page.route(
+                "**/" + descriptor["path"],
+                lambda route: route.fulfill(json={"corrupted": True}),
+            )
+            page.goto(url + "/b0-b1.html?release=" + entry["id"])
+            root = page.locator("#five-dataset-comparison")
+            expect(root).to_have_attribute(
+                "data-error", "publication-rejected", timeout=30000
+            )
+            expect(root.locator("details[data-rental-cost]")).to_have_count(0)
+            page.close()
+            checks.append(
+                {"rejected": "submission-assessment-tamper", "release": entry["id"]}
+            )
         page = context.new_page()
         page.route(
             "**/data/r8-continuous-20261117/summary-v1.json",

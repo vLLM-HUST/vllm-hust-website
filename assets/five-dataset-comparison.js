@@ -12,6 +12,7 @@
   const n = v => Number.isFinite(v) ? v.toFixed(2) : '—';
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= 1e-8 * Math.max(1, Math.abs(b));
   const modelIntegrationResults = new Map();
+  const submissionAssessments = new Map();
   const table = (heads, rows) => `<div class="focus-table" tabindex="0" role="region" aria-label="${esc(heads.join(' / '))}"><table><thead><tr>${heads.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map((v,i)=>`<${i?'td':'th scope="row"'}>${esc(v)}</${i?'td':'th'}>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const required = ['3.4.1','3.4.2','3.4.3','3.4.4'];
   const names = () => t(['有效算力','吞吐与时延','上下文稳定性','成本与利用率'], ['Effective compute','Throughput and latency','Context stability','Cost and utilization']);
@@ -98,6 +99,20 @@
   };
   const continuousWorkloadLabel = () => t('闭环连续压测 · 并发 8','Closed-loop continuous stress test · concurrency 8');
   const terminalReplayWorkloadLabel = () => t('Terminal-Bench 2.1 离线请求回放 · 并发 8','Terminal-Bench 2.1 offline request replay · concurrency 8');
+  const validPhysicalCards = cards => Array.isArray(cards)&&cards.length===2&&
+    new Set(cards).size===cards.length&&cards.every(card=>Number.isInteger(card)&&card>=0);
+  function cardComparison(before, after) {
+    if(!before||!after)return {};
+    const crossCard=before.slice().sort().join()!==after.slice().sort().join();
+    const cardLabel=`B0 [${before.join(', ')}] → B1 [${after.join(', ')}]`;
+    return {cardLabel,crossCard};
+  }
+  function cardComparisonLabel({cardLabel,crossCard}) {
+    return cardLabel?`${crossCard?t('跨卡对照','Cross-card comparison'):t('同卡对照','Matched cards')} · ${cardLabel}`:'';
+  }
+  function cardComparisonAttribute({cardLabel,crossCard}) {
+    return cardLabel?` data-card-comparison="${crossCard?'cross-card':'matched'}"`:'';
+  }
   function chart(key, title, unit, divisor = 1, rows = data.datasets, labels = profileNames(), roles = {B0:'B0',B1:'B1'}) {
     const maximum = Math.max(1,...rows.filter(row=>row.arms?.B0&&row.arms?.B1).map(d=>d.arms.B1[key]/d.arms.B0[key]));
     return `<article class="metric-chart" data-metric="${key}"><header><h3>${title}</h3><span>${unit}</span></header><div class="chart-legend"><span class="legend-b0">${esc(roles.B0)}</span><span class="legend-b1">${esc(roles.B1)}</span></div>${rows.map((row,i)=>{
@@ -116,7 +131,7 @@
       if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
       const good = key==='output_tokens_per_second' ? change>=0 : change<=0;
-      return `<div class="chart-row" data-profile="${row.id}"><div class="chart-row-heading"><strong>${esc(labels[i])}${row.workloadLabel?`<small class="chart-workload-label">${esc(row.workloadLabel)}</small>`:''}</strong><span class="metric-change ${good?'favorable':'regression'}">${row.metricScope?esc(row.metricScope)+' · ':''}${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
+      return `<div class="chart-row" data-profile="${row.id}"${cardComparisonAttribute(row)}><div class="chart-row-heading"><strong>${esc(labels[i])}${row.workloadLabel?`<small class="chart-workload-label">${esc(row.workloadLabel)}</small>`:''}</strong><span class="metric-change ${good?'favorable':'regression'}">${row.metricScope?esc(row.metricScope)+' · ':''}${change>0?'+':''}${n(change)}%</span></div>${['B0','B1'].map(role=>{
         const value=row.arms[role][key]/divisor;
         return `<div class="bar-line" aria-label="${esc(`${labels[i]} ${row.workloadLabel||''} ${roles[role]} ${n(value)} ${unit}`)}"><span class="bar-role">${esc(roles[role])}</span><span class="bar-track"><span class="bar-fill ${role.toLowerCase()}" style="width:${100*row.arms[role][key]/row.arms.B0[key]/maximum}%"></span></span><span class="bar-value">${n(value)}</span></div>`;
       }).join('')}</div>`;
@@ -458,6 +473,8 @@
         if (entry.baseline_id!==baseline.id || !entry.release.endsWith('-'+id) || !entry.mods?.length || !entry.profile?.url || !Array.isArray(entry.measurements)) throw Error('Incomplete release identity');
         for (const measurement of entry.measurements) {
           if (measurement.control!=='B0' || measurement.baseline_id!==baseline.id || measurement.candidate!==id || measurement.arms?.length!==2 || measurement.arms[0].role!==measurement.control || measurement.arms[1].role!==id) throw Error('Release measurement identity mismatch');
+          if(measurement.arms.some(arm=>arm.physical_cards!==undefined)&&
+             !measurement.arms.every(arm=>validPhysicalCards(arm.physical_cards)))throw Error('Invalid per-arm measurement cards');
           for (const arm of measurement.arms) {
             if (![arm.output_tokens_per_second,arm.mean_ttft_ms,arm.mean_tpot_ms,arm.output_tokens,arm.duration_seconds,arm.requests].every(v=>Number.isFinite(v)&&v>0) || !Number.isInteger(arm.failed) || arm.failed<0 || !close(arm.output_tokens/arm.duration_seconds,arm.output_tokens_per_second)) throw Error('Inconsistent release measurement');
           }
@@ -465,6 +482,7 @@
         await validateVersionSupplement(entry, publication);
         await validateVersionComputeReference(entry, publication);
         await validateModelIntegration(entry, publication);
+        await loadSubmissionAssessment(entry, publication);
       }
       if(value.entries.find(row=>row.id==='r5').measurements.length) throw Error('r5 has no formal inference');
       if (!Array.isArray(value.attempt_order) || new Set(value.attempt_order).size!==value.attempt_order.length || value.attempt_order.some(id=>!/^r[1-9][0-9]*$/.test(id)||value.order.includes(id)) || value.attempts?.length!==value.attempt_order.length) throw Error('Invalid early-attempt catalog');
@@ -611,6 +629,8 @@
        !/^[a-f0-9]{64}$/.test(a.raw_asset?.sha256||'')||!Number.isInteger(a.raw_asset?.bytes)||a.raw_asset.bytes<=0||
        !Number.isInteger(a.raw_asset?.asset_id)||a.raw_asset.asset_id<=0||a.raw_asset.redownload_verified!==true)fail();
     if(reuse&&(!/^https:\/\/github\.com\/DeepLinkNext\/DeepLinkEngine\/blob\/[a-f0-9]{40}\//.test(a.recomputation_url||'')||a.certificate?.sha256!==a.source_pair_sha256||!submission||a.original_reference_work_and_time_retained!==true||a.original_efficiency_used!==false||a.shared_work_cancellation_used!==false||a.source_and_workload_applicability_qualified!==true||a.clean_native_clock_source_qualified!==true||a.full_reference_denominator_qualified!==true))fail();
+    if(['B0','B1'].some(role=>a.arms?.[role]?.physical_cards!==undefined)&&
+       !['B0','B1'].every(role=>validPhysicalCards(a.arms?.[role]?.physical_cards)))fail();
     for(const role of ['B0','B1']) {
       const arm=a.arms?.[role];
       if(!arm||arm.F_interval?.length!==2||arm.achieved_tflops_per_card_interval?.length!==2||
@@ -700,6 +720,7 @@
         '≤'+computeBound(arm.reference_tflops_per_card_upper,true),'≥'+computeBound(arm.efficiency_lower_percent)+'%'];
     });
     return `<p>MMLU200 · ${submission?t('输出上限256 · EOS保留 · 每臂三轮正式原生计时，先求和再计算','256 output cap · EOS enabled · three formal native runs per arm; sum before division'):t('输出上限8192 · EOS保留 · 每臂一轮正式原生计时','8192 output cap · EOS enabled · one formal native run per arm')} · BF16 · TP2</p>
+      ${a.arms.B0.physical_cards?`<p>${esc(cardComparisonLabel(cardComparison(a.arms.B0.physical_cards,a.arms.B1.physical_cards)))}</p>`:''}
       <figure><img style="max-width:100%" src="./${esc(a.chart.path)}" alt="${t('B0/B1参考效率下界','B0/B1 reference efficiency lower bounds')}"></figure>
       ${table(t(['运行臂','原生时间 / s','必要算量 / FLOPs','每卡有效算力 / TFLOP/s','参考算力上界 / TFLOP/s','效率下界'],['Arm','Native time / s','Necessary work / FLOPs','Effective compute per card / TFLOP/s','Reference upper bound / TFLOP/s','Efficiency lower bound']),rows)}
       <p>${t('里程碑50%','50% milestone')}：${a.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')} · ${t('最终90%','90% final target')}：${a.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</p>
@@ -788,7 +809,7 @@
       const row=rows.find(row=>row.id===id),available=!!row?.arms;
       const status=row?.baselineObservation?(row.observation?t('B0 已测 · B1 已测（分别列示）','B0 measured · B1 measured (separate)'):t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished')):row?.observation?t('B1单臂实测','B1 single-arm measurement'):available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
       const taskScope=id==='swe'?t('32 任务 / 64 请求','32 tasks / 64 requests'):id==='terminal'?t('32 任务 / 48 请求','32 tasks / 48 requests'):'';
-      return `<article data-dataset="${id}" data-available="${available}" data-b0-available="${!!(row?.arms?.B0||row?.baselineObservation)}" data-b1-available="${!!(row?.arms?.B1||row?.observation)}"><strong>${label}</strong><span>${status}</span>${taskScope?`<small>${taskScope}</small>`:''}${row?.coverageNote?`<small>${esc(row.coverageNote)}</small>`:''}</article>`;
+      return `<article data-dataset="${id}"${cardComparisonAttribute(row||{})} data-available="${available}" data-b0-available="${!!(row?.arms?.B0||row?.baselineObservation)}" data-b1-available="${!!(row?.arms?.B1||row?.observation)}"><strong>${label}</strong><span>${status}</span>${taskScope?`<small>${taskScope}</small>`:''}${row?.cardLabel?`<small>${esc(row.cardLabel)}</small>`:''}${row?.coverageNote?`<small>${esc(row.coverageNote)}</small>`:''}</article>`;
     }).join('')}</div></section>`;
   }
   async function validateVersionSupplement(entry, publication) {
@@ -799,11 +820,10 @@
        a.baseline_id!==entry.baseline_id || a.execution_complete!==true || a.quality_measured!==false ||
        a.effective_flops_certified!==false || a.efficiency_percent!==null ||
        !/^[a-f0-9]{64}$/.test(a.source_summary_sha256||'') || !/^[a-f0-9]{64}$/.test(a.raw_asset?.sha256||'') ||
-       !/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-engine\/releases\/download\//.test(a.raw_asset?.url||'') ||
+       !/^https:\/\/github\.com\/(?:vLLM-HUST\/vllm-hust-engine|DeepLinkNext\/DeepLinkEngine)\/releases\/download\//.test(a.raw_asset?.url||'') ||
        a.comparisons?.length!==a.protocol?.phases?.length || !a.comparisons?.length ||
        !Number.isInteger(a.protocol.output_tokens) || a.protocol.output_tokens<=0)fail();
-    if(a.tensor_parallel_size!==2 || !Array.isArray(a.physical_cards) || a.physical_cards.length!==2 ||
-       new Set(a.physical_cards).size!==2 || !a.physical_cards.every(n=>Number.isInteger(n)&&n>=0) ||
+    if(a.tensor_parallel_size!==2 || (a.physical_cards!==undefined&&!validPhysicalCards(a.physical_cards)) ||
        !Number.isFinite(a.protocol.measurement_window_seconds) || a.protocol.measurement_window_seconds<=0 ||
        !a.protocol.phases.some(p=>p.tenants>1))fail();
     const metrics=m=>{
@@ -830,8 +850,12 @@
          !Number.isInteger(cohorts[0].min_tokens) || cohorts[0].min_tokens<1 ||
          !Number.isInteger(cohorts[0].max_tokens_exclusive) || cohorts[0].max_tokens_exclusive<=cohorts[0].min_tokens)fail();
       ids.add(row.phase);
+      const hasArmCards=['B0','B1'].some(role=>row[role]?.physical_cards!==undefined);
+      if(hasArmCards&&!['B0','B1'].every(role=>validPhysicalCards(row[role]?.physical_cards)))fail();
       for(const role of ['B0','B1']) {
         const arm=row[role],m=arm?.metrics;
+        const physicalCards=arm?.physical_cards??a.physical_cards;
+        if(!validPhysicalCards(physicalCards))fail();
         if(arm?.status!=='completed' || arm.tenants!==phase.tenants || arm.concurrency!==phase.concurrency ||
            !m || ![m.requests,m.successful,m.failed].every(Number.isInteger) || m.requests<=0 ||
            m.successful<0 || m.failed<0 || m.successful+m.failed!==m.requests ||
@@ -857,7 +881,7 @@
         for(const key of ['requests','successful','failed','output_tokens']) {
           if(tenants.reduce((n,t)=>n+t[key],0)!==m[key] || arm.windows.reduce((n,w)=>n+w.metrics[key],0)!==m[key])fail();
         }
-        const utilization=arm.utilization,cardValues=a.physical_cards.map(card=>utilization?.per_card_percent?.[card]);
+        const utilization=arm.utilization,cardValues=physicalCards.map(card=>utilization?.per_card_percent?.[card]);
         if(!cardValues.every(v=>Number.isFinite(v)&&v>=0&&v<=100) ||
            !close(utilization.mean_percent,cardValues.reduce((n,v)=>n+v,0)/cardValues.length) ||
            !Number.isFinite(utilization.covered_seconds) || utilization.covered_seconds<0 ||
@@ -895,13 +919,112 @@
           relative_cost_per_token:row.B0.metrics.output_tokens_per_second/m.output_tokens_per_second}];
       }));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
-      return {id:'real-context-'+row.phase,label:supplementLabel(a,row),arms,changes_percent,
-              workloadLabel:t(a.workload_label_zh,a.workload_label_en)};
+      const cards=cardComparison(row.B0.physical_cards,row.B1.physical_cards);
+      return {id:'real-context-'+row.phase,label:supplementLabel(a,row),arms,changes_percent,...cards,
+              workloadLabel:[t(a.workload_label_zh,a.workload_label_en),cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
     });
+  }
+  async function loadSubmissionAssessment(entry, publication) {
+    const descriptor=entry.submission_assessment;
+    if(!descriptor)return;
+    const fail=()=>{throw Error('Invalid release submission assessment');};
+    async function verifiedAsset(asset, extension) {
+      if(!asset||!/^data\/[a-z0-9/-]+\.(?:json|html)$/.test(asset.path||'')||
+         !asset.path.endsWith('.'+extension)||!/^[a-f0-9]{64}$/.test(asset.sha256||'')||
+         !Number.isInteger(asset.bytes)||asset.bytes<=0)fail();
+      const bindings=publication.files.filter(file=>file.website_path===asset.path);
+      if(bindings.length!==1||bindings[0].sha256!==asset.sha256||bindings[0].bytes!==asset.bytes)fail();
+      const response=await fetch('./'+asset.path,{cache:'no-cache'});
+      if(!response.ok)fail();
+      const raw=transportAssetBytes(await response.arrayBuffer(),asset);
+      const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),byte=>byte.toString(16).padStart(2,'0')).join('');
+      if(raw.byteLength!==asset.bytes||digest!==asset.sha256)fail();
+      return raw;
+    }
+    const report=JSON.parse(new TextDecoder().decode(await verifiedAsset(descriptor,'json')));
+    const targets=report.targets,goals=['4.1','4.2','4.3','4.4'];
+    if(report.schema!=='deeplinkengine-full-acceptance-report/v1'||report.engine_release!==entry.release||
+       report.execution_complete!==true||!goals.every(id=>['milestone','final'].every(gate=>typeof targets?.[id]?.[gate]?.met==='boolean')))fail();
+
+    const compute=entry.compute_reference;
+    if(!compute||!['B0','B1'].every(role=>validPhysicalCards(compute.arms[role].physical_cards))||
+       targets['4.1'].efficiency_lower_percent!==compute.arms.B1.efficiency_lower_percent||
+       targets['4.1'].milestone.met!==compute.milestone_met||targets['4.1'].final.met!==compute.final_numeric_met)fail();
+    const pair=id=>entry.measurements.find(row=>row.id===id)?.arms;
+    if(entry.measurements.some(row=>!row.arms.every(arm=>validPhysicalCards(arm.physical_cards))))fail();
+    const serving=targets['4.2'];
+    for(const [gate,profiles,speed,latency] of [
+      ['milestone',serving.datasets,1.1,0.95],['final',serving.final_datasets,2,0.8]
+    ]) {
+      if(!profiles||Object.keys(profiles).length!==fixedProfiles.length)fail();
+      for(const [id] of fixedProfiles) {
+        const arms=pair(id),row=profiles[id];
+        if(!arms||!row||row.execution_complete!==true||typeof row.quality?.met!=='boolean'||arms.some(arm=>arm.failed!==0))fail();
+        const [before,after]=arms;
+        const throughput=after.output_tokens_per_second/before.output_tokens_per_second;
+        const ttft=after.mean_ttft_ms/before.mean_ttft_ms,tpot=after.mean_tpot_ms/before.mean_tpot_ms;
+        if(!close(Number(row.throughput_ratio),throughput)||!close(Number(row.ttft_ratio),ttft)||
+           !close(Number(row.tpot_ratio),tpot)||row.met!==(row.quality.met&&throughput>=speed&&ttft<=latency&&tpot<=latency))fail();
+      }
+      if(serving[gate].met!==Object.values(profiles).some(row=>row.met))fail();
+    }
+
+    const mmlu=pair('mmlu');
+    const supplement=entry.context_tenant_supplement;
+    const tenant=supplement?.comparisons.find(row=>row.B1.tenants===4);
+    if(!mmlu||!tenant||supplement.comparisons.some(row=>!['B0','B1'].every(role=>validPhysicalCards(row[role].physical_cards))))fail();
+    const cost=targets['4.4'],quote=cost.rental_quote;
+    const rate=Number(quote?.cny_per_card_month);
+    if(typeof quote?.provider!=='string'||!quote.provider.trim()||!/^https:\/\/[^\s]+$/.test(quote.url||'')||
+       !/^\d{4}-\d{2}-\d{2}$/.test(quote.checked_date||'')||!Number.isFinite(rate)||rate<=0)fail();
+    function costWorkload(id, observations) {
+      const evidence=cost.formal_cost?.[id];
+      const arms=Object.fromEntries(['B0','B1'].map((role,i)=>{
+        const {metrics,physicalCards,seal}=observations[i];
+        const arm=evidence?.arms?.[role];
+        const util=evidence?.utilization?.[role];
+        const values=physicalCards.map(card=>util?.per_card_percent?.[card]);
+        if(!arm||arm.occupied_cards!==physicalCards.length||!close(Number(arm.window_seconds),metrics.duration_seconds)||
+           arm.successful_output_tokens!==metrics.output_tokens||arm.measurement_seal_sha256!==seal||
+           !values.every(value=>Number.isFinite(value)&&value>=0&&value<=100)||
+           !close(util.mean_percent,values.reduce((sum,value)=>sum+value,0)/physicalCards.length)||
+           util.missing_seconds!==0||!close(util.covered_seconds,metrics.duration_seconds))fail();
+        return [role,{utilization:util.mean_percent,
+          unitCost:1e6*rate*arm.occupied_cards*Number(arm.window_seconds)/(30*86400*arm.successful_output_tokens)}];
+      }));
+      const reduction=100*(1-arms.B1.unitCost/arms.B0.unitCost);
+      if(!close(Number(evidence.reduction_percent),reduction))fail();
+      return {arms,reduction,cards:cardComparison(...observations.map(row=>row.physicalCards))};
+    }
+    const mmluCost=costWorkload('mmlu',mmlu.map(arm=>({metrics:arm,physicalCards:arm.physical_cards,seal:arm.source_seal_sha256})));
+    const tenantCost=costWorkload('four_tenant',['B0','B1'].map(role=>({
+      metrics:tenant[role].metrics,physicalCards:tenant[role].physical_cards,seal:supplement.arm_seals[role]
+    })));
+    const gain=mmluCost.arms.B1.utilization-mmluCost.arms.B0.utilization;
+    const tenantUtilization=tenantCost.arms.B1.utilization;
+    const allTenants=['B0','B1'].every(role=>Object.values(tenant[role].per_tenant).every(metrics=>metrics.successful>0));
+    if(!close(Number(cost.utilization_gain_pp),gain)||!close(Number(cost.four_tenant_ai_core_mean_percent),tenantUtilization)||
+       cost.milestone.met!==(serving.datasets.mmlu.quality.met&&mmluCost.reduction>=10&&gain>=10)||
+       cost.final.met!==(allTenants&&tenantCost.reduction>=30&&tenantUtilization>=80))fail();
+    if(entry.submission_report)await verifiedAsset(entry.submission_report,'html');
+    submissionAssessments.set(entry.id,{targets,quote,rate,mmluCost,tenantCost,gain,tenantUtilization});
+  }
+  function rentalCostDetails(assessment) {
+    const {quote,rate,mmluCost,tenantCost}=assessment;
+    return `<details data-rental-cost><summary>${t('4.4 租金来源与单位成本','4.4 Rental source and unit cost')}</summary>
+      <p><a href="${esc(quote.url)}">${esc(quote.provider)} ↗</a> · ${esc(quote.checked_date)} · ${n(rate)} ${t('元/卡月','CNY/card-month')}</p>
+      <p>${t('两臂按同一公开租金折算。每百万输出词元成本 = 每卡月租 × 占卡数 × 正式区间秒数 × 10⁶ ÷（30 × 86400 × 成功输出词元数）。正式区间包含排空。','Both arms use the same published rental rate. Cost per million output tokens = monthly rent per card × occupied cards × measured seconds × 10⁶ ÷ (30 × 86400 × successful output tokens). The measured interval includes drain.')}</p>
+      ${table(t(['工况','卡号','B0 元/百万词元','B1 元/百万词元','成本降幅','双卡 AI Core 利用率'],['Workload','Cards','B0 CNY/million tokens','B1 CNY/million tokens','Cost reduction','Two-card AI Core utilization']),
+        [['MMLU200',mmluCost],[t('4K 四租户','4K four tenants'),tenantCost]].map(([label,row])=>[
+          label,cardComparisonLabel(row.cards),n(row.arms.B0.unitCost),n(row.arms.B1.unitCost),
+          n(row.reduction)+'%',n(row.arms.B0.utilization)+'% → '+n(row.arms.B1.utilization)+'%'
+        ]))}
+    </details>`;
   }
   function v2Assessment(entry, rows) {
     const status=(met,evidence)=>[met?t('达成目标','Target met'):t('未达成目标','Target not met'),evidence].join(' · ');
     const missing=reason=>status(false,reason);
+    const assessment=submissionAssessments.get(entry.id);
     const source=(anchor,label)=>`<a href="./test-plan.html#${anchor}-${t('zh','en')}">${label} ↗</a>`;
     const certificate=entry.compute_reference?.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'
       ?entry.compute_reference:null;
@@ -913,7 +1036,16 @@
 
     const mmlu=rows.find(row=>row.id==='mmlu')?.arms;
     const b0=mmlu?.B0,b1=mmlu?.B1;
-    const serving=(speed,latency)=>{
+    const serving=(speed,latency,gate)=>{
+      if(assessment) {
+        const result=assessment.targets['4.2'];
+        const profiles=gate==='final'?result.final_datasets:result.datasets;
+        const accepted=fixedProfiles.filter(([id])=>profiles[id].met).map(([id,label])=>{
+          const row=rows.find(profile=>profile.id===id);
+          return row?.crossCard?`${label} (${t('跨卡','cross-card')})`:label;
+        });
+        return status(result[gate].met,accepted.join(' · '));
+      }
       if(!b0||!b1)return missing(t('本版无 MMLU 配对证据','This version lacks a paired MMLU result'));
       const ratio=b1.output_tokens_per_second/b0.output_tokens_per_second;
       const ttft=100*(1-b1.mean_ttft_ms/b0.mean_ttft_ms),tpot=100*(1-b1.mean_tpot_ms/b0.mean_tpot_ms);
@@ -948,9 +1080,13 @@
         `32K max/min · ${tails(final.slice(0,1))} · TTFT ${tails(final.slice(1,3))} · TPOT ${tails(final.slice(3))}`)
       :missing(t('缺本版 32K 五窗口','Five 32K windows for this version are missing'));
     const tenant=context.find(row=>row.B1.tenants===4);
-    const costMilestone=missing((b0&&b1?`MMLU200 · ${t('同费率估算','Equal-rate estimate')} ${n(100*(1-b0.output_tokens_per_second/b1.output_tokens_per_second))}% · `:'')+
+    const costMilestone=assessment
+      ?status(assessment.targets['4.4'].milestone.met,`MMLU200 · ${t('公开租金折算','Published rental rate')} −${n(assessment.mmluCost.reduction)}% · AI Core +${n(assessment.gain)} pp`)
+      :missing((b0&&b1?`MMLU200 · ${t('同费率估算','Equal-rate estimate')} ${n(100*(1-b0.output_tokens_per_second/b1.output_tokens_per_second))}% · `:'')+
       t('待核验实际费用及同区间双卡利用率','Actual charges and matched two-card utilization require verification'));
-    const costFinal=missing((tenant?`${t('同费率估算','Equal-rate estimate')} ${n(tenant.equal_rate_same_card_count_unit_cost_reduction_percent)}% · AI Core ${n(tenant.B1.utilization.mean_percent)}% · `:'')+
+    const costFinal=assessment
+      ?status(assessment.targets['4.4'].final.met,`${t('4K 四租户 · 跨卡对照','4K four tenants · cross-card comparison')} · ${t('公开租金折算','Published rental rate')} −${n(assessment.tenantCost.reduction)}% · AI Core ${n(assessment.tenantUtilization)}%`)
+      :missing((tenant?`${t('同费率估算','Equal-rate estimate')} ${n(tenant.equal_rate_same_card_count_unit_cost_reduction_percent)}% · AI Core ${n(tenant.B1.utilization.mean_percent)}% · `:'')+
       (tenant?t('缺实际费用凭据','Actual charge evidence is missing'):t('缺四租户实测、实际费用与双卡采样','Four-tenant measurements, actual charges and two-card sampling are missing')));
     return `<section class="submission-assessment" id="submission-v2">
       <div class="section-heading"><h2>${t('送测方案 V2 · 本版证据判定','Submission V2 · Evidence for this version')}</h2>
@@ -958,11 +1094,13 @@
       <p>${t('固定 B0 为 vLLM / vLLM-Ascend 0.18.0。判定只使用本版证据；未达成项注明未过门槛或待核验内容。','Submission B0 is fixed to vLLM / vLLM-Ascend 0.18.0. Each judgment uses this version’s evidence and distinguishes a missed threshold from missing evidence.')}</p>
       ${table(t(['指标','里程碑','结题'],['Target','Milestone','Final']),[
         ['4.1 '+names()[0],'≥50% · '+compute(50),'≥90% · '+compute(90)],
-        ['4.2 '+names()[1],'≥1.10× / ≥5% / ≥5% · '+serving(1.1,5),'≥2× / ≥20% / ≥20% · '+serving(2,20)],
+        ['4.2 '+names()[1],'≥1.10× / ≥5% / ≥5% · '+serving(1.1,5,'milestone'),'≥2× / ≥20% / ≥20% · '+serving(2,20,'final')],
         ['4.3 '+names()[2],'≥50% / ≤3× / ≤2× · '+contextMilestone,'≤1.50× / ≤2× / ≤1.25× · '+contextFinal],
         ['4.4 '+names()[3],'≥10% / +10 pp · '+costMilestone,'≥30% / ≥80% · '+costFinal]
       ])}
-      <p class="assessment-sources">${source('compute',t('有效算力','Compute'))} · ${source('performance',t('性能与质量','Performance and quality'))} · ${source('context',t('上下文','Context'))} · ${source('cost',t('实际费用与采样','Actual charges and sampling'))}</p>
+      <p class="assessment-sources">${source('compute',t('有效算力','Compute'))} · ${source('performance',t('性能与质量','Performance and quality'))} · ${source('context',t('上下文','Context'))} · ${source('cost',t('费用折算与采样','Cost accounting and sampling'))}</p>
+      ${assessment?rentalCostDetails(assessment):''}
+      ${assessment?`<p><a href="./${esc(entry.submission_assessment.path)}">${t('本版验收数据','Version-specific acceptance data')} ↗</a>${entry.submission_report?` · <a href="./${esc(entry.submission_report.path)}">${t('完整补测报告','Full supplement report')} ↗</a>`:''}</p>`:''}
     </section>`;
   }
   function versionSupplement(entry, values, control = 'B0') {
@@ -972,8 +1110,10 @@
     if(!a&&observed.length)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>—</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${fixedBaselineContext()}<div class="supplement-plot" style="background:transparent">${table(t(['工况','B1 token/s','B1 TTFT / s','B1 TPOT / ms'],['Scenario','B1 token/s','B1 TTFT / s','B1 TPOT / ms']),observed.map(row=>[row.label,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))}</div></section>`;
     if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${baselineContext}<div class="supplement-plot missing-plot">${t('本版 B1 尚未发布完整补测结果。','Complete supplement results for this B1 are unpublished.')}</div></section>`;
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
-    return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
+    const cards=cardComparison(tenant?.B0.physical_cards,tenant?.B1.physical_cards);
+    return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"${cardComparisonAttribute(cards)}><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · ${esc(t(a.workload_label_zh,a.workload_label_en))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
+      ${cards.cardLabel?`<p>${esc(cardComparisonLabel(cards))}</p>`:''}
       <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant?.equal_rate_same_card_count_unit_cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant?.B0.utilization.mean_percent)} → ${n(tenant?.B1.utilization.mean_percent)}%</strong></div></div>
       <figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(t(a.workload_label_zh,a.workload_label_en))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure></section>`;
   }
@@ -982,7 +1122,7 @@
     const observed=observationRows(entry).filter(row=>row.id.startsWith('continuous-'));
     if(!a&&observed.length)return fixedBaselineContext()+table(t(['工况','请求数','B1 token/s','TTFT P95 / ms','TTFT P99 / ms'],['Scenario','Requests','B1 token/s','TTFT P95 / ms','TTFT P99 / ms']),observed.map(row=>[row.label,row.observation.requests,n(row.observation.output_tokens_per_second),n(row.observation.ttft_p95_ms),n(row.observation.ttft_p99_ms)]));
     if(!a)return /^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():null;
-    const rows=a.comparisons.map(row=>[supplementLabel(a,row),row.B0.metrics.requests+' / '+row.B1.metrics.requests,
+    const rows=a.comparisons.map(row=>[[supplementLabel(a,row),cardComparisonLabel(cardComparison(row.B0.physical_cards,row.B1.physical_cards))].filter(Boolean).join(' · '),row.B0.metrics.requests+' / '+row.B1.metrics.requests,
       n(row.B0.metrics.output_tokens_per_second)+' / '+n(row.B1.metrics.output_tokens_per_second),
       n(row.throughput_ratio)+'×',n(row.B0.metrics.ttft_ms.p99)+' / '+n(row.B1.metrics.ttft_ms.p99),
       n(row.B0.metrics.tpot_ms.p99)+' / '+n(row.B1.metrics.tpot_ms.p99)]);
@@ -999,11 +1139,13 @@
     const rows=entry.measurements.map(row=>{
       const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
-      return {id:row.id,label:row.label,arms,changes_percent};
+      const cards=cardComparison(row.arms[0].physical_cards,row.arms[1].physical_cards);
+      return {id:row.id,label:row.label,arms,changes_percent,...cards,workloadLabel:cardComparisonLabel(cards)};
     });
     rows.push(...versionSupplementRows(entry));
     if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'});
-    return rows.map(row=>entry.id==='r8'&&['4096-formal','16384-formal'].includes(row.id)?{...row,workloadLabel:continuousWorkloadLabel()}:row);
+    return rows.map(row=>['4096-formal','16384-formal'].includes(row.id)&&(entry.id==='r8'||row.cardLabel)
+      ?{...row,workloadLabel:[continuousWorkloadLabel(),row.workloadLabel].filter(Boolean).join(' · ')}:row);
   }
   function r6ArmRows(role) {
     return data.datasets.map(row=>{
@@ -1051,13 +1193,13 @@
   function measurementDetails(entry) {
     const columns=['ttft_p95_ms','ttft_p99_ms','tpot_p95_ms','tpot_p99_ms','end_to_end_p95_ms','end_to_end_p99_ms'];
     const rows=entry.measurements.flatMap(row=>row.arms.map(arm=>[
-      row.label,arm.role,fixedBaseline.model,arm.requests,arm.failed,
+      row.label,arm.role,arm.physical_cards?.join(', ')||'—',fixedBaseline.model,arm.requests,arm.failed,
       n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),
       ...columns.map(key=>n(arm[key])),arm.source_completed_utc||'—',arm.source_seal_sha256||'—'
     ]));
     return {title:t('逐臂数值、尾时延与来源','Per-arm measurements, tails and sources'),body:
       `<p>${t('吞吐为双卡输出总吞吐。MMLU200 按 C200 一批提交，TTFT 从请求发出至首词元，包含等待。4K/16K C8 以固定时间发压并完整排空，两臂完成请求数可不同。','Throughput counts total output on two chips. MMLU200 submits a C200 batch; TTFT includes waiting after dispatch. Fixed-time 4K/16K C8 trials drain all requests, so arm counts may differ.')}</p>
-      ${table([...t(['工况','运行臂','模型','请求','失败'],['Scenario','Arm','Model','Requests','Failures']),
+      ${table([...t(['工况','运行臂','物理卡','模型','请求','失败'],['Scenario','Arm','Physical cards','Model','Requests','Failures']),
         'tok/s','TTFT mean / s','TPOT mean / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT P95 / ms','TPOT P99 / ms','E2E P95 / ms','E2E P99 / ms',
         ...t(['来源完成时间 UTC','原始封存 SHA-256'],['Source completed UTC','Original seal SHA-256'])],rows)}
       <p><a href="./test-plan.html#profiles-${t('zh','en')}">${t('固定样本、并发及输出预算','Fixed samples, concurrency and output budgets')} ↗</a></p>`};
@@ -1134,7 +1276,7 @@
       const measured=rows.filter(row=>Number.isInteger(row.observation?.correct));
       if(measured.length)return {title,body:table(t(['工况','版本','正确 / 总数','长度终止','失败 / 未解析'],['Scenario','Arm','Correct / total','Length stops','Failed / unparsed']),measured.map(row=>[row.label,'B1 '+entry.id+' · '+row.model,`${row.observation.correct}/${row.observation.requests}`,row.observation.truncated,`${row.observation.failed} / ${row.observation.unparsed}`]))};
       const qualityRows=rows.filter(row=>row.arms).flatMap(row=>['B0','B1'].filter(role=>Number.isInteger(row.arms[role].correct)).map(role=>[row.label,role==='B1'?entry.id:roles.B0,`${row.arms[role].correct}/${row.arms[role].requests}`,row.arms[role].truncated,row.arms[role].unresolved??row.arms[role].unparsed??'—']));
-      return {title,body:(entry.quality_note_zh&&!entry.model_integration?`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`:'')+qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止','未判定'],['Scenario','Version','Correct','Length stops','Unresolved']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
+      return {title,body:(entry.quality_note_zh&&(!entry.model_integration||entry.measurements.length)?`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`:'')+qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止','未判定'],['Scenario','Version','Correct','Length stops','Unresolved']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
     }
     const development=entry.development_measurements||[];
     const developmentRows=development.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms)]));
@@ -1421,7 +1563,7 @@
     const scope=attempt?reason:observation?t(`固定 B0 保留原测记录；B1 书生实测：${observation.workloads.map(row=>row.label_zh).join('、')}。模型与工况分别标注。`,`Fixed B0 observations are retained. Current B1 Intern measurements: ${observation.workloads.map(row=>row.label_en).join(', ')}. Models and workloads are labeled separately.`):t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
     const cardNames=sr?names():t(['有效算力下界','最高吞吐比','16K 吞吐比','最高同费率降幅'],['Effective compute bound','Peak throughput ratio','16K throughput ratio','Best equal-rate cost reduction']);
-    const cardScope=[null,peak?.label,context?.label,peak?.label];
+    const cardScope=[null,peak?.label,[context?.label,context?.crossCard?cardComparisonLabel(context):''].filter(Boolean).join(' · '),peak?.label];
     const fixedProfilesComplete=originalRows.filter(row=>fixedProfiles.some(([id])=>id===row.id)&&row.arms).length;
     const coverageNote=!attempt&&!sr&&entry.id!=='r5'?`<p class="release-coverage-summary">${t('固定五项配对','Fixed-profile pairs')} ${fixedProfilesComplete}/5${entry.publication_status==='frozen-candidate'?' · '+t('冻结候选','Frozen candidate'):''}</p>`:'';
     if(entry.id==='r9'){
