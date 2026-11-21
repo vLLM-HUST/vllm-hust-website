@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
 from playwright.sync_api import sync_playwright
@@ -71,7 +72,9 @@ def verify_development_priority(page, releases, baselines):
 
 
 with sync_playwright() as playwright:
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(
+        headless=True, executable_path=os.environ.get("VLLMHUST_BROWSER_EXECUTABLE")
+    )
     for width, scheme in (
         (1366, "light"),
         (1366, "dark"),
@@ -102,7 +105,7 @@ with sync_playwright() as playwright:
             integration = entry.get("model_integration")
             expected_models[entry["id"]] = (
                 read_descriptor(integration["summary"])["candidate"]["model"]
-                if integration
+                if integration and not entry["measurements"]
                 else entry.get("model") or fixed_model
             )
         baselines = page.locator("#comparison-baseline-select option").evaluate_all(
@@ -149,7 +152,7 @@ with sync_playwright() as playwright:
                         '[data-metric="relative_cost_per_token"] .chart-row-heading>span'
                     ).all_text_contents()
                 )
-                if release in ("r9", "r10"):
+                if release in ("r6", "r9", "r10"):
                     assert (
                         expected_models[release]
                         in page.locator("#comparison-lead").inner_text()
@@ -165,6 +168,19 @@ with sync_playwright() as playwright:
                         row["model"] == expected_models[release]
                         for row in payload["rows"]
                     )
+                    if release == "r6":
+                        report = page.request.get(
+                            args.base_url.rstrip("/")
+                            + "/data/five-datasets-r6-20261114/summary-public-v3.json"
+                        ).json()
+                        by_id = {row["id"]: row for row in payload["rows"]}
+                        for source in report["datasets"]:
+                            arm = by_id[source["id"]]["observation"]
+                            assert arm["requests"] == source["arms"]["B1"]["planned"]
+                            assert (
+                                arm["output_tokens_per_second"]
+                                == source["arms"]["B1"]["output_tokens_per_second"]
+                            )
                     assert all(
                         row.get("observation", {}).get("relative_cost_per_token")
                         is None

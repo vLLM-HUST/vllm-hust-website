@@ -265,6 +265,10 @@
     return null;
   }
   function openLinkedDetail() {
+    if(location.hash==='#r8-current-continuous'){
+      root.querySelector('#r8-current-continuous')?.scrollIntoView();
+      return;
+    }
     let key=linkedDetailKey(location.hash);
     if(key==='compute'&&selectedRelease==='r6')key='goal-3.4.1';
     if(!key||root.getAttribute('aria-busy')==='true')return;
@@ -306,15 +310,19 @@
   let selectableIds = [...releaseIds,...attemptIds,...srIds];
   const controllerId = 'sr5';
   const validRelease = id => /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(id||'');
-  const requestedRelease = new URL(location.href).searchParams.get('release');
+  const releaseFromLocation=()=>new URL(location.href).searchParams.get('release')||
+    (location.hash==='#r8-current-continuous'?'r8':null);
+  const requestedRelease = releaseFromLocation();
   let selectedRelease = validRelease(requestedRelease) ? requestedRelease : null;
   let selectedBaseline = new URL(location.href).searchParams.get('b0') || 'original018-cann8.5.1';
+  let baselineFallback = false;
   let comparisonBaselines = [];
   const baselineObservations = new Map();
   const originalBaselineSelected = () => selectedBaseline === 'original018-cann8.5.1';
   const developmentRelease = () => srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial);
   const developmentComparison = () => originalBaselineSelected()&&!new URL(location.href).searchParams.has('b0')&&new URL(location.href).searchParams.get('comparison')==='development'&&developmentRelease();
   let releaseCatalog = null;
+  let releasePublication = null;
   let fixedBaseline = null;
   let catalogRequest = null;
   let releaseRequest = 0;
@@ -428,7 +436,6 @@
           else if(['partial','published'].includes(item.status))throw Error('Missing B0 observations');
         }
       }
-      if(!baselineIds.has(selectedBaseline))throw Error('Unknown B0 version');
       for (const id of value.order) {
         const matches = value.entries.filter(row=>row.id===id);
         if(matches.length!==1) throw Error('Ambiguous release identity');
@@ -452,6 +459,7 @@
       }
       releaseIds=[...value.order];attemptIds=[...value.attempt_order];selectableIds=[...releaseIds,...attemptIds,...srIds];
       releaseCatalog=value;
+      releasePublication=publication;
     })();
     try { await catalogRequest; } finally { catalogRequest=null; }
   }
@@ -539,7 +547,7 @@
       ${table(t(['工况','版本','token/s','TTFT / s','TPOT / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT P95 / ms','TPOT P99 / ms'],['Workload','Version','token/s','TTFT / s','TPOT / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT P95 / ms','TPOT P99 / ms']),metrics)}
       ${table(t(['工况','吞吐变化','平均TTFT变化','平均TPOT变化'],['Workload','Throughput change','Mean TTFT change','Mean TPOT change']),changes)}
       <p>MMLU200 · ${result.quality.correct}/${result.quality.requests} ${t('正确','correct')} · ${t('长度终止','Length stops')} ${result.quality.truncated} · ${t('失败 / 未解析','Failed / unparsed')} ${result.quality.failed} / ${result.quality.unparsed}</p>
-      <p>${esc(t(result.tradeoffs_zh,result.tradeoffs_en))}</p><p>${esc(t(entry.method_zh,entry.method_en))}</p>
+      <p>${esc(t(result.tradeoffs_zh,result.tradeoffs_en))}</p>
       <figure class="comparison-source-plot"><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('开发对照实测图，可横向滚动','Development comparison measurements; scroll horizontally')}"><img src="./${esc(entry.model_integration.chart.path)}" alt="${t('书生与已发布Qwen R8的开发性能对照，不属于正式B0/B1结果','Intern versus published Qwen R8 development comparison, not formal B0/B1 results')}"></div></figure>
       <p><a href="./${esc(entry.model_integration.summary.path)}">${t('已上传实测汇总','Uploaded measurement summary')} ↗</a> · <a href="${esc(entry.release_url)}">${t('发行包、原始记录与复算脚本','Release, original records and recomputation scripts')} ↗</a></p></div>`};
   }
@@ -703,17 +711,18 @@
         <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
           option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
       </select>
-      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
-      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
+      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<label for="comparison-baseline-select">${t('基线与扩展对照','Baseline and additional controls')}</label>
+      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${item.id===releaseCatalog?.baseline.id?t('送测 B0 · ','Submission B0 · '):t('扩展 · ','Additional · ')}${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
       <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
-      ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
+      ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:developmentRelease()&&!developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}&amp;comparison=development">${t('查看本版专项配对','View this release’s development pair')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
-    </div>`;
+    </div>${baselineFallback?`<p class="baseline-fallback" role="status">${t('链接中的基线版本无效，已显示固定送测 B0。','The baseline in the link is unknown. Showing the fixed submission B0.')}</p>`:''}`;
   }
   function bindMenu() {
     root.querySelector('#comparison-baseline-select')?.addEventListener('change',event=>{
       selectedBaseline=event.target.value;
+      baselineFallback=false;
       const url=new URL(location.href);url.searchParams.set('b0',selectedBaseline);url.searchParams.delete('comparison');history.replaceState(null,'',url);
       showRelease();
     });
@@ -737,7 +746,8 @@
     return `<section class="dataset-coverage" aria-labelledby="dataset-coverage-title"><div class="section-heading"><h2 id="dataset-coverage-title">${t('固定五项数据集','Five fixed profiles')}</h2></div><div class="dataset-coverage-grid">${fixedProfiles.map(([id,label])=>{
       const row=rows.find(row=>row.id===id),available=!!row?.arms;
       const status=row?.baselineObservation?(row.observation?t('B0 已测 · B1 已测（分别列示）','B0 measured · B1 measured (separate)'):t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished')):row?.observation?t('B1单臂实测','B1 single-arm measurement'):available?(referenceLabel?t(`实测；参考 ${referenceLabel}`,`Measured; reference ${referenceLabel}`):row.crossCard?t('已发布跨卡对照','Published cross-card comparison'):t('已发布配对','Published pair')):(qualityOnly&&id==='mmlu'?t('仅质量记录','Quality record only'):t('缺少配对数据','Paired data missing'));
-      return `<article data-dataset="${id}" data-available="${available}" data-b0-available="${!!(row?.arms?.B0||row?.baselineObservation)}" data-b1-available="${!!(row?.arms?.B1||row?.observation)}"><strong>${label}</strong><span>${status}</span></article>`;
+      const taskScope=id==='swe'?t('32 任务 / 64 请求','32 tasks / 64 requests'):id==='terminal'?t('32 任务 / 48 请求','32 tasks / 48 requests'):'';
+      return `<article data-dataset="${id}" data-available="${available}" data-b0-available="${!!(row?.arms?.B0||row?.baselineObservation)}" data-b1-available="${!!(row?.arms?.B1||row?.observation)}"><strong>${label}</strong><span>${status}</span>${taskScope?`<small>${taskScope}</small>`:''}${row?.coverageNote?`<small>${esc(row.coverageNote)}</small>`:''}</article>`;
     }).join('')}</div></section>`;
   }
   async function validateVersionSupplement(entry, publication) {
@@ -848,11 +858,78 @@
               workloadLabel:t(a.workload_label_zh,a.workload_label_en)};
     });
   }
+  function v2Assessment(entry, rows) {
+    const status=(met,evidence)=>[met?t('达成目标','Target met'):t('未达成目标','Target not met'),evidence].join(' · ');
+    const missing=reason=>status(false,reason);
+    const source=(anchor,label)=>`<a href="./test-plan.html#${anchor}-${t('zh','en')}">${label} ↗</a>`;
+    const certificate=entry.compute_reference?.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'
+      ?entry.compute_reference:null;
+    const compute=target=>certificate
+      ?status(Number(certificate.arms.B1.efficiency_lower_percent)>=target,
+        'η ≥ '+computeBound(certificate.arms.B1.efficiency_lower_percent)+'%')
+      :missing(t('待本版 MMLU200 / 256 输出预算三轮必要算量与同步计时核验',
+        'This version needs verified work and synchronized timing for three MMLU200 / out256 runs'));
+
+    const mmlu=rows.find(row=>row.id==='mmlu')?.arms;
+    const b0=mmlu?.B0,b1=mmlu?.B1;
+    const serving=(speed,latency)=>{
+      if(!b0||!b1)return missing(t('本版无 MMLU 配对证据','This version lacks a paired MMLU result'));
+      const ratio=b1.output_tokens_per_second/b0.output_tokens_per_second;
+      const ttft=100*(1-b1.mean_ttft_ms/b0.mean_ttft_ms),tpot=100*(1-b1.mean_tpot_ms/b0.mean_tpot_ms);
+      const score=[b0,b1].map(arm=>Number.isInteger(arm.correct)?arm.correct+'/'+arm.requests:'—').join(' → ');
+      const values=`MMLU200 · ${n(ratio)}× · TTFT −${n(ttft)}% · TPOT −${n(tpot)}% · ${score}`.replaceAll('−-','+');
+      const numericPass=ratio>=speed&&ttft>=latency&&tpot>=latency;
+      return missing(values+' · '+(numericPass
+        ?t('达到该场景性能门槛，待核对 V2 质量与服务验收条件','Performance thresholds met; V2 quality and service acceptance must be verified')
+        :t('该场景未同时达到三项性能门槛','This scenario misses at least one performance threshold')));
+    };
+
+    const context=entry.context_tenant_supplement?.comparisons||[];
+    const find=phase=>context.find(row=>row.phase===phase)?.B1;
+    const short=find('4096-formal'),medium=find('16384-formal'),long=find('32768-formal');
+    const measures=m=>[m.output_tokens_per_second,m.ttft_ms.p95,m.ttft_ms.p99,m.tpot_ms.p95,m.tpot_ms.p99];
+    const within=(values,limits)=>values.every((value,i)=>Number.isFinite(value)&&value>0&&value<=limits[i]);
+    const tails=values=>values.map(value=>n(value)+'×').join(' / ');
+    const milestone=short&&medium?measures(medium.metrics).map((v,i)=>v/measures(short.metrics)[i]):null;
+    const final=long?.windows.length===5?measures(long.metrics).map((_,i)=>{
+      const values=long.windows.map(w=>measures(w.metrics)[i]);
+      return Math.max(...values)/Math.min(...values);
+    }):null;
+    const healthy=(...phases)=>phases.every(phase=>phase?.status==='completed'&&phase.metrics.failed===0&&
+      phase.metrics.requests===phase.metrics.successful&&phase.windows.length===5&&
+      phase.windows.every(w=>w.metrics.requests>0&&w.metrics.failed===0&&w.metrics.requests===w.metrics.successful));
+    const contextMilestone=milestone
+      ?status(healthy(short,medium)&&milestone[0]>=0.5&&within(milestone.slice(1),[3,3,2,2]),
+        `16K / 4K ${n(100*milestone[0])}% · TTFT ${tails(milestone.slice(1,3))} · TPOT ${tails(milestone.slice(3))}`)
+      :missing(t('缺本版 4K 和 16K 专项及尾时延，C8 附加压测另列','Matching 4K and 16K specialist runs and tail latencies are missing; C8 load tests are separate'));
+    const contextFinal=final
+      ?status(healthy(long)&&within(final,[1.5,2,2,1.25,1.25]),
+        `32K max/min · ${tails(final.slice(0,1))} · TTFT ${tails(final.slice(1,3))} · TPOT ${tails(final.slice(3))}`)
+      :missing(t('缺本版 32K 五窗口','Five 32K windows for this version are missing'));
+    const tenant=context.find(row=>row.B1.tenants===4);
+    const costMilestone=missing((b0&&b1?`MMLU200 · ${t('同费率估算','Equal-rate estimate')} ${n(100*(1-b0.output_tokens_per_second/b1.output_tokens_per_second))}% · `:'')+
+      t('待核验实际费用及同区间双卡利用率','Actual charges and matched two-card utilization require verification'));
+    const costFinal=missing((tenant?`${t('同费率估算','Equal-rate estimate')} ${n(tenant.equal_rate_same_card_count_unit_cost_reduction_percent)}% · AI Core ${n(tenant.B1.utilization.mean_percent)}% · `:'')+
+      (tenant?t('缺实际费用凭据','Actual charge evidence is missing'):t('缺四租户实测、实际费用与双卡采样','Four-tenant measurements, actual charges and two-card sampling are missing')));
+    return `<section class="submission-assessment" id="submission-v2">
+      <div class="section-heading"><h2>${t('送测方案 V2 · 本版证据判定','Submission V2 · Evidence for this version')}</h2>
+        <a href="./test-plan.html#targets-${t('zh','en')}">${t('完整判据','Full criteria')} ↗</a></div>
+      <p>${t('固定 B0 为 vLLM / vLLM-Ascend 0.18.0。判定只使用本版证据；未达成项注明未过门槛或待核验内容。','Submission B0 is fixed to vLLM / vLLM-Ascend 0.18.0. Each judgment uses this version’s evidence and distinguishes a missed threshold from missing evidence.')}</p>
+      ${table(t(['指标','里程碑','结题'],['Target','Milestone','Final']),[
+        ['4.1 '+names()[0],'≥50% · '+compute(50),'≥90% · '+compute(90)],
+        ['4.2 '+names()[1],'≥1.10× / ≥5% / ≥5% · '+serving(1.1,5),'≥2× / ≥20% / ≥20% · '+serving(2,20)],
+        ['4.3 '+names()[2],'≥50% / ≤3× / ≤2× · '+contextMilestone,'≤1.50× / ≤2× / ≤1.25× · '+contextFinal],
+        ['4.4 '+names()[3],'≥10% / +10 pp · '+costMilestone,'≥30% / ≥80% · '+costFinal]
+      ])}
+      <p class="assessment-sources">${source('compute',t('有效算力','Compute'))} · ${source('performance',t('性能与质量','Performance and quality'))} · ${source('context',t('上下文','Context'))} · ${source('cost',t('实际费用与采样','Actual charges and sampling'))}</p>
+    </section>`;
+  }
   function versionSupplement(entry, values, control = 'B0') {
     const a=entry.context_tenant_supplement;
     const observed=observationRows(entry).filter(row=>row.id.startsWith('continuous-'));
+    const baselineContext=control==='B0'&&/^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():'';
     if(!a&&observed.length)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t('16K相对B0吞吐','16K throughput vs B0')}</span><strong>—</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${fixedBaselineContext()}<div class="supplement-plot" style="background:transparent">${table(t(['工况','B1 token/s','B1 TTFT / s','B1 TPOT / ms'],['Scenario','B1 token/s','B1 TTFT / s','B1 TPOT / ms']),observed.map(row=>[row.label,n(row.observation.output_tokens_per_second),n(row.observation.mean_ttft_ms/1000),n(row.observation.mean_tpot_ms)]))}</div></section>`;
-    if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${/^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():''}<div class="supplement-plot missing-plot">${t('本版 B1 尚未发布完整补测结果。','Complete supplement results for this B1 are unpublished.')}</div></section>`;
+    if(!a)return `<section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div><div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>—</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>—</strong></div></div>${baselineContext}<div class="supplement-plot missing-plot">${t('本版 B1 尚未发布完整补测结果。','Complete supplement results for this B1 are unpublished.')}</div></section>`;
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · ${esc(t(a.workload_label_zh,a.workload_label_en))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
@@ -887,6 +964,19 @@
     if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'});
     return rows.map(row=>entry.id==='r8'&&['4096-formal','16384-formal'].includes(row.id)?{...row,workloadLabel:continuousWorkloadLabel()}:row);
   }
+  function r6ArmRows(role) {
+    return data.datasets.map(row=>{
+      const arm=row.arms[role], quality=row.quality?.[role];
+      const tracks=Object.values(quality?.tracks||{});
+      const sum=key=>tracks.length&&tracks.every(track=>Number.isInteger(track[key]))
+        ?tracks.reduce((total,track)=>total+track[key],0):undefined;
+      return {id:row.id,label:row.title,model:data.hardware.model,observation:{
+        ...arm,requests:arm.planned,correct:quality?.correct??sum('successes'),
+        truncated:quality?.truncated_recorded??sum('solver_truncated'),
+        unresolved:quality?.unparsed_recorded??sum('unresolved')??sum('judge_unresolved')
+      }};
+    });
+  }
   function assertFormalBaselineIsolation(entry, rows) {
     if(entry.baseline_id!==releaseCatalog.baseline.id)throw Error('Formal comparison lost fixed B0 identity');
     const ids=[...entry.measurements.map(row=>row.id),
@@ -907,8 +997,83 @@
 
   }
   const versionRecordLabel = entry => entry.release_url.includes('/releases/tag/') ? `${entry.id} Release` : t(`${entry.id} 版本记录`,`${entry.id} version record`);
+  function pinnedSource(url) {
+    const prefix='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/';
+    return url.startsWith(prefix)?url.replace('/blob/main/','/blob/'+releasePublication.commit+'/'):url;
+  }
+  function sourceLabel(url) {
+    if(url.includes('/r10-native-rms-'))return url.endsWith('summary.json')
+      ?t('原生 RMS 修订汇总','Native RMS revision summary'):t('原生 RMS 修订报告','Native RMS revision report');
+    if(url.includes('/r10-fixed-five-'))return t('原始 r10 五项及 C8 汇总','Original r10 fixed-five and C8 summary');
+    return url.split('/').at(-1);
+  }
+  function measurementDetails(entry) {
+    const columns=['ttft_p95_ms','ttft_p99_ms','tpot_p95_ms','tpot_p99_ms','end_to_end_p95_ms','end_to_end_p99_ms'];
+    const rows=entry.measurements.flatMap(row=>row.arms.map(arm=>[
+      row.label,arm.role,fixedBaseline.model,arm.requests,arm.failed,
+      n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),
+      ...columns.map(key=>n(arm[key])),arm.source_completed_utc||'—',arm.source_seal_sha256||'—'
+    ]));
+    return {title:t('逐臂数值、尾时延与来源','Per-arm measurements, tails and sources'),body:
+      `<p>${t('吞吐为双卡输出总吞吐。MMLU200 按 C200 一批提交，TTFT 从请求发出至首词元，包含等待。4K/16K C8 以固定时间发压并完整排空，两臂完成请求数可不同。','Throughput counts total output on two chips. MMLU200 submits a C200 batch; TTFT includes waiting after dispatch. Fixed-time 4K/16K C8 trials drain all requests, so arm counts may differ.')}</p>
+      ${table([...t(['工况','运行臂','模型','请求','失败'],['Scenario','Arm','Model','Requests','Failures']),
+        'tok/s','TTFT mean / s','TPOT mean / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT P95 / ms','TPOT P99 / ms','E2E P95 / ms','E2E P99 / ms',
+        ...t(['来源完成时间 UTC','原始封存 SHA-256'],['Source completed UTC','Original seal SHA-256'])],rows)}
+      <p><a href="./test-plan.html#profiles-${t('zh','en')}">${t('固定样本、并发及输出预算','Fixed samples, concurrency and output budgets')} ↗</a></p>`};
+  }
+  const rmsReport='reports/r10-native-rms-20261121/';
+  const rmsDescriptor=(entry,file)=>entry.sources.find(source=>source.url.endsWith('/'+rmsReport+file));
+  function rmsRevisionPanel(entry) {
+    const source=rmsDescriptor(entry,'README.md');
+    if(!source||!rmsDescriptor(entry,'summary.json'))return '';
+    return `<details class="comparison-revision" id="rms-revision"><summary>${t('r10 原生 RMS 修订 · 独立四项实测','r10 native RMS revision · four separate measurements')}</summary>
+      <p>${t('修订版复查 HLE、FrontierScience、4K/C8 和 16K/C8，HLE 与 Frontier 使用修订版共同裁判。MMLU、SWE 与 Terminal 的五项表成绩来自原始 r10。连续写回证据为组件实验。','The revision tested HLE, FrontierScience, 4K/C8 and 16K/C8. HLE and Frontier use the revised common judge. MMLU, SWE and Terminal entries in the main table come from original r10. Contiguous restore evidence is component-level.')}</p>
+      <p><a href="${esc(pinnedSource(source.url))}">${t('修订报告、组件证据与复算数据','Revision report, component evidence and recomputation data')} ↗</a></p>
+      <div class="rms-revision-metrics" aria-live="polite"></div>
+    </details>`;
+  }
+  async function fetchRmsRevision(entry) {
+    const descriptor=rmsDescriptor(entry,'summary.json');
+    const url='https://raw.githubusercontent.com/'+releasePublication.repository+'/'+releasePublication.commit+'/'+rmsReport+'summary.json';
+    const response=await fetch(url,{signal:AbortSignal.timeout(12000)});
+    if(!response.ok)throw Error('Revision source unavailable');
+    const raw=await response.arrayBuffer();
+    const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(raw.byteLength!==descriptor.bytes||digest!==descriptor.sha256)throw Error('Revision checksum mismatch');
+    const report=JSON.parse(new TextDecoder().decode(raw));
+    if(report.schema!=='vllm-hust-r10-native-rms-evidence/v1'||report.original_release!==entry.release||
+       report.baseline_id!==releaseCatalog.baseline.id)throw Error('Revision identity mismatch');
+    return report;
+  }
+  function bindRmsRevision(entry) {
+    const disclosure=root.querySelector('#rms-revision');
+    const panel=disclosure.querySelector('.rms-revision-metrics');
+    disclosure.addEventListener('toggle',async()=>{
+      if(!disclosure.open||panel.dataset.state==='loaded'||panel.dataset.state==='loading')return;
+      panel.dataset.state='loading';
+      panel.textContent=t('正在校验修订版实测…','Verifying revision measurements…');
+      try{
+        const report=await fetchRmsRevision(entry);
+        const profiles=[['HLE200',report.priority_pair.scope.hle],['Frontier160',report.priority_pair.scope.frontier],
+          ['4K / C8',report.C8['4096-formal']],['16K / C8',report.C8['16384-formal']]];
+        const labels={B0:t('固定 B0（修订版裁判）','Fixed B0 (revised judge)'),r10_original:t('原始 r10','Original r10'),r10_corrected:t('原生 RMS 修订','Native RMS revision')};
+        panel.innerHTML=table(t(['工况','运行臂','请求','正确','未决','tok/s','TTFT P95/P99 · ms','E2E P95/P99 · ms'],
+          ['Scenario','Arm','Requests','Correct','Unresolved','tok/s','TTFT P95/P99 · ms','E2E P95/P99 · ms']),
+          profiles.flatMap(([label,arms])=>Object.entries(labels).map(([role,name])=>{
+            const arm=arms[role];
+            return [label,role==='B0'&&!Number.isInteger(arm.correct)?'B0':name,arm.requests,arm.correct??'—',arm.unresolved??'—',
+              n(arm.output_tokens_per_second),n(arm.ttft_p95_ms)+' / '+n(arm.ttft_p99_ms),n(arm.end_to_end_p95_ms)+' / '+n(arm.end_to_end_p99_ms)];
+          })))+`<p>${t('修订版优先发布验收','Revision promotion gate')} · ${report.priority_pair.gate_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`;
+        panel.dataset.state='loaded';
+      }catch{
+        panel.dataset.state='unavailable';
+        panel.textContent=t('网页暂时无法读取或核验汇总，可打开上方固定版本报告。','This page could not verify the summary. Open the pinned revision report above.');
+      }
+    });
+  }
   function versionDetails(entry, rows, key, attempt) {
     if(key==='development')return modelIntegrationDetails(entry);
+    if(key==='arm-metrics')return measurementDetails(entry);
     const roles=comparisonRoles(entry);
     const title={compute:t('有效算力参考','Compute reference'),configuration:t('冻结配置与MOD','Configuration and MODs'),methods:t('计算公式与比较方式','Formulas and comparison'),metrics:t('完整数值','Complete metrics'),quality:t('质量与评分明细','Quality and grading'),evidence:t('原始证据','Original evidence'),supplement:t('上下文与四租户补测','Context and four-tenant supplement')}[key];
     if(attempt)return {title,body:`<p>${esc(t(entry.reason_zh,entry.reason_en))}</p><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号；本次未形成完整配对报告。','r1–r3 identify attempts preceding frozen r4; this attempt did not produce a complete paired report.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><code>${esc(entry.source.sha256)}</code>`};
@@ -927,15 +1092,15 @@
       const qualityView=quality?`<p class="historical-quality">MMLU200 · ${quality.correct}/${quality.requests} ${t('正确','correct')} · ${t('原开发筛选线','Original development screen')} ${quality.historical_screen_minimum}/${quality.requests} · ${quality.historical_screen_passed?t('通过','Passed'):t('未通过','Not passed')}</p>`:'';
       const measured=rows.filter(row=>Number.isInteger(row.observation?.correct));
       if(measured.length)return {title,body:table(t(['工况','版本','正确 / 总数','长度终止','失败 / 未解析'],['Scenario','Arm','Correct / total','Length stops','Failed / unparsed']),measured.map(row=>[row.label,'B1 '+entry.id+' · '+row.model,`${row.observation.correct}/${row.observation.requests}`,row.observation.truncated,`${row.observation.failed} / ${row.observation.unparsed}`]))};
-      const qualityRows=rows.filter(row=>row.arms).flatMap(row=>['B0','B1'].filter(role=>Number.isInteger(row.arms[role].correct)).map(role=>[row.label,role==='B1'?entry.id:roles.B0,`${row.arms[role].correct}/${row.arms[role].requests}`,row.arms[role].truncated]));
-      return {title,body:(entry.quality_note_zh&&!entry.model_integration?`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`:'')+qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止'],['Scenario','Version','Correct','Length stops']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
+      const qualityRows=rows.filter(row=>row.arms).flatMap(row=>['B0','B1'].filter(role=>Number.isInteger(row.arms[role].correct)).map(role=>[row.label,role==='B1'?entry.id:roles.B0,`${row.arms[role].correct}/${row.arms[role].requests}`,row.arms[role].truncated,row.arms[role].unresolved??row.arms[role].unparsed??'—']));
+      return {title,body:(entry.quality_note_zh&&!entry.model_integration?`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`:'')+qualityView+(qualityRows.length?table(t(['场景','版本','正确','长度终止','未判定'],['Scenario','Version','Correct','Length stops','Unresolved']),qualityRows):`<p>${t('本页已发布场景没有配对质量成绩。','The published scenarios have no paired quality scores.')}</p>`)};
     }
     const development=entry.development_measurements||[];
     const developmentRows=development.flatMap(row=>row.arms.map(arm=>[row.label,arm.role,n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms)]));
     const measuredTails=entry.measurements.flatMap(row=>row.arms.filter(arm=>Number.isFinite(arm.ttft_p95_ms)).map(arm=>[row.label,arm.role,n(arm.ttft_p95_ms),n(arm.ttft_p99_ms)]));
     const tails=measuredTails;
     const baselineEvidence=fixedBaseline?`<h3>${t('固定 B0 原始记录','Fixed B0 original observations')}</h3><p>${esc(fixedBaseline.model)} · ${t('来源报告完成时间','Source report completed')} ${esc(fixedBaseline.source_report_completed_utc)} · <a href="./${esc(releaseCatalog.baseline.observations.path)}">${t('五项原值、原始算力分母与逐臂封存来源','Five original profiles, compute denominator and arm seals')}</a></p>`:'';
-    return {title,body:`${baselineEvidence}<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${versionRecordLabel(entry)} ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map((source,i)=>` · <a href="${esc(source.url)}">${t('原件','Source')} ${i+1} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
+    return {title,body:`${baselineEvidence}<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p>${esc(t(entry.method_zh||'',entry.method_en||''))}</p>${tails.length?table(t(['场景','版本','P95 TTFT / ms','P99 TTFT / ms'],['Scenario','Version','P95 TTFT / ms','P99 TTFT / ms']),tails):''}${developmentRows.length?`<h3>${t('开发对照 · B1 r6 → B1 r7','Development comparison · B1 r6 → B1 r7')}</h3>${table(t(['场景','版本','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms'],['Scenario','Version','token/s','TTFT / s','TPOT / ms','P95 TTFT / ms']),developmentRows)}`:''}<p><a href="${esc(entry.release_url)}">${versionRecordLabel(entry)} ↗</a> · <a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>${entry.sources.map(source=>` · <a href="${esc(pinnedSource(source.url))}">${esc(sourceLabel(source.url))} ↗</a>`).join('')}${entry.model_integration?` · <a data-development-evidence href="${esc(entry.release_url)}">${t('模型集成开发记录','Model integration development records')} ↗</a>`:''}</p>${entry.id==='r8'?r8Details('evidence').body:''}`};
   }
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
@@ -1180,7 +1345,9 @@
     const originalRows=standardRows(attempt?[]:sr?srRows(entry):versionRows(entry),missingNote);
     const rows=attempt||sr?originalRows:withFixedBaseline(originalRows),available=rows.filter(row=>row.arms);
     if(!attempt&&!sr)assertFormalBaselineIsolation(entry,rows);
-    const throughput=available.length?Math.max(...available.filter(row=>!row.crossCard).map(row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second)):null;
+    const ratio=row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second;
+    const peak=available.filter(row=>!row.crossCard).reduce((best,row)=>!best||ratio(row)>ratio(best)?row:best,null);
+    const throughput=peak?ratio(peak):null;
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id)||row.contextBand==='16k');
     const reference=sr?null:entry.compute_reference;
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
@@ -1193,7 +1360,36 @@
     const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
     const scope=attempt?reason:observation?t(`固定 B0 保留原测记录；B1 书生实测：${observation.workloads.map(row=>row.label_zh).join('、')}。模型与工况分别标注。`,`Fixed B0 observations are retained. Current B1 Intern measurements: ${observation.workloads.map(row=>row.label_en).join(', ')}. Models and workloads are labeled separately.`):t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
+    const cardNames=sr?names():t(['有效算力下界','最高吞吐比','16K 吞吐比','最高同费率降幅'],['Effective compute bound','Peak throughput ratio','16K throughput ratio','Best equal-rate cost reduction']);
+    const cardScope=[null,peak?.label,context?.label,peak?.label];
+    const fixedProfilesComplete=originalRows.filter(row=>fixedProfiles.some(([id])=>id===row.id)&&row.arms).length;
+    const coverageNote=!attempt&&!sr&&entry.id!=='r5'?`<p class="release-coverage-summary">${t('固定五项配对','Fixed-profile pairs')} ${fixedProfilesComplete}/5${entry.publication_status==='frozen-candidate'?' · '+t('冻结候选','Frozen candidate'):''}</p>`:'';
+    if(entry.id==='r9'){
+      for(const row of rows.filter(r=>fixedProfiles.some(([id])=>id===r.id)&&!r.arms&&!r.observation)){
+        row.coverageNote=row.id==='hle'?t('原轮启动失败；完整续跑结果待发布','Original startup failed; completed continuation pending publication')
+          :t('原轮未执行；待发布续跑结果','Skipped in the original run; continuation pending publication');
+      }
+    }
     root.innerHTML=`<section class="comparison-dashboard"${sr?' data-comparison="sr"':''}>${releaseMenu()}<div class="comparison-meta"><span>${esc(entry.id+' · '+scope)}</span></div><div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${i===3?costNote:notes[i]}</small>${i===0&&reference?`<small>${t('里程碑50%','50% milestone')}：${reference.milestone_met?t('达成目标','Target met'):t('未达成目标','Target not met')}<br>${t('最终90%','90% final')}：${reference.final_numeric_met?t('达成目标','Target met'):t('未达成目标','Target not met')}</small>`:''}</article>`).join('')}</div>${config}${coverageView(rows,!!entry.quality)}<section ${entry.id==='r8'?'id="r8-current-continuous"':''}><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${t(`配对条形按 ${roles.B0} = 1 归一；独立记录按原值显示，模型和工况见详情。`,`Paired bars normalize ${roles.B0} to 1; independent records show raw values. Models and workloads are in details.`)}</p><div class="metric-grid">${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),`${roles.B0} = 1`,1,rows,rows.map(row=>row.label),roles)}</div></section>${versionSupplement(entry,values,roles.B0)}<div class="detail-actions">${[...(!sr?[['compute',t('有效算力参考','Compute reference')]]:[]),...(modelIntegrationResults.has(entry.id)?[['development',t('书生适配开发对照（非正式基线）','Intern adaptation development comparison (not the formal baseline)')]]:[]),['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button"${key==='development'?' id="development-comparison"':''} data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog()}</section>`;
+    const overview=root.querySelector('.goal-grid');
+    if(coverageNote)overview.insertAdjacentHTML('beforebegin',coverageNote);
+    overview.querySelectorAll('.result-card').forEach((card,i)=>{
+      card.firstElementChild.textContent=cardNames[i];
+      const label=cardScope[i];
+      if(label)card.querySelector('small').textContent=label+' · '+card.querySelector('small').textContent;
+    });
+    if(!attempt&&!sr){
+      root.querySelector('.dataset-coverage').insertAdjacentHTML('afterend',v2Assessment(entry,rows));
+      if(entry.measurements.length){
+        root.querySelector('[data-detail="metrics"]').insertAdjacentHTML('afterend',
+          `<button type="button" data-detail="arm-metrics">${t('逐臂数值与尾时延','Per-arm metrics and tails')} ↗</button>`);
+      }
+      const revision=rmsRevisionPanel(entry);
+      if(revision){
+        root.querySelector('#context-tenant-supplement').insertAdjacentHTML('afterend',revision);
+        bindRmsRevision(entry);
+      }
+    }
     if(observation)root.querySelector('.runtime-pair>div:last-child span').textContent+=' · '+observation.candidate.model;
     if(sr){
       const control=root.querySelector('.runtime-pair>div:first-child');
@@ -1226,13 +1422,13 @@
     const entry=releaseEntry()||releaseCatalog.attempts.find(item=>item.id===selectedRelease)||srEntries?.find(item=>item.id===selectedRelease)||{id:selectedRelease,mods:[],measurements:[],release_url:'./report-history.html'};
     const observed=originalBaselineSelected()?{...fixedBaseline,runtime:fixedBaseline.baseline,hardware:{chip_model:fixedBaseline.chip_model,driver_version:fixedBaseline.driver_version??null},profiles:[...fixedBaseline.profiles,...fixedBaseline.context.observations.map(row=>({id:'real-context-'+row.phase,label:row.phase,arm:{...row.B0.metrics,mean_ttft_ms:row.B0.metrics.ttft_ms.mean,mean_tpot_ms:row.B0.metrics.tpot_ms.mean}}))]}:baselineObservations.get(baseline.id);
     const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
-    const candidateModel=modelIntegrationResults.get(entry.id)?.candidate.model||(typeof entry.model==='string'?entry.model:fixedBaseline.model);
+    const candidateModel=(entry.id==='r6'?data.hardware.model:entry.model)||fixedBaseline.model;
     const controllerRows=selectedRelease===controllerId&&controllerSpecial?controllerSpecial.entry.profiles.map(row=>({id:row.id,observation:row.status==='complete'?{output_tokens_per_second:row.controller.output_tokens_per_second,mean_ttft_ms:1000*row.controller.time_to_first_content_seconds.mean,mean_tpot_ms:controllerSpecial.latency?.fixed_profiles_client.controller[row.id]?.mean_tpot_ms}:undefined})):null;
     if(controllerRows){const arm=controllerSpecial.entry.result.request_throttling_controller,latency=controllerSpecial.latency?.multi_turn_engine.controller;controllerRows.push({id:'swe-smith-trajectory',label:'SWE Trace Heavy Load',observation:{output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,mean_ttft_ms:latency?.mean_ttft_ms,mean_tpot_ms:latency?.mean_tpot_ms}});}
-    const sourceRows=controllerRows|| (attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry));
+    const sourceRows=controllerRows||(entry.id==='r6'?r6ArmRows('B1'):attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry));
     const allRows=[...sourceRows];
     for(const row of observed?.profiles||[])if(!allRows.some(item=>item.id===row.id))allRows.push({id:row.id,label:row.label||row.id});
-    const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:candidateModel,
+    const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:row.model||candidateModel,
       observation:(row.arms?.B1||row.observation)?{...(row.arms?.B1||row.observation),relative_cost_per_token:null}:undefined,missingReason:reason,
       ...(observed?.profiles.some(item=>item.id===row.id)?{baselineObservation:{...observed.profiles.find(item=>item.id===row.id).arm,relative_cost_per_token:null},baselineModel:baseline.model}:{})}));
     const isContext=row=>/^(real-context-|continuous-|(?:4096|16384|32768|multi-tenant)-formal$)/.test(row.id);
@@ -1240,7 +1436,8 @@
     const contextTable=table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],context.map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)]));
     const roles={B0:baseline.label,B1:'B1-'+entry.id};
     document.getElementById('comparison-title').textContent=t(baseline.label+' / B1 '+entry.id+' 测试记录',baseline.label+' / B1 '+entry.id+' test records');
-    document.getElementById('comparison-lead').textContent='B0: '+baseline.model+' · B1: '+candidateModel;
+    const models=[...new Set(rows.filter(row=>row.observation).map(row=>row.model))];
+    document.getElementById('comparison-lead').textContent='B0: '+baseline.model+' · B1: '+(models.join(' / ')||candidateModel);
     const note=t('同模型不代表可配对；须核验设备、驱动、权重、输入、预算和计时协议。','The same model alone does not establish a matched pair: devices, drivers, weights, inputs, budgets and timing must be verified.');
     const scores=rows.flatMap(row=>[['B0',row.baselineObservation],['B1 '+entry.id,row.observation]].filter(([,arm])=>Number.isInteger(arm?.correct)&&Number.isInteger(arm?.requests)).map(([role,arm])=>[row.label,role,arm.correct+'/'+arm.requests,arm.failed??'—',arm.truncated??'—']));
     const detail=key=>key==='metrics'||key==='supplement'?table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],(key==='supplement'?context:rows).map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)])):
@@ -1284,6 +1481,10 @@
     if(!data||!combination)return;
     renderR6();root.querySelector('.comparison-dashboard').insertAdjacentHTML('afterbegin',releaseMenu());
     root.querySelector('.frozen-profile').insertAdjacentHTML('afterend',coverageView(data.datasets));
+    root.querySelector('.goal-grid').insertAdjacentHTML('beforebegin',`<p class="assessment-history-note">${t('原报告判定 · 历史 3.4.x 大纲','Original report assessment · historical outline 3.4.x')}</p>`);
+    const r6B0=r6ArmRows('B0');
+    const r6Rows=r6ArmRows('B1').map((row,i)=>({id:row.id,arms:{B0:r6B0[i].observation,B1:row.observation}}));
+    root.querySelector('.dataset-coverage').insertAdjacentHTML('afterend',v2Assessment(releaseEntry(),r6Rows));
     bindMenu();root.dataset.baselineId=releaseCatalog.baseline.id;root.dataset.release='r6';root.dataset.layout='release-dashboard-v1';
   }
   async function loadR8() {
@@ -1311,8 +1512,12 @@
       else if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();
       if(request!==releaseRequest)return;
-      if(!comparisonBaselines.some(item=>item.id===selectedBaseline))throw Error('Unknown B0 version');
       const url=new URL(location.href);
+      if(!comparisonBaselines.some(item=>item.id===selectedBaseline)){
+        baselineFallback=true;selectedBaseline=releaseCatalog.baseline.id;
+        url.searchParams.set('b0',selectedBaseline);
+        history.replaceState(null,'',url);
+      }
       if((url.searchParams.has('b0')||!developmentRelease())&&url.searchParams.has('comparison')){url.searchParams.delete('comparison');history.replaceState(null,'',url);}
       render();openLinkedDetail();
     } catch(error) {
@@ -1324,11 +1529,11 @@
   }
   window.addEventListener('vllm-hust:langchange',render);
   window.addEventListener('hashchange',openLinkedDetail);
-  window.addEventListener('popstate',()=>{const url=new URL(location.href);selectedRelease=validRelease(url.searchParams.get('release'))?url.searchParams.get('release'):null;selectedBaseline=url.searchParams.get('b0')||'original018-cann8.5.1';showRelease();});
+  window.addEventListener('popstate',()=>{const url=new URL(location.href);selectedRelease=validRelease(releaseFromLocation())?releaseFromLocation():null;baselineFallback=false;selectedBaseline=url.searchParams.get('b0')||'original018-cann8.5.1';showRelease();});
   window.addEventListener('pageshow',event=>{
     if(!event.persisted)return;
     releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];controllerSpecial=null;
-    const requested=new URL(location.href).searchParams.get('release');
+    const requested=releaseFromLocation();
     selectedRelease=validRelease(requested)?requested:null;
     selectedBaseline=new URL(location.href).searchParams.get('b0')||'original018-cann8.5.1';
     showRelease();

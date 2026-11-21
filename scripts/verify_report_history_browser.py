@@ -49,6 +49,15 @@ def main():
                     set(r["date"] for r in data["entries"]), reverse=True
                 )
                 expect(root.locator('[data-status="current"]')).to_have_count(1)
+                for release in catalog["order"]:
+                    expect(
+                        root.locator(f'[data-archive-release="{release}"] a')
+                    ).to_have_attribute("href", f"./b0-b1.html?release={release}")
+                expect(
+                    root.locator('[data-archive-release="sr5"] a')
+                ).to_have_attribute(
+                    "href", "./b0-b1.html?release=sr5&comparison=development"
+                )
                 for entry in data["entries"]:
                     row = root.locator(f'[data-report-id="{entry["id"]}"]')
                     expect(row).to_contain_text(
@@ -57,6 +66,10 @@ def main():
                     expect(row.locator("a").first).to_have_attribute(
                         "href", entry["report_url"]
                     )
+                    if entry.get("website_view") == "b0-b1.html":
+                        expect(
+                            row.locator('a[href="./b0-b1.html?release=r6"]')
+                        ).to_have_count(1)
                     if entry.get("artifact_path"):
                         assert context.request.get(
                             args.url + "/" + entry["artifact_path"]
