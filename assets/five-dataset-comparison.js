@@ -313,7 +313,12 @@
   const baselineObservations = new Map();
   const originalBaselineSelected = () => selectedBaseline === 'original018-cann8.5.1';
   const developmentRelease = () => srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial);
-  const developmentComparison = () => originalBaselineSelected()&&!new URL(location.href).searchParams.has('b0')&&new URL(location.href).searchParams.get('comparison')==='development'&&developmentRelease();
+  const controllerReleaseSelected = () => selectedRelease===controllerId&&controllerSpecial;
+  const developmentComparison = () => {
+    const params = new URL(location.href).searchParams;
+    return originalBaselineSelected()&&!params.has('b0')&&
+      (controllerReleaseSelected()||(params.get('comparison')==='development'&&developmentRelease()));
+  };
   let releaseCatalog = null;
   let fixedBaseline = null;
   let catalogRequest = null;
@@ -703,7 +708,7 @@
         <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
           option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
       </select>
-      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
+      ${developmentComparison()?(controllerReleaseSelected()?'':`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`):`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
       <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
       <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
@@ -1245,7 +1250,7 @@
     const scores=rows.flatMap(row=>[['B0',row.baselineObservation],['B1 '+entry.id,row.observation]].filter(([,arm])=>Number.isInteger(arm?.correct)&&Number.isInteger(arm?.requests)).map(([role,arm])=>[row.label,role,arm.correct+'/'+arm.requests,arm.failed??'—',arm.truncated??'—']));
     const detail=key=>key==='metrics'||key==='supplement'?table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],(key==='supplement'?context:rows).map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)])):
       key==='quality'?table(t(['工况','运行臂','正确 / 请求','失败','截断'],['Scenario','Arm','Correct / requests','Failed','Truncated']),scores)+'<p>'+esc(t('独立原评分；完整评分与裁判来源见各自原件。','Independent original grades; complete grading and judge provenance remain in each source.'))+'</p><a href="'+esc(entry.release_url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a>':
-      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>'+((srIds.includes(entry.id)||entry.id===controllerId)?'<p><a href="./b0-b1.html?release='+esc(entry.id)+'&amp;comparison=development">'+t('B1-r8 开发对照（独立页面）','B1-r8 development comparison (separate view)')+'</a></p>':'');
+      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>'+((srIds.includes(entry.id)||entry.id===controllerId)?'<p><a href="./b0-b1.html?release='+esc(entry.id)+(controllerReleaseSelected()?'':'&amp;comparison=development')+'">'+t('B1-r8 开发对照（独立页面）','B1-r8 development comparison (separate view)')+'</a></p>':'');
     root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
       <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${t('所选组合暂无核验配对','No verified pair for the selected combination')}</small></article>`).join('')}</div>
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],t('配置以各自来源为准','See each source for configuration'))}
@@ -1313,7 +1318,7 @@
       if(request!==releaseRequest)return;
       if(!comparisonBaselines.some(item=>item.id===selectedBaseline))throw Error('Unknown B0 version');
       const url=new URL(location.href);
-      if((url.searchParams.has('b0')||!developmentRelease())&&url.searchParams.has('comparison')){url.searchParams.delete('comparison');history.replaceState(null,'',url);}
+      if((url.searchParams.has('b0')||controllerReleaseSelected()||!developmentRelease())&&url.searchParams.has('comparison')){url.searchParams.delete('comparison');history.replaceState(null,'',url);}
       render();openLinkedDetail();
     } catch(error) {
       if(request!==releaseRequest)return;

@@ -191,11 +191,24 @@ def assert_sr(page, root, entry, layout, lang):
 
 
 def assert_controller_special(page, root, entry, layout, lang, latency=None):
-    page.goto(
-        page.url.split("?")[0].split("#")[0] + "?release=sr5&comparison=development"
-    )
-    expect(root.locator("#comparison-release-select")).to_be_visible(timeout=30000)
+    base = page.url.split("?")[0].split("#")[0]
+    canonical = base + "?release=sr5"
     menu = root.locator("#comparison-release-select")
+    page.goto(base + "?release=r8")
+    expect(menu).to_be_visible(timeout=30000)
+    menu.select_option("sr5")
+    expect(root).to_have_attribute("data-baseline-id", "B1-r8-adapted")
+    expect(page).to_have_url(canonical)
+
+    page.goto(canonical + "&comparison=development")
+    expect(root).to_have_attribute("data-baseline-id", "B1-r8-adapted")
+    expect(page).to_have_url(canonical)
+
+    page.goto(canonical + "&b0=original018-cann8.5.1")
+    expect(root).to_have_attribute("data-baseline-id", "original018-cann8.5.1")
+
+    page.goto(canonical)
+    expect(root).to_have_attribute("data-baseline-id", "B1-r8-adapted")
     expect(root.locator(".release-selector select")).to_have_count(1)
     expect(menu.locator('optgroup option[value="sr5"]')).to_have_text(
         "B1-sr5 · 请求限流控制器"
