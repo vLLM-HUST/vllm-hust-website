@@ -97,6 +97,11 @@ with sync_playwright() as playwright:
             args.base_url.rstrip("/") + "/data/engine-release-history-v1.json"
         ).json()
         fixed_model = read_descriptor(catalog["baseline"]["observations"])["model"]
+        independent_baselines = {
+            item["id"]: read_descriptor(item["observations"])
+            for item in catalog.get("comparison_baselines", [])
+            if item.get("observations")
+        }
         expected_models = {}
         for entry in catalog["entries"]:
             integration = entry.get("model_integration")
@@ -170,6 +175,35 @@ with sync_playwright() as playwright:
                         is None
                         for row in payload["rows"]
                     )
+                if release in ("r8", "r10") and baseline in independent_baselines:
+                    with page.expect_download() as download:
+                        page.locator("#comparison-export").click()
+                    payload = json.loads(Path(download.value.path()).read_bytes())
+                    assert payload["paired"] is False
+                    for original in independent_baselines[baseline]["profiles"]:
+                        matches = [
+                            row
+                            for row in payload["rows"]
+                            if row["id"] == original["id"]
+                        ]
+                        assert len(matches) == 1
+                        assert all(
+                            matches[0]["baselineObservation"][key] == value
+                            for key, value in original["arm"].items()
+                        )
+                        if original.get("workload_kind") == "continuous-synthetic":
+                            assert original["id"] in ("4096-formal", "16384-formal")
+                            assert (
+                                len(
+                                    [
+                                        row
+                                        for row in payload["context"]
+                                        if row["id"] == original["id"]
+                                    ]
+                                )
+                                == 1
+                            )
+                            assert "C8" in matches[0]["label"]
                 if baseline != "original018-cann8.5.1":
                     assert (
                         page.locator(
