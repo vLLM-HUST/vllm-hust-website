@@ -1221,7 +1221,7 @@
     const allRows=[...sourceRows];
     for(const row of observed?.profiles||[])if(!allRows.some(item=>item.id===row.id))allRows.push({id:row.id,label:row.label||row.id});
     const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:candidateModel,
-      observation:row.arms?.B1||row.observation,missingReason:reason,
+      observation:(row.arms?.B1||row.observation)?{...(row.arms?.B1||row.observation),relative_cost_per_token:null}:undefined,missingReason:reason,
       ...(observed?.profiles.some(item=>item.id===row.id)?{baselineObservation:{...observed.profiles.find(item=>item.id===row.id).arm,relative_cost_per_token:null},baselineModel:baseline.model}:{})}));
     const context=rows.filter(row=>!['mmlu','hle','frontier','swe','terminal'].includes(row.id));
     const roles={B0:baseline.label,B1:'B1-'+entry.id};
