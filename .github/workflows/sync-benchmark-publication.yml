@@ -32,9 +32,20 @@ jobs:
         run: |
           python scripts/refresh_benchmark_publication.py
           python scripts/update_benchmark_publication.py --check
+      - name: Verify non-interactive publication push authentication
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          test -n "$GH_TOKEN"
+          gh auth setup-git --hostname github.com
+          git push --dry-run origin "HEAD:refs/heads/automation/publication-auth-${GITHUB_RUN_ID}"
       - name: Create or update the publication PR
         id: publication
         uses: peter-evans/create-pull-request@v8
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GIT_TERMINAL_PROMPT: '0'
         with:
           token: ${{ secrets.PAT_TOKEN }}
           branch: automation/reviewed-benchmark-publication
