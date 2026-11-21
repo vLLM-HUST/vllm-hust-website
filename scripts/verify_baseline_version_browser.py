@@ -4,11 +4,72 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from urllib.parse import parse_qs, urlencode, urlparse
 from playwright.sync_api import sync_playwright
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--base-url", default="http://127.0.0.1:8000")
 args = parser.parse_args()
+
+
+def verify_development_priority(page, releases, baselines):
+    original = "original018-cann8.5.1"
+    assert "sr1" in releases
+    sr = ["sr1"] + [
+        item for item in releases if item.startswith("sr") and item != "sr1"
+    ]
+    alternate = next(item for item in baselines if item != original)
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+
+    def wait_release(value):
+        page.wait_for_function(
+            '(id)=>document.querySelector("#five-dataset-comparison").dataset.release===id',
+            arg=value,
+        )
+
+    def verify_original():
+        page.wait_for_function(
+            '(id)=>document.querySelector("#five-dataset-comparison").dataset.baselineId===id',
+            arg=original,
+        )
+        assert page.locator("#comparison-baseline-select").input_value() == original
+        assert page.locator('[data-comparison="selected-b0"]').count() == 1
+        assert page.locator(".metric-change").count() == 0
+        assert page.locator("[data-baseline-observation]").count() > 0
+        assert "comparison" not in parse_qs(urlparse(page.url).query)
+        with page.expect_download() as download:
+            page.locator("#comparison-export").click()
+        exported = json.loads(Path(download.value.path()).read_bytes())
+        assert exported["baseline"] == original and exported["candidate"] == sr[0]
+        assert exported["paired"] is False
+
+    page.goto(base + "?" + urlencode({"release": sr[0], "comparison": "development"}))
+    page.wait_for_selector('[data-baseline-id="B1-r8"]', timeout=60000)
+    assert page.locator("#comparison-baseline-select").count() == 0
+    if len(sr) > 1:
+        page.select_option("#comparison-release-select", sr[1])
+        wait_release(sr[1])
+        assert parse_qs(urlparse(page.url).query)["comparison"] == ["development"]
+    page.select_option("#comparison-release-select", "r10")
+    wait_release("r10")
+    assert "comparison" not in parse_qs(urlparse(page.url).query)
+    page.select_option("#comparison-baseline-select", alternate)
+    page.select_option("#comparison-release-select", sr[0])
+    wait_release(sr[0])
+    page.select_option("#comparison-baseline-select", original)
+    verify_original()
+    page.reload()
+    verify_original()
+    page.goto(
+        base
+        + "?"
+        + urlencode({"release": sr[0], "comparison": "development", "b0": original})
+    )
+    verify_original()
+    page.reload()
+    verify_original()
+
+
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(headless=True)
     for width, scheme in (
@@ -117,6 +178,7 @@ with sync_playwright() as playwright:
                         == 0
                     )
             assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+1")
+        verify_development_priority(page, releases, baselines)
         print(
             "PASS",
             width,
