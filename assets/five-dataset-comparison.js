@@ -308,6 +308,10 @@
   const validRelease = id => /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(id||'');
   const requestedRelease = new URL(location.href).searchParams.get('release');
   let selectedRelease = validRelease(requestedRelease) ? requestedRelease : null;
+  let selectedBaseline = new URL(location.href).searchParams.get('b0') || 'original018-cann8.5.1';
+  let comparisonBaselines = [];
+  const baselineObservations = new Map();
+  const originalBaselineSelected = () => selectedBaseline === 'original018-cann8.5.1';
   let releaseCatalog = null;
   let fixedBaseline = null;
   let catalogRequest = null;
@@ -336,6 +340,28 @@
     });
     if(value.context?.observations?.length!==4||!value.compute?.arm?.source_and_timing_qualified)fail();
     for(const row of value.context.observations)if(row.B1||row.B0?.status!=='completed'||row.B0.metrics?.failed!==0||row.B0.windows?.length!==5)fail();
+    return value;
+  }
+  async function loadComparisonBaseline(baseline,publication) {
+    const descriptor=baseline.observations;
+    if(!/^data\/[a-z0-9/_-]+\.json$/.test(descriptor.path||''))throw Error('Invalid B0 observations path');
+    const matches=publication.files.filter(row=>row.website_path===descriptor.path);
+    if(matches.length!==1||matches[0].sha256!==descriptor.sha256||matches[0].bytes!==descriptor.bytes)throw Error('Unpublished B0 observations');
+    const response=await fetch('./'+descriptor.path,{cache:'no-cache'});
+    if(!response.ok)throw Error('B0 observations unavailable');
+    const raw=await response.arrayBuffer();
+    const pin=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(pin!==descriptor.sha256||raw.byteLength!==descriptor.bytes)throw Error('B0 observations checksum mismatch');
+    const value=JSON.parse(new TextDecoder().decode(raw));
+    if(value.schema!=='vllm-hust-official-baseline-observations/v1'||value.baseline_id!==baseline.id||value.model!==baseline.model||value.precision!==baseline.precision||value.tensor_parallel_size!==baseline.tensor_parallel_size||!value.runtime?.image_digest||!value.hardware?.chip_model||!value.hardware?.driver_version||!Array.isArray(value.profiles))throw Error('B0 observation identity mismatch');
+    const ids=new Set();
+    for(const row of value.profiles){
+      const arm=row.arm;
+      if(!row.id||ids.has(row.id)||arm?.role!=='B0'||!Number.isInteger(arm.requests)||arm.requests<0||!Number.isInteger(arm.failed)||arm.failed<0||arm.failed>arm.requests||!/^[a-f0-9]{64}$/.test(arm.source_seal_sha256||''))throw Error('Invalid B0 profile');
+      ids.add(row.id);
+      for(const key of ['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms'])if(arm[key]!==null&&(!Number.isFinite(arm[key])||arm[key]<0))throw Error('Invalid B0 metric');
+      if(Number.isFinite(arm.output_tokens_per_second)&&(!Number.isFinite(arm.output_tokens)||!Number.isFinite(arm.duration_seconds)||arm.duration_seconds<=0||!close(arm.output_tokens/arm.duration_seconds,arm.output_tokens_per_second)))throw Error('Inconsistent B0 throughput');
+    }
     return value;
   }
   function withFixedBaseline(rows) {
@@ -382,6 +408,18 @@
       const baseline=value.baseline;
       if (baseline?.id!=='original018-cann8.5.1' || baseline.vllm!=='0.18.0' || baseline.vllm_ascend!=='0.18.0' || baseline.cann!=='8.5.1' || baseline.sdk_source_map_sha256!=='a357ad8cf1ff6f8797fb2d6476e71a0deef5ee0899a55ea32ed65f07fe7773bc' || baseline.image_digest!=='sha256:2467d259ff068ca4edd7b50b849152910f3c05e435f314639fc06bcc7a00f9fa') throw Error('Unexpected fixed B0 identity'); // pragma: allowlist secret -- fixed public B0 image and SDK digests
       fixedBaseline=await loadFixedBaseline(baseline,publication);
+      comparisonBaselines=[{...baseline,label:'vLLM 0.18 / Ascend 0.18',status:'published'},...(value.comparison_baselines||[])];
+      const baselineIds=new Set();
+      for(const item of comparisonBaselines){
+        if(!item.id || baselineIds.has(item.id) || !item.label || !item.profile?.url?.startsWith('https://'))throw Error('Invalid B0 selection catalog');
+        baselineIds.add(item.id);
+        if(item.id!==baseline.id){
+          if(!['pending','candidate-pending','partial','published'].includes(item.status) || !item.model || item.precision!=='BF16' || item.tensor_parallel_size!==2 || item.pairs!==null)throw Error('Unreviewed B0 observations');
+          if(item.observations)baselineObservations.set(item.id,await loadComparisonBaseline(item,publication));
+          else if(['partial','published'].includes(item.status))throw Error('Missing B0 observations');
+        }
+      }
+      if(!baselineIds.has(selectedBaseline))throw Error('Unknown B0 version');
       for (const id of value.order) {
         const matches = value.entries.filter(row=>row.id===id);
         if(matches.length!==1) throw Error('Ambiguous release identity');
@@ -649,20 +687,27 @@
     }).join('');
     const specialIds=[...srIds,...(controllerSpecial?[controllerId]:[])].sort((a,b)=>BigInt(a.slice(2))>BigInt(b.slice(2))?-1:1);
     return `<div class="comparison-meta release-selector">
-      <label for="comparison-release-select">${t('版本 / 运行记录','Version / run history')}</label>
+      <label for="comparison-release-select">${t('B1 版本 / 运行记录','B1 version / run history')}</label>
       <select id="comparison-release-select">
         <optgroup label="${t('冻结版本','Frozen releases')}">${engineOptions(releaseIds,releaseCatalog?.entries)}</optgroup>
         <optgroup label="${t('冻结前尝试','Pre-freeze attempts')}">${engineOptions(attemptIds,releaseCatalog?.attempts)}</optgroup>
         <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
           option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
       </select>
-      <a class="fixed-b0-identity" href="${esc(releaseCatalog?.baseline.profile.url||'./engine.html')}">B0 · vLLM0.18 / Ascend0.18</a>
+      <label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
+      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(item.label)}${item.status==='candidate-pending'?t(' · 候选版，待发布结果',' · candidate, results pending'):item.status==='pending'?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
+      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${t('B0 来源','B0 source')} ↗</a>
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
     </div>`;
   }
   function bindMenu() {
+    root.querySelector('#comparison-baseline-select').addEventListener('change',event=>{
+      selectedBaseline=event.target.value;
+      const url=new URL(location.href);url.searchParams.set('b0',selectedBaseline);history.replaceState(null,'',url);
+      showRelease();
+    });
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
       selectedRelease=event.target.value;
       const url=new URL(location.href);url.searchParams.set('release',selectedRelease);history.replaceState(null,'',url);
@@ -1166,8 +1211,53 @@
     if(key==='methods')return {title:t('计算公式与比较方式','Formulas and comparison'),body:`<dl class="method-list"><dt>${t('配对条件','Pairing')}</dt><dd>${t('两臂相同71条预热与输入配方；并发8、输出256 token，每阶段提交300秒再排空；预热不计时。','Same 71 warmups and input recipe; concurrency 8, 256 output tokens, each phase submits for 300s then drains. Warmup is unscored.')}</dd><dt>${t('吞吐','Throughput')}</dt><dd>${t('完成输出token数 ÷ 包含排空的阶段耗时。','Completed output tokens / phase wall time including drain.')}</dd><dt>TTFT</dt><dd>${t('首内容token时刻 − 请求提交时刻，包含排队与prefill。','First content-token time − submission time, including queueing and prefill.')}</dd><dt>TPOT</dt><dd>${t('(响应完成时刻 − 首内容token时刻) ÷ (输出token数 − 1)，逐请求等权平均。','(Completion time − first content-token time) / (output tokens − 1), averaged equally across requests.')}</dd><dt>${t('同费率成本','Equal-rate cost')}</dt><dd>${t('设备费率与卡数相同：单位token成本比 = B0吞吐 / B1吞吐。图中B0 = 1。','With equal device rates and counts: unit token cost ratio = B0 throughput / B1 throughput. B0 = 1 in the chart.')}</dd></dl>`};
     return {title:t('原始证据','Original evidence'),body:`<p>${t('C8闭环 · 正式871请求、失败0 · 每臂一次。固定五项配对结果见本页图表与质量详情。','C8 closed loop · 871 measured requests, zero failures · one run per arm. The five-profile pairs are included in this page’s charts and quality details.')}</p><p><a href="./data/r8-continuous-20261117/summary-v1.json">${t('详细统计','Detailed statistics')} ↗</a> · <a href="${esc(currentR8.evidence.raw.url)}">${t('原始数据与CPU复算','Original data and CPU replay')} ↗</a></p><figure class="comparison-source-plot"><a href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" width="2160" height="1440" alt="${t('B0与r8连续负载原始对照图','Original B0 and r8 continuous-load chart')}"></a></figure>`};
   }
+  function renderSelectedBaseline() {
+    const baseline=comparisonBaselines.find(item=>item.id===selectedBaseline);
+    const entry=releaseEntry()||releaseCatalog.attempts.find(item=>item.id===selectedRelease)||srEntries?.find(item=>item.id===selectedRelease)||{id:selectedRelease,mods:[],measurements:[],release_url:'./report-history.html'};
+    const observed=baselineObservations.get(baseline.id);
+    const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
+    const candidateModel=singleArmObservation(entry)?.candidate.model||'Qwen3.5-35B-A3B';
+    const sourceRows=attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
+    const allRows=[...sourceRows];
+    for(const row of observed?.profiles||[])if(!allRows.some(item=>item.id===row.id))allRows.push({id:row.id,label:row.label||row.id});
+    const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:candidateModel,
+      observation:row.arms?.B1||row.observation,missingReason:reason,
+      ...(observed?.profiles.some(item=>item.id===row.id)?{baselineObservation:{...observed.profiles.find(item=>item.id===row.id).arm,relative_cost_per_token:null},baselineModel:baseline.model}:{})}));
+    const context=rows.filter(row=>!['mmlu','hle','frontier','swe','terminal'].includes(row.id));
+    const roles={B0:baseline.label,B1:'B1-'+entry.id};
+    document.getElementById('comparison-title').textContent=baseline.label+' / B1 '+entry.id;
+    document.getElementById('comparison-lead').textContent='B0: '+baseline.model+' · B1: '+candidateModel;
+    const note=t('同模型不代表可配对；须核验设备、驱动、权重、输入、预算和计时协议。','The same model alone does not establish a matched pair: devices, drivers, weights, inputs, budgets and timing must be verified.');
+    const detail=key=>key==='metrics'||key==='supplement'?table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],(key==='supplement'?context:rows).map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)])):
+      key==='quality'?'<p>'+esc(t('所选 B1 评分见其版本原件；尚无所选 B0 的配对评分。','See the selected B1 evidence for grading; paired grades for the selected B0 are unpublished.'))+'</p><a href="'+esc(entry.release_url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a>':
+      '<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+(observed?'<p>'+esc(JSON.stringify({runtime:observed.runtime,hardware:observed.hardware}))+'</p>':'')+'<p><a href="'+esc(baseline.profile.url)+'">'+esc(baseline.label)+'</a> · <a href="'+esc(entry.release_url||entry.source?.url||'./report-history.html')+'">B1 '+esc(entry.id)+'</a></p>';
+    root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
+      <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${t('所选组合暂无核验配对','No verified pair for the selected combination')}</small></article>`).join('')}</div>
+      ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],t('配置以各自来源为准','See each source for configuration'))}
+      ${coverageView(rows)}<section><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${esc(reason)}</p><div class="metric-grid">
+      ${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}
+      ${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}
+      ${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}
+      ${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'—',1,rows,rows.map(row=>row.label),roles)}</div></section>
+      <section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('查看数值','View metrics')} ↗</button></div><div class="supplement-highlights">${['16K','32K',t('四租户','Four tenants')].map(label=>`<div><span>${label}</span><strong>—</strong></div>`).join('')}</div><div class="supplement-plot missing-plot">${esc(reason)}</div></section>
+      <div class="detail-actions">${['compute','methods','quality','evidence'].map(key=>`<button type="button" data-detail="${key}">${t({compute:'有效算力参考',methods:'公式与比较方式',quality:'质量与评分明细',evidence:'原始证据'}[key],{compute:'Compute reference',methods:'Methods',quality:'Quality',evidence:'Evidence'}[key])} ↗</button>`).join('')}<button type="button" id="comparison-export">${t('导出所选组合','Export selection')}</button></div>${detailDialog()}</section>`;
+    const control=root.querySelector('.runtime-pair>div:first-child');
+    control.querySelector('strong').textContent=baseline.label;
+    control.querySelector('span').textContent='CANN '+baseline.cann+' · '+baseline.model;
+    root.querySelector('.runtime-pair>div:last-child span').textContent=t('运行时身份见 B1 原件','See B1 evidence for runtime identity');
+    root.querySelector('[data-detail="controller-progress"]')?.remove();
+    bindMenu();bindDetails(key=>({title:t('所选组合','Selected comparison'),body:detail(key)}));
+    root.querySelector('#comparison-export').onclick=()=>{
+      const payload={schema:'selected-b0-b1-observations/v1',baseline:baseline.id,candidate:entry.id,paired:false,reason,rows,context};
+      const link=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
+      link.href=url;link.download=baseline.id+'-B1-'+entry.id+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    };
+    root.dataset.baselineId=baseline.id;root.dataset.release=entry.id;root.dataset.loaded='selected-b0-'+baseline.id;
+    root.dataset.layout='release-dashboard-v1';root.setAttribute('aria-busy','false');
+  }
   function render() {
     if(!releaseCatalog||!selectedRelease||!selectableIds.includes(selectedRelease))return;
+    if(!originalBaselineSelected()){renderSelectedBaseline();return;}
     if(selectedRelease===controllerId&&controllerSpecial){renderControllerSpecial();return;}
     if(srIds.includes(selectedRelease)){if(srEntries)renderVersion();return;}
     if(selectedRelease!=='r6'){if(selectedRelease!=='r8'||currentR8)renderVersion();return;}
@@ -1201,6 +1291,7 @@
       else if(selectedRelease==='r8'&&!currentR8)await loadR8();
       else if(selectedRelease==='r6'&&!data)await loadR6();
       if(request!==releaseRequest)return;
+      if(!comparisonBaselines.some(item=>item.id===selectedBaseline))throw Error('Unknown B0 version');
       render();openLinkedDetail();
     } catch(error) {
       if(request!==releaseRequest)return;
@@ -1211,11 +1302,13 @@
   }
   window.addEventListener('vllm-hust:langchange',render);
   window.addEventListener('hashchange',openLinkedDetail);
+  window.addEventListener('popstate',()=>{const url=new URL(location.href);selectedRelease=validRelease(url.searchParams.get('release'))?url.searchParams.get('release'):null;selectedBaseline=url.searchParams.get('b0')||'original018-cann8.5.1';showRelease();});
   window.addEventListener('pageshow',event=>{
     if(!event.persisted)return;
     releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];controllerSpecial=null;
     const requested=new URL(location.href).searchParams.get('release');
     selectedRelease=validRelease(requested)?requested:null;
+    selectedBaseline=new URL(location.href).searchParams.get('b0')||'original018-cann8.5.1';
     showRelease();
   });
   showRelease();
