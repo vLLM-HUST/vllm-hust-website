@@ -6,6 +6,7 @@
   const t = (zh, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? zh : en;
   const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
   let catalog;
+  let releaseIndex=[];
 
   // Preserve bookmarks to the old detailed report after moving it to the archive.
   if (!root && document.getElementById('five-dataset-comparison') &&
@@ -23,31 +24,55 @@
       'Newest first, in Asia/Shanghai. Experiment, report, archive-label and source-revision dates are labeled separately; a revision is not new inference. Original conclusions and evidence remain available; the comparison page shows the latest round.');
     if (!catalog) return;
     const dates = [...new Set(catalog.entries.map(r => r.date))];
-    root.innerHTML = `<nav class="report-date-index" aria-label="${t('归档日期', 'Archive dates')}">${dates.map(day => `<a href="#date-${day}">${day}</a>`).join(' · ')}</nav>` + dates.map(day => {
+    const releases=releaseIndex.length?`<section class="five-dataset-panel release-archive-index" aria-labelledby="release-archive-title">
+      <h2 id="release-archive-title">${t('引擎版本与专项记录','Engine versions and specialist records')}</h2>
+      <ul>${releaseIndex.map(row=>`<li data-archive-release="${escape(row.id)}"><a href="./b0-b1.html?release=${escape(row.id)}${row.special?'&amp;comparison=development':''}">${escape(row.id)} · ${escape(t(row.label_zh,row.label_en))}</a>${row.date?` · <time datetime="${row.date}">${row.date}</time>`:''}</li>`).join('')}</ul>
+    </section>`:'';
+    root.innerHTML = releases + `<nav class="report-date-index" aria-label="${t('归档日期', 'Archive dates')}">${dates.map(day => `<a href="#date-${day}">${day}</a>`).join(' · ')}</nav>` + dates.map(day => {
       const rows = catalog.entries.filter(r => r.date === day);
       return `<section class="five-dataset-panel report-date-group" id="date-${day}"><h2><time datetime="${day}">${day}</time></h2>${rows.map(r => {
-        const label = r.status === 'current' ? t('最新一轮', 'Latest round') : t('历史归档', 'Archived');
+        const label = r.id===catalog.current_report_id ? t('r6 历史报告修订','r6 archived report revision') : t('历史归档', 'Archived');
+        const websiteView=r.website_view==='b0-b1.html'?'b0-b1.html?release=r6':r.website_view;
         const kind = {experiment_date:t('测试日期', 'Experiment date'), report_date:t('报告日期', 'Report date'), source_revision_date:t('来源修订日期', 'Source revision date'), archive_label_date:t('归档标识日期', 'Archive label date')}[r.date_kind];
-        return `<article class="report-history-entry" data-report-id="${escape(r.id)}" data-status="${r.status}"><h3>${escape(t(r.title_zh, r.title_en))}</h3><p class="focus-status">${label} · ${kind} · ${day}</p><p>${escape(t(r.scope_zh, r.scope_en))}</p><p><a href="${escape(r.report_url)}">${t('原版报告', 'Original report')}</a>${r.website_view ? ` · <a href="./${escape(r.website_view)}">${t('网页查看', 'Website view')}</a>` : ''}${r.artifact_path ? ` · <a href="./${escape(r.artifact_path)}">${t('该版数据', 'Versioned data')}</a>` : ''}</p><details><summary>${t('来源身份', 'Source identity')}</summary><p>commit: <code>${r.source_commit}</code><br>report SHA256: <code>${r.report_sha256}</code></p></details></article>`;
+        return `<article class="report-history-entry" data-report-id="${escape(r.id)}" data-status="${r.status}"><h3>${escape(t(r.title_zh, r.title_en))}</h3><p class="focus-status">${label} · ${kind} · ${day}</p><p>${escape(t(r.scope_zh, r.scope_en))}</p><p><a href="${escape(r.report_url)}">${t('原版报告', 'Original report')}</a>${websiteView ? ` · <a href="./${escape(websiteView)}">${t('网页查看', 'Website view')}</a>` : ''}${r.artifact_path ? ` · <a href="./${escape(r.artifact_path)}">${t('该版数据', 'Versioned data')}</a>` : ''}</p><details><summary>${t('来源身份', 'Source identity')}</summary><p>commit: <code>${r.source_commit}</code><br>report SHA256: <code>${r.report_sha256}</code></p></details></article>`;
       }).join('')}</section>`;
     }).join('');
     root.dataset.loaded = catalog.schema;
     root.setAttribute('aria-busy', 'false');
   }
 
+  async function readPublished(manifest, sourcePath) {
+    const entries = manifest.files.filter(f => f.website_path === sourcePath);
+    if (entries.length !== 1) throw Error('Ambiguous archive source');
+    const response = await fetch('./' + sourcePath, {cache:'no-cache'});
+    if (!response.ok) throw Error('Missing archive source');
+    const raw = await response.arrayBuffer();
+    const sha = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', raw)), b => b.toString(16).padStart(2, '0')).join('');
+    if (sha !== entries[0].sha256 || raw.byteLength !== entries[0].bytes) throw Error('Archive checksum mismatch');
+    return JSON.parse(new TextDecoder().decode(raw));
+  }
+  async function loadReleaseIndex(manifest) {
+    const files=['engine-release-history-v1.json','sr-development-results-v1.json','controller-product-results-v1.json'];
+    const [versions,sr,controller]=await Promise.all(files.map(file=>readPublished(manifest,'data/'+file).catch(()=>null)));
+    const validDate=date=>/^\d{4}-\d{2}-\d{2}$/.test(date||'')?date:null;
+    const engine=versions?.schema==='vllm-hust-engine-release-history/v1'
+      ?[...versions.entries,...versions.attempts].filter(row=>/^r[1-9]\d*$/.test(row.id))
+        .map(row=>({...row,date:validDate(row.frozen_date)})):[];
+    const special=sr?.schema==='vllm-hust-sr-development/v1'?sr.entries.filter(row=>/^sr[1-9]\d*$/.test(row.id)).map(row=>{
+      const stamp=row.release_url.match(/(\d{4})(\d{2})(\d{2})$/);
+      return {...row,special:true,label_zh:row.name,label_en:row.name,date:stamp?stamp.slice(1).join('-'):null};
+    }):[];
+    if(controller?.schema==='controller-product-results/v1'&&controller.releases.some(row=>row.id==='r8')&&!special.some(row=>row.id==='sr5')){
+      special.push({id:'sr5',special:true,date:validDate(controller.updated),label_zh:'请求限流控制器',label_en:'Request throttling controller'});
+    }
+    return [...engine,...special].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.id.localeCompare(a.id,undefined,{numeric:true}));
+  }
   async function load() {
     const m = await fetch('./data/benchmark-source-manifest.json', {cache:'no-cache'});
     if (!m.ok) throw Error('Missing source manifest');
     const manifest = await m.json();
     if (manifest.repository !== 'vLLM-HUST/vllm-hust-benchmark' || manifest.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(manifest.commit)) throw Error('Invalid source identity');
-    const entries = manifest.files.filter(f => f.website_path === path);
-    if (entries.length !== 1) throw Error('Ambiguous archive source');
-    const response = await fetch('./' + path, {cache:'no-cache'});
-    if (!response.ok) throw Error('Missing archive source');
-    const raw = await response.arrayBuffer();
-    const sha = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', raw)), b => b.toString(16).padStart(2, '0')).join('');
-    if (sha !== entries[0].sha256 || raw.byteLength !== entries[0].bytes) throw Error('Archive checksum mismatch');
-    const value = JSON.parse(new TextDecoder().decode(raw));
+    const value = await readPublished(manifest,path);
     if (value.schema !== 'benchmark-report-history/v1' || value.timezone !== 'Asia/Shanghai' || !Array.isArray(value.entries) || !value.entries.length) throw Error('Invalid archive');
     const ids = new Set();
     value.entries.forEach((r, i) => {
@@ -63,6 +88,7 @@
     const current = value.entries.filter(r => r.status === 'current');
     if (current.length !== 1 || current[0].id !== value.current_report_id || current[0].website_view !== 'b0-b1.html') throw Error('Ambiguous current report');
     catalog = value;
+    releaseIndex=await loadReleaseIndex(manifest);
     render();
   }
 

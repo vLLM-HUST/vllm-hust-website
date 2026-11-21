@@ -13,7 +13,7 @@
   };
   let data, manifest, error;
   function render() {
-    root.replaceChildren(node('h2', t('当前参考 Engine 测试状态', 'Current reference Engine test status')));
+    root.replaceChildren(node('h2', t('r6 历史参考 Engine 测试记录', 'Archived r6 reference Engine test record')));
     if (!data) {
       root.append(node('p', error
         ? t('结果加载或校验失败，请查看 B0/B1 页与固定发布源。', 'Result verification failed. See the B0/B1 page and pinned publication source.')
@@ -44,11 +44,13 @@
     const details = node('details');
     details.append(node('summary', t('查看四项目标的证据状态', 'View evidence for all four targets')), list);
     root.append(details);
-    const link = node('a', t('查看完整 B0/B1 结果与图表 →', 'View complete B0/B1 results and charts →'));
-    link.href = './b0-b1.html';
+    const link = node('a', t('查看 r6 历史结果与图表 →', 'View archived r6 results and charts →'));
+    link.href = './b0-b1.html?release=r6';
+    const latest = node('a', t('查看最新正式 B0/B1 →', 'View latest official B0/B1 →'));
+    latest.href = './b0-b1.html?release=latest';
     const source = node('a', t('固定结果来源 ↗', 'Pinned result source ↗'));
     source.href = `https://github.com/${manifest.repository}/blob/${manifest.commit}/website-publication/${path}`;
-    root.append(link, node('span', ' · '), source);
+    root.append(link, node('span', ' · '), latest, node('span', ' · '), source);
     root.dataset.loaded = data.run_id;
   }
   window.addEventListener('vllm-hust:langchange', render);
