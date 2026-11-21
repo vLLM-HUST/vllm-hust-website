@@ -1481,7 +1481,7 @@
     const observed=originalBaselineSelected()?{...fixedBaseline,runtime:fixedBaseline.baseline,hardware:{chip_model:fixedBaseline.chip_model,driver_version:fixedBaseline.driver_version??null},profiles:[...fixedBaseline.profiles,...fixedBaseline.context.observations.map(row=>({id:'real-context-'+row.phase,label:row.phase,arm:{...row.B0.metrics,mean_ttft_ms:row.B0.metrics.ttft_ms.mean,mean_tpot_ms:row.B0.metrics.tpot_ms.mean}}))]}:baselineObservations.get(baseline.id);
     const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
     const candidateModel=entry.id==='r6'?data.hardware.model:
-      ((!entry.measurements.length&&modelIntegrationResults.get(entry.id)?.candidate.model)||entry.model||fixedBaseline.model);
+      ((!entry.measurements?.length&&modelIntegrationResults.get(entry.id)?.candidate.model)||entry.model||fixedBaseline.model);
     const sourceRows=entry.id==='r6'?r6ArmRows('B1'):attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
     const allRows=[...sourceRows];
     for(const row of observed?.profiles||[])if(!allRows.some(item=>item.id===row.id))allRows.push({id:row.id,label:row.label||row.id});
