@@ -1,3 +1,3 @@
 # Reviewed public Git commits, independent data and visibility-policy locks.
-publication_revision = "52c84b293bb83effd1a814dcadf40271c76bb7f4" # pragma: allowlist secret
-visibility_policy_revision = "52c84b293bb83effd1a814dcadf40271c76bb7f4" # pragma: allowlist secret
+publication_revision = "839e3c5994f89363da13e7cb1f97efa3ab85afac" # pragma: allowlist secret
+visibility_policy_revision = "839e3c5994f89363da13e7cb1f97efa3ab85afac" # pragma: allowlist secret
