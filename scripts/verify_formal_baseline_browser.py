@@ -110,9 +110,16 @@ def verify(url, output):
         guard = "if(!attempt&&!sr)assertFormalBaselineIsolation(entry,rows);"
         assert poisoned.count(guard) == 1
         assert source.count("observation:row.candidate") == 1
-        reference_as_candidate = source.replace(
-            "observation:row.candidate", "observation:row.reference"
-        )
+        # Force the historical wrong-observation path even after the release
+        # gains real pairs; merely changing the single-arm fallback then does
+        # nothing and no longer exercises the guard.
+        borrowed_observations = """
+    if(entry.model_integration){
+      const d=modelIntegrationResults.get(entry.id);
+      return d.workloads.map(row=>({id:row.id,label:row.label_en,observation:row.reference,model:d.candidate.model}));
+    }
+"""
+        reference_as_candidate = source.replace(marker, marker + borrowed_observations)
         reference_data = context.request.get(
             url + "/" + entries[0]["model_integration"]["summary"]["path"]
         ).json()
