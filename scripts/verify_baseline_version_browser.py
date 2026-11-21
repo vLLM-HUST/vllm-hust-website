@@ -201,7 +201,7 @@ def verify_development_priority(page, releases, baselines):
     verify_original()
 
 
-def verify_full_baseline_details(page, source, label, width, scheme):
+def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
     """Read the two existing dialogs; do not invent paired goals or grades."""
     expected_tracks = [
         [
@@ -218,7 +218,7 @@ def verify_full_baseline_details(page, source, label, width, scheme):
     ]
     page.evaluate("window.scrollTo(0,0)")
     page.screenshot(
-        path=str(args.output / f"layout-{width}-{scheme}.png"), full_page=True
+        path=str(args.output / f"{prefix}layout-{width}-{scheme}.png"), full_page=True
     )
     page.locator('[data-detail="quality"]').click()
     dialog = page.locator("#comparison-detail-dialog")
@@ -243,7 +243,7 @@ def verify_full_baseline_details(page, source, label, width, scheme):
     assert "替代裁判" in text or "substitute judge" in text
     assert "SWE/Terminal" in text and ("轨迹推理" in text or "trace inference" in text)
     page.screenshot(
-        path=str(args.output / f"quality-{width}-{scheme}.png"), full_page=True
+        path=str(args.output / f"{prefix}quality-{width}-{scheme}.png"), full_page=True
     )
     if width == 390:
         last_grade = (
@@ -257,7 +257,7 @@ def verify_full_baseline_details(page, source, label, width, scheme):
         )
         dialog.locator("p").last.scroll_into_view_if_needed()
         page.screenshot(
-            path=str(args.output / f"quality-right-{width}-{scheme}.png"),
+            path=str(args.output / f"{prefix}quality-right-{width}-{scheme}.png"),
             full_page=True,
         )
     dialog.locator(".dialog-close").click()
@@ -281,7 +281,7 @@ def verify_full_baseline_details(page, source, label, width, scheme):
         "算量适用性未通过" in text or "Arithmetic applicability is ineligible" in text
     )
     page.screenshot(
-        path=str(args.output / f"compute-{width}-{scheme}.png"), full_page=True
+        path=str(args.output / f"{prefix}compute-{width}-{scheme}.png"), full_page=True
     )
     if width == 390:
         tokens = dialog.locator("tbody tr").last.locator("td").last
@@ -292,7 +292,7 @@ def verify_full_baseline_details(page, source, label, width, scheme):
             and bounds["x"] + bounds["width"] <= frame["x"] + frame["width"]
         )
         page.screenshot(
-            path=str(args.output / f"compute-right-{width}-{scheme}.png"),
+            path=str(args.output / f"{prefix}compute-right-{width}-{scheme}.png"),
             full_page=True,
         )
     dialog.locator(".dialog-close").click()
@@ -413,7 +413,7 @@ with sync_playwright() as playwright:
                 if check_candidate or check_baseline:
                     if (
                         check_baseline
-                        and baseline == "official-0.23.0"
+                        and baseline in ("official-0.23.0", "official-0.30.0")
                         and release == "r10"
                     ):
                         payload = download_selection(page)
@@ -494,7 +494,10 @@ with sync_playwright() as playwright:
                                 == 1
                             )
                             assert "C8" in matches[0]["label"]
-                if baseline == "official-0.23.0" and release == "r10":
+                if (
+                    baseline in ("official-0.23.0", "official-0.30.0")
+                    and release == "r10"
+                ):
                     descriptor = next(
                         item
                         for item in catalog["comparison_baselines"]
@@ -506,6 +509,7 @@ with sync_playwright() as playwright:
                         descriptor["label"],
                         width,
                         scheme,
+                        prefix="official030-" if baseline == "official-0.30.0" else "",
                     )
                 if baseline != "original018-cann8.5.1":
                     assert (
