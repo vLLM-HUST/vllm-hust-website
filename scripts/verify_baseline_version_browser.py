@@ -10,7 +10,139 @@ from playwright.sync_api import sync_playwright
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--base-url", default="http://127.0.0.1:8000")
+parser.add_argument(
+    "--output", type=Path, default=Path("output/playwright/baseline-version")
+)
 args = parser.parse_args()
+export_events = {}
+
+
+def observe_exports(page):
+    events = []
+    export_events[page] = events
+    page.on(
+        "console",
+        lambda message: events.append(
+            {"kind": "console", "type": message.type, "text": message.text}
+        ),
+    )
+    page.on(
+        "pageerror",
+        lambda error: events.append({"kind": "pageerror", "text": str(error)}),
+    )
+    page.on(
+        "download",
+        lambda download: events.append(
+            {"kind": "download", "filename": download.suggested_filename}
+        ),
+    )
+    cdp = page.context.new_cdp_session(page)
+    cdp.send("Log.enable")
+    cdp.on(
+        "Log.entryAdded",
+        lambda event: events.append({"kind": "browser-log", "entry": event}),
+    )
+    page.add_init_script("""(()=>{
+      const probe=window.__comparisonExportProbe=[];
+      const save=(kind,value={})=>{probe.push({kind,at:performance.now(),...value});if(probe.length>100)probe.shift()};
+      document.addEventListener('click',event=>{const button=event.target.closest?.('#comparison-export');
+        if(button)save('click',{trusted:event.isTrusted,onclickBound:typeof button.onclick==='function'})},true);
+      const create=URL.createObjectURL,revoke=URL.revokeObjectURL,click=HTMLAnchorElement.prototype.click;
+      URL.createObjectURL=function(blob){const url=create.call(this,blob);save('blob-created',{url,bytes:blob.size});return url};
+      URL.revokeObjectURL=function(url){save('blob-revoked',{url});return revoke.call(this,url)};
+      HTMLAnchorElement.prototype.click=function(){if(this.download)save('anchor-click',{url:this.href,filename:this.download});return click.call(this)};
+    })()""")
+
+
+def download_selection(page):
+    def state():
+        try:
+            return page.evaluate("""()=>({url:location.href,root:{...document.querySelector('#five-dataset-comparison').dataset},
+          baseline:document.querySelector('#comparison-baseline-select')?.value,
+          release:document.querySelector('#comparison-release-select')?.value,
+          onclickBound:typeof document.querySelector('#comparison-export')?.onclick==='function',
+          events:window.__comparisonExportProbe||[]})""")
+        except Exception as error:
+            return {"url": page.url, "state_error": str(error)}
+
+    before = state()
+    stage = "click-and-wait-for-download"
+    try:
+        with page.expect_download() as download:
+            page.locator("#comparison-export").click()
+        stage = "download-started"
+        failure = download.value.failure()
+        assert failure is None, "Export download failed: " + str(failure)
+        stage = "download-completed"
+        return json.loads(Path(download.value.path()).read_bytes())
+    except Exception as error:
+        args.output.mkdir(parents=True, exist_ok=True)
+        evidence = {
+            "stage": stage,
+            "before": before,
+            "after": state(),
+            "error": str(error),
+            "browser_events": export_events[page],
+        }
+        (args.output / "export-failure.json").write_text(
+            json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        print("EXPORT_FAILURE", json.dumps(evidence, ensure_ascii=False), flush=True)
+        try:
+            page.screenshot(
+                path=str(args.output / "export-failure.png"), full_page=True
+            )
+        except Exception as screenshot_error:
+            print("Export screenshot failed:", screenshot_error, flush=True)
+        raise
+
+
+def read_export_blob(page):
+    # Verify each pairing's actual link and Blob without repeated native download events.
+    name, payload = page.locator("#comparison-export").evaluate(
+        """button=>new Promise((resolve,reject)=>{
+          const controller=new AbortController();
+          const timer=setTimeout(()=>{
+            controller.abort();
+            reject(new Error('Export did not emit a download link'));
+          },5000);
+          document.addEventListener('click',async event=>{
+            const link=event.target.closest('a[download]');
+            if(!link||!link.href.startsWith('blob:'))return;
+            event.preventDefault();
+            clearTimeout(timer);
+            controller.abort();
+            try {
+              const response=await fetch(link.href);
+              if(!response.ok)throw Error('Export Blob unreadable');
+              resolve([link.download,await response.json()]);
+            } catch(error) { reject(error); }
+          },{capture:true,signal:controller.signal});
+          button.click();
+        })"""
+    )
+    assert name == f"{payload['baseline']}-B1-{payload['candidate']}.json"
+    return payload
+
+
+def context_contrasts(page):
+    return page.locator(
+        "#context-tenant-supplement th,#context-tenant-supplement td"
+    ).evaluate_all(
+        """nodes=>{
+          const rgba=color=>{const v=color.match(/[\\d.]+/g).map(Number);return v.length===3?[...v,1]:v};
+          const over=(a,b)=>a.slice(0,3).map((v,i)=>v*a[3]+b[i]*(1-a[3]));
+          const luminance=rgb=>rgb.map(v=>v/255).map(v=>v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4)
+            .reduce((sum,v,i)=>sum+v*[0.2126,0.7152,0.0722][i],0);
+          return nodes.map(node=>{
+            const ancestors=[];for(let n=node;n;n=n.parentElement)ancestors.push(n);
+            const bg=ancestors.reverse().reduce((color,n)=>over(rgba(getComputedStyle(n).backgroundColor),color),[255,255,255]);
+            const foreground=over(rgba(getComputedStyle(node).color),bg);
+            const values=[luminance(foreground),luminance(bg)].sort((a,b)=>a-b);
+            return (values[1]+0.05)/(values[0]+0.05);
+          });
+        }"""
+    )
 
 
 def verify_development_priority(page, releases, baselines):
@@ -28,7 +160,7 @@ def verify_development_priority(page, releases, baselines):
             arg=value,
         )
 
-    def verify_original():
+    def verify_original(native=False):
         page.wait_for_function(
             '(id)=>document.querySelector("#five-dataset-comparison").dataset.baselineId===id',
             arg=original,
@@ -38,9 +170,7 @@ def verify_development_priority(page, releases, baselines):
         assert page.locator(".metric-change").count() == 0
         assert page.locator("[data-baseline-observation]").count() > 0
         assert "comparison" not in parse_qs(urlparse(page.url).query)
-        with page.expect_download() as download:
-            page.locator("#comparison-export").click()
-        exported = json.loads(Path(download.value.path()).read_bytes())
+        exported = download_selection(page) if native else read_export_blob(page)
         assert exported["baseline"] == original and exported["candidate"] == sr[0]
         assert exported["paired"] is False
 
@@ -58,7 +188,7 @@ def verify_development_priority(page, releases, baselines):
     page.select_option("#comparison-release-select", sr[0])
     wait_release(sr[0])
     page.select_option("#comparison-baseline-select", original)
-    verify_original()
+    verify_original(native=True)
     page.reload()
     verify_original()
     page.goto(
@@ -84,6 +214,7 @@ with sync_playwright() as playwright:
         page = browser.new_page(
             viewport={"width": width, "height": 900}, color_scheme=scheme
         )
+        observe_exports(page)
         page.goto(args.base_url.rstrip("/") + "/b0-b1.html?release=r8")
         page.wait_for_selector("#comparison-baseline-select", timeout=60000)
 
@@ -100,6 +231,11 @@ with sync_playwright() as playwright:
             args.base_url.rstrip("/") + "/data/engine-release-history-v1.json"
         ).json()
         fixed_model = read_descriptor(catalog["baseline"]["observations"])["model"]
+        independent_baselines = {
+            item["id"]: read_descriptor(item["observations"])
+            for item in catalog.get("comparison_baselines", [])
+            if item.get("observations")
+        }
         expected_models = {}
         for entry in catalog["entries"]:
             integration = entry.get("model_integration")
@@ -152,14 +288,29 @@ with sync_playwright() as playwright:
                         '[data-metric="relative_cost_per_token"] .chart-row-heading>span'
                     ).all_text_contents()
                 )
-                if release in ("r6", "r9", "r10"):
+                check_candidate = release in ("r6", "r9", "r10")
+                check_baseline = (
+                    release in ("r8", "r10") and baseline in independent_baselines
+                )
+                payload = None
+                if check_candidate or check_baseline:
+                    if (
+                        check_baseline
+                        and baseline == "official-0.23.0"
+                        and release == "r10"
+                    ):
+                        payload = download_selection(page)
+                    else:
+                        payload = read_export_blob(page)
+                    assert (payload["baseline"], payload["candidate"]) == (
+                        baseline,
+                        release,
+                    )
+                if check_candidate:
                     assert (
                         expected_models[release]
                         in page.locator("#comparison-lead").inner_text()
                     )
-                    with page.expect_download() as download:
-                        page.locator("#comparison-export").click()
-                    payload = json.loads(Path(download.value.path()).read_bytes())
                     assert (
                         payload["baseline"] == baseline
                         and payload["candidate"] == release
@@ -186,6 +337,35 @@ with sync_playwright() as playwright:
                         is None
                         for row in payload["rows"]
                     )
+                if check_baseline:
+                    assert payload["paired"] is False
+                    contrasts = context_contrasts(page)
+                    if contrasts:
+                        assert min(contrasts) >= 4.5
+                    for original in independent_baselines[baseline]["profiles"]:
+                        matches = [
+                            row
+                            for row in payload["rows"]
+                            if row["id"] == original["id"]
+                        ]
+                        assert len(matches) == 1
+                        assert all(
+                            matches[0]["baselineObservation"][key] == value
+                            for key, value in original["arm"].items()
+                        )
+                        if original.get("workload_kind") == "continuous-synthetic":
+                            assert original["id"] in ("4096-formal", "16384-formal")
+                            assert (
+                                len(
+                                    [
+                                        row
+                                        for row in payload["context"]
+                                        if row["id"] == original["id"]
+                                    ]
+                                )
+                                == 1
+                            )
+                            assert "C8" in matches[0]["label"]
                 if baseline != "original018-cann8.5.1":
                     assert (
                         page.locator(
@@ -199,6 +379,7 @@ with sync_playwright() as playwright:
         page = browser.new_page(
             viewport={"width": width, "height": 900}, color_scheme=scheme
         )
+        observe_exports(page)
         verify_development_priority(page, releases, baselines)
         print(
             "PASS",
