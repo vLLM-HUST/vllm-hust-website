@@ -312,7 +312,8 @@
   let comparisonBaselines = [];
   const baselineObservations = new Map();
   const originalBaselineSelected = () => selectedBaseline === 'original018-cann8.5.1';
-  const developmentComparison = () => originalBaselineSelected()&&new URL(location.href).searchParams.get('comparison')==='development'&&(srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial));
+  const developmentRelease = () => srIds.includes(selectedRelease)||(selectedRelease===controllerId&&controllerSpecial);
+  const developmentComparison = () => originalBaselineSelected()&&!new URL(location.href).searchParams.has('b0')&&new URL(location.href).searchParams.get('comparison')==='development'&&developmentRelease();
   let releaseCatalog = null;
   let fixedBaseline = null;
   let catalogRequest = null;
@@ -713,12 +714,12 @@
   function bindMenu() {
     root.querySelector('#comparison-baseline-select')?.addEventListener('change',event=>{
       selectedBaseline=event.target.value;
-      const url=new URL(location.href);url.searchParams.set('b0',selectedBaseline);history.replaceState(null,'',url);
+      const url=new URL(location.href);url.searchParams.set('b0',selectedBaseline);url.searchParams.delete('comparison');history.replaceState(null,'',url);
       showRelease();
     });
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
       selectedRelease=event.target.value;
-      const url=new URL(location.href);url.searchParams.set('release',selectedRelease);history.replaceState(null,'',url);
+      const url=new URL(location.href);url.searchParams.set('release',selectedRelease);if(url.searchParams.has('b0')||!developmentRelease())url.searchParams.delete('comparison');history.replaceState(null,'',url);
       showRelease();
     });
   }
@@ -1311,6 +1312,8 @@
       else if(selectedRelease==='r6'&&!data)await loadR6();
       if(request!==releaseRequest)return;
       if(!comparisonBaselines.some(item=>item.id===selectedBaseline))throw Error('Unknown B0 version');
+      const url=new URL(location.href);
+      if((url.searchParams.has('b0')||!developmentRelease())&&url.searchParams.has('comparison')){url.searchParams.delete('comparison');history.replaceState(null,'',url);}
       render();openLinkedDetail();
     } catch(error) {
       if(request!==releaseRequest)return;
