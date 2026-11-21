@@ -139,3 +139,17 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .supplement-workload-label span { font-size:13px;line-height:1.5;overflow-wrap:anywhere; }
 
 .comparison-dashboard[data-comparison="sr"] .bar-role { flex:0 0 43px; }
+
+.submission-assessment,.comparison-revision { margin:28px 0;min-width:0; }
+.submission-assessment .focus-table { overflow-x:auto; }
+.submission-assessment table { min-width:660px; }
+.submission-assessment td { white-space:normal;line-height:1.55; }
+.comparison-revision { border:1px solid #819498;border-radius:12px;padding:16px; }
+.comparison-revision summary { cursor:pointer;font-weight:650; }
+.rms-revision-metrics .focus-table { overflow-x:auto; }
+.release-coverage-summary { font-weight:650;margin:12px 0; }
+.release-archive-index ul { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:8px 24px; }
+@media(max-width:600px) {
+  [data-page="b0-b1"] .benchmark-tabs { grid-template-columns:repeat(3,minmax(0,1fr));padding:4px;gap:4px; }
+  [data-page="b0-b1"] .benchmark-tabs a { min-width:0;padding:8px 3px;font-size:11px;line-height:1.4; }
+}
