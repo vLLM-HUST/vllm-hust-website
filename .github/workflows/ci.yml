@@ -132,6 +132,7 @@ jobs:
           python scripts/verify_dataset_standard_browser.py http://127.0.0.1:8769/dataset-standard.html --output output/dataset-standard
           python scripts/verify_b1_definition_browser.py --url http://127.0.0.1:8769 --output output/playwright/b1-definition
           python scripts/verify_formal_baseline_browser.py --url http://127.0.0.1:8769 --output output/playwright/formal-baseline-isolation
+          python scripts/verify_baseline_version_browser.py --base-url http://127.0.0.1:8769
           python scripts/verify_five_dataset_comparison_browser.py --url http://127.0.0.1:8769 --output output/playwright/five-dataset-comparison
           python scripts/verify_controlplane_browser.py --url http://127.0.0.1:8769 --output output/playwright/controlplane
           python scripts/verify_optimization_exploration_browser.py --url http://127.0.0.1:8769 --output output/playwright/optimization-exploration

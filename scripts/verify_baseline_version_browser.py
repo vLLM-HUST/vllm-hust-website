@@ -23,6 +23,10 @@ with sync_playwright() as playwright:
         assert "original018-cann8.5.1" in baselines
         for baseline in baselines:
             page.select_option("#comparison-baseline-select", baseline)
+            # Existing formal/development browser suites cover the legacy
+            # selector default. This suite covers additional official versions.
+            if baseline == "original018-cann8.5.1":
+                continue
             for release in releases:
                 page.select_option("#comparison-release-select", release)
                 page.wait_for_function(
