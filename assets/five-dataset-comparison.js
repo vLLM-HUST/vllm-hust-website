@@ -106,12 +106,12 @@
         const candidate=key==='relative_cost_per_token'?null:row.observation?.[key];
         const before=base[key],limit=Math.max(1,before,Number.isFinite(candidate)?candidate:0);
         const line=(role,value)=>`<div class="bar-line"><span class="bar-role">${role}</span><span class="bar-track">${Number.isFinite(value)?`<span class="bar-fill ${role.toLowerCase()}" style="width:${100*value/limit}%"></span>`:''}</span><span class="bar-value">${n(Number.isFinite(value)?value/divisor:null)}</span></div>`;
-        return `<div class="chart-row" data-profile="${esc(row.id)}" data-baseline-observation="verified"${row.observation?' data-observation="single-arm"':''}><div class="chart-row-heading"><strong>${esc(labels[i])}<small class="chart-workload-label">B0 · ${esc(row.baselineModel)}${row.observation?' / B1 · '+esc(row.model):''}</small></strong><span>${row.observation?t('分别实测','Separate measurements'):t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished')}</span></div>${line('B0',before)}${line('B1',candidate)}</div>`;
+        return `<div class="chart-row" data-profile="${esc(row.id)}" data-baseline-observation="verified"${row.observation?' data-observation="single-arm"':''}><div class="chart-row-heading"><strong>${esc(labels[i])}<small class="chart-workload-label">B0 · ${esc(row.baselineModel)}${row.observation?' / B1 · '+esc(row.model):''}</small></strong><span>${Number.isFinite(before)&&Number.isFinite(candidate)?t('分别实测','Separate measurements'):Number.isFinite(before)?t('B0 已测 · B1 暂无结果','B0 measured · B1 unpublished'):Number.isFinite(candidate)?t('B1 已测 · B0 暂无结果','B1 measured · B0 unpublished'):t('未发布','Unpublished')}</span></div>${line('B0',before)}${line('B1',candidate)}</div>`;
       }
       if(row.observation){
         const raw=key==='relative_cost_per_token'?null:row.observation[key];
         const value=Number.isFinite(raw)?n(raw/divisor):'—';
-        return `<div class="chart-row" data-profile="${esc(row.id)}" data-observation="single-arm"><div class="chart-row-heading"><strong>${esc(labels[i])}<small class="chart-workload-label">${esc(row.model)} · ${t('单臂实测','Single-arm measurement')}</small></strong><span>${t('原值','Measured value')}</span></div><div class="bar-line"><span class="bar-role">B0</span><span class="bar-track"></span><span class="bar-value">—</span></div><div class="bar-line"><span class="bar-role">B1</span><span class="bar-track"></span><span class="bar-value">${value}</span></div></div>`;
+        return `<div class="chart-row" data-profile="${esc(row.id)}" data-observation="single-arm"><div class="chart-row-heading"><strong>${esc(labels[i])}<small class="chart-workload-label">${esc(row.model)} · ${Number.isFinite(raw)?t('单臂实测','Single-arm measurement'):t('本指标未发布','This metric is unpublished')}</small></strong><span>${Number.isFinite(raw)?t('原值','Measured value'):t('未发布','Unpublished')}</span></div><div class="bar-line"><span class="bar-role">B0</span><span class="bar-track"></span><span class="bar-value">—</span></div><div class="bar-line"><span class="bar-role">B1</span><span class="bar-track"></span><span class="bar-value">${value}</span></div></div>`;
       }
       if(!row.arms?.B0||!row.arms?.B1)return `<div class="chart-row metric-missing" data-profile="${esc(row.id)}" data-missing="true"><div class="chart-row-heading"><strong>${esc(labels[i])}</strong><span aria-label="${t('无配对数据','No paired data')}">—</span></div><p class="missing-metric">${esc(row.missingReason||t('本版未发布配对数据','No published pair for this version'))}</p></div>`;
       const change = key==='estimated_cny_per_million_output_tokens' ? row.changes_percent.unit_cost_change_percent : row.changes_percent[key];
@@ -354,7 +354,10 @@
     const pin=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),b=>b.toString(16).padStart(2,'0')).join('');
     if(pin!==descriptor.sha256||raw.byteLength!==descriptor.bytes)throw Error('B0 observations checksum mismatch');
     const value=JSON.parse(new TextDecoder().decode(raw));
-    if(value.schema!=='vllm-hust-official-baseline-observations/v1'||value.baseline_id!==baseline.id||value.model!==baseline.model||value.precision!==baseline.precision||value.tensor_parallel_size!==baseline.tensor_parallel_size||!value.runtime?.image_digest||!value.hardware?.chip_model||!value.hardware?.driver_version||!Array.isArray(value.profiles))throw Error('B0 observation identity mismatch');
+    if(value.schema!=='vllm-hust-official-baseline-observations/v1'||value.baseline_id!==baseline.id||value.model!==baseline.model||value.precision!==baseline.precision||value.tensor_parallel_size!==baseline.tensor_parallel_size||!value.hardware?.chip_model||!value.hardware?.driver_version||!Array.isArray(value.profiles))throw Error('B0 observation identity mismatch');
+    if(baseline.source_identity){
+      if(value.runtime?.kind!=='source-build-candidate'||!/^[a-f0-9]{64}$/.test(value.runtime.build_receipt_sha256||'')||Object.entries(baseline.source_identity).some(([key,expected])=>value.runtime[key]!==expected)||value.runtime.image_digest)throw Error('B0 source candidate identity mismatch');
+    }else if(value.runtime?.kind!=='official-image'||value.runtime.image_digest!==baseline.image_digest)throw Error('B0 official image identity mismatch');
     const ids=new Set();
     for(const row of value.profiles){
       const arm=row.arm;
@@ -416,6 +419,10 @@
         baselineIds.add(item.id);
         if(item.id!==baseline.id){
           if(!['pending','candidate-pending','partial','published'].includes(item.status) || !item.model || item.precision!=='BF16' || item.tensor_parallel_size!==2 || item.pairs!==null)throw Error('Unreviewed B0 observations');
+          if(item.source_identity){
+            const identity=item.source_identity;
+            if(identity.kind!=='source-build-candidate'||!/^candidate-/.test(item.id)||!/source candidate|源码候选/.test(item.label)||(item.label_en&&!/source candidate/i.test(item.label_en))||!/^sha256:[a-f0-9]{64}$/.test(identity.base_image_digest||'')||!['vllm_source_commit','ascend_source_commit'].every(key=>/^[a-f0-9]{40}$/.test(identity[key]||''))||item.image_digest)throw Error('Unreviewed B0 source candidate');
+          }else if(!/^sha256:[a-f0-9]{64}$/.test(item.image_digest||''))throw Error('Missing B0 image identity');
           if(item.observations)baselineObservations.set(item.id,await loadComparisonBaseline(item,publication));
           else if(['partial','published'].includes(item.status))throw Error('Missing B0 observations');
         }
@@ -696,7 +703,7 @@
           option(id,'B1-'+id+(id===controllerId&&controllerSpecial?' · '+controllerName():''))).join('')}</optgroup>
       </select>
       ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
-      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(item.label)}${item.status==='candidate-pending'?t(' · 候选版，待发布结果',' · candidate, results pending'):item.status==='pending'?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
+      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
       <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
@@ -1214,11 +1221,11 @@
   }
   function renderSelectedBaseline() {
     const selected=comparisonBaselines.find(item=>item.id===selectedBaseline);
-    const baseline={...selected,model:selected.model||fixedBaseline.model};
+    const baseline={...selected,label:t(selected.label,selected.label_en||selected.label),model:selected.model||fixedBaseline.model};
     const entry=releaseEntry()||releaseCatalog.attempts.find(item=>item.id===selectedRelease)||srEntries?.find(item=>item.id===selectedRelease)||{id:selectedRelease,mods:[],measurements:[],release_url:'./report-history.html'};
     const observed=originalBaselineSelected()?{...fixedBaseline,runtime:fixedBaseline.baseline,hardware:{chip_model:fixedBaseline.chip_model,driver_version:fixedBaseline.driver_version??null},profiles:[...fixedBaseline.profiles,...fixedBaseline.context.observations.map(row=>({id:'real-context-'+row.phase,label:row.phase,arm:{...row.B0.metrics,mean_ttft_ms:row.B0.metrics.ttft_ms.mean,mean_tpot_ms:row.B0.metrics.tpot_ms.mean}}))]}:baselineObservations.get(baseline.id);
     const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
-    const candidateModel=singleArmObservation(entry)?.candidate.model||'Qwen3.5-35B-A3B';
+    const candidateModel=modelIntegrationResults.get(entry.id)?.candidate.model||(typeof entry.model==='string'?entry.model:fixedBaseline.model);
     const controllerRows=selectedRelease===controllerId&&controllerSpecial?controllerSpecial.entry.profiles.map(row=>({id:row.id,observation:row.status==='complete'?{output_tokens_per_second:row.controller.output_tokens_per_second,mean_ttft_ms:1000*row.controller.time_to_first_content_seconds.mean,mean_tpot_ms:controllerSpecial.latency?.fixed_profiles_client.controller[row.id]?.mean_tpot_ms}:undefined})):null;
     if(controllerRows){const arm=controllerSpecial.entry.result.request_throttling_controller,latency=controllerSpecial.latency?.multi_turn_engine.controller;controllerRows.push({id:'swe-smith-trajectory',label:'SWE Trace Heavy Load',observation:{output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,mean_ttft_ms:latency?.mean_ttft_ms,mean_tpot_ms:latency?.mean_tpot_ms}});}
     const sourceRows=controllerRows|| (attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry));
@@ -1227,7 +1234,9 @@
     const rows=standardRows(allRows).map(row=>({id:row.id,label:row.label,model:candidateModel,
       observation:(row.arms?.B1||row.observation)?{...(row.arms?.B1||row.observation),relative_cost_per_token:null}:undefined,missingReason:reason,
       ...(observed?.profiles.some(item=>item.id===row.id)?{baselineObservation:{...observed.profiles.find(item=>item.id===row.id).arm,relative_cost_per_token:null},baselineModel:baseline.model}:{})}));
-    const context=rows.filter(row=>!['mmlu','hle','frontier','swe','terminal'].includes(row.id));
+    const isContext=row=>/^(real-context-|continuous-|(?:4096|16384|32768|multi-tenant)-formal$)/.test(row.id);
+    const context=rows.filter(isContext),performanceRows=rows.filter(row=>!isContext(row));
+    const contextTable=table([t('工况','Scenario'),'B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],context.map(row=>[row.label,n(row.baselineObservation?.output_tokens_per_second),n(row.observation?.output_tokens_per_second),n(row.baselineObservation?.mean_ttft_ms),n(row.observation?.mean_ttft_ms),n(row.baselineObservation?.mean_tpot_ms),n(row.observation?.mean_tpot_ms)]));
     const roles={B0:baseline.label,B1:'B1-'+entry.id};
     document.getElementById('comparison-title').textContent=t(baseline.label+' / B1 '+entry.id+' 测试记录',baseline.label+' / B1 '+entry.id+' test records');
     document.getElementById('comparison-lead').textContent='B0: '+baseline.model+' · B1: '+candidateModel;
@@ -1240,11 +1249,11 @@
       <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${t('所选组合暂无核验配对','No verified pair for the selected combination')}</small></article>`).join('')}</div>
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],t('配置以各自来源为准','See each source for configuration'))}
       ${coverageView(rows)}<section><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${esc(reason)}</p><div class="metric-grid">
-      ${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,rows,rows.map(row=>row.label),roles)}
-      ${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,rows,rows.map(row=>row.label),roles)}
-      ${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,rows,rows.map(row=>row.label),roles)}
-      ${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'—',1,rows,rows.map(row=>row.label),roles)}</div></section>
-      <section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('查看数值','View metrics')} ↗</button></div><div class="supplement-highlights">${['16K','32K',t('四租户','Four tenants')].map(label=>`<div><span>${label}</span><strong>—</strong></div>`).join('')}</div><div class="supplement-plot missing-plot">${esc(reason)}</div></section>
+      ${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,performanceRows,performanceRows.map(row=>row.label),roles)}
+      ${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,performanceRows,performanceRows.map(row=>row.label),roles)}
+      ${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,performanceRows,performanceRows.map(row=>row.label),roles)}
+      ${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'—',1,performanceRows,performanceRows.map(row=>row.label),roles)}</div></section>
+      <section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('查看数值','View metrics')} ↗</button></div><div class="supplement-highlights">${[t('16K 吞吐比','16K throughput ratio'),t('32K 吞吐比','32K throughput ratio'),t('四租户收益','Four-tenant improvement')].map(label=>`<div><span>${label}</span><strong>—</strong></div>`).join('')}</div><div class="supplement-plot${context.length?'':' missing-plot'}">${context.length?contextTable:esc(reason)}</div></section>
       <div class="detail-actions">${['compute','methods','quality','evidence'].map(key=>`<button type="button" data-detail="${key}">${t({compute:'有效算力参考',methods:'公式与比较方式',quality:'质量与评分明细',evidence:'原始证据'}[key],{compute:'Compute reference',methods:'Methods',quality:'Quality',evidence:'Evidence'}[key])} ↗</button>`).join('')}<button type="button" id="comparison-export">${t('导出所选组合','Export selection')}</button></div>${detailDialog()}</section>`;
     const control=root.querySelector('.runtime-pair>div:first-child');
     control.querySelector('strong').textContent=baseline.label;

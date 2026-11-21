@@ -1,6 +1,9 @@
 """Check the assembled site's B0/B1 selectors; does not generate measurements."""
 
 import argparse
+import hashlib
+import json
+from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -8,12 +11,39 @@ parser.add_argument("--base-url", default="http://127.0.0.1:8000")
 args = parser.parse_args()
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(headless=True)
-    for width, scheme in ((1366, "light"), (390, "dark")):
+    for width, scheme in (
+        (1366, "light"),
+        (1366, "dark"),
+        (390, "light"),
+        (390, "dark"),
+    ):
         page = browser.new_page(
             viewport={"width": width, "height": 900}, color_scheme=scheme
         )
         page.goto(args.base_url.rstrip("/") + "/b0-b1.html?release=r8")
         page.wait_for_selector("#comparison-baseline-select", timeout=60000)
+
+        def read_descriptor(descriptor):
+            response = page.request.get(
+                args.base_url.rstrip("/") + "/" + descriptor["path"]
+            )
+            raw = response.body()
+            assert response.ok and len(raw) == descriptor["bytes"]
+            assert hashlib.sha256(raw).hexdigest() == descriptor["sha256"]
+            return json.loads(raw)
+
+        catalog = page.request.get(
+            args.base_url.rstrip("/") + "/data/engine-release-history-v1.json"
+        ).json()
+        fixed_model = read_descriptor(catalog["baseline"]["observations"])["model"]
+        expected_models = {}
+        for entry in catalog["entries"]:
+            integration = entry.get("model_integration")
+            expected_models[entry["id"]] = (
+                read_descriptor(integration["summary"])["candidate"]["model"]
+                if integration
+                else entry.get("model") or fixed_model
+            )
         baselines = page.locator("#comparison-baseline-select option").evaluate_all(
             "(rows)=>rows.map(row=>row.value)"
         )
@@ -46,6 +76,39 @@ with sync_playwright() as playwright:
                 )
                 assert page.locator(".metric-chart").count() == 4
                 assert page.locator("#context-tenant-supplement").count() == 1
+                assert all(
+                    value
+                    not in (
+                        "Measured value",
+                        "原值",
+                        "分别实测",
+                        "Separate measurements",
+                    )
+                    for value in page.locator(
+                        '[data-metric="relative_cost_per_token"] .chart-row-heading>span'
+                    ).all_text_contents()
+                )
+                if release in ("r9", "r10"):
+                    assert (
+                        expected_models[release]
+                        in page.locator("#comparison-lead").inner_text()
+                    )
+                    with page.expect_download() as download:
+                        page.locator("#comparison-export").click()
+                    payload = json.loads(Path(download.value.path()).read_bytes())
+                    assert (
+                        payload["baseline"] == baseline
+                        and payload["candidate"] == release
+                    )
+                    assert all(
+                        row["model"] == expected_models[release]
+                        for row in payload["rows"]
+                    )
+                    assert all(
+                        row.get("observation", {}).get("relative_cost_per_token")
+                        is None
+                        for row in payload["rows"]
+                    )
                 if baseline != "original018-cann8.5.1":
                     assert (
                         page.locator(
