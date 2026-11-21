@@ -710,7 +710,6 @@
     }).join('');
     const specialIds=[...srIds].sort((a,b)=>BigInt(a.slice(2))>BigInt(b.slice(2))?-1:1);
     return `<div class="comparison-meta release-selector">
-      <div class="release-fields"><div class="release-field">
       <label for="comparison-release-select">${t('B1 版本 / 运行记录','B1 version / run history')}</label>
       <select id="comparison-release-select">
         <optgroup label="${t('冻结版本','Frozen releases')}">${engineOptions(releaseIds,releaseCatalog?.entries)}</optgroup>
@@ -718,21 +717,20 @@
         <optgroup label="${t('SR 实验版本','Experimental SR releases')}">${specialIds.map(id=>
           option(id,'B1-'+id)).join('')}</optgroup>
       </select>
-      </div>
-      ${developmentComparison()?'':`<div class="release-field"><label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
-      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select></div>`}
-      <div class="release-field"><label for="comparison-controlplane-select">${t('控制面','Control plane')}</label>
-      <select id="comparison-controlplane-select">
-        <option value="">${t('无','None')}</option>
-        <option value="${controllerOption}" ${selectedController?'selected':''}>${controllerName()}</option>
-      </select></div></div>
-      <div class="release-links">
-      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:
-      `<a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
+      ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
+      <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(t(item.label,item.label_en||item.label))}${['candidate-pending','pending'].includes(item.status)?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
+      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
-    </div></div>`;
+    </div>
+    <div class="comparison-meta release-selector controlplane-selector">
+      <label for="comparison-controlplane-select">${t('控制面','Control plane')}</label>
+      <select id="comparison-controlplane-select">
+        <option value="">${t('无','None')}</option>
+        <option value="${controllerOption}" ${selectedController?'selected':''}>${controllerName()}</option>
+      </select>
+    </div>`;
   }
   function bindMenu() {
     root.querySelector('#comparison-controlplane-select').addEventListener('change',event=>{
@@ -1047,7 +1045,7 @@
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
-    const selector=root.querySelector('.release-selector');
+    const selector=root.querySelector('.controlplane-selector');
     if(!selector)return;
     const panel=document.createElement('section');
     panel.id='controller-comparison';

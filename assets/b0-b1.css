@@ -97,13 +97,8 @@ body[data-page="b0-b1"] .focus-hero h1 { font-size: clamp(28px, 3vw, 40px); marg
 .release-selector select,.release-selector option,.release-selector optgroup { color:#203137;background:#fff;color-scheme:light; }
 .release-selector select { font:inherit;min-width:0;max-width:100%;padding:8px 12px;border:1px solid #63777e;border-radius:8px;cursor:pointer; }
 .release-selector select:focus-visible { outline:3px solid #006b79;outline-offset:3px; }
-.release-selector { display:grid;gap:12px; }
-.release-fields { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px; }
-.release-field { display:flex;align-items:center;min-width:0;gap:10px; }
-.release-field label { flex:none; }
-.release-field select { flex:1;width:0; }
-.release-links { display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap; }
-@media(max-width:800px) { .release-fields { grid-template-columns:1fr;gap:8px; } .release-field label { min-width:9rem; } }
+.controlplane-selector { justify-content:flex-start; }
+.controlplane-selector select { width:12rem; }
 
 #controller-comparison { margin:24px 0 32px;padding:22px;border:1px solid #819498;border-radius:14px;min-width:0; }
 #controller-comparison-title { font-size:22px;margin:0 0 14px; }

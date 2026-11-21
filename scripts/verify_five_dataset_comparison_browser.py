@@ -205,6 +205,9 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
     control.select_option("request-throttling")
     expect(page).to_have_url(canonical)
     expect(panel).to_have_attribute("data-engine-release", "r8")
+    expect(
+        root.locator(".release-selector + .controlplane-selector + #controller-comparison")
+    ).to_have_count(1)
     expect(menu).to_have_value("r8")
     expect(baseline).to_have_value(original)
     menu.select_option("r6")
