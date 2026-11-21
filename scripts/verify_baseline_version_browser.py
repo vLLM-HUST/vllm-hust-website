@@ -12,6 +12,26 @@ parser.add_argument("--base-url", default="http://127.0.0.1:8000")
 args = parser.parse_args()
 
 
+def context_contrasts(page):
+    return page.locator(
+        "#context-tenant-supplement th,#context-tenant-supplement td"
+    ).evaluate_all(
+        """nodes=>{
+          const rgba=color=>{const v=color.match(/[\\d.]+/g).map(Number);return v.length===3?[...v,1]:v};
+          const over=(a,b)=>a.slice(0,3).map((v,i)=>v*a[3]+b[i]*(1-a[3]));
+          const luminance=rgb=>rgb.map(v=>v/255).map(v=>v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4)
+            .reduce((sum,v,i)=>sum+v*[0.2126,0.7152,0.0722][i],0);
+          return nodes.map(node=>{
+            const ancestors=[];for(let n=node;n;n=n.parentElement)ancestors.push(n);
+            const bg=ancestors.reverse().reduce((color,n)=>over(rgba(getComputedStyle(n).backgroundColor),color),[255,255,255]);
+            const foreground=over(rgba(getComputedStyle(node).color),bg);
+            const values=[luminance(foreground),luminance(bg)].sort((a,b)=>a-b);
+            return (values[1]+0.05)/(values[0]+0.05);
+          });
+        }"""
+    )
+
+
 def verify_development_priority(page, releases, baselines):
     original = "original018-cann8.5.1"
     assert "sr1" in releases
@@ -180,6 +200,9 @@ with sync_playwright() as playwright:
                         page.locator("#comparison-export").click()
                     payload = json.loads(Path(download.value.path()).read_bytes())
                     assert payload["paired"] is False
+                    contrasts = context_contrasts(page)
+                    if contrasts:
+                        assert min(contrasts) >= 4.5
                     for original in independent_baselines[baseline]["profiles"]:
                         matches = [
                             row
