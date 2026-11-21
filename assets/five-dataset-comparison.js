@@ -696,7 +696,7 @@
       </select>
       <label for="comparison-baseline-select">${t('B0 版本','B0 version')}</label>
       <select id="comparison-baseline-select">${comparisonBaselines.map(item=>`<option value="${esc(item.id)}" ${selectedBaseline===item.id?'selected':''}>${esc(item.label)}${item.status==='candidate-pending'?t(' · 候选版，待发布结果',' · candidate, results pending'):item.status==='pending'?t(' · 待发布结果',' · results pending'):''}</option>`).join('')}</select>
-      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${t('B0 来源','B0 source')} ↗</a>
+      <a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
