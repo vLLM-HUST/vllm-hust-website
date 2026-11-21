@@ -206,7 +206,7 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
     expect(page).to_have_url(canonical)
     expect(panel).to_have_attribute("data-engine-release", "r8")
     expect(
-        root.locator(".release-selector + .controlplane-selector + #controller-comparison")
+        root.locator(".release-selector + #controller-comparison")
     ).to_have_count(1)
     expect(menu).to_have_value("r8")
     expect(baseline).to_have_value(original)
