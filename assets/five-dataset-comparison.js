@@ -996,6 +996,11 @@
     return phase.tenants>1?t(`${phase.tenants}租户 / C${phase.concurrency}`,`${phase.tenants} tenants / C${phase.concurrency}`):
       `${cohort.min_tokens/1024}K–${cohort.max_tokens_exclusive/1024}K / C${phase.concurrency}`;
   }
+  function isTerminalReplayC8(supplement, row) {
+    const source = sealedContextWorkload(supplement.protocol?.input_sha256);
+    return source?.datasets.length === 1 && source.datasets[0] === 'Terminal-Bench 2.1'
+      && row.B1.tenants === 1 && row.B1.concurrency === 8;
+  }
   function versionSupplementRows(entry) {
     const a=entry.context_tenant_supplement;
     if(!a)return [];
@@ -1010,7 +1015,7 @@
       const cards=cardComparison(row.B0.physical_cards,row.B1.physical_cards);
       return {id:'real-context-'+row.phase,label:supplementLabel(a,row),arms,changes_percent,...cards,
               workloadKind:'fixed-data-context',workloadSource:sealedContextWorkload(a.protocol?.input_sha256),
-              workloadLabel:[contextWorkloadLabel(a),cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
+              workloadLabel:[isTerminalReplayC8(a,row)?terminalReplayWorkloadLabel():contextWorkloadLabel(a),cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
     });
   }
   async function loadSubmissionAssessment(entry, publication) {
@@ -1212,11 +1217,16 @@
     }
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     const cards=cardComparison(tenant?.B0.physical_cards,tenant?.B1.physical_cards);
+    const replayBands=a.comparisons.filter(row=>isTerminalReplayC8(a,row))
+      .map(row=>supplementLabel(a,row).replace(' / C8',''));
+    const replayLabel=replayBands.length
+      ? `<div class="supplement-workload-label" data-workload="terminal-replay" role="note"><strong>${esc(replayBands.join(' · '))}</strong><span>${terminalReplayWorkloadLabel()}</span></div>`
+      : '';
     return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"${cardComparisonAttribute(cards)}><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · ${esc(contextWorkloadLabel(a))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
       ${cards.cardLabel?`<p>${esc(cardComparisonLabel(cards))}</p>`:''}
       <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant?.equal_rate_same_card_count_unit_cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant?.B0.utilization.mean_percent)} → ${n(tenant?.B1.utilization.mean_percent)}%</strong></div></div>
-      <figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(contextWorkloadLabel(a))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure></section>`;
+      <figure>${replayLabel}<div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(contextWorkloadLabel(a))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure></section>`;
   }
   function versionSupplementDetails(entry, contextRows) {
     const a=entry.context_tenant_supplement;
