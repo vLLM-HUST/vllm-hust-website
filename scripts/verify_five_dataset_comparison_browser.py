@@ -955,17 +955,18 @@ def verify(url, output):
                             ).to_have_text(values[1])
                         else:
                             expect(root.locator(".metric-chart")).to_have_count(4)
-                            expect(root.locator(".metric-missing")).to_have_count(
-                                0 if release == "r5" else 20
-                            )
-                            expect(root.locator(".bar-value")).to_have_count(
-                                40 if release == "r5" else 0
-                            )
+                            expect(root.locator(".metric-missing")).to_have_count(0)
+                            expect(root.locator(".bar-value")).to_have_count(40)
                             if release == "r5":
                                 expect(root).to_contain_text(
                                     "ready" if lang == "zh" else "readiness"
                                 )
                         if release in ("r1", "r2", "r3"):
+                            expect(
+                                root.locator(
+                                    '.dataset-coverage [data-b0-available="true"][data-b1-available="false"]'
+                                )
+                            ).to_have_count(5)
                             root.locator('[data-detail="evidence"]').click()
                             expect(root.locator("dialog")).to_contain_text(
                                 "continuous-b1-packed-" + release
