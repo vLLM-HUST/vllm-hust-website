@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 INDEX = (Path(__file__).resolve().parents[1] / "ecosystem-archive.html").read_text(
@@ -86,10 +87,34 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         if item.get("public_surface", True) is not False
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
-    mod_count = len(mod_projects)
     assert "instance-controller" in mod_projects
     assert "kv-controller" in mod_projects
-    assert mod_count == 59
+    # Exercise the shipped catalog summary against this publication's inputs.
+    rendered_summary = subprocess.check_output(
+        [
+            "node",
+            "-e",
+            """
+const fs = require('node:fs');
+global.window = globalThis;
+require('./assets/ecosystem-catalog.js');
+const registry = JSON.parse(fs.readFileSync('data/ecosystem.json', 'utf8'));
+const taxonomy = JSON.parse(fs.readFileSync('data/mod-taxonomy.json', 'utf8'));
+const summary = EcosystemCatalog.summarize(registry, taxonomy);
+console.log(JSON.stringify({
+  total: summary.total,
+  projects: summary.mods.map(item => item.catalog_project_id || item.id).sort()
+}));
+""",
+        ],
+        cwd=root,
+        text=True,
+        encoding="utf-8",
+    )
+    assert json.loads(rendered_summary) == {
+        "total": len(mod_projects),
+        "projects": sorted(mod_projects),
+    }
     scenario_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
