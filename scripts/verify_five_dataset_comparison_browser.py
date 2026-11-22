@@ -488,6 +488,28 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     assert dashboard_layout(page.locator("#five-dataset-comparison")) == layout
 
 
+def assert_terminal_replay_labels(root, lang):
+    replay = (
+        "Terminal-Bench 2.1 离线请求回放 · 并发 8"
+        if lang == "zh"
+        else "Terminal-Bench 2.1 offline request replay · concurrency 8"
+    )
+    label = root.locator('#context-tenant-supplement [data-workload="terminal-replay"]')
+    expect(label).to_contain_text(replay)
+    for band in ("4K–8K", "16K–24K", "32K–48K"):
+        expect(label).to_contain_text(band)
+    for phase in ("4096", "16384", "32768"):
+        labels = root.locator(
+            f'[data-profile="real-context-{phase}-formal"] .chart-workload-label'
+        )
+        expect(labels).to_have_count(4)
+        expect(labels).to_contain_text([replay] * 4)
+    for label in root.locator(
+        '[data-profile="real-context-multi-tenant-formal"] .chart-workload-label'
+    ).all():
+        expect(label).not_to_contain_text(replay)
+
+
 def assert_model_integration(page, root, entry, url, lang):
     # Keep the same dashboard, showing actual B1 values without inventing a
     # fixed-B0 pair or substituting an older optimized engine as the control.
@@ -964,6 +986,7 @@ def verify(url, output):
                     extra = published_r8["context_tenant_supplement"]
                     supplement = root.locator("#context-tenant-supplement")
                     expect(supplement).to_have_attribute("data-source-release", "r8")
+                    assert_terminal_replay_labels(root, lang)
                     for row in extra["comparisons"]:
                         for key, divisor in [
                             ("output_tokens_per_second", 1),
@@ -1146,6 +1169,8 @@ def verify(url, output):
                         expect(root).to_have_attribute(
                             "data-release", entry["id"], timeout=30000
                         )
+                        if entry["id"] == "r9":
+                            assert_terminal_replay_labels(root, lang)
                         if entry.get("model_integration"):
                             assert dashboard_layout(root) == r8_layout
                             assert_model_integration(page, root, entry, url, lang)
