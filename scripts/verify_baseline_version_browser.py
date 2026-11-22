@@ -203,7 +203,9 @@ def verify_development_priority(page, releases, baselines):
     verify_original()
 
 
-def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
+def verify_full_baseline_details(
+    page, source, label, width, scheme, prefix="", repair=None, commit=None
+):
     """Read the two existing dialogs; do not invent paired goals or grades."""
     expected_tracks = [
         [
@@ -282,6 +284,20 @@ def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
     assert (
         "算量适用性未通过" in text or "Arithmetic applicability is ineligible" in text
     )
+    patch_detail = dialog.locator("[data-b0-kv-prefix-repair]")
+    if repair:
+        assert patch_detail.is_visible()
+        interval = "–".join(
+            f"{float(value):.3f}" for value in repair["tflops_per_card_interval"]
+        )
+        assert interval in patch_detail.inner_text()
+        assert "3 × 200" in patch_detail.inner_text()
+        assert patch_detail.locator("a").get_attribute("href") == (
+            f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
+            "reports/b0-mtp-kv-prefix-repair-v1/README.md"
+        )
+    else:
+        assert patch_detail.count() == 0
     page.screenshot(
         path=str(args.output / f"{prefix}compute-{width}-{scheme}.png"), full_page=True
     )
@@ -576,6 +592,22 @@ with sync_playwright() as playwright:
             args.base_url.rstrip("/") + "/data/benchmark-source-manifest.json"
         ).json()
         commit = publication["commit"]
+        repair_source = next(
+            (
+                file
+                for file in publication["files"]
+                if file["website_path"] == "data/b0-mtp-kv-prefix-repair-v1/report.json"
+            ),
+            None,
+        )
+        repair_versions = {}
+        if repair_source:
+            repair_report = read_descriptor(
+                {**repair_source, "path": repair_source["website_path"]}
+            )
+            assert repair_report["scope"] == "patched-variants-only"
+            repair_versions = repair_report["versions"]
+            assert set(repair_versions) == {"0.23.0", "0.30.0"}
         source = next(
             file
             for file in publication["files"]
@@ -945,6 +977,8 @@ with sync_playwright() as playwright:
                         width,
                         scheme,
                         prefix="official030-" if baseline == "official-0.30.0" else "",
+                        repair=repair_versions.get(baseline.removeprefix("official-")),
+                        commit=commit,
                     )
                 if baseline != "original018-cann8.5.1":
                     assert (
