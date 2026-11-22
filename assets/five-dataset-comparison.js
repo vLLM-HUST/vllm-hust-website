@@ -1337,16 +1337,120 @@
     });
   }
 
+  async function loadCandidateAssessment(entry) {
+    const asset=entry.candidate_submission_assessment;
+    const bindings=releasePublication.files.filter(file=>file.website_path===asset.path);
+    if(!/^data\/[a-z0-9-]+\.json$/.test(asset.path)||bindings.length!==1||
+       bindings[0].sha256!==asset.sha256||bindings[0].bytes!==asset.bytes){
+      throw Error('Unbound candidate submission assessment');
+    }
+    const response=await fetch('./'+asset.path,{cache:'no-cache',signal:AbortSignal.timeout(12000)});
+    const value=await readPublishedJson(releasePublication,asset.path,response);
+    if(value.schema!=='vllm-hust-candidate-v2-assessment/v1'||value.release_family!==entry.id||
+       value.baseline_id!==releaseCatalog.baseline.id||!/^[a-f0-9]{40}$/.test(value.engine_revision)){
+      throw Error('Candidate assessment identity mismatch');
+    }
+    return value;
+  }
+
+  function candidateAssessment(item, report, value) {
+    const record=value.candidates?.[item.kind], goals=['4.1','4.2','4.3','4.4'];
+    const targets=record?.targets;
+    const sha=hash=>/^[a-f0-9]{64}$/.test(hash||'');
+    const prefix='https://github.com/DeepLinkNext/DeepLinkEngine/blob/'+value.engine_revision+'/evidence/';
+    const sources=['compute_audit','original_evidence_audit','context_audit'].map(key=>record?.sources?.[key]);
+    const fail=()=>{throw Error('Candidate assessment evidence does not match its fixed trial');};
+    if(record?.selection?.release!==report.release||record.selection.baseline_id!==report.baseline_id||
+       record.selection.status!=='candidate'||record.selection.version!==value.release_family+'-'+item.kind||
+       record.fixed_five?.sha256!==item.summary.sha256||record.fixed_five?.bytes!==item.summary.bytes||
+       !goals.every(id=>['milestone','final'].every(gate=>typeof targets?.[id]?.[gate]?.met==='boolean'))||
+       !sources.every(source=>source?.url?.startsWith(prefix)&&sha(source.sha256)&&Number.isInteger(source.bytes)&&source.bytes>0))fail();
+
+    const [compute,performance,context,cost]=goals.map(id=>targets[id]);
+    const roles=['B0','B1'], native=compute.native, workload=context.baseline_context.workload;
+    const phases=['4096-formal','16384-formal','32768-formal','multi-tenant-formal'];
+    if(native.release!==report.release||native.baseline_id!==report.baseline_id||
+       context.paired.comparison.map(row=>row.phase).join()!==phases.join()||
+       !workload.datasets?.length||!workload.task_ids?.length||
+       !roles.every(role=>sha(native.native_seals[role])&&native.arms[role].repetitions.length===3&&
+         sha(context.paired.arm_seals[role])&&context.physical_cards[role]?.length===2))fail();
+    const costAreas=[cost.mmlu_full_answers,cost.four_tenant],rent=cost.published_rental;
+    if(cost.cost_basis!=='published_rental'||!/^https:\/\/[^\s]+$/.test(rent.source_url)||
+       !roles.every((role,i)=>costAreas[0].arms[role].measurement_seal_sha256===
+         report.measurements.mmlu[i===0?'B0':'candidate'].source_seal_sha256&&
+         costAreas[1].arms[role].measurement_seal_sha256===context.paired.arm_seals[role]))fail();
+
+    const status=gate=>gate.met?t('达成','Met'):t('未达成','Not met');
+    const heading=(label,fields,rows)=>'<h4>'+esc(label)+'</h4>'+table(fields,rows);
+    const ratio=value=>n(Number(value))+'×';
+    const percent=value=>n(Number(value))+'%';
+    const speedRows=fixedProfiles.map(([id])=>{
+      const {B0,candidate}=report.measurements[id],row=performance.datasets[id];
+      const ratios=row.ratios;
+      const metrics={throughput_ratio:'output_tokens_per_second',ttft_ratio:'mean_ttft_ms',tpot_ratio:'mean_tpot_ms'};
+      if(!record.datasets[id]||!Object.entries(metrics).every(([key,metric])=>
+        close(Number(ratios[key]),candidate[metric]/B0[metric])))fail();
+      const drop=row.quality?.drop_pp;
+      const quality=drop==null?'—':typeof drop==='object'?
+        Object.entries(drop).map(([track,value])=>track+' '+n(Number(value))).join(' / '):n(Number(drop));
+      const dataset=t(record.datasets[id],record.datasets[id].replace(' 公开轨迹',' public traces'));
+      return [dataset,...Object.keys(metrics).map(key=>ratio(ratios[key])),
+        quality,status(row.milestone),status(row.final)];
+    });
+    const dataName=workload.datasets.join(' / ');
+    const contextRows=context.paired.comparison.map((row,i)=>[dataName,
+      ['4K / C8','16K / C8','32K / C8',t('4K / 四租户 C24','4K / four tenants C24')][i],
+      ...roles.map(role=>n(row[role].metrics.output_tokens_per_second)),
+      ...roles.map(role=>String(row[role].metrics.successful)),
+      ...roles.map(role=>n(row[role].metrics.ttft_ms.p95)),...roles.map(role=>context.physical_cards[role].join(', '))]);
+    const costRows=costAreas.map((area,i)=>[i===0?t('MMLU-Pro 200 完整回答','MMLU-Pro 200 full answers'):dataName+' · 4K / C24',
+      ...roles.map(role=>n(Number(area.arms[role].cost_per_million_output_tokens_cny))),
+      percent(area.unit_cost_reduction_percent),...roles.map(role=>percent(area.utilization[role].mean_percent))]);
+    const sourceNames=t(['原生计时与算量','固定五项原件复算','上下文与四租户封存'],['Native timing and work','Fixed-profile source audit','Context and four-tenant seals']);
+    return '<p>'+esc(report.release)+' · '+esc(record.selection.model)+' · BF16 · TP2 · '+t('固定 0.18 B0','Fixed 0.18 B0')+'</p>'+
+      table(t(['送测 V2','里程碑','结题'],['Submission V2','Milestone','Final']),
+        goals.map((id,i)=>[id+' '+names()[i],status(targets[id].milestone),status(targets[id].final)]))+
+      heading('4.1 · MMLU-Pro 200 / out256',
+        t(['运行臂','物理卡','三轮计时 / 秒','有效算力下界 / TFLOP/s/卡','效率下界','原生封存 SHA-256'],
+          ['Arm','Physical cards','Three runs / s','Effective lower / TFLOP/s/card','Efficiency lower','Native seal SHA-256']),
+        roles.map(role=>[role,native.physical_cards[role].join(', '),
+          native.arms[role].repetitions.map(run=>Number(run.T_seconds).toFixed(3)).join(' / '),
+          n(Number(compute.achieved_tflops_per_card_lower[role])),percent(compute.efficiency_lower_percent[role]),native.native_seals[role]]))+
+      heading(t('4.2 · 固定五项','4.2 · Five fixed profiles'),
+        t(['数据集','吞吐 B1/B0','平均 TTFT B1/B0','平均 TPOT B1/B0','正确率降幅 / pp','里程碑','结题'],
+          ['Dataset','Throughput B1/B0','Mean TTFT B1/B0','Mean TPOT B1/B0','Accuracy drop / pp','Milestone','Final']),speedRows)+
+      heading(t('4.3 · 真实上下文与四租户','4.3 · Real context and four tenants'),
+        t(['数据集','工况','B0 tok/s','B1 tok/s','B0 成功','B1 成功','B0 TTFT P95 / ms','B1 TTFT P95 / ms','B0 物理卡','B1 物理卡'],
+          ['Dataset','Workload','B0 tok/s','B1 tok/s','B0 successes','B1 successes','B0 TTFT P95 / ms','B1 TTFT P95 / ms','B0 cards','B1 cards']),contextRows)+
+      '<p>'+t('16K/4K 吞吐','16K/4K throughput')+' '+percent(Number(context.measured_ratios.throughput)*100)+
+      ' · TTFT P95 '+ratio(context.measured_ratios.ttft_p95)+
+      ' · '+t('32K 窗口最大/最小','32K window max/min')+
+      ' · '+t('吞吐','Throughput')+' '+ratio(context.measured_window_ratios.throughput)+
+      ' · TTFT P95/P99 '+ratio(context.measured_window_ratios.ttft_p95)+' / '+ratio(context.measured_window_ratios.ttft_p99)+
+      ' · TPOT P95/P99 '+ratio(context.measured_window_ratios.tpot_p95)+' / '+ratio(context.measured_window_ratios.tpot_p99)+'</p>'+
+      '<details><summary>'+t('任务 ID 与上下文封存','Task IDs and context seals')+'</summary><p>'+esc(workload.task_ids.join(' · '))+'</p>'+
+      table(t(['运行臂','原始封存 SHA-256'],['Arm','Original seal SHA-256']),roles.map(role=>[role,context.paired.arm_seals[role]]))+'</details>'+
+      heading(t('4.4 · 公开租金折算','4.4 · Published rental estimate'),
+        t(['工况','B0 元/百万输出词元','B1 元/百万输出词元','成本降幅','B0 AI Core','B1 AI Core'],
+          ['Workload','B0 CNY/million output tokens','B1 CNY/million output tokens','Cost reduction','B0 AI Core','B1 AI Core']),costRows)+
+      '<p><a href="'+esc(rent.source_url)+'">'+esc(rent.publisher)+' ↗</a> · '+Number(rent.monthly_cost_per_card_cny).toLocaleString(t('zh-CN','en-US'))+' '+t('元/卡月','CNY/card-month')+'</p>'+
+      '<p>'+sources.map((source,i)=>'<a href="'+esc(source.url)+'">'+esc(sourceNames[i])+' ↗</a>').join(' · ')+'</p>';
+  }
+
+
   function candidateReportPanels(entry) {
     return candidateReports(entry).map(item=>`<details class="comparison-revision" data-candidate-report="${esc(item.kind)}">
-      <summary>${esc(entry.id+' · '+item.label)} · ${t('固定五项和两档 C8','Five fixed profiles and both C8 bands')}</summary>
+      <summary>${esc(entry.id+' · '+item.label)} · ${entry.candidate_submission_assessment?
+        t('固定 0.18 B0 · V2 实测与判定','Fixed 0.18 B0 · V2 measurements and verdicts'):t('固定五项和两档 C8','Five fixed profiles and both C8 bands')}</summary>
       <p>${t('报告使用封存的固定 0.18 B0。各候选保留自己的评分和运行配置。','This report uses the sealed fixed 0.18 B0. Each candidate retains its own grades and configuration.')}</p>
       <p><a href="${esc(pinnedSource(item.readme.url))}">${t('完整报告与配置','Full report and configuration')} ↗</a> · <a href="${esc(pinnedSource(item.summary.url))}">JSON ↗</a></p>
+      ${entry.candidate_submission_assessment?'<div data-candidate-v2 aria-live="polite"></div>':''}
       <div data-candidate-metrics aria-live="polite"></div>
     </details>`).join('');
   }
 
   function bindCandidateReports(entry) {
+    let assessment;
     const labels={mmlu:'MMLU-Pro 200',hle:'HLE-Verified 200',frontier:'FrontierScience 160',
       swe:'SWE-bench Pro · 64 requests',terminal:'Terminal-Bench 2.1 · 48 requests',
       '4096-formal':t('4K / C8 · 合成请求','4K / C8 · Synthetic requests'),
@@ -1354,6 +1458,7 @@
     for(const item of candidateReports(entry)){
       const disclosure=root.querySelector(`[data-candidate-report="${item.kind}"]`);
       const panel=disclosure.querySelector('[data-candidate-metrics]');
+      const v2Panel=disclosure.querySelector('[data-candidate-v2]');
       disclosure.addEventListener('toggle',async()=>{
         if(!disclosure.open||['loaded','loading'].includes(panel.dataset.state))return;
         panel.dataset.state='loading';
@@ -1387,6 +1492,16 @@
               ['Scenario','Arm','Requests','Failed','Correct','Unresolved','tok/s','Mean TTFT / ms','Mean TPOT / ms','TTFT P95/P99 / ms','TPOT P95/P99 / ms','E2E P95/P99 / ms','Seal SHA-256']),rows)+
             table(t(['裁判阶段','计划','已记录','未决'],['Judge phase','Planned','Recorded','Unresolved']),judgeRows);
           panel.dataset.state='loaded';
+          if(v2Panel){
+            try{
+              assessment??=loadCandidateAssessment(entry);
+              v2Panel.innerHTML=candidateAssessment(item,report,await assessment);
+              v2Panel.dataset.state='loaded';
+            }catch{
+              v2Panel.dataset.state='unavailable';
+              v2Panel.textContent=t('未能校验本版 V2 证据。','Could not verify V2 evidence for this candidate.');
+            }
+          }
         }catch{
           panel.dataset.state='unavailable';
           panel.textContent=t('未能校验候选汇总。可从上方入口查看该版原件。','The candidate summary could not be verified. Use the fixed report link above.');
