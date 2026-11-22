@@ -794,7 +794,12 @@ with sync_playwright() as playwright:
                 if check_candidate or check_baseline:
                     if (
                         check_baseline
-                        and baseline in ("official-0.23.0", "official-0.30.0")
+                        and baseline
+                        in (
+                            "official-0.23.0",
+                            "official-0.30.0",
+                            "candidate-0.28.0rc1-source",
+                        )
                         and release == "r10"
                     ):
                         payload = download_selection(page)
@@ -953,7 +958,12 @@ with sync_playwright() as playwright:
                                 == "continuous-synthetic"
                             )
                 if (
-                    baseline in ("official-0.23.0", "official-0.30.0")
+                    baseline
+                    in (
+                        "official-0.23.0",
+                        "official-0.30.0",
+                        "candidate-0.28.0rc1-source",
+                    )
                     and release == "r10"
                 ):
                     descriptor = next(
@@ -973,10 +983,18 @@ with sync_playwright() as playwright:
                     verify_full_baseline_details(
                         page,
                         independent_baselines[baseline],
-                        descriptor["label"],
+                        descriptor.get("label_en", descriptor["label"])
+                        if args.language == "en"
+                        else descriptor["label"],
                         width,
                         scheme,
-                        prefix="official030-" if baseline == "official-0.30.0" else "",
+                        prefix=(
+                            "official030-"
+                            if baseline == "official-0.30.0"
+                            else "candidate028-"
+                            if baseline == "candidate-0.28.0rc1-source"
+                            else ""
+                        ),
                         repair=repair_versions.get(baseline.removeprefix("official-")),
                         commit=commit,
                     )
