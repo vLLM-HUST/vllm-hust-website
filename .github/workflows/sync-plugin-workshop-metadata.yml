@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 50906eb4e71f0a3cb28aa658f41f37eaa3b3c7f5 # pragma: allowlist secret
+          ref: 434e2594b885aee35968a9b2fe09d4a366b386e1 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -43,7 +43,7 @@ jobs:
       - name: Project canonical publication data
         run: >-
           python .benchmark-source/scripts/sync_website_publication.py publish
-          --revision 50906eb4e71f0a3cb28aa658f41f37eaa3b3c7f5 --website .
+          --revision 434e2594b885aee35968a9b2fe09d4a366b386e1 --website .
 
       - name: Sync Workshop metadata
         env:
