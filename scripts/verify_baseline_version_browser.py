@@ -13,6 +13,7 @@ parser.add_argument("--base-url", default="http://127.0.0.1:8000")
 parser.add_argument(
     "--output", type=Path, default=Path("output/playwright/baseline-version")
 )
+parser.add_argument("--language", choices=("zh", "en"), default="zh")
 args = parser.parse_args()
 export_events = {}
 
@@ -299,7 +300,123 @@ def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
     assert not dialog.is_visible()
 
 
+def verify_candidate_reports(page, entry, commit):
+    expected_reports = {"native-rms": 21, "contiguous-restore": 28}
+    panels = page.locator("[data-candidate-report]")
+    assert panels.count() == len(expected_reports)
+    for kind, count in expected_reports.items():
+        panel = page.locator(f"[data-candidate-report='{kind}']")
+        source = next(
+            item
+            for item in entry["sources"]
+            if f"-{kind}-fixed-five-" in item["url"]
+            and item["url"].endswith("/summary.json")
+        )
+        assert panel.get_by_text("JSON", exact=False).get_attribute("href") == source[
+            "url"
+        ].replace("/blob/main/", f"/blob/{commit}/")
+        filename = source["url"].split("/reports/", 1)[1]
+        response = page.request.get(args.base_url.rstrip("/") + "/data/" + filename)
+        raw = response.body()
+        assert response.ok and len(raw) == source["bytes"]
+        assert hashlib.sha256(raw).hexdigest() == source["sha256"]
+        report = json.loads(raw)
+        panel.locator("summary").click()
+        panel.locator("[data-candidate-metrics][data-state=loaded]").wait_for(
+            timeout=20000
+        )
+        assert "672" in panel.inner_text()
+        assert panel.locator("table").first.locator("tbody tr").count() == count
+        assert panel.locator("table").last.locator("tbody tr").count() == 4
+        assert set(
+            panel.locator("table")
+            .first.locator("tbody tr td:last-child")
+            .all_text_contents()
+        ) == {
+            arm["source_seal_sha256"]
+            for arms in report["measurements"].values()
+            for arm in arms.values()
+        }
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+        panel.locator("summary").click()
+    history = page.locator("#rms-revision")
+    history.locator("summary").click()
+    history.locator(".rms-revision-metrics[data-state=loaded]").wait_for(timeout=20000)
+    assert history.locator("tbody tr").count() == 12
+    history.locator("summary").click()
+
+
+def verify_candidate_checksum(page):
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    pattern = "**/data/r10-native-rms-fixed-five-*/summary.json"
+    page.route(
+        pattern,
+        lambda route: route.fulfill(
+            status=200, content_type="application/json", body="{}"
+        ),
+    )
+    page.goto(base + "?release=r10")
+    panel = page.locator("[data-candidate-report='native-rms']")
+    panel.locator("summary").click()
+    panel.locator("[data-candidate-metrics][data-state=unavailable]").wait_for()
+    assert panel.locator("tbody tr").count() == 0
+    page.unroute(pattern)
+
+
+def verify_archived_cards_checksum(page, archived_record):
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    pattern = "**/data/b0-archived-card-provenance-v1.json"
+    page.route(
+        pattern,
+        lambda route: route.fulfill(
+            status=200, content_type="application/json", body="{}"
+        ),
+    )
+    baseline = archived_record["baseline_id"]
+    page.goto(base + "?" + urlencode({"release": "r10", "b0": baseline}))
+    page.wait_for_selector("#comparison-export")
+    result = read_export_blob(page)
+    row = next(
+        item for item in result["rows"] if item["id"] == archived_record["profile_id"]
+    )
+    assert (
+        row["baselineObservation"]["source_seal_sha256"]
+        == archived_record["source_seal_sha256"]
+    )
+    assert row["baselineObservation"]["physical_cards"] is None
+    assert "baselineCardMapping" not in row
+    page.unroute(pattern)
+
+
+def verify_legacy_links(page, catalog):
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    page.goto(base + "?release=unknown&b0=unknown&controlplane=unknown")
+    for choice in ("release", "baseline", "controller"):
+        page.locator(f".{choice}-fallback").wait_for()
+    assert parse_qs(urlparse(page.url).query) == {
+        "release": [catalog["default_release"]],
+        "b0": [catalog["baseline"]["id"]],
+    }
+    for alias, target in (
+        ("acceptance-stages", "#submission-v2"),
+        ("method-4", "[data-rental-cost][open]"),
+        ("metric-4", "[data-rental-cost][open]"),
+    ):
+        page.goto(base + "?release=" + catalog["default_release"] + "#" + alias)
+        page.locator(target).wait_for()
+        page.wait_for_function(
+            """selector => {
+                const element = document.querySelector(selector);
+                const nav = document.querySelector('.site-nav');
+                const top = element?.getBoundingClientRect().top;
+                return top >= nav.getBoundingClientRect().bottom - 1 && top < innerHeight;
+            }""",
+            arg=target,
+        )
+
+
 checked_matrix = []
+expected_matrix = set()
 args.output.mkdir(parents=True, exist_ok=True)
 
 with sync_playwright() as playwright:
@@ -314,6 +431,9 @@ with sync_playwright() as playwright:
     ):
         page = browser.new_page(
             viewport={"width": width, "height": 900}, color_scheme=scheme
+        )
+        page.add_init_script(
+            f"localStorage.setItem('vllm-hust_lang','{args.language}')"
         )
         observe_exports(page)
         page.goto(args.base_url.rstrip("/") + "/b0-b1.html?release=r8")
@@ -332,6 +452,68 @@ with sync_playwright() as playwright:
             args.base_url.rstrip("/") + "/data/engine-release-history-v1.json"
         ).json()
         fixed_model = read_descriptor(catalog["baseline"]["observations"])["model"]
+        sr = page.request.get(
+            args.base_url.rstrip("/") + "/data/sr-development-results-v1.json"
+        ).json()
+        controller_results = page.request.get(
+            args.base_url.rstrip("/") + "/data/controller-product-results-v1.json"
+        ).json()
+        controller_releases = {entry["id"] for entry in controller_results["releases"]}
+        publication = page.request.get(
+            args.base_url.rstrip("/") + "/data/benchmark-source-manifest.json"
+        ).json()
+        commit = publication["commit"]
+        source = next(
+            file
+            for file in publication["files"]
+            if file["website_path"] == "data/b0-archived-card-provenance-v1.json"
+        )
+        archived_card_mappings = {
+            (record["baseline_id"], record["profile_id"]): record
+            for record in read_descriptor({**source, "path": source["website_path"]})[
+                "records"
+            ]
+        }
+        release_entries = {entry["id"]: entry for entry in catalog["entries"]}
+        expected_baselines = {catalog["baseline"]["id"]} | {
+            item["id"] for item in catalog.get("comparison_baselines", [])
+        }
+        expected_releases = set(catalog["order"] + catalog["attempt_order"]) | {
+            item["id"] for item in sr["entries"]
+        }
+        controller_selector = "#comparison-controlplane-select"
+        controller_options = page.locator(controller_selector + " option").evaluate_all(
+            "(rows)=>rows.map(row=>row.value)"
+        )
+        assert set(controller_options) == {"", "request-throttling"}
+        expected_matrix.update(
+            (width, scheme, baseline, release, control)
+            for baseline in expected_baselines
+            for release in expected_releases
+            for control in controller_options
+        )
+
+        def record_matrix(baseline, release):
+            controller = page.locator("#controller-comparison")
+            for control in controller_options:
+                page.select_option(controller_selector, control)
+                query = parse_qs(urlparse(page.url).query)
+                assert query.get("controlplane", []) == ([control] if control else [])
+                assert controller.count() == int(bool(control))
+                assert (
+                    page.locator("#comparison-release-select").input_value() == release
+                )
+                assert (
+                    page.locator("#comparison-baseline-select").input_value()
+                    == baseline
+                )
+                if control and release in controller_releases:
+                    assert controller.get_attribute("data-engine-release") == release
+                elif control:
+                    assert controller.get_attribute("data-engine-release") is None
+                checked_matrix.append([width, scheme, baseline, release, control])
+            page.select_option(controller_selector, "")
+
         independent_baselines = {
             item["id"]: read_descriptor(item["observations"])
             for item in catalog.get("comparison_baselines", [])
@@ -362,7 +544,12 @@ with sync_playwright() as playwright:
         releases = page.locator("#comparison-release-select option").evaluate_all(
             "(rows)=>rows.map(row=>row.value)"
         )
-        assert "original018-cann8.5.1" in baselines
+        assert set(baselines) == expected_baselines and len(baselines) == len(
+            expected_baselines
+        )
+        assert set(releases) == expected_releases and len(releases) == len(
+            expected_releases
+        )
         for baseline in baselines:
             page.select_option("#comparison-baseline-select", baseline)
             if baseline == "original018-cann8.5.1":
@@ -375,7 +562,7 @@ with sync_playwright() as playwright:
                     assert page.locator('[data-comparison="selected-b0"]').count() == 1
                     assert page.locator(".metric-change").count() == 0
                     assert page.locator("[data-baseline-observation]").count() > 0
-                    checked_matrix.append([width, scheme, baseline, release])
+                    record_matrix(baseline, release)
                 for release in (item for item in releases if not item.startswith("sr")):
                     page.select_option("#comparison-release-select", release)
                     page.wait_for_function(
@@ -397,7 +584,18 @@ with sync_playwright() as playwright:
                             name in supplement.inner_text()
                             for name in source["datasets"]
                         )
-                    checked_matrix.append([width, scheme, baseline, release])
+                    if release == "r10":
+                        verify_candidate_reports(page, release_entries[release], commit)
+                    if release == "r7":
+                        supplement = page.locator("#context-tenant-supplement")
+                        for source in release_entries[release]["measurements"]:
+                            assert (
+                                supplement.get_by_text(
+                                    source["label"], exact=True
+                                ).count()
+                                > 0
+                            )
+                    record_matrix(baseline, release)
                 continue
             for release in releases:
                 page.select_option("#comparison-release-select", release)
@@ -443,7 +641,7 @@ with sync_playwright() as playwright:
                         '[data-metric="relative_cost_per_token"] .chart-row-heading>span'
                     ).all_text_contents()
                 )
-                check_candidate = release in ("r6", "r9", "r10")
+                check_candidate = release in ("r6", "r7", "r9", "r10")
                 check_baseline = (
                     release in ("r8", "r10") and baseline in independent_baselines
                 )
@@ -480,6 +678,51 @@ with sync_playwright() as playwright:
                         row["model"] == expected_models[release]
                         for row in payload["rows"]
                     )
+                    if release == "r7":
+                        by_id = {row["id"]: row for row in payload["context"]}
+                        for profile in ("4096", "16384"):
+                            assert (
+                                by_id[profile]["workloads"]["B1"]["kind"]
+                                == "continuous-synthetic"
+                            )
+                    if release == "r9":
+                        supplement = release_entries[release][
+                            "context_tenant_supplement"
+                        ]
+                        by_id = {row["id"]: row for row in payload["context"]}
+                        for phase in supplement["comparisons"]:
+                            row = by_id["real-context-" + phase["phase"]]
+                            assert (
+                                row["observation"]["source_seal_sha256"]
+                                == supplement["arm_seals"]["B1"]
+                            )
+                            assert (
+                                row["observation"]["physical_cards"]
+                                == phase["B1"]["physical_cards"]
+                            )
+                            assert row["workloads"]["B1"] == {
+                                "kind": "fixed-data-context",
+                                "source": expected_context_workloads["B1"],
+                            }
+                        assert (
+                            by_id["4096-formal"]["workloads"]["B1"]["kind"]
+                            == "continuous-synthetic"
+                        )
+                    if release == "r10":
+                        assert (
+                            payload["configuration"]["B1"]["release"]
+                            == release_entries[release]["release"]
+                        )
+                        assert (
+                            payload["configuration"]["B1"]["settings"]
+                            == release_entries[release]["settings"]
+                        )
+                        assert {
+                            item["kind"] for item in payload["candidate_reports"]
+                        } == {
+                            "native-rms",
+                            "contiguous-restore",
+                        }
                     if release == "r6":
                         report = page.request.get(
                             args.base_url.rstrip("/")
@@ -498,7 +741,7 @@ with sync_playwright() as playwright:
                         is None
                         for row in payload["rows"]
                     )
-                checked_matrix.append([width, scheme, baseline, release])
+                record_matrix(baseline, release)
                 if check_baseline:
                     assert payload["native_timing"] == independent_baselines[
                         baseline
@@ -521,6 +764,28 @@ with sync_playwright() as playwright:
                             matches[0]["baselineObservation"][key] == value
                             for key, value in original["arm"].items()
                         )
+                        if original.get("source_metric"):
+                            assert matches[0]["baselineObservation"][
+                                "physical_cards"
+                            ] == (
+                                original["arm"].get("physical_cards")
+                                or independent_baselines[baseline]["hardware"][
+                                    "physical_devices"
+                                ]
+                            )
+                        archive = archived_card_mappings.get((baseline, original["id"]))
+                        if archive:
+                            assert (
+                                matches[0]["baselineCardMapping"] == archive["source"]
+                            )
+                            assert (
+                                matches[0]["baselineObservation"]["physical_cards"]
+                                == archive["physical_cards"]
+                            )
+                            assert (
+                                matches[0]["baselineObservation"]["source_seal_sha256"]
+                                == archive["source_seal_sha256"]
+                            )
                         assert matches[0]["baselineQuality"] == original.get("quality")
                         assert matches[0]["baselineExecutionScope"] == original.get(
                             "execution_scope"
@@ -538,6 +803,10 @@ with sync_playwright() as playwright:
                                 == 1
                             )
                             assert "C8" in matches[0]["label"]
+                            assert (
+                                matches[0]["workloads"]["B0"]["kind"]
+                                == "continuous-synthetic"
+                            )
                 if (
                     baseline in ("official-0.23.0", "official-0.30.0")
                     and release == "r10"
@@ -547,6 +816,15 @@ with sync_playwright() as playwright:
                         for item in catalog["comparison_baselines"]
                         if item["id"] == baseline
                     )
+                    titles = []
+                    for detail in ("configuration", "methods", "evidence"):
+                        page.locator(f'[data-detail="{detail}"]').click()
+                        dialog = page.locator("dialog[open]")
+                        titles.append(dialog.locator("h2").inner_text())
+                        if detail in ("configuration", "evidence"):
+                            assert dialog.locator("table").count() >= 1
+                        page.keyboard.press("Escape")
+                    assert len(set(titles)) == len(titles)
                     verify_full_baseline_details(
                         page,
                         independent_baselines[baseline],
@@ -568,8 +846,17 @@ with sync_playwright() as playwright:
         page = browser.new_page(
             viewport={"width": width, "height": 900}, color_scheme=scheme
         )
+        page.add_init_script(
+            f"localStorage.setItem('vllm-hust_lang','{args.language}')"
+        )
         observe_exports(page)
         verify_development_priority(page, releases, baselines)
+        verify_legacy_links(page, catalog)
+        if width == 1366 and scheme == "light":
+            verify_candidate_checksum(page)
+            verify_archived_cards_checksum(
+                page, next(iter(archived_card_mappings.values()))
+            )
         print(
             "PASS",
             width,
@@ -582,14 +869,16 @@ with sync_playwright() as playwright:
         page.close()
     browser.close()
 
-assert len(checked_matrix) == 4 * 13 * 4
-assert len(set(map(tuple, checked_matrix))) == len(checked_matrix)
+assert set(map(tuple, checked_matrix)) == expected_matrix
+assert len(checked_matrix) == len(expected_matrix)
 (args.output / "matrix-verification.json").write_text(
     json.dumps(
         dict(
             status="passed",
             checked_combinations=checked_matrix,
             combinations=len(checked_matrix),
+            controllers=controller_options,
+            language=args.language,
             themes=["light", "dark"],
             widths=[1366, 390],
             real_downloads_preserved=True,
