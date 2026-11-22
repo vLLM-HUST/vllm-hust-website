@@ -1311,6 +1311,7 @@
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
   const controllerContextPath = 'data/controller-r8-context-tenant-v1.json';
+  const controllerHeavyLoadRepeatPath = 'data/controller-r8-heavy-load-repeat-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
 
@@ -1326,16 +1327,20 @@
     for(const entry of value.releases){
       if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
       validateControllerPair(entry);
-      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null});
+      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null});
     }
     const r8=results.get('r8');
-    if(r8)[r8.latency,r8.context]=await Promise.all([
+    if(r8)[r8.latency,r8.context,r8.repeat]=await Promise.all([
       loadControllerLatency(publication,r8.entry).catch(error=>{
         console.warn('Controller latency supplement rejected',error);
         return null;
       }),
       loadControllerContext(publication,r8.entry).catch(error=>{
         console.warn('Controller context supplement rejected',error);
+        return null;
+      }),
+      loadControllerHeavyLoadRepeat(publication,r8.entry).catch(error=>{
+        console.warn('Controller repeat supplement rejected',error);
         return null;
       })
     ]);
@@ -1422,6 +1427,26 @@
     return value;
   }
 
+  async function loadControllerHeavyLoadRepeat(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerHeavyLoadRepeatPath))return null;
+    const response=await fetch('./'+controllerHeavyLoadRepeatPath,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,controllerHeavyLoadRepeatPath,response);
+    const source=entry.result.direct;
+    if(value.schema!=='controller-r8-heavy-load-repeat/v1'||value.engine_release!==entry.engine_release||
+      value.program_state_residency!==entry.state_resident_seats||!/^\d{4}-\d{2}-\d{2}$/.test(value.date)||
+      !/^reports\/controller-r8-[0-9]{8}-repeat\/README\.md$/.test(value.report_path)||
+      !/^[a-f0-9]{64}$/.test(value.report_pair_sha256))throw Error('Unmatched SWE Trace Heavy Load repeat');
+    for(const arm of [value.direct,value.controller]){
+      if(arm?.programs!==source.completed_tasks||arm.requests!==source.successful_requests||
+        arm.input_tokens!==source.input_tokens||arm.output_tokens!==source.output_tokens||
+        !Number.isFinite(arm.elapsed_seconds)||arm.elapsed_seconds<=0||
+        !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
+        !Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100)
+        throw Error('Incomplete SWE Trace Heavy Load repeat');
+    }
+    return value;
+  }
+
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
@@ -1440,7 +1465,7 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency,context}=pair;
+    const {entry,commit,latency,context,repeat}=pair;
     const r=entry.result, a=r.direct, b=r.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
     const pairedMetrics=(direct,controller)=>{
@@ -1520,6 +1545,18 @@
         <p>${t(`两组各 ${direct.requests} 条请求。引擎侧从请求进入引擎开始计时，放行前等待计入客户端请求耗时。本轮客户端采用非流式接口，未记录首 token 到达时间。`,`${direct.requests} requests per arm. Engine timings start at engine admission. Client request latency includes waiting before admission. This run used non-streaming responses, so client first-token arrival was unobserved.`)}</p>
         ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}`;
     };
+    const repeatDetails=()=>{
+      if(!repeat)return '';
+      const rows=[
+        [t('整批耗时（秒）','Batch time (s)'),...['direct','controller'].map(arm=>n(repeat[arm].elapsed_seconds))],
+        [t('输出吞吐（token/s）','Output throughput (token/s)'),...['direct','controller'].map(arm=>n(repeat[arm].output_tokens_per_second))],
+        [t('输入 token 缓存命中率','Cached input tokens'),...['direct','controller'].map(arm=>n(repeat[arm].cached_input_percent)+'%')]
+      ];
+      const report=`https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${commit}/${repeat.report_path}`;
+      return `<h3>${trajectoryLabel} · ${t('复测','Repeat')} · ${esc(repeat.date)}</h3>
+        ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}
+        <p><a href="${esc(report)}">${t('复测报告与图表','Repeat report and figures')} ↗</a></p>`;
+    };
     const batchTime=`${n(a.elapsed_seconds)} → ${n(b.elapsed_seconds)} s`;
     const cacheHit=`${n(a.cached_input_percent)}% → ${n(b.cached_input_percent)}%`;
     const chartRows=[...rows];
@@ -1567,7 +1604,7 @@
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
         `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
-        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}`};
+        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}${repeatDetails()}`};
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
       if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首内容 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first content-token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
       if(key==='quality')return {title:t('质量与评分明细','Quality and grading'),body:table([t('指标','Metric'),roles.B0,roles.B1],entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]))+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
