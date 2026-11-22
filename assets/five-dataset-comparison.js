@@ -1312,6 +1312,8 @@
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
   const controllerContextPath = 'data/controller-r8-context-tenant-v1.json';
   const controllerHeavyLoadRepeatPath = 'data/controller-r8-heavy-load-repeat-v1.json';
+  const controllerFixedProfilesPath = 'data/controller-r8-fixed-profiles-repeat-v1.json';
+  const controllerComputePath = 'data/controller-r8-mmlu256-service-compute-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
 
@@ -1327,10 +1329,10 @@
     for(const entry of value.releases){
       if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
       validateControllerPair(entry);
-      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null});
+      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null});
     }
     const r8=results.get('r8');
-    if(r8)[r8.latency,r8.context,r8.repeat]=await Promise.all([
+    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute]=await Promise.all([
       loadControllerLatency(publication,r8.entry).catch(error=>{
         console.warn('Controller latency supplement rejected',error);
         return null;
@@ -1341,6 +1343,14 @@
       }),
       loadControllerHeavyLoadRepeat(publication,r8.entry).catch(error=>{
         console.warn('Controller repeat supplement rejected',error);
+        return null;
+      }),
+      loadControllerFixedProfiles(publication,r8.entry).catch(error=>{
+        console.warn('Controller fixed-profile supplement rejected',error);
+        return null;
+      }),
+      loadControllerCompute(publication,r8.entry).catch(error=>{
+        console.warn('Controller service compute supplement rejected',error);
         return null;
       })
     ]);
@@ -1447,6 +1457,72 @@
     return value;
   }
 
+  async function loadControllerFixedProfiles(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerFixedProfilesPath))return null;
+    const response=await fetch('./'+controllerFixedProfilesPath,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,controllerFixedProfilesPath,response);
+    if(value.schema!=='controller-r8-fixed-profiles-repeat/v1'||value.engine_release!==entry.engine_release||
+      value.state_resident_seats!==entry.state_resident_seats||
+      value.profiles?.map(row=>row.id).join()!==fixedProfiles.map(([id])=>id).join())
+      throw Error('Unmatched fixed profile repeat');
+    const counts={mmlu:200,hle:200,frontier:160,swe:64,terminal:48};
+    const positive=value=>Number.isFinite(value)&&value>0;
+    for(const row of value.profiles){
+      const expected=counts[row.id];
+      if(row.status!=='complete'||row.same_client_request_bodies!==true||row.same_per_case_engine_prompt_tokens!==true)
+        throw Error('Incomplete fixed-profile pair');
+      for(const arm of [row.direct,row.controller]){
+        if(arm.planned!==expected||arm.successful!==expected||arm.release_errors!==0||
+          !positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||
+          !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
+          arm.time_to_first_content_seconds?.n!==expected||!positive(arm.time_to_first_content_seconds?.mean)||
+          !Number.isInteger(arm.time_per_output_token_ms?.n)||arm.time_per_output_token_ms.n<1||
+          arm.time_per_output_token_ms.n>expected||!positive(arm.time_per_output_token_ms.mean))
+          throw Error('Invalid fixed-profile metrics');
+        const quality=arm.quality;
+        const count=(number,limit)=>Number.isInteger(number)&&number>=0&&number<=limit;
+        if(row.id==='mmlu'&&(!count(quality?.correct,expected)||quality.planned!==expected))
+          throw Error('Incomplete MMLU-Pro grades');
+        if(row.id==='hle'){
+          const groups=Object.values(quality?.groups||{});
+          if(groups.some(group=>!count(group.total,expected)||!count(group.successes,group.total)||!count(group.unresolved,group.total))||
+             groups.reduce((sum,group)=>sum+group.total,0)!==expected)
+            throw Error('Incomplete Humanity’s Last Exam grades');
+        }
+        if(row.id==='frontier'&&Object.entries({olympiad:100,research:60}).some(([track,total])=>{
+          const grade=quality?.tracks?.[track];
+          return grade?.total!==total||!count(grade.successes,total)||!count(grade.judge_invalid,total);
+        }))throw Error('Incomplete FrontierScience grades');
+      }
+      if(!close(row.time_reduction_percent,100*(1-row.controller.elapsed_seconds/row.direct.elapsed_seconds))||
+         !close(row.output_token_change_percent,100*(row.controller.output_tokens/row.direct.output_tokens-1)))
+        throw Error('Fixed-profile summary does not match the measured arms');
+    }
+    return value;
+  }
+
+  async function loadControllerCompute(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerComputePath))return null;
+    const response=await fetch('./'+controllerComputePath,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,controllerComputePath,response);
+    if(value.schema!=='controller-r8-mmlu256-service-compute/v1'||value.engine_release!==entry.engine_release||
+       value.state_resident_seats!==entry.state_resident_seats||value.accelerators!==2||value.native_efficiency_certified!==false||
+       !/^[a-f0-9]{64}$/.test(value.source_formula_sha256)||!/^[a-f0-9]{64}$/.test(value.model_config_sha256))
+      throw Error('Unmatched service compute measurement');
+    for(const side of ['direct','controller']){
+      const arm=value.arms?.[side];
+      if(arm?.rounds?.map(r=>r.repetition).join()!=='1,2,3'||arm.rounds.some(r=>r.requests!==200||r.input_tokens!==282265||
+        !Number.isSafeInteger(r.target_matrix_work_lower_flops)||r.target_matrix_work_lower_flops<=0||
+        !Number.isInteger(r.output_tokens)||r.output_tokens<200||r.output_tokens>51200||
+        !Number.isFinite(r.elapsed_seconds)||r.elapsed_seconds<=0))throw Error('Incomplete three-round service compute evidence');
+      const sum=key=>arm.rounds.reduce((a,r)=>a+r[key],0);
+      const seconds=sum('elapsed_seconds'), work=sum('target_matrix_work_lower_flops');
+      if(!close(arm.synchronized_service_seconds,seconds)||!close(arm.target_matrix_tflops_per_card_lower,work/(2e12*seconds))||
+        !close(arm.output_tokens_per_second,sum('output_tokens')/seconds))throw Error('Service compute summary does not match the sealed rounds');
+    }
+    return value;
+  }
+
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
@@ -1465,7 +1541,8 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency,context,repeat}=pair;
+    const {entry,commit,latency,context,repeat,fixed,compute}=pair;
+    const profiles=fixed?fixed.profiles.map((row,index)=>({...row,label:entry.profiles[index].label})):entry.profiles;
     const r=entry.result, a=r.direct, b=r.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
     const pairedMetrics=(direct,controller)=>{
@@ -1476,13 +1553,14 @@
       return {arms,changes_percent:Object.fromEntries(Object.keys(arms.B0)
         .map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]))};
     };
-    const rows=standardRows(entry.profiles.map(p=>{
+    const rows=standardRows(profiles.map(p=>{
       if(p.status!=='complete')return {id:p.id,missingReason:t(p.reason_zh,p.reason_en)};
       const metrics=['direct','controller'].map(role=>{
         const arm=p[role];
         return {output_tokens_per_second:arm.output_tokens_per_second,
           mean_ttft_ms:1000*arm.time_to_first_content_seconds.mean,
-          ...(latency?{mean_tpot_ms:latency.fixed_profiles_client[role][p.id].mean_tpot_ms}:{})
+          ...(fixed?{mean_tpot_ms:arm.time_per_output_token_ms.mean}
+            :latency?{mean_tpot_ms:latency.fixed_profiles_client[role][p.id].mean_tpot_ms}:{})
         };
       });
       return {id:p.id,...pairedMetrics(...metrics)};
@@ -1545,6 +1623,17 @@
         <p>${t(`两组各 ${direct.requests} 条请求。引擎侧从请求进入引擎开始计时，放行前等待计入客户端请求耗时。本轮客户端采用非流式接口，未记录首 token 到达时间。`,`${direct.requests} requests per arm. Engine timings start at engine admission. Client request latency includes waiting before admission. This run used non-streaming responses, so client first-token arrival was unobserved.`)}</p>
         ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}`;
     };
+    const computeDetails=()=>{
+      if(!compute)return '';
+      const sides=['direct','controller'];
+      return `<h3>${t('MMLU-Pro 200 · 输出上限 256','MMLU-Pro 200 · 256 output token limit')}</h3>
+        <p>${t('三轮各 200 条请求。分子取目标模型必要矩阵算量下界，计时覆盖整批服务和双卡同步。引擎原生效率认证使用独立的算量与计时协议。','Three rounds of 200 requests. The numerator bounds the target model’s necessary matrix work. Timing includes the complete service batch and both accelerator fences. Native engine efficiency uses its own work and timing protocol.')}</p>
+        ${table([t('指标','Metric'),roles.B0,roles.B1],[
+          [t('必要矩阵计算速率下界（TFLOP/s/卡）','Necessary matrix work lower rate (TFLOP/s per accelerator)'),...sides.map(side=>'≥'+lowerRate(compute.arms[side].target_matrix_tflops_per_card_lower))],
+          [t('三轮合计（秒）','Three rounds total (s)'),...sides.map(side=>n(compute.arms[side].synchronized_service_seconds))],
+          [t('整批输出吞吐（token/s）','Batch output throughput (token/s)'),...sides.map(side=>n(compute.arms[side].output_tokens_per_second))]
+        ])}<p><a href="./${controllerComputePath}">${t('逐轮算量及计时记录','Per-round work and timing')} ↗</a></p>`;
+    };
     const repeatDetails=()=>{
       if(!repeat)return '';
       const rows=[
@@ -1565,8 +1654,10 @@
     const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
     const context16k=contextRows.find(row=>row.id==='16384');
     const contextRatio=context16k?n(context16k.arms.B1.output_tokens_per_second/context16k.arms.B0.output_tokens_per_second)+'×':'—';
-    const values=['—',(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%',contextRatio,(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
-    const notes=[t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
+    const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
+    const computeValue=compute?'≥'+lowerRate(compute.arms.controller.target_matrix_tflops_per_card_lower):'—';
+    const values=[computeValue,(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%',contextRatio,(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
+    const notes=[compute?t('服务侧必要矩阵算量下界 · TFLOP/s/卡','Service-side necessary matrix work · TFLOP/s per accelerator'):t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
     const metricChart=(key,title,unit,divisor,reason)=>{
       const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
@@ -1577,7 +1668,7 @@
           ?t('尚未发布客户端逐 token 时延补充数据','Client time per output token supplement is unpublished'):missing)});
       return chart(key,title,unit,divisor,metricRows,chartRows.map(row=>row.label),roles);
     };
-    const summaryRows=entry.profiles.map(p=>p.status==='complete'
+    const summaryRows=profiles.map(p=>p.status==='complete'
       ?[p.label,n(p.direct.elapsed_seconds),n(p.controller.elapsed_seconds),n(p.time_reduction_percent)+'%',n(p.output_token_change_percent)+'%']
       :[p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
     summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
@@ -1604,10 +1695,28 @@
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
         `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
-        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}${repeatDetails()}`};
+        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}${repeatDetails()}${computeDetails()}`};
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
       if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首内容 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first content-token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
-      if(key==='quality')return {title:t('质量与评分明细','Quality and grading'),body:table([t('指标','Metric'),roles.B0,roles.B1],entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]))+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
+      if(key==='quality'){
+        let rows=entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]);
+        if(fixed){
+          const [mmlu,hle,frontier]=['mmlu','hle','frontier'].map(id=>fixed.profiles.find(row=>row.id===id));
+          const sides=['direct','controller'];
+          const sum=(groups,field)=>Object.values(groups||{}).reduce((value,group)=>value+(group[field]||0),0);
+          rows=[
+            [t('MMLU-Pro 正确数 / 200','MMLU-Pro correct / 200'),...sides.map(side=>`${mmlu[side].quality.correct} / 200`)],
+            [t('Humanity’s Last Exam 正确数 / 200','Humanity’s Last Exam correct / 200'),...sides.map(side=>`${sum(hle[side].quality.groups,'successes')} / 200`)],
+            [t('Humanity’s Last Exam 评分未判定','Humanity’s Last Exam unresolved grades'),...sides.map(side=>sum(hle[side].quality.groups,'unresolved'))],
+            ...['olympiad','research'].flatMap(track=>[
+              [`FrontierScience ${track} ${t('达标数 / 总数','successes / total')}`,...sides.map(side=>{const row=frontier[side].quality.tracks[track];return `${row.successes} / ${row.total}`;})],
+              [`FrontierScience ${track} ${t('评分未解析','unparsed grades')}`,...sides.map(side=>frontier[side].quality.tracks[track].judge_invalid)]
+            ])
+          ];
+        }
+        return {title:t('质量与评分明细','Quality and grading'),
+          body:table([t('指标','Metric'),roles.B0,roles.B1],rows)+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
+      }
       if(key==='supplement'&&context)return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:
         table([...t(['工况','路径','完成请求','输出 token/s'],['Scenario','Path','Completed requests','Output token/s']),
           'TTFT mean / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT mean / ms','TPOT P95 / ms','TPOT P99 / ms'],
