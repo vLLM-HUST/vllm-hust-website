@@ -1411,7 +1411,7 @@
            ||m.duration_seconds<300||m.output_tokens!==m.successful*256
            ||!close(m.output_tokens/m.duration_seconds,m.output_tokens_per_second)
            ||!completeLatency(m.ttft_ms)||!completeLatency(m.tpot_ms)
-           ||!Number.isFinite(arm.sampled_aicore_mean_percent)||arm.sampled_aicore_mean_percent<0||arm.sampled_aicore_mean_percent>100
+           ||(arm.sampled_aicore_mean_percent!==null&&(!Number.isFinite(arm.sampled_aicore_mean_percent)||arm.sampled_aicore_mean_percent<0||arm.sampled_aicore_mean_percent>100))
            ||Object.keys(arm.per_tenant||{}).length!==tenants
            ||Array.from({length:tenants},(_,i)=>arm.per_tenant?.['tenant-'+i]).some(row=>
              !row||!Number.isInteger(row.successful)||row.successful<1||!Number.isFinite(row.output_tokens_per_second)||row.output_tokens_per_second<=0)
@@ -1491,7 +1491,7 @@
         <p class="chart-scale-note">${t('每个阶段预热 60 秒，提交 300 秒，吞吐计入排空时间。时延从客户端测量。','Each phase warms up for 60 seconds, submits for 300 seconds and includes the drain time in throughput. Latency is measured at the client.')}</p>
         <div class="metric-grid">${charts.map(([key,title,unit])=>chart(key,title,unit,1,contextRows,labels,roles)).join('')}</div>
         ${table(t(['工况','直连采样利用率','控制器采样利用率'],['Scenario','Direct sampled utilization','Controller sampled utilization']),
-          contextRows.map(row=>[row.label,n(row.arms.B0.aicore_percent)+'%',n(row.arms.B1.aicore_percent)+'%']))}
+          contextRows.map(row=>[row.label,...['B0','B1'].map(role=>Number.isFinite(row.arms[role].aicore_percent)?n(row.arms[role].aicore_percent)+'%':'—')]))}
         ${table(t(['租户','直连完成请求','控制器完成请求','直连 token/s','控制器 token/s'],['Tenant','Direct completions','Controller completions','Direct token/s','Controller token/s']),tenantRows)}
         <p><a href="./${controllerContextPath}">${t('阶段、窗口与逐租户原始汇总','Source summary by phase, window and tenant')} ↗</a></p>
       </section>`;
