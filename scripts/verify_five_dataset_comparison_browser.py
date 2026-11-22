@@ -98,8 +98,7 @@ def assert_current_compute_reference(root, entry, lang):
 
 
 def assert_release_control_readable(page, root):
-    contrast = root.locator("#comparison-release-select").evaluate(
-        """select => {
+    contrast = root.locator("#comparison-release-select").evaluate("""select => {
           const luminance = rgb => {
             const channels = rgb.match(/[0-9.]+/g).slice(0,3).map(Number)
               .map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
@@ -109,8 +108,7 @@ def assert_release_control_readable(page, root):
             const css=getComputedStyle(el),a=luminance(css.color),b=luminance(css.backgroundColor);
             return {ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),background:css.backgroundColor};
           });
-        }"""
-    )
+        }""")
     assert all(c["ratio"] >= 4.5 for c in contrast), contrast
     assert all(c["background"] != "rgba(0, 0, 0, 0)" for c in contrast), contrast
     select = root.locator("#comparison-release-select")
@@ -320,9 +318,11 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         f"{100 * (1 - b['elapsed_seconds'] / a['elapsed_seconds']):.2f}%"
     )
     cache = " → ".join(
-        f"{arm['cached_input_percent']:.2f}%"
-        if arm["cached_input_percent"] is not None
-        else "—"
+        (
+            f"{arm['cached_input_percent']:.2f}%"
+            if arm["cached_input_percent"] is not None
+            else "—"
+        )
         for arm in (a, b)
     )
     expect(evidence).to_contain_text(cache)
@@ -367,7 +367,27 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         expect(root.locator("#controller-context-tenant .metric-chart")).to_have_count(
             4
         )
+        context_panel = root.locator("#controller-context-tenant")
+        tenant = context_panel.locator('[data-profile="multi-tenant"]').first
+        expect(tenant).to_contain_text("Terminal-Bench 2.1")
+        context_panel.locator('[data-detail="supplement"]').click()
+        supplement = root.locator("dialog")
+        context_windows = supplement.locator("table").filter(
+            has_text="控制器完成数" if lang == "zh" else "Controller completions"
+        )
+        expect(context_windows.locator("tbody tr")).to_have_count(5)
+        expect(context_windows.locator("tbody tr").last).to_contain_text("240–300")
+        page.keyboard.press("Escape")
+        expect(supplement).not_to_be_visible()
     if compute:
+        expect(root.locator(".result-card").first.locator("span")).to_have_text(
+            "服务侧矩阵算力下界"
+            if lang == "zh"
+            else "Service-side matrix compute lower bound"
+        )
+        expect(root.locator("[data-controller-native-efficiency]")).to_contain_text(
+            "V2 4.1"
+        )
         lower = compute["arms"]["controller"]["target_matrix_tflops_per_card_lower"]
         expect(root.locator(".result-card").first.locator("strong")).to_have_text(
             f"≥{int(100 * lower) / 100:.2f}"
@@ -393,9 +413,11 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
             row = device_chart.locator(f'[data-profile="{displayed}"]')
             expect(row.locator(".bar-value")).to_have_text(
                 [
-                    f"{pair[side]['mean_percent']:.2f}"
-                    if pair[side]["coverage_complete"]
-                    else "—"
+                    (
+                        f"{pair[side]['mean_percent']:.2f}"
+                        if pair[side]["coverage_complete"]
+                        else "—"
+                    )
                     for side in ("direct", "controller")
                 ]
             )
@@ -403,12 +425,16 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     dialog = root.locator("dialog")
     expect(dialog).to_be_visible()
     expect(dialog.locator("tbody tr").nth(4)).to_contain_text("SWE Trace Heavy Load")
+    if streaming:
+        expect(
+            dialog.locator('a[href="./data/controller-r8-streamed-heavy-load-v1.json"]')
+        ).to_have_count(1)
     if latency:
         engine = latency["multi_turn_engine"]
         engine_table = dialog.locator("table").filter(
-            has_text="引擎侧首 token 时延"
-            if lang == "zh"
-            else "Engine time to first token"
+            has_text=(
+                "引擎侧首 token 时延" if lang == "zh" else "Engine time to first token"
+            )
         )
         for index, (metric, divisor) in enumerate(
             (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1))
@@ -446,6 +472,15 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     expect(
         dialog.locator("tbody tr").filter(has_text="SWE Trace Heavy Load")
     ).to_contain_text(f"{1875 * 2e6 / (30 * 86400 * output_rates[1]):.2f}")
+    if context:
+        tenant_phase = next(
+            row for row in context["phases"] if row["id"] == "multi-tenant"
+        )
+        direct, controlled = (
+            tenant_phase[side]["metrics"]["output_tokens_per_second"]
+            for side in ("direct", "controller")
+        )
+        expect(dialog).to_contain_text(f"{100 * (direct / controlled - 1):.3f}%")
     page.keyboard.press("Escape")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     control.select_option("")
@@ -949,9 +984,11 @@ def verify(url, output):
                                     else (
                                         metrics["ttft_ms"]["mean"]
                                         if key == "mean_ttft_ms"
-                                        else metrics["tpot_ms"]["mean"]
-                                        if key == "mean_tpot_ms"
-                                        else metrics[key]
+                                        else (
+                                            metrics["tpot_ms"]["mean"]
+                                            if key == "mean_tpot_ms"
+                                            else metrics[key]
+                                        )
                                     )
                                     / divisor
                                 )

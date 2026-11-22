@@ -16,6 +16,8 @@ function sandbox() {
     location: { href: 'https://example.test/b0-b1.html', hash: '', search: '' }, document: { getElementById: () => ({}) },
     window: { addEventListener() {}, vllmHustSite: { getCurrentLang: () => 'en' } } };
   vm.createContext(context);
+  const evidence = fs.readFileSync(path.join(__dirname, '..', 'assets', 'controller-evidence.js'), 'utf8');
+  vm.runInContext(evidence, context);
   vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey, transportAssetBytes, loadFixedBaseline, withFixedBaseline, setFixedBaseline: value=>{fixedBaseline=value;} };\n})();'), context);
   return context;
 }

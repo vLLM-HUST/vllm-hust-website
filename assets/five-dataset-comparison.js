@@ -10,6 +10,10 @@
   const t = (zh, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? zh : en;
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const n = v => Number.isFinite(v) ? v.toFixed(2) : '—';
+  const {
+    controllerFixedProfilesPath,controllerComputePath,controllerStreamingPath,controllerC8Path,
+    readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerTimingSupplement
+  }=window.vllmHustControllerEvidence;
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= 1e-8 * Math.max(1, Math.abs(b));
   const modelIntegrationResults = new Map();
   const submissionAssessments = new Map();
@@ -1470,10 +1474,6 @@
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
   const controllerContextPath = 'data/controller-r8-context-tenant-v1.json';
   const controllerHeavyLoadRepeatPath = 'data/controller-r8-heavy-load-repeat-v1.json';
-  const controllerFixedProfilesPath = 'data/controller-r8-fixed-profiles-repeat-v1.json';
-  const controllerComputePath = 'data/controller-r8-mmlu256-service-compute-v1.json';
-  const controllerStreamingPath = 'data/controller-r8-streamed-heavy-load-v1.json';
-  const controllerC8Path = 'data/controller-r8-closed-loop-c8-v1.json';
   const controllerUtilizationPath = 'data/controller-r8-ai-core-utilization-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
@@ -1550,15 +1550,6 @@
     }
   }
 
-  async function readPublishedJson(publication,path,response) {
-    const bindings=publication.files.filter(file=>file.website_path===path);
-    if(bindings.length!==1||!response.ok)throw Error('Published asset unavailable or ambiguous');
-    const bytes=await response.arrayBuffer();
-    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
-    if(bindings[0].bytes!==bytes.byteLength||bindings[0].sha256!==hash)throw Error('Published asset checksum mismatch');
-    return JSON.parse(new TextDecoder().decode(bytes));
-  }
-
   async function loadControllerLatency(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerLatencyPath))return null;
     const response=await fetch('./'+controllerLatencyPath,{cache:'no-cache'});
@@ -1630,100 +1621,6 @@
     return value;
   }
 
-  async function loadControllerFixedProfiles(publication,entry) {
-    if(!publication.files.some(file=>file.website_path===controllerFixedProfilesPath))return null;
-    const response=await fetch('./'+controllerFixedProfilesPath,{cache:'no-cache'});
-    const value=await readPublishedJson(publication,controllerFixedProfilesPath,response);
-    if(value.schema!=='controller-r8-fixed-profiles-repeat/v1'||value.engine_release!==entry.engine_release||
-      value.state_resident_seats!==entry.state_resident_seats||
-      value.profiles?.map(row=>row.id).join()!==fixedProfiles.map(([id])=>id).join())
-      throw Error('Unmatched fixed profile repeat');
-    const counts={mmlu:200,hle:200,frontier:160,swe:64,terminal:48};
-    const positive=value=>Number.isFinite(value)&&value>0;
-    for(const row of value.profiles){
-      const expected=counts[row.id];
-      if(row.status!=='complete'||row.same_client_request_bodies!==true||row.same_per_case_engine_prompt_tokens!==true)
-        throw Error('Incomplete fixed-profile pair');
-      for(const arm of [row.direct,row.controller]){
-        if(arm.planned!==expected||arm.successful!==expected||arm.release_errors!==0||
-          !positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||
-          !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
-          arm.time_to_first_output_seconds?.n!==expected||!positive(arm.time_to_first_output_seconds?.mean)||
-          !Number.isInteger(arm.time_per_output_token_ms?.n)||arm.time_per_output_token_ms.n<1||
-          arm.time_per_output_token_ms.n>expected||!positive(arm.time_per_output_token_ms.mean))
-          throw Error('Invalid fixed-profile metrics');
-        const quality=arm.quality;
-        const count=(number,limit)=>Number.isInteger(number)&&number>=0&&number<=limit;
-        if(row.id==='mmlu'&&(!count(quality?.correct,expected)||quality.planned!==expected))
-          throw Error('Incomplete MMLU-Pro grades');
-        if(row.id==='hle'){
-          const groups=Object.values(quality?.groups||{});
-          if(groups.some(group=>!count(group.total,expected)||!count(group.successes,group.total)||!count(group.unresolved,group.total))||
-             groups.reduce((sum,group)=>sum+group.total,0)!==expected)
-            throw Error('Incomplete Humanity’s Last Exam grades');
-        }
-        if(row.id==='frontier'&&Object.entries({olympiad:100,research:60}).some(([track,total])=>{
-          const grade=quality?.tracks?.[track];
-          return grade?.total!==total||!count(grade.successes,total)||!count(grade.judge_invalid,total);
-        }))throw Error('Incomplete FrontierScience grades');
-      }
-      if(!close(row.time_reduction_percent,100*(1-row.controller.elapsed_seconds/row.direct.elapsed_seconds))||
-         !close(row.output_token_change_percent,100*(row.controller.output_tokens/row.direct.output_tokens-1)))
-        throw Error('Fixed-profile summary does not match the measured arms');
-    }
-    return value;
-  }
-
-  async function loadControllerCompute(publication,entry) {
-    if(!publication.files.some(file=>file.website_path===controllerComputePath))return null;
-    const response=await fetch('./'+controllerComputePath,{cache:'no-cache'});
-    const value=await readPublishedJson(publication,controllerComputePath,response);
-    if(value.schema!=='controller-r8-mmlu256-service-compute/v1'||value.engine_release!==entry.engine_release||
-       value.state_resident_seats!==entry.state_resident_seats||value.accelerators!==2||value.native_efficiency_certified!==false||
-       !/^[a-f0-9]{64}$/.test(value.source_formula_sha256)||!/^[a-f0-9]{64}$/.test(value.model_config_sha256))
-      throw Error('Unmatched service compute measurement');
-    for(const side of ['direct','controller']){
-      const arm=value.arms?.[side];
-      if(arm?.rounds?.map(r=>r.repetition).join()!=='1,2,3'||arm.rounds.some(r=>r.requests!==200||r.input_tokens!==282265||
-        !Number.isSafeInteger(r.target_matrix_work_lower_flops)||r.target_matrix_work_lower_flops<=0||
-        !Number.isInteger(r.output_tokens)||r.output_tokens<200||r.output_tokens>51200||
-        !Number.isFinite(r.elapsed_seconds)||r.elapsed_seconds<=0))throw Error('Incomplete three-round service compute evidence');
-      const sum=key=>arm.rounds.reduce((a,r)=>a+r[key],0);
-      const seconds=sum('elapsed_seconds'), work=sum('target_matrix_work_lower_flops');
-      if(!close(arm.synchronized_service_seconds,seconds)||!close(arm.target_matrix_tflops_per_card_lower,work/(2e12*seconds))||
-        !close(arm.output_tokens_per_second,sum('output_tokens')/seconds))throw Error('Service compute summary does not match the sealed rounds');
-    }
-    return value;
-  }
-
-  async function loadControllerTimingSupplement(publication,entry,path) {
-    if(!publication.files.some(file=>file.website_path===path))return null;
-    const response=await fetch('./'+path,{cache:'no-cache'});
-    const value=await readPublishedJson(publication,path,response);
-    const streaming=path===controllerStreamingPath;
-    const schema=streaming?'controller-r8-streamed-heavy-load/v1':'controller-r8-closed-loop-c8/v1';
-    if(value.schema!==schema||value.engine_release!==entry.engine_release||value.state_resident_seats!==entry.state_resident_seats)
-      throw Error('Unmatched timing supplement');
-    const positive=value=>Number.isFinite(value)&&value>0;
-    if(!streaming&&(value.concurrency!==8||value.rows?.map(row=>row.id).join()!=='4096-formal,16384-formal'))
-      throw Error('Incomplete original closed-loop C8 intervals');
-    for(const row of streaming?[value]:value.rows){
-      for(const arm of [row.direct,row.controller]){
-        const time=streaming?arm.elapsed_seconds:arm.cohort_wall_seconds;
-        if(!positive(time)||!positive(arm.mean_ttft_ms)||!positive(arm.mean_tpot_ms)||
-          !Number.isInteger(arm.requests)||!positive(arm.requests)||!close(arm.output_tokens_per_second,arm.output_tokens/time))
-          throw Error('Incomplete requests or timing observations');
-        if(streaming&&(arm.requests!==entry.result.direct.successful_requests||arm.output_tokens!==entry.result.direct.output_tokens||
-          arm.tpot_requests<1||arm.tpot_requests>arm.requests||
-          (arm.cached_input_percent!==null&&(!Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100))))
-          throw Error('Unmatched streamed heavy-load census');
-        if(!streaming&&(arm.phase!==row.id||time<300||arm.seconds!==300||arm.output_tokens!==256*arm.requests))
-          throw Error('Unmatched standardized C8 window or output budget');
-      }
-    }
-    return value;
-  }
-
   async function loadControllerUtilization(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerUtilizationPath))return null;
     const response=await fetch('./'+controllerUtilizationPath,{cache:'no-cache'});
@@ -1789,6 +1686,8 @@
       });
       return {id:p.id,...pairedMetrics(...metrics)};
     }));
+    const contextWorkload=sealedContextWorkload(context?.input_sha256);
+    const contextDataset=contextWorkload?.datasets.join(' / ')||t('数据集身份待核验','Dataset identity pending verification');
     const contextRows=(context?.phases||[]).map(phase=>{
       const labels={4096:'4K–8K / C8',16384:'16K–24K / C8',32768:'32K–48K / C8',
         'multi-tenant':t('四租户 / C24','Four tenants / C24')};
@@ -1798,7 +1697,7 @@
         p99_tpot_ms:arm.metrics.tpot_ms.p99,
         aicore_percent:arm.sampled_aicore_mean_percent
       }));
-      return {id:phase.id,label:labels[phase.id],...pairedMetrics(...metrics)};
+      return {id:phase.id,label:labels[phase.id]+' · '+contextDataset,...pairedMetrics(...metrics)};
     });
     const contextSection=()=>{
       if(!contextRows.length)return '';
@@ -1820,6 +1719,7 @@
         ${table(t(['工况','直连采样利用率','控制器采样利用率'],['Scenario','Direct sampled utilization','Controller sampled utilization']),
           contextRows.map(row=>[row.label,...['B0','B1'].map(role=>Number.isFinite(row.arms[role].aicore_percent)?n(row.arms[role].aicore_percent)+'%':'—')]))}
         ${table(t(['租户','直连完成请求','控制器完成请求','直连 token/s','控制器 token/s'],['Tenant','Direct completions','Controller completions','Direct token/s','Controller token/s']),tenantRows)}
+        ${contextWorkload?`<p>${esc(formatContextWorkload(contextWorkload))} · <a href="./${controllerContextPath}">${t('冻结输入与逐阶段执行摘要','Sealed input and per-phase execution digests')} ↗</a></p>`:''}
         <p><a href="./${controllerContextPath}">${t('阶段、窗口与逐租户原始汇总','Source summary by phase, window and tenant')} ↗</a></p>
       </section>`;
     };
@@ -1873,11 +1773,13 @@
     const latestDirect=streaming?.direct||a, latestController=streaming?.controller||b;
     const batchTime=`${n(latestDirect.elapsed_seconds)} → ${n(latestController.elapsed_seconds)} s`;
     const timeReduction=100*(1-latestController.elapsed_seconds/latestDirect.elapsed_seconds);
+    const trajectorySource=streaming?`<a href="./${controllerStreamingPath}">${t('本批流式来源','Source for this streaming batch')} ↗</a>`:'';
+    const c8Label=id=>(id==='4096-formal'?'4K':'16K')+' / C8 · '+t('独立闭环','Independent closed loop');
     const cacheHit=[latestDirect,latestController].map(arm=>Number.isFinite(arm.cached_input_percent)?n(arm.cached_input_percent)+'%':'—').join(' → ');
     const chartRows=[...rows];
     chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
     for(const row of c8?.rows||[]){
-      const label=row.id==='4096-formal'?'4K / C8':'16K / C8';
+      const label=c8Label(row.id);
       const fields=[row.direct,row.controller].map(arm=>({output_tokens_per_second:arm.output_tokens_per_second,
         mean_ttft_ms:arm.mean_ttft_ms,mean_tpot_ms:arm.mean_tpot_ms}));
       chartRows.push({id:row.id,label,...pairedMetrics(...fields)});
@@ -1887,9 +1789,11 @@
     const context16k=contextRows.find(row=>row.id==='16384');
     const contextRatio=context16k?n(context16k.arms.B1.output_tokens_per_second/context16k.arms.B0.output_tokens_per_second)+'×':'—';
     const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
+    const controllerCards=t(['服务侧矩阵算力下界','重负载输出吞吐','上下文输出吞吐','同费率加速卡成本'],
+      ['Service-side matrix compute lower bound','Heavy-load output throughput','Context output throughput','Accelerator cost at equal rental rates']);
     const computeValue=compute?'≥'+lowerRate(compute.arms.controller.target_matrix_tflops_per_card_lower):'—';
     const values=[computeValue,(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%',contextRatio,(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
-    const notes=[compute?t('服务侧必要矩阵算量下界 · TFLOP/s/卡','Service-side necessary matrix work · TFLOP/s per accelerator'):t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
+    const notes=[compute?t('服务侧必要矩阵算量下界 · TFLOP/s/卡','Service-side necessary matrix work · TFLOP/s per accelerator'):t('本版暂无服务侧矩阵算量配对','No service-side matrix-work pair for this version'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
     const metricChart=(key,title,unit,divisor,reason)=>{
       const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
@@ -1916,7 +1820,7 @@
         }
       }
       const supplements=[...(streaming?[{...streaming,label:trajectoryLabel}]:[]),
-        ...(c8?.rows||[]).map(row=>({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'}))];
+        ...(c8?.rows||[]).map(row=>({...row,label:c8Label(row.id)}))];
       for(const row of supplements){
         for(const side of ['direct','controller']){
           const arm=row[side];
@@ -1930,6 +1834,22 @@
         ['Profile','Path','Completions','TTFT P95 (s)','TTFT P99 (s)','TPOT P95 (ms)','TPOT P99 (ms)','End-to-end P95 (s)','End-to-end P99 (s)']),
         measurements.map(([label,side,count,...values])=>[label,side==='direct'?roles.B0:roles.B1,count,...values.map(value=>n(Number.isFinite(value)?value:null))]))}`;
     };
+    const contextWindowsDetails=()=>{
+      const phase=context.phases.find(row=>row.id==='32768');
+      if(!phase)return '';
+      const {direct,controller}=phase;
+      const windows=direct.windows;
+      if(!Array.isArray(windows)||!Array.isArray(controller.windows)||windows.length!==5||controller.windows.length!==windows.length||
+         windows.some((row,i)=>row.submission_start_seconds!==controller.windows[i]?.submission_start_seconds||
+           row.submission_end_seconds!==controller.windows[i]?.submission_end_seconds))return '';
+      const fields=window=>[window.metrics?.successful??'—',n(window.metrics?.ttft_ms?.p99),n(window.metrics?.tpot_ms?.p99)];
+      const rows=windows.map((window,i)=>{
+        return [`${window.submission_start_seconds}–${window.submission_end_seconds}`,...fields(window),...fields(controller.windows[i])];
+      });
+      return `<h3>32K–48K / C8 · ${esc(contextDataset)} · ${t('五个提交窗口','Five submission windows')}</h3>
+        ${table(t(['窗口（秒）','直连完成数','直连 TTFT P99 / ms','直连 TPOT P99 / ms','控制器完成数','控制器 TTFT P99 / ms','控制器 TPOT P99 / ms'],
+          ['Window (s)','Direct completions','Direct TTFT P99 / ms','Direct TPOT P99 / ms','Controller completions','Controller TTFT P99 / ms','Controller TPOT P99 / ms']),rows)}`;
+    };
     const costDetails=()=>{
       const monthlyRent=1875,occupiedCards=2;
       const quote='https://news.smm.cn/news/TCNOQJBAJVZYJ73BMVU7G5GJZXQ462A4U6NN4CY';
@@ -1938,10 +1858,19 @@
         row.label,
         ...['B0','B1'].map(side=>n(cost(row.arms[side])))
       ]);
+      const tenant=contextRows.find(row=>row.id==='multi-tenant');
+      const tenantDetails=tenant?`<h3>${esc(tenant.label)}</h3>${table([t('同一正式区间','Same measured interval'),roles.B0,roles.B1],[
+        [t('成本估算（元/百万输出 token）','Estimated cost (CNY/million output tokens)'),...['B0','B1'].map(side=>n(cost(tenant.arms[side])))],
+        [t('加速卡单位成本变化','Change in accelerator unit cost'),'—',`${tenant.changes_percent.relative_cost_per_token.toFixed(3)}%`],
+        [t('双卡 AI Core 采样利用率','Sampled two-card AI Core utilization'),...['B0','B1'].map(side=>{
+          const percent=tenant.arms[side].aicore_percent;
+          return Number.isFinite(percent)?n(percent)+'%':'—';
+        })]
+      ])}`:'';
       return `<h3>${t('每百万输出 token 加速卡成本估算','Estimated accelerator cost per million output tokens')}</h3>
         <p>${t('沿用引擎送测的公开租赁报价。每张卡每月 1,875 元，按 30 天分摊。两组各用两张卡。','The engine assessment uses a published rental quote of CNY 1,875 per accelerator per 30-day month. Each arm uses two accelerators.')}
         <a href="${quote}">${t('上海有色网报价','Shanghai Metals Market quote')} ↗</a></p>
-        ${table([t('负载（元/百万输出 token）','Profile (CNY/million output tokens)'),roles.B0,roles.B1],values)}`;
+        ${table([t('负载（元/百万输出 token）','Profile (CNY/million output tokens)'),roles.B0,roles.B1],values)}${tenantDetails}`;
     };
     const utilizationChart=()=>{
       if(!utilization)return '';
@@ -1967,7 +1896,9 @@
     };
     panel.innerHTML=`${heading}
       <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
-      <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
+      <div class="goal-grid">${controllerCards.map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
+      ${compute?`<p class="comparison-meta" data-controller-native-efficiency>${t('V2 4.1 尚缺控制面工况的原生双卡计时、完整必要算量和经核验的同工况参考上界。','V2 4.1 for this controller setup still needs native two-card timing, complete necessary work and a verified upper bound for the matched reference.')}
+        <a href="./test-plan.html">${t('V2 核验口径','V2 verification protocol')} ↗</a></p>`:''}
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
         <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(timeReduction)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
@@ -1987,7 +1918,7 @@
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
-        `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
+        `<p>${trajectoryLabel} · ${esc(latestDirect.requests??latestDirect.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(latestDirect.output_tokens)} ${t('输出 token / 组','output tokens per arm')} ${trajectorySource}</p>
         <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${tailDetails()}${engineLatency()}${repeatDetails()}${computeDetails()}`};
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
       if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首个模型输出 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first model output token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p>${costDetails()}<p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
@@ -2026,7 +1957,7 @@
             [roles.B0,phase.direct.metrics],[roles.B1,phase.controller.metrics]
           ].map(([label,m])=>[contextRows[index].label,label,m.successful,n(m.output_tokens_per_second),
             ...[m.ttft_ms,m.tpot_ms].flatMap(value=>['mean','p95','p99'].map(q=>n(value[q])))])))+
-        `<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
+        contextWindowsDetails()+`<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
       const pairedSources=[
         [fixed,controllerFixedProfilesPath,t('五项固定负载与评分','Five fixed profiles and grades')],
         [streaming,controllerStreamingPath,t('SWE Trace Heavy Load 流式补测','SWE Trace Heavy Load streaming pair')],
@@ -2035,7 +1966,9 @@
         [compute,controllerComputePath,t('服务侧矩阵算力下界','Service-side matrix compute lower bound')],
         [utilization,controllerUtilizationPath,t('双卡 AI Core 采样区间','Two-card AI Core sampling interval')]
       ].filter(([available])=>available);
-      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p>${pairedSources.length?`<ul>${pairedSources.map(([,path,label])=>`<li><a href="./${path}">${esc(label)} ↗</a></li>`).join('')}</ul>`:''}<p><a href="${esc(source)}">${t('历史原始报告','Historical report')} ↗</a> · ${resultLink}</p>`};
+      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p>
+        ${c8?`<p>${t('独立闭环 C8 的公开记录未列出输入摘要或数据集身份。','The published independent closed-loop C8 record does not identify the workload input digest or dataset.')}</p>`:''}
+        ${pairedSources.length?`<ul>${pairedSources.map(([,path,label])=>`<li><a href="./${path}">${esc(label)} ↗</a></li>`).join('')}</ul>`:''}<p><a href="${esc(source)}">${t('历史原始报告','Historical report')} ↗</a> · ${resultLink}</p>`};
     },panel);
     panel.dataset.engineRelease=entry.id;
   }
