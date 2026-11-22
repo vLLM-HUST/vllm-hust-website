@@ -1316,6 +1316,7 @@
   const controllerComputePath = 'data/controller-r8-mmlu256-service-compute-v1.json';
   const controllerStreamingPath = 'data/controller-r8-streamed-heavy-load-v1.json';
   const controllerC8Path = 'data/controller-r8-closed-loop-c8-v1.json';
+  const controllerUtilizationPath = 'data/controller-r8-ai-core-utilization-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
 
@@ -1331,10 +1332,10 @@
     for(const entry of value.releases){
       if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
       validateControllerPair(entry);
-      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null,streaming:null,c8:null});
+      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null,streaming:null,c8:null,utilization:null});
     }
     const r8=results.get('r8');
-    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute,r8.streaming,r8.c8]=await Promise.all([
+    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute,r8.streaming,r8.c8,r8.utilization]=await Promise.all([
       loadControllerLatency(publication,r8.entry).catch(error=>{
         console.warn('Controller latency supplement rejected',error);
         return null;
@@ -1361,6 +1362,10 @@
       }),
       loadControllerTimingSupplement(publication,r8.entry,controllerC8Path).catch(error=>{
         console.warn('Controller C8 supplement rejected',error);
+        return null;
+      }),
+      loadControllerUtilization(publication,r8.entry).catch(error=>{
+        console.warn('Controller utilization supplement rejected',error);
         return null;
       })
     ]);
@@ -1485,7 +1490,7 @@
         if(arm.planned!==expected||arm.successful!==expected||arm.release_errors!==0||
           !positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||
           !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
-          arm.time_to_first_content_seconds?.n!==expected||!positive(arm.time_to_first_content_seconds?.mean)||
+          arm.time_to_first_output_seconds?.n!==expected||!positive(arm.time_to_first_output_seconds?.mean)||
           !Number.isInteger(arm.time_per_output_token_ms?.n)||arm.time_per_output_token_ms.n<1||
           arm.time_per_output_token_ms.n>expected||!positive(arm.time_per_output_token_ms.mean))
           throw Error('Invalid fixed-profile metrics');
@@ -1561,6 +1566,29 @@
     return value;
   }
 
+  async function loadControllerUtilization(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerUtilizationPath))return null;
+    const response=await fetch('./'+controllerUtilizationPath,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,controllerUtilizationPath,response);
+    const expected=[...fixedProfiles.map(([id])=>id),'swe-heavy','4096-formal','16384-formal'].sort().join();
+    if(value.schema!=='controller-r8-ai-core-utilization/v1'||value.engine_release!==entry.engine_release||
+      value.state_resident_seats!==entry.state_resident_seats||Object.keys(value.rows||{}).sort().join()!==expected)
+      throw Error('Invalid accelerator utilization scope');
+    const bounded=percent=>Number.isFinite(percent)&&percent>=0&&percent<=100;
+    for(const pair of Object.values(value.rows)){
+      for(const side of ['direct','controller']){
+        const arm=pair[side],cards=Object.values(arm?.cards||{});
+        if(cards.length!==2||!Number.isFinite(arm.window_start_wall)||!(arm.window_end_wall>arm.window_start_wall)||
+          cards.some(card=>!Number.isFinite(card.unobserved_seconds)||card.unobserved_seconds<0)||
+          arm.coverage_complete!==cards.every(card=>card.unobserved_seconds<.001)||
+          (arm.coverage_complete ? !bounded(arm.mean_percent)||cards.some(card=>!bounded(card.mean_percent))||
+            !close(arm.mean_percent,(cards[0].mean_percent+cards[1].mean_percent)/2) : arm.mean_percent!==null))
+          throw Error('Invalid accelerator utilization observation');
+      }
+    }
+    return value;
+  }
+
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
@@ -1579,7 +1607,7 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency,context,repeat,fixed,compute,streaming,c8}=pair;
+    const {entry,commit,latency,context,repeat,fixed,compute,streaming,c8,utilization}=pair;
     const profiles=fixed?fixed.profiles.map((row,index)=>({...row,label:entry.profiles[index].label})):entry.profiles;
     const a=entry.result.direct,b=entry.result.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
@@ -1596,7 +1624,7 @@
       const metrics=['direct','controller'].map(role=>{
         const arm=p[role];
         return {output_tokens_per_second:arm.output_tokens_per_second,
-          mean_ttft_ms:1000*arm.time_to_first_content_seconds.mean,
+          mean_ttft_ms:1000*(fixed?arm.time_to_first_output_seconds:arm.time_to_first_content_seconds).mean,
           ...(fixed?{mean_tpot_ms:arm.time_per_output_token_ms.mean}
             :latency?{mean_tpot_ms:latency.fixed_profiles_client[role][p.id].mean_tpot_ms}:{})
         };
@@ -1697,7 +1725,7 @@
       chartRows.push({id:row.id,label,...pairedMetrics(...fields)});
     }
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
-    const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
+    const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器专题','Request Throttling Controller overview')} ↗</a>`;
     const context16k=contextRows.find(row=>row.id==='16384');
     const contextRatio=context16k?n(context16k.arms.B1.output_tokens_per_second/context16k.arms.B0.output_tokens_per_second)+'×':'—';
     const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
@@ -1719,6 +1747,66 @@
       :[p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
     summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
       [trajectoryLabel,n(latestDirect.elapsed_seconds),n(latestController.elapsed_seconds),n(timeReduction)+'%',n(100*(latestController.output_tokens/latestDirect.output_tokens-1))+'%']);
+    const tailDetails=()=>{
+      const measurements=[];
+      if(fixed)for(const row of profiles){
+        for(const side of ['direct','controller']){
+          const arm=row[side];
+          if(!arm.latency_seconds)continue;
+          const first=arm.time_to_first_output_seconds,perToken=arm.time_per_output_token_ms;
+          measurements.push([row.label,side,arm.successful,first.p95,first.p99,perToken.p95,perToken.p99,arm.latency_seconds.p95,arm.latency_seconds.p99]);
+        }
+      }
+      const supplements=[...(streaming?[{...streaming,label:trajectoryLabel}]:[]),
+        ...(c8?.rows||[]).map(row=>({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'}))];
+      for(const row of supplements){
+        for(const side of ['direct','controller']){
+          const arm=row[side];
+          measurements.push([row.label,side,arm.requests,arm.ttft_p95_ms/1000,arm.ttft_p99_ms/1000,arm.tpot_p95_ms,arm.tpot_p99_ms,
+            arm.end_to_end_p95_ms/1000,arm.end_to_end_p99_ms/1000]);
+        }
+      }
+      if(!measurements.length)return '';
+      return `<h3>${t('客户端尾部时延','Client tail latency')}</h3>${table(t(
+        ['负载','路径','完成请求','首 token P95（秒）','首 token P99（秒）','逐 token P95（毫秒）','逐 token P99（毫秒）','端到端 P95（秒）','端到端 P99（秒）'],
+        ['Profile','Path','Completions','TTFT P95 (s)','TTFT P99 (s)','TPOT P95 (ms)','TPOT P99 (ms)','End-to-end P95 (s)','End-to-end P99 (s)']),
+        measurements.map(([label,side,count,...values])=>[label,side==='direct'?roles.B0:roles.B1,count,...values.map(value=>n(Number.isFinite(value)?value:null))]))}`;
+    };
+    const costDetails=()=>{
+      const monthlyRent=1875,occupiedCards=2;
+      const quote='https://news.smm.cn/news/TCNOQJBAJVZYJ73BMVU7G5GJZXQ462A4U6NN4CY';
+      const cost=arm=>monthlyRent*occupiedCards*1e6/(30*86400*arm.output_tokens_per_second);
+      const values=[...chartRows,...contextRows].filter(row=>row.arms?.B0&&row.arms?.B1).map(row=>[
+        row.label,
+        ...['B0','B1'].map(side=>n(cost(row.arms[side])))
+      ]);
+      return `<h3>${t('每百万输出 token 加速卡成本估算','Estimated accelerator cost per million output tokens')}</h3>
+        <p>${t('沿用引擎送测的公开租赁报价。每张卡每月 1,875 元，按 30 天分摊。两组各用两张卡。','The engine assessment uses a published rental quote of CNY 1,875 per accelerator per 30-day month. Each arm uses two accelerators.')}
+        <a href="${quote}">${t('上海有色网报价','Shanghai Metals Market quote')} ↗</a></p>
+        ${table([t('负载（元/百万输出 token）','Profile (CNY/million output tokens)'),roles.B0,roles.B1],values)}`;
+    };
+    const utilizationChart=()=>{
+      if(!utilization)return '';
+      const results=chartRows.map(row=>{
+        const observation=utilization.rows[row.id===trajectoryId?'swe-heavy':row.id];
+        if(!observation)return '';
+        const sides=['direct','controller'];
+        const complete=sides.every(side=>observation[side].coverage_complete);
+        const delta=observation.controller.mean_percent-observation.direct.mean_percent;
+        const label=t('双卡采样时间加权均值','Time-weighted two-card mean');
+        return `<div class="chart-row" data-profile="${esc(row.id)}"><div class="chart-row-heading">
+          <strong>${esc(row.label)}</strong><span>${complete?(delta>0?'+':'')+n(delta)+' pp':t('采样有缺口','Sampling gap')}</span></div>
+          ${sides.map((side,index)=>{
+            const current=observation[side].mean_percent,role=index?'B1':'B0';
+            return `<div class="bar-line"><span class="bar-role">${esc(roles[role])}</span><span class="bar-track">
+              ${Number.isFinite(current)?`<span title="${label}" class="bar-fill ${role.toLowerCase()}" style="width:${current}%"></span>`:''}</span>
+              <span class="bar-value">${n(current)}</span></div>`;
+          }).join('')}</div>`;
+      });
+      return `<article class="metric-chart" data-metric="ai_core_utilization_percent"><header><h3>${t('AI Core 利用率','AI Core utilization')}</h3><span>%</span></header>
+        <p class="chart-scale-note">${t('按两张加速卡的正式请求区间采样并加权。','Time-weighted over the formal request interval for both accelerators.')}</p>
+        ${results.join('')}<p><a href="./${controllerUtilizationPath}">${t('逐卡覆盖与采样来源','Per-card coverage and sample source')} ↗</a></p></article>`;
+    };
     panel.innerHTML=`${heading}
       <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
       <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
@@ -1736,16 +1824,18 @@
       ${metricChart('mean_ttft_ms',t('首 token 时延 ↓','Time to first token ↓'),'s',1000)}
       ${metricChart('mean_tpot_ms',t('逐 token 时延 ↓','Time per output token ↓'),'ms',1,t('此负载未记录客户端逐 token 时延','Client time per output token unavailable for this workload'))}
       ${metricChart('relative_cost_per_token',t('单位输出 token 的加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1'),1)}</div>
+      ${utilizationChart()}
       ${contextSection()}
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
         `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
-        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}${repeatDetails()}${computeDetails()}`};
+        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${tailDetails()}${engineLatency()}${repeatDetails()}${computeDetails()}`};
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
-      if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首内容 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first content-token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
+      if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首个模型输出 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first model output token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p>${costDetails()}<p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
       if(key==='quality'){
         let rows=entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]);
+        let breakdown='';
         if(fixed){
           const [mmlu,hle,frontier]=['mmlu','hle','frontier'].map(id=>fixed.profiles.find(row=>row.id===id));
           const sides=['direct','controller'];
@@ -1759,9 +1849,17 @@
               [`FrontierScience ${track} ${t('评分未解析','unparsed grades')}`,...sides.map(side=>frontier[side].quality.tracks[track].judge_invalid)]
             ])
           ];
+          const groupNames={'gold/text':t('原题 · 文本','Gold · text'),'gold/image':t('原题 · 图像','Gold · image'),
+            'revision/text':t('修订题 · 文本','Revision · text'),'revision/image':t('修订题 · 图像','Revision · image')};
+          const groupRows=Object.entries(groupNames).flatMap(([id,label])=>sides.flatMap((side,index)=>{
+            const grade=hle[side].quality.groups[id];
+            return grade?[[label,index?roles.B1:roles.B0,`${grade.successes} / ${grade.total}`,grade.unresolved,grade.solver_truncated??'—']]:[];
+          }));
+          if(groupRows.length)breakdown=`<h3>Humanity’s Last Exam</h3>${table(t(['题组','路径','正确 / 总数','评分未判定','答题达到输出上限'],
+            ['Group','Path','Correct / total','Unresolved grade','Solver length stops']),groupRows)}`;
         }
         return {title:t('质量与评分明细','Quality and grading'),
-          body:table([t('指标','Metric'),roles.B0,roles.B1],rows)+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
+          body:table([t('指标','Metric'),roles.B0,roles.B1],rows)+breakdown+`<p>${esc(fixed?t('SWE trace64、SWE Trace Heavy Load 和 Terminal trace48 统计回放性能。','SWE trace64, SWE Trace Heavy Load and Terminal trace48 report replay performance.'):t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
       }
       if(key==='supplement'&&context)return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:
         table([...t(['工况','路径','完成请求','输出 token/s'],['Scenario','Path','Completed requests','Output token/s']),
@@ -1771,7 +1869,15 @@
           ].map(([label,m])=>[contextRows[index].label,label,m.successful,n(m.output_tokens_per_second),
             ...[m.ttft_ms,m.tpot_ms].flatMap(value=>['mean','p95','p99'].map(q=>n(value[q])))])))+
         `<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
-      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p><p>${esc(t(entry.limitations_zh,entry.limitations_en))}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a> · ${resultLink}</p>`};
+      const pairedSources=[
+        [fixed,controllerFixedProfilesPath,t('五项固定负载与评分','Five fixed profiles and grades')],
+        [streaming,controllerStreamingPath,t('SWE Trace Heavy Load 流式补测','SWE Trace Heavy Load streaming pair')],
+        [c8,controllerC8Path,t('4K / 16K 闭环并发 8','4K / 16K closed-loop concurrency 8')],
+        [context,controllerContextPath,t('三档上下文和四租户','Three context ranges and four tenants')],
+        [compute,controllerComputePath,t('服务侧矩阵算力下界','Service-side matrix compute lower bound')],
+        [utilization,controllerUtilizationPath,t('双卡 AI Core 采样区间','Two-card AI Core sampling interval')]
+      ].filter(([available])=>available);
+      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p>${pairedSources.length?`<ul>${pairedSources.map(([,path,label])=>`<li><a href="./${path}">${esc(label)} ↗</a></li>`).join('')}</ul>`:''}<p><a href="${esc(source)}">${t('历史原始报告','Historical report')} ↗</a> · ${resultLink}</p>`};
     },panel);
     panel.dataset.engineRelease=entry.id;
   }

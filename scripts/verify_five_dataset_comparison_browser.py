@@ -15,6 +15,14 @@ HISTORY = "data/engine-release-history-v1.json"
 SR = "data/sr-development-results-v1.json"
 CONTROLLER = "data/controller-product-results-v1.json"
 CONTROLLER_LATENCY = "data/controller-r8-latency-v1.json"
+CONTROLLER_SUPPLEMENTS = {
+    "fixed": "data/controller-r8-fixed-profiles-repeat-v1.json",
+    "streaming": "data/controller-r8-streamed-heavy-load-v1.json",
+    "context": "data/controller-r8-context-tenant-v1.json",
+    "compute": "data/controller-r8-mmlu256-service-compute-v1.json",
+    "c8": "data/controller-r8-closed-loop-c8-v1.json",
+    "utilization": "data/controller-r8-ai-core-utilization-v1.json",
+}
 COMBINATION = "data/five-datasets-r6-20261114/frozen-combination-v1.json"
 
 
@@ -190,7 +198,7 @@ def assert_sr(page, root, entry, layout, lang):
     page.keyboard.press("Escape")
 
 
-def assert_controller_special(page, root, entry, layout, lang, latency=None):
+def assert_controller_special(page, root, entry, layout, lang, latency, supplements):
     base = page.url.split("?")[0].split("#")[0]
     canonical = base + "?release=r8&controlplane=request-throttling"
     menu = root.locator("#comparison-release-select")
@@ -239,26 +247,53 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
         expect(panel).to_have_attribute("data-engine-release", "r8")
         expect(menu.locator('option[value="sr5"]')).to_have_count(0)
     root = panel
-    expect(root.locator('[data-dataset="hle"]')).to_have_attribute(
-        "data-available", "false"
+    fixed = supplements.get("fixed")
+    streaming = supplements.get("streaming")
+    context = supplements.get("context")
+    compute = supplements.get("compute")
+    c8 = supplements.get("c8")
+    utilization = supplements.get("utilization")
+    profiles = (
+        [
+            {**row, "label": old["label"]}
+            for row, old in zip(fixed["profiles"], entry["profiles"], strict=True)
+        ]
+        if fixed
+        else entry["profiles"]
     )
-    tpot_chart = root.locator('[data-metric="mean_tpot_ms"]')
-    if latency:
-        profiles = latency["fixed_profiles_client"]
-        for dataset in profiles["direct"]:
+    expect(root.locator('[data-dataset="hle"]')).to_have_attribute(
+        "data-available", "true" if fixed else "false"
+    )
+    performance = root.locator(":scope > .metric-grid")
+    tpot_chart = performance.locator('[data-metric="mean_tpot_ms"]')
+    if fixed:
+        for profile in profiles:
+            row = tpot_chart.locator(f'[data-profile="{profile["id"]}"]')
+            expect(row.locator(".bar-value")).to_have_text(
+                [
+                    f"{profile[side]['time_per_output_token_ms']['mean']:.2f}"
+                    for side in ("direct", "controller")
+                ]
+            )
+        expect(tpot_chart.locator(".metric-missing")).to_have_count(
+            0 if streaming or latency else 1
+        )
+    elif latency:
+        timing = latency["fixed_profiles_client"]
+        for dataset in timing["direct"]:
             row = tpot_chart.locator(f'[data-profile="{dataset}"]')
             expect(row.locator(".bar-value")).to_have_text(
                 [
-                    f"{profiles[role][dataset]['mean_tpot_ms']:.2f}"
+                    f"{timing[role][dataset]['mean_tpot_ms']:.2f}"
                     for role in ("direct", "controller")
                 ]
             )
         expect(tpot_chart.locator(".metric-missing")).to_have_count(1)
     else:
         expect(tpot_chart.locator(".bar-fill")).to_have_count(0)
-    cost_chart = root.locator('[data-metric="relative_cost_per_token"]')
-    expect(cost_chart.locator(".metric-missing")).to_have_count(1)
-    for profile in entry["profiles"]:
+    cost_chart = performance.locator('[data-metric="relative_cost_per_token"]')
+    expect(cost_chart.locator(".metric-missing")).to_have_count(0 if fixed else 1)
+    for profile in profiles:
         if profile["status"] == "complete":
             ratio = (
                 profile["direct"]["output_tokens_per_second"]
@@ -268,6 +303,8 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
             expect(row.locator(".bar-value")).to_have_text(["1.00", f"{ratio:.2f}"])
     result = entry["result"]
     a, b = result["direct"], result["request_throttling_controller"]
+    if streaming:
+        a, b = streaming["direct"], streaming["controller"]
     output_rates = [arm["output_tokens"] / arm["elapsed_seconds"] for arm in (a, b)]
     throughput_change = 100 * (output_rates[1] / output_rates[0] - 1)
     expect(root.locator(".result-card").nth(1).locator("strong")).to_have_text(
@@ -279,17 +316,23 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
     expect(clarification).to_contain_text("SWE trace64")
     expect(clarification).to_contain_text("SWE Trace Heavy Load")
     expect(clarification).not_to_contain_text("SWE-smith")
-    expect(evidence).to_contain_text(f"{result['time_reduction_percent']:.2f}%")
     expect(evidence).to_contain_text(
-        f"{a['cached_input_percent']:.2f}% → {b['cached_input_percent']:.2f}%"
+        f"{100 * (1 - b['elapsed_seconds'] / a['elapsed_seconds']):.2f}%"
     )
-    for chart in root.locator(".metric-chart").all():
+    cache = " → ".join(
+        f"{arm['cached_input_percent']:.2f}%"
+        if arm["cached_input_percent"] is not None
+        else "—"
+        for arm in (a, b)
+    )
+    expect(evidence).to_contain_text(cache)
+    for chart in performance.locator(".metric-chart").all():
         expect(
             chart.locator(
                 '[data-profile="swe"] + [data-profile="swe-smith-trajectory"]'
             )
         ).to_have_count(1)
-    row = root.locator(
+    row = performance.locator(
         '[data-metric="output_tokens_per_second"] [data-profile="swe-smith-trajectory"]'
     )
     expect(row.locator(".bar-value")).to_have_text(
@@ -300,10 +343,14 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
         ["1.00", f"{output_rates[0] / output_rates[1]:.2f}"]
     )
     for metric, divisor in (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1)):
-        row = root.locator(
+        row = performance.locator(
             f'[data-metric="{metric}"] [data-profile="swe-smith-trajectory"]'
         )
-        if latency:
+        if streaming:
+            expect(row.locator(".bar-value")).to_have_text(
+                [f"{arm[metric] / divisor:.2f}" for arm in (a, b)]
+            )
+        elif latency:
             engine = latency["multi_turn_engine"]
             expect(row.locator(".metric-change")).to_contain_text(
                 "引擎侧" if lang == "zh" else "Engine-side"
@@ -316,13 +363,53 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
             )
         else:
             expect(row).to_have_attribute("data-missing", "true")
+    if context:
+        expect(root.locator("#controller-context-tenant .metric-chart")).to_have_count(
+            4
+        )
+    if compute:
+        lower = compute["arms"]["controller"]["target_matrix_tflops_per_card_lower"]
+        expect(root.locator(".result-card").first.locator("strong")).to_have_text(
+            f"≥{int(100 * lower) / 100:.2f}"
+        )
+    if c8:
+        for summary in c8["rows"]:
+            row = performance.locator(
+                f'[data-metric="output_tokens_per_second"] [data-profile="{summary["id"]}"]'
+            )
+            expect(row.locator(".bar-value")).to_have_text(
+                [
+                    f"{summary[side]['output_tokens_per_second']:.2f}"
+                    for side in ("direct", "controller")
+                ]
+            )
+    if utilization:
+        device_chart = root.locator('[data-metric="ai_core_utilization_percent"]')
+        expect(device_chart.locator(".chart-row")).to_have_count(
+            len(utilization["rows"])
+        )
+        for dataset, pair in utilization["rows"].items():
+            displayed = "swe-smith-trajectory" if dataset == "swe-heavy" else dataset
+            row = device_chart.locator(f'[data-profile="{displayed}"]')
+            expect(row.locator(".bar-value")).to_have_text(
+                [
+                    f"{pair[side]['mean_percent']:.2f}"
+                    if pair[side]["coverage_complete"]
+                    else "—"
+                    for side in ("direct", "controller")
+                ]
+            )
     root.locator('[data-detail="metrics"]').click()
     dialog = root.locator("dialog")
     expect(dialog).to_be_visible()
     expect(dialog.locator("tbody tr").nth(4)).to_contain_text("SWE Trace Heavy Load")
     if latency:
         engine = latency["multi_turn_engine"]
-        engine_table = dialog.locator("table").nth(1)
+        engine_table = dialog.locator("table").filter(
+            has_text="引擎侧首 token 时延"
+            if lang == "zh"
+            else "Engine time to first token"
+        )
         for index, (metric, divisor) in enumerate(
             (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1))
         ):
@@ -334,14 +421,32 @@ def assert_controller_special(page, root, entry, layout, lang, latency=None):
                     for role in ("direct", "controller")
                 ]
             )
-    for profile in entry["profiles"]:
-        row = dialog.locator("tbody tr").filter(has_text=profile["label"])
+    for profile in profiles:
+        row = (
+            dialog.locator("table")
+            .first.locator("tbody tr")
+            .filter(has_text=profile["label"])
+        )
         if profile["status"] == "complete":
             expect(row).to_contain_text(f"{profile['time_reduction_percent']:.2f}%")
         else:
             expect(row).to_contain_text(profile[f"reason_{lang}"])
+    if fixed and streaming and c8:
+        tails = dialog.locator("table").filter(
+            has_text="端到端 P99" if lang == "zh" else "End-to-end P99"
+        )
+        expect(tails.locator("tbody tr")).to_have_count(16)
+        assert all(
+            value != "—" for value in tails.locator("tbody td").all_text_contents()
+        )
     page.keyboard.press("Escape")
     expect(root.locator('[data-detail="metrics"]')).to_be_focused()
+    root.locator('[data-detail="methods"]').click()
+    expect(dialog.locator('a[href*="news.smm.cn"]')).to_have_count(1)
+    expect(
+        dialog.locator("tbody tr").filter(has_text="SWE Trace Heavy Load")
+    ).to_contain_text(f"{1875 * 2e6 / (30 * 86400 * output_rates[1]):.2f}")
+    page.keyboard.press("Escape")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     control.select_option("")
     expect(panel).to_have_count(0)
@@ -686,6 +791,11 @@ def verify(url, output):
         controller_catalog = context.request.get(url + "/" + CONTROLLER).json()
         latency_response = context.request.get(url + "/" + CONTROLLER_LATENCY)
         controller_latency = latency_response.json() if latency_response.ok else None
+        controller_supplements = {}
+        for label, path in CONTROLLER_SUPPLEMENTS.items():
+            response = context.request.get(url + "/" + path)
+            if response.ok:
+                controller_supplements[label] = response.json()
         controller_special = next(
             row for row in controller_catalog["releases"] if row["id"] == "r8"
         )
@@ -898,6 +1008,7 @@ def verify(url, output):
                         r8_layout,
                         lang,
                         controller_latency,
+                        controller_supplements,
                     )
                     for release, controls, values in [
                         ("r1", [], []),
