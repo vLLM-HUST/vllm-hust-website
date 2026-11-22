@@ -1201,7 +1201,7 @@ vllm-hust-ext extension check ${extensionId}`
 
     const metrics = element("div", "plugin-repo-metrics");
     [
-      [copy().stars, metadata.metrics?.stars, `${metadata.repository_url}/stargazers`],
+      [copy().stars, metadata.metrics?.stars, metadata.repository_url],
       [copy().pullRequests, metadata.metrics?.open_pull_requests, `${metadata.repository_url}/pulls`],
       [copy().forks, metadata.metrics?.forks, `${metadata.repository_url}/forks`]
     ].forEach(([label, value, href]) => {
