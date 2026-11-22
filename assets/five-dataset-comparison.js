@@ -1468,6 +1468,13 @@
   }
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
+  const controllerContextPath = 'data/controller-r8-context-tenant-v1.json';
+  const controllerHeavyLoadRepeatPath = 'data/controller-r8-heavy-load-repeat-v1.json';
+  const controllerFixedProfilesPath = 'data/controller-r8-fixed-profiles-repeat-v1.json';
+  const controllerComputePath = 'data/controller-r8-mmlu256-service-compute-v1.json';
+  const controllerStreamingPath = 'data/controller-r8-streamed-heavy-load-v1.json';
+  const controllerC8Path = 'data/controller-r8-closed-loop-c8-v1.json';
+  const controllerUtilizationPath = 'data/controller-r8-ai-core-utilization-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
 
@@ -1483,13 +1490,43 @@
     for(const entry of value.releases){
       if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
       validateControllerPair(entry);
-      results.set(entry.id,{entry,commit:publication.commit,latency:null});
+      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null,streaming:null,c8:null,utilization:null});
     }
     const r8=results.get('r8');
-    if(r8)r8.latency=await loadControllerLatency(publication,r8.entry).catch(error=>{
-      console.warn('Controller latency supplement rejected',error);
-      return null;
-    });
+    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute,r8.streaming,r8.c8,r8.utilization]=await Promise.all([
+      loadControllerLatency(publication,r8.entry).catch(error=>{
+        console.warn('Controller latency supplement rejected',error);
+        return null;
+      }),
+      loadControllerContext(publication,r8.entry).catch(error=>{
+        console.warn('Controller context supplement rejected',error);
+        return null;
+      }),
+      loadControllerHeavyLoadRepeat(publication,r8.entry).catch(error=>{
+        console.warn('Controller repeat supplement rejected',error);
+        return null;
+      }),
+      loadControllerFixedProfiles(publication,r8.entry).catch(error=>{
+        console.warn('Controller fixed-profile supplement rejected',error);
+        return null;
+      }),
+      loadControllerCompute(publication,r8.entry).catch(error=>{
+        console.warn('Controller service compute supplement rejected',error);
+        return null;
+      }),
+      loadControllerTimingSupplement(publication,r8.entry,controllerStreamingPath).catch(error=>{
+        console.warn('Controller streamed heavy-load supplement rejected',error);
+        return null;
+      }),
+      loadControllerTimingSupplement(publication,r8.entry,controllerC8Path).catch(error=>{
+        console.warn('Controller C8 supplement rejected',error);
+        return null;
+      }),
+      loadControllerUtilization(publication,r8.entry).catch(error=>{
+        console.warn('Controller utilization supplement rejected',error);
+        return null;
+      })
+    ]);
     controllerResults=results;
   }
 
@@ -1542,6 +1579,174 @@
     return value;
   }
 
+  async function loadControllerContext(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerContextPath))return null;
+    const response=await fetch('./'+controllerContextPath,{cache:'no-cache'});
+    const value=await readPublishedJson(publication,controllerContextPath,response);
+    const expected=[['4096',8,1],['16384',8,1],['32768',8,1],['multi-tenant',24,4]];
+    const completeLatency=row=>['mean','p95','p99'].every(key=>Number.isFinite(row?.[key])&&row[key]>0);
+    if(value.schema!=='controller-context-tenant-pair/v1'||value.engine_release!==entry.engine_release
+       ||value.max_num_seqs!==entry.max_num_seqs||value.state_resident_seats!==entry.state_resident_seats
+       ||!/^[a-f0-9]{64}$/.test(value.input_sha256)||value.phases?.length!==expected.length)
+      throw Error('Unmatched controller context supplement');
+    for(const [index,[id,concurrency,tenants]] of expected.entries()){
+      const phase=value.phases[index];
+      if(phase.id!==id||phase.concurrency!==concurrency||phase.tenants!==tenants)
+        throw Error('Unexpected controller context workload');
+      for(const arm of [phase.direct,phase.controller]){
+        const m=arm?.metrics;
+        if(!m||!Number.isInteger(m.successful)||m.successful<concurrency||m.requests!==m.successful||m.failed!==0
+           ||m.duration_seconds<300||m.output_tokens!==m.successful*256
+           ||!close(m.output_tokens/m.duration_seconds,m.output_tokens_per_second)
+           ||!completeLatency(m.ttft_ms)||!completeLatency(m.tpot_ms)
+           ||(arm.sampled_aicore_mean_percent!==null&&(!Number.isFinite(arm.sampled_aicore_mean_percent)||arm.sampled_aicore_mean_percent<0||arm.sampled_aicore_mean_percent>100))
+           ||Object.keys(arm.per_tenant||{}).length!==tenants
+           ||Array.from({length:tenants},(_,i)=>arm.per_tenant?.['tenant-'+i]).some(row=>
+             !row||!Number.isInteger(row.successful)||row.successful<1||!Number.isFinite(row.output_tokens_per_second)||row.output_tokens_per_second<=0)
+           ||!/^[a-f0-9]{64}$/.test(arm.execution_sha256))
+          throw Error('Incomplete controller context measurements');
+      }
+    }
+    return value;
+  }
+
+  async function loadControllerHeavyLoadRepeat(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerHeavyLoadRepeatPath))return null;
+    const response=await fetch('./'+controllerHeavyLoadRepeatPath,{cache:'no-cache'});
+    const value=await readPublishedJson(publication,controllerHeavyLoadRepeatPath,response);
+    const source=entry.result.direct;
+    if(value.schema!=='controller-r8-heavy-load-repeat/v1'||value.engine_release!==entry.engine_release||
+      value.program_state_residency!==entry.state_resident_seats||!/^\d{4}-\d{2}-\d{2}$/.test(value.date)||
+      !/^reports\/controller-r8-[0-9]{8}-repeat\/README\.md$/.test(value.report_path)||
+      !/^[a-f0-9]{64}$/.test(value.report_pair_sha256))throw Error('Unmatched SWE Trace Heavy Load repeat');
+    for(const arm of [value.direct,value.controller]){
+      if(arm?.programs!==source.completed_tasks||arm.requests!==source.successful_requests||
+        arm.input_tokens!==source.input_tokens||arm.output_tokens!==source.output_tokens||
+        !Number.isFinite(arm.elapsed_seconds)||arm.elapsed_seconds<=0||
+        !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
+        !Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100)
+        throw Error('Incomplete SWE Trace Heavy Load repeat');
+    }
+    return value;
+  }
+
+  async function loadControllerFixedProfiles(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerFixedProfilesPath))return null;
+    const response=await fetch('./'+controllerFixedProfilesPath,{cache:'no-cache'});
+    const value=await readPublishedJson(publication,controllerFixedProfilesPath,response);
+    if(value.schema!=='controller-r8-fixed-profiles-repeat/v1'||value.engine_release!==entry.engine_release||
+      value.state_resident_seats!==entry.state_resident_seats||
+      value.profiles?.map(row=>row.id).join()!==fixedProfiles.map(([id])=>id).join())
+      throw Error('Unmatched fixed profile repeat');
+    const counts={mmlu:200,hle:200,frontier:160,swe:64,terminal:48};
+    const positive=value=>Number.isFinite(value)&&value>0;
+    for(const row of value.profiles){
+      const expected=counts[row.id];
+      if(row.status!=='complete'||row.same_client_request_bodies!==true||row.same_per_case_engine_prompt_tokens!==true)
+        throw Error('Incomplete fixed-profile pair');
+      for(const arm of [row.direct,row.controller]){
+        if(arm.planned!==expected||arm.successful!==expected||arm.release_errors!==0||
+          !positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||
+          !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
+          arm.time_to_first_output_seconds?.n!==expected||!positive(arm.time_to_first_output_seconds?.mean)||
+          !Number.isInteger(arm.time_per_output_token_ms?.n)||arm.time_per_output_token_ms.n<1||
+          arm.time_per_output_token_ms.n>expected||!positive(arm.time_per_output_token_ms.mean))
+          throw Error('Invalid fixed-profile metrics');
+        const quality=arm.quality;
+        const count=(number,limit)=>Number.isInteger(number)&&number>=0&&number<=limit;
+        if(row.id==='mmlu'&&(!count(quality?.correct,expected)||quality.planned!==expected))
+          throw Error('Incomplete MMLU-Pro grades');
+        if(row.id==='hle'){
+          const groups=Object.values(quality?.groups||{});
+          if(groups.some(group=>!count(group.total,expected)||!count(group.successes,group.total)||!count(group.unresolved,group.total))||
+             groups.reduce((sum,group)=>sum+group.total,0)!==expected)
+            throw Error('Incomplete Humanity’s Last Exam grades');
+        }
+        if(row.id==='frontier'&&Object.entries({olympiad:100,research:60}).some(([track,total])=>{
+          const grade=quality?.tracks?.[track];
+          return grade?.total!==total||!count(grade.successes,total)||!count(grade.judge_invalid,total);
+        }))throw Error('Incomplete FrontierScience grades');
+      }
+      if(!close(row.time_reduction_percent,100*(1-row.controller.elapsed_seconds/row.direct.elapsed_seconds))||
+         !close(row.output_token_change_percent,100*(row.controller.output_tokens/row.direct.output_tokens-1)))
+        throw Error('Fixed-profile summary does not match the measured arms');
+    }
+    return value;
+  }
+
+  async function loadControllerCompute(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerComputePath))return null;
+    const response=await fetch('./'+controllerComputePath,{cache:'no-cache'});
+    const value=await readPublishedJson(publication,controllerComputePath,response);
+    if(value.schema!=='controller-r8-mmlu256-service-compute/v1'||value.engine_release!==entry.engine_release||
+       value.state_resident_seats!==entry.state_resident_seats||value.accelerators!==2||value.native_efficiency_certified!==false||
+       !/^[a-f0-9]{64}$/.test(value.source_formula_sha256)||!/^[a-f0-9]{64}$/.test(value.model_config_sha256))
+      throw Error('Unmatched service compute measurement');
+    for(const side of ['direct','controller']){
+      const arm=value.arms?.[side];
+      if(arm?.rounds?.map(r=>r.repetition).join()!=='1,2,3'||arm.rounds.some(r=>r.requests!==200||r.input_tokens!==282265||
+        !Number.isSafeInteger(r.target_matrix_work_lower_flops)||r.target_matrix_work_lower_flops<=0||
+        !Number.isInteger(r.output_tokens)||r.output_tokens<200||r.output_tokens>51200||
+        !Number.isFinite(r.elapsed_seconds)||r.elapsed_seconds<=0))throw Error('Incomplete three-round service compute evidence');
+      const sum=key=>arm.rounds.reduce((a,r)=>a+r[key],0);
+      const seconds=sum('elapsed_seconds'), work=sum('target_matrix_work_lower_flops');
+      if(!close(arm.synchronized_service_seconds,seconds)||!close(arm.target_matrix_tflops_per_card_lower,work/(2e12*seconds))||
+        !close(arm.output_tokens_per_second,sum('output_tokens')/seconds))throw Error('Service compute summary does not match the sealed rounds');
+    }
+    return value;
+  }
+
+  async function loadControllerTimingSupplement(publication,entry,path) {
+    if(!publication.files.some(file=>file.website_path===path))return null;
+    const response=await fetch('./'+path,{cache:'no-cache'});
+    const value=await readPublishedJson(publication,path,response);
+    const streaming=path===controllerStreamingPath;
+    const schema=streaming?'controller-r8-streamed-heavy-load/v1':'controller-r8-closed-loop-c8/v1';
+    if(value.schema!==schema||value.engine_release!==entry.engine_release||value.state_resident_seats!==entry.state_resident_seats)
+      throw Error('Unmatched timing supplement');
+    const positive=value=>Number.isFinite(value)&&value>0;
+    if(!streaming&&(value.concurrency!==8||value.rows?.map(row=>row.id).join()!=='4096-formal,16384-formal'))
+      throw Error('Incomplete original closed-loop C8 intervals');
+    for(const row of streaming?[value]:value.rows){
+      for(const arm of [row.direct,row.controller]){
+        const time=streaming?arm.elapsed_seconds:arm.cohort_wall_seconds;
+        if(!positive(time)||!positive(arm.mean_ttft_ms)||!positive(arm.mean_tpot_ms)||
+          !Number.isInteger(arm.requests)||!positive(arm.requests)||!close(arm.output_tokens_per_second,arm.output_tokens/time))
+          throw Error('Incomplete requests or timing observations');
+        if(streaming&&(arm.requests!==entry.result.direct.successful_requests||arm.output_tokens!==entry.result.direct.output_tokens||
+          arm.tpot_requests<1||arm.tpot_requests>arm.requests||
+          (arm.cached_input_percent!==null&&(!Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100))))
+          throw Error('Unmatched streamed heavy-load census');
+        if(!streaming&&(arm.phase!==row.id||time<300||arm.seconds!==300||arm.output_tokens!==256*arm.requests))
+          throw Error('Unmatched standardized C8 window or output budget');
+      }
+    }
+    return value;
+  }
+
+  async function loadControllerUtilization(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerUtilizationPath))return null;
+    const response=await fetch('./'+controllerUtilizationPath,{cache:'no-cache'});
+    const value=await readPublishedJson(publication,controllerUtilizationPath,response);
+    const expected=[...fixedProfiles.map(([id])=>id),'swe-heavy','4096-formal','16384-formal'].sort().join();
+    if(value.schema!=='controller-r8-ai-core-utilization/v1'||value.engine_release!==entry.engine_release||
+      value.state_resident_seats!==entry.state_resident_seats||Object.keys(value.rows||{}).sort().join()!==expected)
+      throw Error('Invalid accelerator utilization scope');
+    const bounded=percent=>Number.isFinite(percent)&&percent>=0&&percent<=100;
+    for(const pair of Object.values(value.rows)){
+      for(const side of ['direct','controller']){
+        const arm=pair[side],cards=Object.values(arm?.cards||{});
+        if(cards.length!==2||!Number.isFinite(arm.window_start_wall)||!(arm.window_end_wall>arm.window_start_wall)||
+          cards.some(card=>!Number.isFinite(card.unobserved_seconds)||card.unobserved_seconds<0)||
+          arm.coverage_complete!==cards.every(card=>card.unobserved_seconds<.001)||
+          (arm.coverage_complete ? !bounded(arm.mean_percent)||cards.some(card=>!bounded(card.mean_percent))||
+            !close(arm.mean_percent,(cards[0].mean_percent+cards[1].mean_percent)/2) : arm.mean_percent!==null))
+          throw Error('Invalid accelerator utilization observation');
+      }
+    }
+    return value;
+  }
+
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
@@ -1560,8 +1765,9 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency}=pair;
-    const r=entry.result, a=r.direct, b=r.request_throttling_controller;
+    const {entry,commit,latency,context,repeat,fixed,compute,streaming,c8,utilization}=pair;
+    const profiles=fixed?fixed.profiles.map((row,index)=>({...row,label:entry.profiles[index].label})):entry.profiles;
+    const a=entry.result.direct,b=entry.result.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
     const pairedMetrics=(direct,controller)=>{
       const arms={
@@ -1571,20 +1777,55 @@
       return {arms,changes_percent:Object.fromEntries(Object.keys(arms.B0)
         .map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]))};
     };
-    const rows=standardRows(entry.profiles.map(p=>{
+    const rows=standardRows(profiles.map(p=>{
       if(p.status!=='complete')return {id:p.id,missingReason:t(p.reason_zh,p.reason_en)};
       const metrics=['direct','controller'].map(role=>{
         const arm=p[role];
         return {output_tokens_per_second:arm.output_tokens_per_second,
-          mean_ttft_ms:1000*arm.time_to_first_content_seconds.mean,
-          ...(latency?{mean_tpot_ms:latency.fixed_profiles_client[role][p.id].mean_tpot_ms}:{})
+          mean_ttft_ms:1000*(fixed?arm.time_to_first_output_seconds:arm.time_to_first_content_seconds).mean,
+          ...(fixed?{mean_tpot_ms:arm.time_per_output_token_ms.mean}
+            :latency?{mean_tpot_ms:latency.fixed_profiles_client[role][p.id].mean_tpot_ms}:{})
         };
       });
       return {id:p.id,...pairedMetrics(...metrics)};
     }));
+    const contextRows=(context?.phases||[]).map(phase=>{
+      const labels={4096:'4K–8K / C8',16384:'16K–24K / C8',32768:'32K–48K / C8',
+        'multi-tenant':t('四租户 / C24','Four tenants / C24')};
+      const metrics=[phase.direct,phase.controller].map(arm=>({
+        output_tokens_per_second:arm.metrics.output_tokens_per_second,
+        p99_ttft_ms:arm.metrics.ttft_ms.p99,
+        p99_tpot_ms:arm.metrics.tpot_ms.p99,
+        aicore_percent:arm.sampled_aicore_mean_percent
+      }));
+      return {id:phase.id,label:labels[phase.id],...pairedMetrics(...metrics)};
+    });
+    const contextSection=()=>{
+      if(!contextRows.length)return '';
+      const labels=contextRows.map(row=>row.label);
+      const charts=[
+        ['output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s'],
+        ['p99_ttft_ms',t('首 token 时延 P99 ↓','Time to first token P99 ↓'),'ms'],
+        ['p99_tpot_ms',t('逐 token 时延 P99 ↓','Time per output token P99 ↓'),'ms'],
+        ['relative_cost_per_token',t('单位输出 token 加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1')]
+      ];
+      const tenants=context.phases.find(phase=>phase.id==='multi-tenant');
+      const tenantRows=Object.entries(tenants.direct.per_tenant).map(([name,direct])=>{
+        const controller=tenants.controller.per_tenant[name];
+        return [name,direct.successful,controller.successful,n(direct.output_tokens_per_second),n(controller.output_tokens_per_second)];
+      });
+      return `<section id="controller-context-tenant"><div class="section-heading"><h3>${t('上下文与四租户实测','Context and four-tenant measurements')}</h3><button type="button" data-detail="supplement">${t('逐组指标与来源','Per-arm metrics and source')} ↗</button></div>
+        <p class="chart-scale-note">${t('每个阶段预热 60 秒，提交 300 秒，吞吐计入排空时间。时延从客户端测量。','Each phase warms up for 60 seconds, submits for 300 seconds and includes the drain time in throughput. Latency is measured at the client.')}</p>
+        <div class="metric-grid">${charts.map(([key,title,unit])=>chart(key,title,unit,1,contextRows,labels,roles)).join('')}</div>
+        ${table(t(['工况','直连采样利用率','控制器采样利用率'],['Scenario','Direct sampled utilization','Controller sampled utilization']),
+          contextRows.map(row=>[row.label,...['B0','B1'].map(role=>Number.isFinite(row.arms[role].aicore_percent)?n(row.arms[role].aicore_percent)+'%':'—')]))}
+        ${table(t(['租户','直连完成请求','控制器完成请求','直连 token/s','控制器 token/s'],['Tenant','Direct completions','Controller completions','Direct token/s','Controller token/s']),tenantRows)}
+        <p><a href="./${controllerContextPath}">${t('阶段、窗口与逐租户原始汇总','Source summary by phase, window and tenant')} ↗</a></p>
+      </section>`;
+    };
     const trajectoryLabel='SWE Trace Heavy Load';
     const trajectoryId='swe-smith-trajectory';
-    const trajectoryMetrics=[['direct',a],['controller',b]].map(([role,arm])=>{
+    const trajectoryMetrics=streaming?['direct','controller'].map(side=>({output_tokens_per_second:streaming[side].output_tokens_per_second,mean_ttft_ms:streaming[side].mean_ttft_ms,mean_tpot_ms:streaming[side].mean_tpot_ms})):[['direct',a],['controller',b]].map(([role,arm])=>{
       const engine=latency?.multi_turn_engine[role];
       return {output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,
         ...(engine?{mean_ttft_ms:engine.mean_ttft_ms,mean_tpot_ms:engine.mean_tpot_ms}:{})
@@ -1602,38 +1843,133 @@
         [t('引擎侧请求耗时（秒）','Engine request latency (s)'),n(direct.mean_e2e_ms/1000),n(controller.mean_e2e_ms/1000)],
         [t('客户端从请求就绪到完成（秒）','Client request ready to completion (s)'),n(a.request_latency_seconds.mean),n(b.request_latency_seconds.mean)]
       ];
-      return `<h3>${trajectoryLabel} · ${t('请求时延分解','Request latency breakdown')}</h3>
+      return `<h3>${trajectoryLabel} · ${t('非流式批次的时延分解','Latency breakdown for the non-streaming batch')}</h3>
         <p>${t(`两组各 ${direct.requests} 条请求。引擎侧从请求进入引擎开始计时，放行前等待计入客户端请求耗时。本轮客户端采用非流式接口，未记录首 token 到达时间。`,`${direct.requests} requests per arm. Engine timings start at engine admission. Client request latency includes waiting before admission. This run used non-streaming responses, so client first-token arrival was unobserved.`)}</p>
         ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}`;
     };
-    const batchTime=`${n(a.elapsed_seconds)} → ${n(b.elapsed_seconds)} s`;
-    const cacheHit=`${n(a.cached_input_percent)}% → ${n(b.cached_input_percent)}%`;
+    const computeDetails=()=>{
+      if(!compute)return '';
+      const sides=['direct','controller'];
+      return `<h3>${t('MMLU-Pro 200 · 输出上限 256','MMLU-Pro 200 · 256 output token limit')}</h3>
+        <p>${t('三轮各 200 条请求。分子取目标模型必要矩阵算量下界，计时覆盖整批服务和双卡同步。引擎原生效率认证使用独立的算量与计时协议。','Three rounds of 200 requests. The numerator bounds the target model’s necessary matrix work. Timing includes the complete service batch and both accelerator fences. Native engine efficiency uses its own work and timing protocol.')}</p>
+        ${table([t('指标','Metric'),roles.B0,roles.B1],[
+          [t('必要矩阵计算速率下界（TFLOP/s/卡）','Necessary matrix work lower rate (TFLOP/s per accelerator)'),...sides.map(side=>'≥'+lowerRate(compute.arms[side].target_matrix_tflops_per_card_lower))],
+          [t('三轮合计（秒）','Three rounds total (s)'),...sides.map(side=>n(compute.arms[side].synchronized_service_seconds))],
+          [t('整批输出吞吐（token/s）','Batch output throughput (token/s)'),...sides.map(side=>n(compute.arms[side].output_tokens_per_second))]
+        ])}<p><a href="./${controllerComputePath}">${t('逐轮算量及计时记录','Per-round work and timing')} ↗</a></p>`;
+    };
+    const repeatDetails=()=>{
+      if(!repeat)return '';
+      const rows=[
+        [t('整批耗时（秒）','Batch time (s)'),...['direct','controller'].map(arm=>n(repeat[arm].elapsed_seconds))],
+        [t('输出吞吐（token/s）','Output throughput (token/s)'),...['direct','controller'].map(arm=>n(repeat[arm].output_tokens_per_second))],
+        [t('输入 token 缓存命中率','Cached input tokens'),...['direct','controller'].map(arm=>n(repeat[arm].cached_input_percent)+'%')]
+      ];
+      const report=`https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${commit}/${repeat.report_path}`;
+      return `<h3>${trajectoryLabel} · ${t('复测','Repeat')} · ${esc(repeat.date)}</h3>
+        ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}
+        <p><a href="${esc(report)}">${t('复测报告与图表','Repeat report and figures')} ↗</a></p>`;
+    };
+    const latestDirect=streaming?.direct||a, latestController=streaming?.controller||b;
+    const batchTime=`${n(latestDirect.elapsed_seconds)} → ${n(latestController.elapsed_seconds)} s`;
+    const timeReduction=100*(1-latestController.elapsed_seconds/latestDirect.elapsed_seconds);
+    const cacheHit=[latestDirect,latestController].map(arm=>Number.isFinite(arm.cached_input_percent)?n(arm.cached_input_percent)+'%':'—').join(' → ');
     const chartRows=[...rows];
     chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
+    for(const row of c8?.rows||[]){
+      const label=row.id==='4096-formal'?'4K / C8':'16K / C8';
+      const fields=[row.direct,row.controller].map(arm=>({output_tokens_per_second:arm.output_tokens_per_second,
+        mean_ttft_ms:arm.mean_ttft_ms,mean_tpot_ms:arm.mean_tpot_ms}));
+      chartRows.push({id:row.id,label,...pairedMetrics(...fields)});
+    }
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
-    const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
-    const values=['—',(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%','—',(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
-    const notes=[t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
+    const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器专题','Request Throttling Controller overview')} ↗</a>`;
+    const context16k=contextRows.find(row=>row.id==='16384');
+    const contextRatio=context16k?n(context16k.arms.B1.output_tokens_per_second/context16k.arms.B0.output_tokens_per_second)+'×':'—';
+    const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
+    const computeValue=compute?'≥'+lowerRate(compute.arms.controller.target_matrix_tflops_per_card_lower):'—';
+    const values=[computeValue,(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%',contextRatio,(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
+    const notes=[compute?t('服务侧必要矩阵算量下界 · TFLOP/s/卡','Service-side necessary matrix work · TFLOP/s per accelerator'):t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
     const metricChart=(key,title,unit,divisor,reason)=>{
       const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
       const missing=reason||t('多轮回放使用非流式接口，未记录客户端首内容 token 到达时间','The non-streaming multi-turn replay has no client first content-token arrival timestamp');
       const metricRows=chartRows.map(row=>Number.isFinite(row.arms?.B0?.[key])&&Number.isFinite(row.arms?.B1?.[key])
-        ?{...row,metricScope:scopedLatency&&row.id===trajectoryId?t('引擎侧','Engine-side'):null}
+        ?{...row,metricScope:scopedLatency&&row.id===trajectoryId&&!streaming?t('引擎侧','Engine-side'):null}
         :{...row,arms:null,missingReason:row.missingReason||(key==='mean_tpot_ms'&&row.id!==trajectoryId
           ?t('尚未发布客户端逐 token 时延补充数据','Client time per output token supplement is unpublished'):missing)});
       return chart(key,title,unit,divisor,metricRows,chartRows.map(row=>row.label),roles);
     };
-    const summaryRows=entry.profiles.map(p=>p.status==='complete'
+    const summaryRows=profiles.map(p=>p.status==='complete'
       ?[p.label,n(p.direct.elapsed_seconds),n(p.controller.elapsed_seconds),n(p.time_reduction_percent)+'%',n(p.output_token_change_percent)+'%']
       :[p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
     summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
-      [trajectoryLabel,n(a.elapsed_seconds),n(b.elapsed_seconds),n(r.time_reduction_percent)+'%',n(100*(b.output_tokens/a.output_tokens-1))+'%']);
+      [trajectoryLabel,n(latestDirect.elapsed_seconds),n(latestController.elapsed_seconds),n(timeReduction)+'%',n(100*(latestController.output_tokens/latestDirect.output_tokens-1))+'%']);
+    const tailDetails=()=>{
+      const measurements=[];
+      if(fixed)for(const row of profiles){
+        for(const side of ['direct','controller']){
+          const arm=row[side];
+          if(!arm.latency_seconds)continue;
+          const first=arm.time_to_first_output_seconds,perToken=arm.time_per_output_token_ms;
+          measurements.push([row.label,side,arm.successful,first.p95,first.p99,perToken.p95,perToken.p99,arm.latency_seconds.p95,arm.latency_seconds.p99]);
+        }
+      }
+      const supplements=[...(streaming?[{...streaming,label:trajectoryLabel}]:[]),
+        ...(c8?.rows||[]).map(row=>({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'}))];
+      for(const row of supplements){
+        for(const side of ['direct','controller']){
+          const arm=row[side];
+          measurements.push([row.label,side,arm.requests,arm.ttft_p95_ms/1000,arm.ttft_p99_ms/1000,arm.tpot_p95_ms,arm.tpot_p99_ms,
+            arm.end_to_end_p95_ms/1000,arm.end_to_end_p99_ms/1000]);
+        }
+      }
+      if(!measurements.length)return '';
+      return `<h3>${t('客户端尾部时延','Client tail latency')}</h3>${table(t(
+        ['负载','路径','完成请求','首 token P95（秒）','首 token P99（秒）','逐 token P95（毫秒）','逐 token P99（毫秒）','端到端 P95（秒）','端到端 P99（秒）'],
+        ['Profile','Path','Completions','TTFT P95 (s)','TTFT P99 (s)','TPOT P95 (ms)','TPOT P99 (ms)','End-to-end P95 (s)','End-to-end P99 (s)']),
+        measurements.map(([label,side,count,...values])=>[label,side==='direct'?roles.B0:roles.B1,count,...values.map(value=>n(Number.isFinite(value)?value:null))]))}`;
+    };
+    const costDetails=()=>{
+      const monthlyRent=1875,occupiedCards=2;
+      const quote='https://news.smm.cn/news/TCNOQJBAJVZYJ73BMVU7G5GJZXQ462A4U6NN4CY';
+      const cost=arm=>monthlyRent*occupiedCards*1e6/(30*86400*arm.output_tokens_per_second);
+      const values=[...chartRows,...contextRows].filter(row=>row.arms?.B0&&row.arms?.B1).map(row=>[
+        row.label,
+        ...['B0','B1'].map(side=>n(cost(row.arms[side])))
+      ]);
+      return `<h3>${t('每百万输出 token 加速卡成本估算','Estimated accelerator cost per million output tokens')}</h3>
+        <p>${t('沿用引擎送测的公开租赁报价。每张卡每月 1,875 元，按 30 天分摊。两组各用两张卡。','The engine assessment uses a published rental quote of CNY 1,875 per accelerator per 30-day month. Each arm uses two accelerators.')}
+        <a href="${quote}">${t('上海有色网报价','Shanghai Metals Market quote')} ↗</a></p>
+        ${table([t('负载（元/百万输出 token）','Profile (CNY/million output tokens)'),roles.B0,roles.B1],values)}`;
+    };
+    const utilizationChart=()=>{
+      if(!utilization)return '';
+      const results=chartRows.map(row=>{
+        const observation=utilization.rows[row.id===trajectoryId?'swe-heavy':row.id];
+        if(!observation)return '';
+        const sides=['direct','controller'];
+        const complete=sides.every(side=>observation[side].coverage_complete);
+        const delta=observation.controller.mean_percent-observation.direct.mean_percent;
+        const label=t('双卡采样时间加权均值','Time-weighted two-card mean');
+        return `<div class="chart-row" data-profile="${esc(row.id)}"><div class="chart-row-heading">
+          <strong>${esc(row.label)}</strong><span>${complete?(delta>0?'+':'')+n(delta)+' pp':t('采样有缺口','Sampling gap')}</span></div>
+          ${sides.map((side,index)=>{
+            const current=observation[side].mean_percent,role=index?'B1':'B0';
+            return `<div class="bar-line"><span class="bar-role">${esc(roles[role])}</span><span class="bar-track">
+              ${Number.isFinite(current)?`<span title="${label}" class="bar-fill ${role.toLowerCase()}" style="width:${current}%"></span>`:''}</span>
+              <span class="bar-value">${n(current)}</span></div>`;
+          }).join('')}</div>`;
+      });
+      return `<article class="metric-chart" data-metric="ai_core_utilization_percent"><header><h3>${t('AI Core 利用率','AI Core utilization')}</h3><span>%</span></header>
+        <p class="chart-scale-note">${t('按两张加速卡的正式请求区间采样并加权。','Time-weighted over the formal request interval for both accelerators.')}</p>
+        ${results.join('')}<p><a href="./${controllerUtilizationPath}">${t('逐卡覆盖与采样来源','Per-card coverage and sample source')} ↗</a></p></article>`;
+    };
     panel.innerHTML=`${heading}
-      <div class="comparison-meta"><span>${t(`两组使用同一份 B1 ${entry.id} 引擎配置`,`Both arms share the same B1 ${entry.id} engine configuration`)}</span>${resultLink}</div>
+      <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
       <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
-        <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(r.time_reduction_percent)}%</strong></span>
+        <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(timeReduction)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
       <section class="frozen-profile"><div class="section-heading"><h3>${t('控制面实验配置','Control plane experiment configuration')}</h3><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div>
       <p>${esc(entry.engine_release)}</p><p class="frozen-settings">${esc(settings)}</p></section>
@@ -1646,16 +1982,60 @@
       ${metricChart('mean_ttft_ms',t('首 token 时延 ↓','Time to first token ↓'),'s',1000)}
       ${metricChart('mean_tpot_ms',t('逐 token 时延 ↓','Time per output token ↓'),'ms',1,t('此负载未记录客户端逐 token 时延','Client time per output token unavailable for this workload'))}
       ${metricChart('relative_cost_per_token',t('单位输出 token 的加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1'),1)}</div>
+      ${utilizationChart()}
+      ${contextSection()}
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
         `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
-        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${engineLatency()}`};
+        <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${tailDetails()}${engineLatency()}${repeatDetails()}${computeDetails()}`};
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
-      if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首内容 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first content-token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
-      if(key==='quality')return {title:t('质量与评分明细','Quality and grading'),body:table([t('指标','Metric'),roles.B0,roles.B1],entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]))+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
-      if(key==='supplement')return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:`<p>${t('本专项没有对应补测数据。','There are no corresponding supplementary measurements for this comparison.')}</p>`};
-      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p><p>${esc(t(entry.limitations_zh,entry.limitations_en))}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a> · ${resultLink}</p>`};
+      if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首个模型输出 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first model output token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p>${costDetails()}<p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
+      if(key==='quality'){
+        let rows=entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]);
+        let breakdown='';
+        if(fixed){
+          const [mmlu,hle,frontier]=['mmlu','hle','frontier'].map(id=>fixed.profiles.find(row=>row.id===id));
+          const sides=['direct','controller'];
+          const sum=(groups,field)=>Object.values(groups||{}).reduce((value,group)=>value+(group[field]||0),0);
+          rows=[
+            [t('MMLU-Pro 正确数 / 200','MMLU-Pro correct / 200'),...sides.map(side=>`${mmlu[side].quality.correct} / 200`)],
+            [t('Humanity’s Last Exam 正确数 / 200','Humanity’s Last Exam correct / 200'),...sides.map(side=>`${sum(hle[side].quality.groups,'successes')} / 200`)],
+            [t('Humanity’s Last Exam 评分未判定','Humanity’s Last Exam unresolved grades'),...sides.map(side=>sum(hle[side].quality.groups,'unresolved'))],
+            ...['olympiad','research'].flatMap(track=>[
+              [`FrontierScience ${track} ${t('达标数 / 总数','successes / total')}`,...sides.map(side=>{const row=frontier[side].quality.tracks[track];return `${row.successes} / ${row.total}`;})],
+              [`FrontierScience ${track} ${t('评分未解析','unparsed grades')}`,...sides.map(side=>frontier[side].quality.tracks[track].judge_invalid)]
+            ])
+          ];
+          const groupNames={'gold/text':t('原题 · 文本','Gold · text'),'gold/image':t('原题 · 图像','Gold · image'),
+            'revision/text':t('修订题 · 文本','Revision · text'),'revision/image':t('修订题 · 图像','Revision · image')};
+          const groupRows=Object.entries(groupNames).flatMap(([id,label])=>sides.flatMap((side,index)=>{
+            const grade=hle[side].quality.groups[id];
+            return grade?[[label,index?roles.B1:roles.B0,`${grade.successes} / ${grade.total}`,grade.unresolved,grade.solver_truncated??'—']]:[];
+          }));
+          if(groupRows.length)breakdown=`<h3>Humanity’s Last Exam</h3>${table(t(['题组','路径','正确 / 总数','评分未判定','答题达到输出上限'],
+            ['Group','Path','Correct / total','Unresolved grade','Solver length stops']),groupRows)}`;
+        }
+        return {title:t('质量与评分明细','Quality and grading'),
+          body:table([t('指标','Metric'),roles.B0,roles.B1],rows)+breakdown+`<p>${esc(fixed?t('SWE trace64、SWE Trace Heavy Load 和 Terminal trace48 统计回放性能。','SWE trace64, SWE Trace Heavy Load and Terminal trace48 report replay performance.'):t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
+      }
+      if(key==='supplement'&&context)return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:
+        table([...t(['工况','路径','完成请求','输出 token/s'],['Scenario','Path','Completed requests','Output token/s']),
+          'TTFT mean / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT mean / ms','TPOT P95 / ms','TPOT P99 / ms'],
+          context.phases.flatMap((phase,index)=>[
+            [roles.B0,phase.direct.metrics],[roles.B1,phase.controller.metrics]
+          ].map(([label,m])=>[contextRows[index].label,label,m.successful,n(m.output_tokens_per_second),
+            ...[m.ttft_ms,m.tpot_ms].flatMap(value=>['mean','p95','p99'].map(q=>n(value[q])))])))+
+        `<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
+      const pairedSources=[
+        [fixed,controllerFixedProfilesPath,t('五项固定负载与评分','Five fixed profiles and grades')],
+        [streaming,controllerStreamingPath,t('SWE Trace Heavy Load 流式补测','SWE Trace Heavy Load streaming pair')],
+        [c8,controllerC8Path,t('4K / 16K 闭环并发 8','4K / 16K closed-loop concurrency 8')],
+        [context,controllerContextPath,t('三档上下文和四租户','Three context ranges and four tenants')],
+        [compute,controllerComputePath,t('服务侧矩阵算力下界','Service-side matrix compute lower bound')],
+        [utilization,controllerUtilizationPath,t('双卡 AI Core 采样区间','Two-card AI Core sampling interval')]
+      ].filter(([available])=>available);
+      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p>${pairedSources.length?`<ul>${pairedSources.map(([,path,label])=>`<li><a href="./${path}">${esc(label)} ↗</a></li>`).join('')}</ul>`:''}<p><a href="${esc(source)}">${t('历史原始报告','Historical report')} ↗</a> · ${resultLink}</p>`};
     },panel);
     panel.dataset.engineRelease=entry.id;
   }
