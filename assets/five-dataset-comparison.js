@@ -1314,6 +1314,8 @@
   const controllerHeavyLoadRepeatPath = 'data/controller-r8-heavy-load-repeat-v1.json';
   const controllerFixedProfilesPath = 'data/controller-r8-fixed-profiles-repeat-v1.json';
   const controllerComputePath = 'data/controller-r8-mmlu256-service-compute-v1.json';
+  const controllerStreamingPath = 'data/controller-r8-streamed-heavy-load-v1.json';
+  const controllerC8Path = 'data/controller-r8-closed-loop-c8-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
 
@@ -1329,10 +1331,10 @@
     for(const entry of value.releases){
       if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
       validateControllerPair(entry);
-      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null});
+      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null,streaming:null,c8:null});
     }
     const r8=results.get('r8');
-    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute]=await Promise.all([
+    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute,r8.streaming,r8.c8]=await Promise.all([
       loadControllerLatency(publication,r8.entry).catch(error=>{
         console.warn('Controller latency supplement rejected',error);
         return null;
@@ -1351,6 +1353,14 @@
       }),
       loadControllerCompute(publication,r8.entry).catch(error=>{
         console.warn('Controller service compute supplement rejected',error);
+        return null;
+      }),
+      loadControllerTimingSupplement(publication,r8.entry,controllerStreamingPath).catch(error=>{
+        console.warn('Controller streamed heavy-load supplement rejected',error);
+        return null;
+      }),
+      loadControllerTimingSupplement(publication,r8.entry,controllerC8Path).catch(error=>{
+        console.warn('Controller C8 supplement rejected',error);
         return null;
       })
     ]);
@@ -1523,6 +1533,34 @@
     return value;
   }
 
+  async function loadControllerTimingSupplement(publication,entry,path) {
+    if(!publication.files.some(file=>file.website_path===path))return null;
+    const response=await fetch('./'+path,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,path,response);
+    const streaming=path===controllerStreamingPath;
+    const schema=streaming?'controller-r8-streamed-heavy-load/v1':'controller-r8-closed-loop-c8/v1';
+    if(value.schema!==schema||value.engine_release!==entry.engine_release||value.state_resident_seats!==entry.state_resident_seats)
+      throw Error('Unmatched timing supplement');
+    const positive=value=>Number.isFinite(value)&&value>0;
+    if(!streaming&&(value.concurrency!==8||value.rows?.map(row=>row.id).join()!=='4096-formal,16384-formal'))
+      throw Error('Incomplete original closed-loop C8 intervals');
+    for(const row of streaming?[value]:value.rows){
+      for(const arm of [row.direct,row.controller]){
+        const time=streaming?arm.elapsed_seconds:arm.cohort_wall_seconds;
+        if(!positive(time)||!positive(arm.mean_ttft_ms)||!positive(arm.mean_tpot_ms)||
+          !Number.isInteger(arm.requests)||!positive(arm.requests)||!close(arm.output_tokens_per_second,arm.output_tokens/time))
+          throw Error('Incomplete requests or timing observations');
+        if(streaming&&(arm.requests!==entry.result.direct.successful_requests||arm.output_tokens!==entry.result.direct.output_tokens||
+          arm.tpot_requests<1||arm.tpot_requests>arm.requests||
+          (arm.cached_input_percent!==null&&(!Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100))))
+          throw Error('Unmatched streamed heavy-load census');
+        if(!streaming&&(arm.phase!==row.id||time<300||arm.seconds!==300||arm.output_tokens!==256*arm.requests))
+          throw Error('Unmatched standardized C8 window or output budget');
+      }
+    }
+    return value;
+  }
+
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
@@ -1541,9 +1579,9 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency,context,repeat,fixed,compute}=pair;
+    const {entry,commit,latency,context,repeat,fixed,compute,streaming,c8}=pair;
     const profiles=fixed?fixed.profiles.map((row,index)=>({...row,label:entry.profiles[index].label})):entry.profiles;
-    const r=entry.result, a=r.direct, b=r.request_throttling_controller;
+    const a=entry.result.direct,b=entry.result.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
     const pairedMetrics=(direct,controller)=>{
       const arms={
@@ -1601,7 +1639,7 @@
     };
     const trajectoryLabel='SWE Trace Heavy Load';
     const trajectoryId='swe-smith-trajectory';
-    const trajectoryMetrics=[['direct',a],['controller',b]].map(([role,arm])=>{
+    const trajectoryMetrics=streaming?['direct','controller'].map(side=>({output_tokens_per_second:streaming[side].output_tokens_per_second,mean_ttft_ms:streaming[side].mean_ttft_ms,mean_tpot_ms:streaming[side].mean_tpot_ms})):[['direct',a],['controller',b]].map(([role,arm])=>{
       const engine=latency?.multi_turn_engine[role];
       return {output_tokens_per_second:arm.output_tokens/arm.elapsed_seconds,
         ...(engine?{mean_ttft_ms:engine.mean_ttft_ms,mean_tpot_ms:engine.mean_tpot_ms}:{})
@@ -1619,7 +1657,7 @@
         [t('引擎侧请求耗时（秒）','Engine request latency (s)'),n(direct.mean_e2e_ms/1000),n(controller.mean_e2e_ms/1000)],
         [t('客户端从请求就绪到完成（秒）','Client request ready to completion (s)'),n(a.request_latency_seconds.mean),n(b.request_latency_seconds.mean)]
       ];
-      return `<h3>${trajectoryLabel} · ${t('请求时延分解','Request latency breakdown')}</h3>
+      return `<h3>${trajectoryLabel} · ${t('非流式批次的时延分解','Latency breakdown for the non-streaming batch')}</h3>
         <p>${t(`两组各 ${direct.requests} 条请求。引擎侧从请求进入引擎开始计时，放行前等待计入客户端请求耗时。本轮客户端采用非流式接口，未记录首 token 到达时间。`,`${direct.requests} requests per arm. Engine timings start at engine admission. Client request latency includes waiting before admission. This run used non-streaming responses, so client first-token arrival was unobserved.`)}</p>
         ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}`;
     };
@@ -1646,10 +1684,18 @@
         ${table([t('指标','Metric'),roles.B0,roles.B1],rows)}
         <p><a href="${esc(report)}">${t('复测报告与图表','Repeat report and figures')} ↗</a></p>`;
     };
-    const batchTime=`${n(a.elapsed_seconds)} → ${n(b.elapsed_seconds)} s`;
-    const cacheHit=`${n(a.cached_input_percent)}% → ${n(b.cached_input_percent)}%`;
+    const latestDirect=streaming?.direct||a, latestController=streaming?.controller||b;
+    const batchTime=`${n(latestDirect.elapsed_seconds)} → ${n(latestController.elapsed_seconds)} s`;
+    const timeReduction=100*(1-latestController.elapsed_seconds/latestDirect.elapsed_seconds);
+    const cacheHit=[latestDirect,latestController].map(arm=>Number.isFinite(arm.cached_input_percent)?n(arm.cached_input_percent)+'%':'—').join(' → ');
     const chartRows=[...rows];
     chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
+    for(const row of c8?.rows||[]){
+      const label=row.id==='4096-formal'?'4K / C8':'16K / C8';
+      const fields=[row.direct,row.controller].map(arm=>({output_tokens_per_second:arm.output_tokens_per_second,
+        mean_ttft_ms:arm.mean_ttft_ms,mean_tpot_ms:arm.mean_tpot_ms}));
+      chartRows.push({id:row.id,label,...pairedMetrics(...fields)});
+    }
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
     const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
     const context16k=contextRows.find(row=>row.id==='16384');
@@ -1663,7 +1709,7 @@
       const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
       const missing=reason||t('多轮回放使用非流式接口，未记录客户端首内容 token 到达时间','The non-streaming multi-turn replay has no client first content-token arrival timestamp');
       const metricRows=chartRows.map(row=>Number.isFinite(row.arms?.B0?.[key])&&Number.isFinite(row.arms?.B1?.[key])
-        ?{...row,metricScope:scopedLatency&&row.id===trajectoryId?t('引擎侧','Engine-side'):null}
+        ?{...row,metricScope:scopedLatency&&row.id===trajectoryId&&!streaming?t('引擎侧','Engine-side'):null}
         :{...row,arms:null,missingReason:row.missingReason||(key==='mean_tpot_ms'&&row.id!==trajectoryId
           ?t('尚未发布客户端逐 token 时延补充数据','Client time per output token supplement is unpublished'):missing)});
       return chart(key,title,unit,divisor,metricRows,chartRows.map(row=>row.label),roles);
@@ -1672,12 +1718,12 @@
       ?[p.label,n(p.direct.elapsed_seconds),n(p.controller.elapsed_seconds),n(p.time_reduction_percent)+'%',n(p.output_token_change_percent)+'%']
       :[p.label,'—','—',t(p.reason_zh,p.reason_en),'—']);
     summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
-      [trajectoryLabel,n(a.elapsed_seconds),n(b.elapsed_seconds),n(r.time_reduction_percent)+'%',n(100*(b.output_tokens/a.output_tokens-1))+'%']);
+      [trajectoryLabel,n(latestDirect.elapsed_seconds),n(latestController.elapsed_seconds),n(timeReduction)+'%',n(100*(latestController.output_tokens/latestDirect.output_tokens-1))+'%']);
     panel.innerHTML=`${heading}
       <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
       <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
-        <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(r.time_reduction_percent)}%</strong></span>
+        <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(timeReduction)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
       <section class="frozen-profile"><div class="section-heading"><h3>${t('控制面实验配置','Control plane experiment configuration')}</h3><button type="button" data-detail="configuration">${t('版本与配置详情','Versions and configuration')} ↗</button></div>
       <p>${esc(entry.engine_release)}</p><p class="frozen-settings">${esc(settings)}</p></section>
