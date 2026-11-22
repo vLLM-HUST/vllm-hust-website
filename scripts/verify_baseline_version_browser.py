@@ -1,6 +1,7 @@
 """Check the assembled site's B0/B1 selectors; does not generate measurements."""
 
 import argparse
+from decimal import Decimal, ROUND_DOWN
 import hashlib
 import json
 import os
@@ -418,6 +419,9 @@ def verify_candidate_v2_checksum(page, entry):
         ),
     )
     page.goto(base + "?release=" + entry["id"])
+    if entry.get("stable_evidence"):
+        page.locator("#submission-v2 [data-stable-assessment-unavailable]").wait_for()
+        assert page.locator("#submission-v2 tbody tr").count() == 0
     panel = page.locator("[data-candidate-report='native-rms']")
     panel.locator(":scope > summary").click()
     panel.locator("[data-candidate-v2][data-state=unavailable]").wait_for()
@@ -449,6 +453,52 @@ def verify_archived_cards_checksum(page, archived_record):
     assert row["baselineObservation"]["physical_cards"] is None
     assert "baselineCardMapping" not in row
     page.unroute(pattern)
+
+
+def verify_stable_default(page, catalog):
+    entry = next(
+        row for row in catalog["entries"] if row["id"] == catalog["default_release"]
+    )
+    stable = entry.get("stable_evidence")
+    if stable is None:
+        return
+    base = args.base_url.rstrip("/")
+    page.goto(base + "/b0-b1.html")
+    page.locator("#submission-v2").wait_for()
+    assert page.locator("#comparison-release-select").input_value() == entry["id"]
+    assert (
+        page.locator("#comparison-baseline-select").input_value()
+        == catalog["baseline"]["id"]
+    )
+    response = page.request.get(
+        base + "/" + entry["candidate_submission_assessment"]["path"]
+    )
+    assert response.ok
+    record = response.json()["candidates"][stable["kind"]]
+    block = page.locator("#submission-v2")
+    assert stable["measured_release"] in block.inner_text()
+    assert (
+        block.get_by_role(
+            "link", name="PyPI " + stable["pypi_version"], exact=False
+        ).get_attribute("href")
+        == stable["pypi_url"]
+    )
+    words = ("达成", "未达成") if args.language == "zh" else ("Met", "Not met")
+    for index, row in enumerate(
+        block.locator("table").first.locator("tbody tr").all(), 1
+    ):
+        assert row.locator("td").all_text_contents() == [
+            words[not record["targets"][f"4.{index}"][gate]["met"]]
+            for gate in ("milestone", "final")
+        ]
+    assert "Terminal-Bench 2.1" in block.inner_text()
+    expected = Decimal(record["targets"]["4.1"]["efficiency_lower_percent"]["B1"])
+    lower = expected.quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    assert (
+        page.locator(".goal-grid article").first.locator("strong").inner_text()
+        == f"≥{lower}%"
+    )
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
 
 
 def verify_legacy_links(page, catalog):
@@ -915,6 +965,7 @@ with sync_playwright() as playwright:
         observe_exports(page)
         verify_development_priority(page, releases, baselines)
         verify_legacy_links(page, catalog)
+        verify_stable_default(page, catalog)
         if width == 1366 and scheme == "light":
             verify_candidate_checksum(page)
             verify_candidate_v2_checksum(page, release_entries["r10"])
