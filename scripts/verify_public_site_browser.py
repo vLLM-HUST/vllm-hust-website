@@ -12,6 +12,49 @@ from urllib.parse import unquote, urlsplit
 from playwright.async_api import async_playwright
 
 
+async def verify_stable_install_manifest(request, release):
+    stable = release["stable_evidence"]
+    manifest_response, receipt_response = await asyncio.gather(
+        request.get(stable["install_manifest_url"], timeout=30000),
+        request.get(stable["arm64_acceptance_url"], timeout=30000),
+    )
+    assert manifest_response.ok, "Stable installation manifest is unavailable"
+    assert receipt_response.ok, "Stable ARM64 acceptance receipt is unavailable"
+    lines = (await manifest_response.text()).splitlines()
+    assert "--require-hashes" in lines, "Missing hash requirement"
+    receipt = await receipt_response.json()
+    assert receipt["release"] == release["release"]
+    assert receipt["linux_architecture"] == "aarch64"
+    assert receipt["isolated_venv"] and receipt["serve_dry_run_passed"]
+    assert not receipt["model_started"] and not receipt["npu_initialized"]
+    assert receipt["sdist"]["sha256"] == stable["sdist_sha256"]
+    assert receipt["sdk_sha256"] == stable["sdk_sha256"]
+    assert receipt["sdist"]["filename"] == (
+        f"vllm_hust_engine-{stable['pypi_version']}.tar.gz"
+    )
+    wheel_hashes = receipt["wheel_sha256"]
+    assert len(wheel_hashes) == 3
+    expected = {receipt["sdist"]["filename"]: stable["sdist_sha256"], **wheel_hashes}
+    prefix = stable["install_manifest_url"].rsplit("/", 1)[0] + "/"
+    requirements = [
+        shlex.split(line) for line in lines if line and not line.startswith(("#", "--"))
+    ]
+    observed = {}
+    names = set()
+    for name, operator, url, digest in requirements:
+        filename = unquote(urlsplit(url).path.rsplit("/", 1)[1])
+        assert operator == "@" and url.startswith(prefix)
+        assert filename not in observed and name not in names
+        assert re.fullmatch(r"--hash=sha256:[a-f0-9]{64}", digest)
+        observed[filename] = digest.removeprefix("--hash=sha256:")
+        names.add(name)
+    assert names == {"vllm-hust-engine", "vllm", "vllm-ascend", "vllm-hust-runtime"}
+    assert observed == expected, (
+        "Stable installation files differ from the accepted package"
+    )
+    assert all(name.endswith("-cp312-cp312-linux_aarch64.whl") for name in wheel_hashes)
+
+
 async def verify(args):
     root = args.root.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
@@ -20,8 +63,20 @@ async def verify(args):
         raw = (root / item["website_path"]).read_bytes()
         assert len(raw) == item["bytes"]
         assert hashlib.sha256(raw).hexdigest() == item["sha256"], item["website_path"]
+    catalog_path = "data/engine-release-history-v1.json"
+    assert any(item["website_path"] == catalog_path for item in manifest["files"])
+    catalog = json.loads((root / catalog_path).read_bytes())
+    release = next(
+        row for row in catalog["entries"] if row["id"] == catalog["default_release"]
+    )
+    stable = release["stable_evidence"]
     receipts = []
     async with async_playwright() as pw:
+        request = await pw.request.new_context()
+        try:
+            await verify_stable_install_manifest(request, release)
+        finally:
+            await request.dispose()
         browser = await pw.chromium.launch(executable_path=args.browser)
         semaphore = asyncio.Semaphore(3)
 
@@ -93,17 +148,32 @@ async def verify(args):
                                 flag in serve
                                 for flag in ("--model", "--physical-devices")
                             )
+                            assert "--no-deps" not in command
+                            assert "--engine-version" not in install
+                            assert serve[serve.index("--physical-devices") + 1] == (
+                                "$DEEPLINK_PHYSICAL_DEVICES"
+                            )
+                            url = stable["install_manifest_url"]
                             assert (
-                                "--no-deps" not in command
-                                and "wheels/r8.txt" not in command
+                                await page.locator(
+                                    "#engine-install-source"
+                                ).get_attribute("href")
+                                == url
+                            )
+                            assert (
+                                stable["pypi_version"]
+                                in await page.locator(
+                                    "#engine-install-copy"
+                                ).inner_text()
                             )
                             manual = await page.locator(
                                 "#install-runtime details pre"
                             ).text_content()
-                            assert (
-                                "python -m pip install --no-deps -r "
-                                "https://vllm-hust.sage.org.ai/wheels/r8.txt"
-                            ) in manual
+                            pip = shlex.split(manual.splitlines()[0])
+                            assert pip[:4] == ["python", "-m", "pip", "install"]
+                            assert "--no-deps" in pip
+                            assert pip[pip.index("-r") + 1] == url
+                            assert "vllm-hust-engine verify" in manual.splitlines()
                             manifest = root / "wheels/r8.txt"
                             fetched = await page.request.get(
                                 f"{args.url.rstrip('/')}/wheels/r8.txt"
