@@ -1832,8 +1832,6 @@
       };
     });
     const trajectory={id:trajectoryId,label:trajectoryLabel,...pairedMetrics(...trajectoryMetrics)};
-    const trajectoryChange=trajectory.changes_percent.output_tokens_per_second;
-    const acceleratorCostChange=trajectory.changes_percent.relative_cost_per_token;
     const engineLatency=()=>{
       if(!latency)return '';
       const {direct,controller}=latency.multi_turn_engine;
@@ -1884,12 +1882,17 @@
     }
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
     const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器专题','Request Throttling Controller overview')} ↗</a>`;
-    const context16k=contextRows.find(row=>row.id==='16384');
-    const contextRatio=context16k?n(context16k.arms.B1.output_tokens_per_second/context16k.arms.B0.output_tokens_per_second)+'×':'—';
+    const peak=peakThroughputPair([...chartRows,...contextRows]);
+    const throughput=peak?throughputRatio(peak):null;
+    const context16k=contextRows.find(row=>row.id==='16384')||chartRows.find(row=>row.id==='16384-formal');
     const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
-    const computeValue=compute?'≥'+lowerRate(compute.arms.controller.target_matrix_tflops_per_card_lower):'—';
-    const values=[computeValue,(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%',contextRatio,(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
-    const notes=[compute?t('服务侧必要矩阵算量下界 · TFLOP/s/卡','Service-side necessary matrix work · TFLOP/s per accelerator'):t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
+    const values=['—',peak?n(throughput)+'×':'—',context16k?n(throughputRatio(context16k))+'×':'—',peak?n(100*(1-1/throughput))+'%':'—'];
+    const notes=[
+      compute?t('参考效率待核算 · 服务侧算力见详情','Reference efficiency pending · service compute in details'):t('参考效率待核算','Reference efficiency pending'),
+      peak?[peak.label,t('已发布场景最高吞吐比','Highest published throughput ratio')].join(' · '):t('暂无配对实测','No paired measurements'),
+      context16k?[context16k.label,t('相对同配置引擎直连吞吐','Throughput vs the same direct engine')].join(' · '):t('暂无 16K 配对实测','No paired 16K measurements'),
+      peak?[peak.label,t('同费率单位输出 token 成本降低','Lower output token cost at equal rates')].join(' · '):t('暂无配对实测','No paired measurements')
+    ];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
     const metricChart=(key,title,unit,divisor,reason)=>{
       const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
@@ -1967,7 +1970,8 @@
     };
     panel.innerHTML=`${heading}
       <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
-      <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
+      <p class="release-coverage-summary">${fixedPairSummary(rows)}</p>
+      <div class="goal-grid">${comparisonSummaryNames().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${esc(notes[i])}</small></article>`).join('')}</div>
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
         <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(timeReduction)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
@@ -2098,6 +2102,24 @@
     if(key==='metrics')return {title:t('完整数值','Complete metrics'),body:table(t(['场景','版本','物理卡','tok/s','TTFT / s','TPOT / ms','TTFT P95 / s','TTFT P99 / s','E2E P95 / s','E2E P99 / s'],['Profile','Arm','Physical cards','tok/s','TTFT / s','TPOT / ms','TTFT P95 / s','TTFT P99 / s','E2E P95 / s','E2E P99 / s']),measurements.flatMap(row=>['B0','B1'].map((role,i)=>{const arm=row.arms[role];return [[row.label,row.variant].filter(Boolean).join(' · '),roles[role],row.cards[i].join(', '),n(arm.output_tokens_per_second),n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms/1000),n(arm.ttft_p99_ms/1000),n(arm.end_to_end_p95_ms/1000),n(arm.end_to_end_p99_ms/1000)];})))};
     return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p><a href="./${srPath}">${t('公开汇总','Public summary')} ↗</a> · <a href="${esc(entry.release_url)}">${t('私有 Release','Private Release')} ↗</a></p>`};
   }
+  function comparisonSummaryNames() {
+    return t(['有效算力下界','最高吞吐比','16K 吞吐比','最高同费率降幅'],['Effective compute bound','Peak throughput ratio','16K throughput ratio','Best equal-rate cost reduction']);
+  }
+
+  function throughputRatio(row) {
+    return row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second;
+  }
+
+  function peakThroughputPair(rows) {
+    return rows.filter(row=>row.arms&&!row.crossCard)
+      .reduce((best,row)=>!best||throughputRatio(row)>throughputRatio(best)?row:best,null);
+  }
+
+  function fixedPairSummary(rows) {
+    const complete=rows.filter(row=>fixedProfiles.some(([id])=>id===row.id)&&row.arms).length;
+    return `${t('固定五项配对','Fixed-profile pairs')} ${complete}/${fixedProfiles.length}`;
+  }
+
   function renderVersion() {
     const attempt=attemptIds.includes(selectedRelease);
     const sr=srIds.includes(selectedRelease);
@@ -2108,9 +2130,8 @@
     const originalRows=standardRows(attempt?[]:sr?srRows(entry):versionRows(entry),missingNote);
     const rows=sr?originalRows:withFixedBaseline(originalRows),available=rows.filter(row=>row.arms);
     if(!attempt&&!sr)assertFormalBaselineIsolation(entry,rows);
-    const ratio=row=>row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second;
-    const peak=available.filter(row=>!row.crossCard).reduce((best,row)=>!best||ratio(row)>ratio(best)?row:best,null);
-    const throughput=peak?ratio(peak):null;
+    const peak=peakThroughputPair(available);
+    const throughput=peak?throughputRatio(peak):null;
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id)||row.contextBand==='16k');
     const reference=sr?null:entry.compute_reference;
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
@@ -2123,10 +2144,9 @@
     const config=frozenProfile(entry.id,{B0:releaseCatalog.baseline.cann,B1:attempt?'—':'9.1.0'},attempt?[]:sr?[entry.name]:entry.mods,settings);
     const scope=attempt?reason:observation?t(`固定 B0 保留原测记录；B1 书生实测：${observation.workloads.map(row=>row.label_zh).join('、')}。模型与工况分别标注。`,`Fixed B0 observations are retained. Current B1 Intern measurements: ${observation.workloads.map(row=>row.label_en).join(', ')}. Models and workloads are labeled separately.`):t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
-    const cardNames=sr?names():t(['有效算力下界','最高吞吐比','16K 吞吐比','最高同费率降幅'],['Effective compute bound','Peak throughput ratio','16K throughput ratio','Best equal-rate cost reduction']);
+    const cardNames=sr?names():comparisonSummaryNames();
     const cardScope=[null,peak?.label,[context?.label,context?.crossCard?cardComparisonLabel(context):''].filter(Boolean).join(' · '),peak?.label];
-    const fixedProfilesComplete=originalRows.filter(row=>fixedProfiles.some(([id])=>id===row.id)&&row.arms).length;
-    const coverageNote=!attempt&&!sr&&entry.id!=='r5'?`<p class="release-coverage-summary">${t('固定五项配对','Fixed-profile pairs')} ${fixedProfilesComplete}/5${entry.publication_status==='frozen-candidate'?' · '+t('冻结候选','Frozen candidate'):''}</p>`:'';
+    const coverageNote=!attempt&&!sr&&entry.id!=='r5'?`<p class="release-coverage-summary">${fixedPairSummary(originalRows)}${entry.publication_status==='frozen-candidate'?' · '+t('冻结候选','Frozen candidate'):''}</p>`:'';
     if(entry.id==='r9'){
       for(const row of rows.filter(r=>fixedProfiles.some(([id])=>id===r.id)&&!r.arms&&!r.observation)){
         row.coverageNote=row.id==='hle'?t('原轮启动失败；完整续跑结果待发布','Original startup failed; completed continuation pending publication')
