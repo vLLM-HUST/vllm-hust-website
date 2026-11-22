@@ -940,6 +940,60 @@ def main():
                     verify_engine_mod_creators(page, language)
                     count = verify_publications(page, "engine", language)
                     expect(page.locator("#engine-install-title")).to_be_visible()
+                    expect(page.locator("#engine-install-title")).to_contain_text(
+                        "安装与服务" if language == "zh" else "Install and serve"
+                    )
+                    expect(page).to_have_title(
+                        "vLLM-HUST Engine | 安装与服务"
+                        if language == "zh"
+                        else "vLLM-HUST Engine | Install and serve"
+                    )
+                    expect(page.locator("#engine-hero-download")).to_have_text(
+                        "下载安装工具 ↗" if language == "zh" else "Download installer ↗"
+                    )
+                    expect(page.locator("#engine-install-copy")).to_contain_text(
+                        "最新稳定版" if language == "zh" else "latest stable release"
+                    )
+                    install = page.locator("#engine-install-command").inner_text()
+                    assert (
+                        "python deeplink.py install --out /workspace/deeplink-install"
+                        in install
+                    )
+                    assert (
+                        "python deeplink.py serve --installation /workspace/deeplink-install"
+                        in install
+                    )
+                    assert (
+                        "--model /models/Qwen3.5-35B-A3B --physical-devices 0,7"
+                        in install
+                    )
+                    assert "--no-deps" not in install and "wheels/r8.txt" not in install
+                    expect(page.locator("#engine-install-source")).to_have_attribute(
+                        "href", "https://vllm-hust.sage.org.ai/wheels/r8.txt"
+                    )
+                    expect(page.locator("#engine-install-source")).to_contain_text(
+                        "历史 r8" if language == "zh" else "Historical r8"
+                    )
+                    manual = page.locator("#install-runtime details pre").text_content()
+                    assert (
+                        "python -m pip install --no-deps -r https://vllm-hust.sage.org.ai/wheels/r8.txt"
+                        in manual
+                    )
+                    assert (
+                        "python -m pip uninstall vllm vllm-ascend vllm-hust-runtime"
+                        in manual
+                    )
+                    expect(
+                        page.locator(".engine-profile .diagram-caption")
+                    ).to_contain_text(
+                        "历史配置示例"
+                        if language == "zh"
+                        else "Historical configuration",
+                        use_inner_text=True,
+                    )
+                    expect(page.locator("#engine-try-title")).to_have_text(
+                        "测试与报告" if language == "zh" else "Tests and reports"
+                    )
                     kit_url = "https://github.com/DeepLinkNext/DeepLinkEngine/archive/refs/heads/main.zip"
                     for selector in ("#engine-hero-download", "#engine-release-link"):
                         expect(page.locator(selector)).to_have_attribute(

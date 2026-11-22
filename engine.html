@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="vLLM-HUST Engine versions for Ascend. Download frozen r8, reproduce its measurements and develop further optimizations from a pinned MOD stack." />
+  <meta name="description" content="vLLM-HUST Engine for Ascend. Install with automatic environment preparation, run an OpenAI-compatible inference service and extend it with MODs." />
   <link rel="canonical" href="https://vllm-hust.sage.org.ai/engine.html" />
   <link rel="icon" type="image/png" href="./assets/brand/vllm-hust-icon.png" />
-  <title>vLLM-HUST Engine | Frozen r8</title>
+  <title>vLLM-HUST Engine | Install and serve</title>
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
   <link rel="stylesheet" href="./assets/product-home.css?v=20261118" />
   <link rel="stylesheet" href="./assets/engine.css?v=compact-release-20261117" />
@@ -37,11 +37,11 @@
   <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch language"><span id="langToggleText">中 / EN</span></button>
 
   <main class="product-shell"><nav aria-label="产品" class="product-switcher"><a aria-current="page" data-i18n-common="navEngine" href="./engine.html">Engine</a><span aria-hidden="true">/</span><a data-i18n-common="navControlPlane" href="./control-plane.html">Control Plane</a><span aria-hidden="true">/</span><a data-i18n-common="navContinuum" href="./continuum.html">Continuum</a></nav><nav aria-label="Product sections" class="product-jumps"><a href="#workflow"><span class="lang-zh">开始了解</span><span class="lang-en">Explore</span></a><a href="#product-details"><span class="lang-zh">实现与版本</span><span class="lang-en">Implementation</span></a><a href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span></a></nav><section aria-labelledby="engine-title" class="product-hero"><div class="product-intro">
-<p class="product-eyebrow" id="engine-kicker">Ascend serving stack</p><p class="product-status" id="engine-short-status">Fixed starting point: r8 · E36/R54 · async H2D · Tail256</p>
+<p class="product-eyebrow" id="engine-kicker">Ascend serving stack</p><p class="product-status" id="engine-short-status">Install · Serve · Extend</p>
 <h1 id="engine-title">vLLM-HUST Engine</h1>
 <p class="product-owner" id="engine-owner">负责人：张书豪</p>
-<p class="product-lead" id="engine-lede">Frozen r8 is available for reproduction, MOD development and further optimization.</p>
-<div class="product-actions"><a class="product-button" href="https://github.com/DeepLinkNext/DeepLinkEngine/archive/refs/heads/main.zip" id="engine-hero-download">Download complete test kit ↗</a>
+<p class="product-lead" id="engine-lede">An Ascend inference engine with automatic installation, OpenAI-compatible serving and MOD extensions.</p>
+<div class="product-actions"><a class="product-button" href="https://github.com/DeepLinkNext/DeepLinkEngine/archive/refs/heads/main.zip" id="engine-hero-download">Download installer ↗</a>
 <a class="product-text-link publications-shortcut" href="#publications"><span class="lang-zh">相关论文</span><span class="lang-en">Publications</span> ↓</a>
 <a class="product-text-link" href="./b0-b1.html" id="engine-hero-benchmark">B0 / B1 results ↗</a>
 
@@ -49,26 +49,31 @@
 
 </div>
 
-</div><aside aria-label="Frozen B1 r8" class="product-diagram engine-profile">
-<div class="diagram-caption"><span class="lang-zh">冻结组合</span><span class="lang-en">Frozen combination</span></div><div class="engine-profile-top"><strong>B1 r8</strong><time datetime="2026-11-17">2026-11-17</time></div>
+</div><aside aria-label="Historical B1 r8" class="product-diagram engine-profile">
+<div class="diagram-caption"><span class="lang-zh">历史配置示例</span><span class="lang-en">Historical configuration</span></div><div class="engine-profile-top"><strong>B1 r8</strong><time datetime="2026-11-17">2026-11-17</time></div>
 <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
 <div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>H2D async copy · E36/R54 · Tail256</strong></div>
 <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
 <p class="engine-mod-chips"><a href="#r8-mods" id="engine-mod-badge-link" style="color:inherit">10 MODs and their creators ↗</a></p>
-</aside></section><section aria-label="Engine capabilities" class="product-capabilities"><article><h3><span class="lang-zh">冻结可复现</span><span class="lang-en">Frozen &amp; reproducible</span></h3><p><span class="lang-zh">固定运行时、配置与版本，提供一键测试。</span><span class="lang-en">Pinned runtime, configuration and one-command evaluation.</span></p></article><article><h3><span class="lang-zh">优化执行</span><span class="lang-en">Optimized execution</span></h3><p><span class="lang-zh">组合执行图、调度与 KV 数据通路优化。</span><span class="lang-en">Combined graph, scheduling and KV data-path optimizations.</span></p></article><article><h3><span class="lang-zh">MOD 扩展</span><span class="lang-en">Extend with MODs</span></h3><p><span class="lang-zh">以冻结版本为对照，组合和验证新优化。</span><span class="lang-en">Build and validate new optimizations against a frozen release.</span></p></article></section><section class="product-workspace" id="workflow"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2><span class="lang-zh">安装，运行，继续优化。</span><span class="lang-en">Install. Run. Build on it.</span></h2></div><div class="product-start-grid"><section aria-labelledby="engine-install-title" class="engine-section" id="install-runtime" style="scroll-margin-top:96px">
-<h2 id="engine-install-title">Install and replace the official packages</h2>
-<p id="engine-install-copy">Run one command in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The fixed SHA256-checked manifest installs all four engine packages and replaces vllm and vllm-ascend.</p>
-<pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">python -m pip install --no-deps -r https://vllm-hust.sage.org.ai/wheels/r8.txt</code></pre>
-<p class="engine-note" id="engine-install-scope">Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.</p>
-<details><summary id="engine-install-details">Dependencies, verification and uninstall</summary>
-<p id="engine-install-deps">Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. These vendor dependencies must already be prepared; --no-deps preserves them. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
-<p id="engine-install-sdk-note">The manifest explicitly pins Engine 2026.11.17.8.post2 and all three runtime wheels. --no-deps avoids re-resolving conflicting upstream NumPy requirements; it does not install Torch, Triton-Ascend or CANN. pip checks all four artifact hashes. No separate installer, private source access or native recompilation is needed. The frozen r8 runtime and MODs are unchanged. Installation does not start a model.</p>
-<p><a href="https://vllm-hust.sage.org.ai/wheels/r8.txt" id="engine-install-source">Pinned installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/">PyPI</a></p>
-<pre style="max-width:100%;overflow-x:auto"><code>python -m pip uninstall vllm vllm-ascend vllm-hust-runtime</code></pre>
+</aside></section><section aria-label="Engine capabilities" class="product-capabilities"><article><h3><span class="lang-zh">安装与服务</span><span class="lang-en">Install &amp; serve</span></h3><p><span class="lang-zh">自动准备独立环境，安装引擎并启动推理服务。</span><span class="lang-en">Prepare a private environment, install the engine and serve inference.</span></p></article><article><h3><span class="lang-zh">优化执行</span><span class="lang-en">Optimized execution</span></h3><p><span class="lang-zh">组合执行图、调度与 KV 数据通路优化。</span><span class="lang-en">Combined graph, scheduling and KV data-path optimizations.</span></p></article><article><h3><span class="lang-zh">MOD 扩展</span><span class="lang-en">Extend with MODs</span></h3><p><span class="lang-zh">组合和验证新优化，保留各版本的配置与结果。</span><span class="lang-en">Build and validate optimizations while retaining each version’s configuration and results.</span></p></article></section><section class="product-workspace" id="workflow"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2><span class="lang-zh">安装，运行，继续优化。</span><span class="lang-en">Install. Run. Build on it.</span></h2></div><div class="product-start-grid"><section aria-labelledby="engine-install-title" class="engine-section" id="install-runtime" style="scroll-margin-top:96px">
+<h2 id="engine-install-title">Install and serve</h2>
+<p id="engine-install-copy">The installer selects the latest stable release, prepares a private Python environment and verifies the engine files automatically.</p>
+<pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">git clone https://github.com/DeepLinkNext/DeepLinkEngine.git
+cd DeepLinkEngine
+python deeplink.py install --out /workspace/deeplink-install
+python deeplink.py serve --installation /workspace/deeplink-install \
+  --model /models/Qwen3.5-35B-A3B --physical-devices 0,7</code></pre>
+<p class="engine-note" id="engine-install-scope">Prepare the Ascend driver, CANN and model weights first. Set the two physical device IDs to your allocation. Installation records the selected version; serving reuses it.</p>
+<details><summary id="engine-install-details">Environment and historical r8 installation</summary>
+<p id="engine-install-deps">Historical r8 dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. Prepare them first when using the manual command below; --no-deps preserves them. Qualified r8 model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
+<p id="engine-install-sdk-note">The historical r8 manifest pins Engine 2026.11.17.8.post2 and all three runtime wheels. pip checks all four artifact hashes. In this manual route, --no-deps preserves the prepared vendor environment and does not install Torch, Triton-Ascend or CANN. Installation does not start a model. Use --engine-version VERSION with the automatic installer to select a historical release.</p>
+<p><a href="https://vllm-hust.sage.org.ai/wheels/r8.txt" id="engine-install-source">Historical r8 installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/">PyPI</a></p>
+<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-deps -r https://vllm-hust.sage.org.ai/wheels/r8.txt
+python -m pip uninstall vllm vllm-ascend vllm-hust-runtime</code></pre>
 </details>
 </section><section aria-labelledby="engine-try-title" class="engine-section" id="try-r8">
-<h2 id="engine-try-title">Build on frozen r8</h2>
-<p id="engine-try-copy">Download the complete DeepLinkEngine repository. Set the model, physical device IDs, cache and new output directory in evaluation.json, then run the command below. The entry prepares the fixed environment and engine automatically.</p>
+<h2 id="engine-try-title">Tests and reports</h2>
+<p id="engine-try-copy">To run the test matrix, set the model, physical device IDs, cache and a new output directory in evaluation.json, then run the command below. See the guide for first runs and reuse of completed results.</p>
 <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code>git clone https://github.com/DeepLinkNext/DeepLinkEngine.git
 cd DeepLinkEngine
 cp benchmark/run-all.example.json evaluation.json
@@ -298,17 +303,18 @@ python run_all.py --config evaluation.json</code></pre>
   <script>
     window.vllmHustPageDict = {
   "en": {
-    "engine-install-title": "Install and replace the official packages",
-    "engine-install-copy": "Run one command in your target CPython 3.12 / Linux aarch64 virtual environment with CANN 9.1.0. The fixed SHA256-checked manifest installs all four engine packages and replaces vllm and vllm-ascend.",
-    "engine-install-scope": "Keeps import vllm, import vllm_ascend and the vllm command. Use the frozen r8 runner below to enable the Qwen35 MOD combination.",
-    "engine-install-details": "Dependencies, verification and uninstall",
-    "engine-install-deps": "Qualified dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. These vendor dependencies must already be prepared; --no-deps preserves them. Qualified model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.",
-    "engine-install-sdk-note": "The manifest explicitly pins Engine 2026.11.17.8.post2 and all three runtime wheels. --no-deps avoids re-resolving conflicting upstream NumPy requirements; it does not install Torch, Triton-Ascend or CANN. pip checks all four artifact hashes. No separate installer, private source access or native recompilation is needed. The frozen r8 runtime and MODs are unchanged. Installation does not start a model.",
-    "engine-install-source": "Pinned installation manifest ↗",
+    "title": "vLLM-HUST Engine | Install and serve",
+    "engine-install-title": "Install and serve",
+    "engine-install-copy": "The installer selects the latest stable release, prepares a private Python environment and verifies the engine files automatically.",
+    "engine-install-scope": "Prepare the Ascend driver, CANN and model weights first. Set the two physical device IDs to your allocation. Installation records the selected version; serving reuses it.",
+    "engine-install-details": "Environment and historical r8 installation",
+    "engine-install-deps": "Historical r8 dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. Prepare them first when using the manual command below; --no-deps preserves them. Qualified r8 model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.",
+    "engine-install-sdk-note": "The historical r8 manifest pins Engine 2026.11.17.8.post2 and all three runtime wheels. pip checks all four artifact hashes. In this manual route, --no-deps preserves the prepared vendor environment and does not install Torch, Triton-Ascend or CANN. Installation does not start a model. Use --engine-version VERSION with the automatic installer to select a historical release.",
+    "engine-install-source": "Historical r8 installation manifest ↗",
     "sr1-shortcut": "SR experiment details ↗",
     "engine-kicker": "Ascend serving stack",
     "engine-owner": "Lead: Shuhao Zhang (张书豪)",
-    "engine-lede": "Frozen r8 is available for reproduction, MOD development and further optimization.",
+    "engine-lede": "An Ascend inference engine with automatic installation, OpenAI-compatible serving and MOD extensions.",
     "engine-hero-benchmark": "B0 / B1 results ↗",
     "engine-hero-release": "r8 sources and artifacts ↗",
     "engine-model-label": "Model",
@@ -367,14 +373,14 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-task-reverse-output_tokens_per_second": "Output throughput (tok/s)",
     "engine-task-reverse-mean_ttft_ms": "Mean TTFT (s)",
     "engine-task-reverse-mean_tpot_ms": "Mean TPOT (ms)",
-    "engine-hero-download": "Download complete test kit ↗",
-    "engine-short-status": "Fixed starting point: r8 · E36/R54 · async H2D · Tail256",
+    "engine-hero-download": "Download installer ↗",
+    "engine-short-status": "Install · Serve · Extend",
     "engine-config-summary": "MODs, creators and resource budgets",
     "engine-context-summary": "4K / 16K comparisons",
     "engine-download-summary": "Downloads, checksums and reproduction",
     "engine-archive-summary": "Historical reports",
-    "engine-try-title": "Build on frozen r8",
-    "engine-try-copy": "Download the complete DeepLinkEngine repository. Set the model, physical device IDs, cache and new output directory in evaluation.json, then run the command below. The entry prepares the fixed environment and engine automatically.",
+    "engine-try-title": "Tests and reports",
+    "engine-try-copy": "To run the test matrix, set the model, physical device IDs, cache and a new output directory in evaluation.json, then run the command below. See the guide for first runs and reuse of completed results.",
     "engine-try-scope": "The full run includes all five fixed profiles, the compute reference, 4K/16K/32K and four tenants. Cache cleanup and warmup run automatically; logs follow in the terminal. The repository guide also describes MMLU200 quick mode.",
     "engine-mod-badge-link": "10 MODs and their creators ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
@@ -390,17 +396,18 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-r6-history": "B0/r6 full report ↗"
   },
   "zh": {
-    "engine-install-title": "安装并替换官方包",
-    "engine-install-copy": "在目标 CPython 3.12 / Linux aarch64 虚拟环境中执行一条命令，需 CANN 9.1.0。固定清单核验全部四包的 SHA256，一次安装冻结 r8 并替换 vllm、vllm-ascend 两个官方包。",
-    "engine-install-scope": "保留 import vllm、import vllm_ascend 和 vllm 命令。Qwen35 的整套 MOD 组合使用下方冻结 r8 入口启用。",
-    "engine-install-details": "依赖、校验与卸载详情",
-    "engine-install-deps": "固定依赖：Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0、Transformers 5.14.1、tokenizers 0.22.2。需预先准备这些固定依赖；--no-deps 保留现有供应商环境。已验证的模型与硬件范围：Qwen3.5-35B-A3B BF16、双 Ascend 910B2、TP2。",
-    "engine-install-sdk-note": "清单显式固定 Engine 2026.11.17.8.post2 与三个运行时 wheel，并由 pip 核验全部四包哈希。--no-deps 避免重新解析上游冲突的 NumPy 依赖，不负责安装 Torch、Triton-Ascend 或 CANN。无需另跑安装器、访问私有源码或重编 native；冻结 r8 运行时与 MOD 不变。安装阶段不启动模型。",
-    "engine-install-source": "固定安装清单 ↗",
+    "title": "vLLM-HUST Engine | 安装与服务",
+    "engine-install-title": "安装与服务",
+    "engine-install-copy": "安装器默认选择最新稳定版，自动准备独立 Python 环境并校验引擎文件。",
+    "engine-install-scope": "先准备昇腾驱动、CANN 和模型权重，两张物理卡号填写实际分配值。安装会记录所选版本，启动服务时沿用该版本。",
+    "engine-install-details": "环境与历史 r8 安装",
+    "engine-install-deps": "历史 r8 固定依赖：Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0、Transformers 5.14.1、tokenizers 0.22.2。使用下方手动命令时需预先准备，--no-deps 保留现有供应商环境。r8 已验证范围：Qwen3.5-35B-A3B BF16、双 Ascend 910B2、TP2。",
+    "engine-install-sdk-note": "历史 r8 清单固定 Engine 2026.11.17.8.post2 与三个运行时 wheel，pip 核验全部四包哈希。此手动方式的 --no-deps 保留预先准备的供应商环境，不安装 Torch、Triton-Ascend 或 CANN。安装阶段不启动模型。自动安装器也可用 --engine-version VERSION 选择历史版本。",
+    "engine-install-source": "历史 r8 安装清单 ↗",
     "sr1-shortcut": "SR 系列实验详情 ↗",
     "engine-kicker": "Ascend 推理服务栈",
     "engine-owner": "负责人：张书豪",
-    "engine-lede": "r8 已冻结发布，可直接复现、开发 MOD 与继续优化。",
+    "engine-lede": "面向昇腾的推理引擎，提供自动安装、OpenAI 兼容服务和 MOD 扩展。",
     "engine-hero-benchmark": "B0 / B1 对比结果 ↗",
     "engine-hero-release": "r8 源码与原件 ↗",
     "engine-model-label": "模型",
@@ -459,14 +466,14 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-task-reverse-output_tokens_per_second": "输出吞吐（tok/s）",
     "engine-task-reverse-mean_ttft_ms": "平均TTFT（秒）",
     "engine-task-reverse-mean_tpot_ms": "平均TPOT（毫秒）",
-    "engine-hero-download": "下载完整测试套件 ↗",
-    "engine-short-status": "固定起点：r8 · E36/R54 · 异步 H2D · Tail256",
+    "engine-hero-download": "下载安装工具 ↗",
+    "engine-short-status": "安装 · 服务 · 扩展",
     "engine-config-summary": "MOD、制作者与资源配置",
     "engine-context-summary": "4K / 16K 对照图",
     "engine-download-summary": "下载、校验与复现详情",
     "engine-archive-summary": "历史报告",
-    "engine-try-title": "基于 r8 继续优化",
-    "engine-try-copy": "下载完整 DeepLinkEngine 仓库，在 evaluation.json 中填写模型、两张物理卡、缓存和新的输出目录，再运行下方命令。入口自动准备固定环境和引擎。",
+    "engine-try-title": "测试与报告",
+    "engine-try-copy": "需要测试时，在 evaluation.json 中填写模型、两张物理卡、缓存和新的输出目录，再运行下方命令。首次运行与已有结果复用见测试指南。",
     "engine-try-scope": "完整测试包含固定五项、有效算力参考、4K/16K/32K 和四租户；自动清理缓存并预热，终端持续显示日志。MMLU200 快速模式见仓库测试指南。",
     "engine-mod-badge-link": "10 项 MOD 与制作者 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
