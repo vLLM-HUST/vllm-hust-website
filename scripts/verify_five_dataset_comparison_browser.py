@@ -472,6 +472,15 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     expect(
         dialog.locator("tbody tr").filter(has_text="SWE Trace Heavy Load")
     ).to_contain_text(f"{1875 * 2e6 / (30 * 86400 * output_rates[1]):.2f}")
+    if context:
+        tenant_phase = next(
+            row for row in context["phases"] if row["id"] == "multi-tenant"
+        )
+        direct, controlled = (
+            tenant_phase[side]["metrics"]["output_tokens_per_second"]
+            for side in ("direct", "controller")
+        )
+        expect(dialog).to_contain_text(f"{100 * (direct / controlled - 1):.3f}%")
     page.keyboard.press("Escape")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     control.select_option("")

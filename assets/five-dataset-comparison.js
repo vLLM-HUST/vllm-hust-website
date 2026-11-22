@@ -1861,6 +1861,7 @@
       const tenant=contextRows.find(row=>row.id==='multi-tenant');
       const tenantDetails=tenant?`<h3>${esc(tenant.label)}</h3>${table([t('同一正式区间','Same measured interval'),roles.B0,roles.B1],[
         [t('成本估算（元/百万输出 token）','Estimated cost (CNY/million output tokens)'),...['B0','B1'].map(side=>n(cost(tenant.arms[side])))],
+        [t('加速卡单位成本变化','Change in accelerator unit cost'),'—',`${tenant.changes_percent.relative_cost_per_token.toFixed(3)}%`],
         [t('双卡 AI Core 采样利用率','Sampled two-card AI Core utilization'),...['B0','B1'].map(side=>{
           const percent=tenant.arms[side].aicore_percent;
           return Number.isFinite(percent)?n(percent)+'%':'—';
