@@ -40,6 +40,15 @@ def verify(args):
     receipts = []
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=args.browser)
+        manifest = browser.new_context()
+        files = manifest.request.get(
+            args.url.rstrip("/") + "/data/benchmark-source-manifest.json"
+        ).json()["files"]
+        full_pair = any(
+            row["website_path"] == "data/controller-r8-fixed-profiles-repeat-v1.json"
+            for row in files
+        )
+        manifest.close()
         for width in (1440, 390):
             for theme in ("light", "dark"):
                 context = browser.new_context(
@@ -112,6 +121,11 @@ def verify(args):
                         )
                         assert page.locator(".control-summary article").count() == 4
                         assert page.locator(".control-bar-line").count() == 2
+                        expect(
+                            root.locator(
+                                'a[href="./b0-b1.html?release=r8&controlplane=request-throttling"]'
+                            )
+                        ).to_have_count(1 if full_pair and identity == "r8" else 0)
                         for detail in page.locator(".control-details").all():
                             detail.locator("summary").focus()
                             page.keyboard.press("Enter")
