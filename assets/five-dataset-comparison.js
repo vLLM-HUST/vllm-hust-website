@@ -1243,7 +1243,7 @@
       return {id:row.id,label:row.label,arms,changes_percent,...cards,workloadLabel:cardComparisonLabel(cards)};
     });
     rows.push(...versionSupplementRows(entry));
-    if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:c8Label(row.id)});
+    if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'});
     return rows.map(row=>continuousProfile(row.id)
       ?{...row,workloadKind:'continuous-synthetic',workloadLabel:[continuousWorkloadLabel(),row.workloadLabel].filter(Boolean).join(' · ')}
       :row);
