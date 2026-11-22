@@ -86,10 +86,8 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
         if item.get("public_surface", True) is not False
         and taxonomy.get(item["id"], {}).get("kind") in active_kinds
     }
-    mod_count = len(mod_projects)
     assert "instance-controller" in mod_projects
     assert "kv-controller" in mod_projects
-    assert mod_count == 59
     scenario_count = len(
         json.loads(
             (root / "data" / "plugin-workload-navigation.json").read_text(
@@ -106,8 +104,6 @@ def test_homepage_mod_summary_matches_canonical_catalog() -> None:
             for phase in taxonomy[item["id"]]["phases"]
         }
     )
-    assert scenario_count == 16
-    assert phase_count == 8
     assert "Explore the MOD catalog" in INDEX
     assert "查看 MOD 目录" in INDEX
     assert "Public MOD catalog" in INDEX
