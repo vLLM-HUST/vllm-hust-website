@@ -1310,6 +1310,7 @@
   }
   const controllerResultsPath = 'data/controller-product-results-v1.json';
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
+  const controllerContextPath = 'data/controller-r8-context-tenant-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
 
@@ -1325,13 +1326,19 @@
     for(const entry of value.releases){
       if(!/^r[1-9][0-9]*$/.test(entry.id)||results.has(entry.id))throw Error('Ambiguous controller engine version');
       validateControllerPair(entry);
-      results.set(entry.id,{entry,commit:publication.commit,latency:null});
+      results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null});
     }
     const r8=results.get('r8');
-    if(r8)r8.latency=await loadControllerLatency(publication,r8.entry).catch(error=>{
-      console.warn('Controller latency supplement rejected',error);
-      return null;
-    });
+    if(r8)[r8.latency,r8.context]=await Promise.all([
+      loadControllerLatency(publication,r8.entry).catch(error=>{
+        console.warn('Controller latency supplement rejected',error);
+        return null;
+      }),
+      loadControllerContext(publication,r8.entry).catch(error=>{
+        console.warn('Controller context supplement rejected',error);
+        return null;
+      })
+    ]);
     controllerResults=results;
   }
 
@@ -1384,6 +1391,37 @@
     return value;
   }
 
+  async function loadControllerContext(publication,entry) {
+    if(!publication.files.some(file=>file.website_path===controllerContextPath))return null;
+    const response=await fetch('./'+controllerContextPath,{cache:'no-cache'});
+    const value=await readControllerPublication(publication,controllerContextPath,response);
+    const expected=[['4096',8,1],['16384',8,1],['32768',8,1],['multi-tenant',24,4]];
+    const completeLatency=row=>['mean','p95','p99'].every(key=>Number.isFinite(row?.[key])&&row[key]>0);
+    if(value.schema!=='controller-context-tenant-pair/v1'||value.engine_release!==entry.engine_release
+       ||value.max_num_seqs!==entry.max_num_seqs||value.state_resident_seats!==entry.state_resident_seats
+       ||!/^[a-f0-9]{64}$/.test(value.input_sha256)||value.phases?.length!==expected.length)
+      throw Error('Unmatched controller context supplement');
+    for(const [index,[id,concurrency,tenants]] of expected.entries()){
+      const phase=value.phases[index];
+      if(phase.id!==id||phase.concurrency!==concurrency||phase.tenants!==tenants)
+        throw Error('Unexpected controller context workload');
+      for(const arm of [phase.direct,phase.controller]){
+        const m=arm?.metrics;
+        if(!m||!Number.isInteger(m.successful)||m.successful<concurrency||m.requests!==m.successful||m.failed!==0
+           ||m.duration_seconds<300||m.output_tokens!==m.successful*256
+           ||!close(m.output_tokens/m.duration_seconds,m.output_tokens_per_second)
+           ||!completeLatency(m.ttft_ms)||!completeLatency(m.tpot_ms)
+           ||!Number.isFinite(arm.sampled_aicore_mean_percent)||arm.sampled_aicore_mean_percent<0||arm.sampled_aicore_mean_percent>100
+           ||Object.keys(arm.per_tenant||{}).length!==tenants
+           ||Array.from({length:tenants},(_,i)=>arm.per_tenant?.['tenant-'+i]).some(row=>
+             !row||!Number.isInteger(row.successful)||row.successful<1||!Number.isFinite(row.output_tokens_per_second)||row.output_tokens_per_second<=0)
+           ||!/^[a-f0-9]{64}$/.test(arm.execution_sha256))
+          throw Error('Incomplete controller context measurements');
+      }
+    }
+    return value;
+  }
+
   function renderControllerPanel() {
     root.querySelector('#controller-comparison')?.remove();
     if(!selectedController)return;
@@ -1402,7 +1440,7 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency}=pair;
+    const {entry,commit,latency,context}=pair;
     const r=entry.result, a=r.direct, b=r.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
     const pairedMetrics=(direct,controller)=>{
@@ -1424,6 +1462,40 @@
       });
       return {id:p.id,...pairedMetrics(...metrics)};
     }));
+    const contextRows=(context?.phases||[]).map(phase=>{
+      const labels={4096:'4K–8K / C8',16384:'16K–24K / C8',32768:'32K–48K / C8',
+        'multi-tenant':t('四租户 / C24','Four tenants / C24')};
+      const metrics=[phase.direct,phase.controller].map(arm=>({
+        output_tokens_per_second:arm.metrics.output_tokens_per_second,
+        p99_ttft_ms:arm.metrics.ttft_ms.p99,
+        p99_tpot_ms:arm.metrics.tpot_ms.p99,
+        aicore_percent:arm.sampled_aicore_mean_percent
+      }));
+      return {id:phase.id,label:labels[phase.id],...pairedMetrics(...metrics)};
+    });
+    const contextSection=()=>{
+      if(!contextRows.length)return '';
+      const labels=contextRows.map(row=>row.label);
+      const charts=[
+        ['output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s'],
+        ['p99_ttft_ms',t('首 token 时延 P99 ↓','Time to first token P99 ↓'),'ms'],
+        ['p99_tpot_ms',t('逐 token 时延 P99 ↓','Time per output token P99 ↓'),'ms'],
+        ['relative_cost_per_token',t('单位输出 token 加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1')]
+      ];
+      const tenants=context.phases.find(phase=>phase.id==='multi-tenant');
+      const tenantRows=Object.entries(tenants.direct.per_tenant).map(([name,direct])=>{
+        const controller=tenants.controller.per_tenant[name];
+        return [name,direct.successful,controller.successful,n(direct.output_tokens_per_second),n(controller.output_tokens_per_second)];
+      });
+      return `<section id="controller-context-tenant"><div class="section-heading"><h3>${t('上下文与四租户实测','Context and four-tenant measurements')}</h3><button type="button" data-detail="supplement">${t('逐组指标与来源','Per-arm metrics and source')} ↗</button></div>
+        <p class="chart-scale-note">${t('每个阶段预热 60 秒，提交 300 秒，吞吐计入排空时间。时延从客户端测量。','Each phase warms up for 60 seconds, submits for 300 seconds and includes the drain time in throughput. Latency is measured at the client.')}</p>
+        <div class="metric-grid">${charts.map(([key,title,unit])=>chart(key,title,unit,1,contextRows,labels,roles)).join('')}</div>
+        ${table(t(['工况','直连采样利用率','控制器采样利用率'],['Scenario','Direct sampled utilization','Controller sampled utilization']),
+          contextRows.map(row=>[row.label,n(row.arms.B0.aicore_percent)+'%',n(row.arms.B1.aicore_percent)+'%']))}
+        ${table(t(['租户','直连完成请求','控制器完成请求','直连 token/s','控制器 token/s'],['Tenant','Direct completions','Controller completions','Direct token/s','Controller token/s']),tenantRows)}
+        <p><a href="./${controllerContextPath}">${t('阶段、窗口与逐租户原始汇总','Source summary by phase, window and tenant')} ↗</a></p>
+      </section>`;
+    };
     const trajectoryLabel='SWE Trace Heavy Load';
     const trajectoryId='swe-smith-trajectory';
     const trajectoryMetrics=[['direct',a],['controller',b]].map(([role,arm])=>{
@@ -1454,8 +1526,10 @@
     chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
     const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器完整实测','Full Request Throttling Controller results')} ↗</a>`;
-    const values=['—',(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%','—',(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
-    const notes=[t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
+    const context16k=contextRows.find(row=>row.id==='16384');
+    const contextRatio=context16k?n(context16k.arms.B1.output_tokens_per_second/context16k.arms.B0.output_tokens_per_second)+'×':'—';
+    const values=['—',(trajectoryChange>0?'+':'')+n(trajectoryChange)+'%',contextRatio,(acceleratorCostChange>0?'+':'')+n(acceleratorCostChange)+'%'];
+    const notes=[t('本专项未核算有效算力','Effective compute unmeasured'),t('SWE Trace Heavy Load 整批输出吞吐','SWE Trace Heavy Load batch output throughput'),context16k?t('16K–24K 输出吞吐相对同配置引擎直连','16K–24K throughput relative to direct access to the same engine'):t('本专项未测固定上下文对照','Fixed context comparison unmeasured'),t('SWE Trace Heavy Load 同费率加速卡成本估算','SWE Trace Heavy Load accelerator-only cost estimate')];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
     const metricChart=(key,title,unit,divisor,reason)=>{
       const scopedLatency=key==='mean_ttft_ms'||key==='mean_tpot_ms';
@@ -1472,7 +1546,7 @@
     summaryRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,
       [trajectoryLabel,n(a.elapsed_seconds),n(b.elapsed_seconds),n(r.time_reduction_percent)+'%',n(100*(b.output_tokens/a.output_tokens-1))+'%']);
     panel.innerHTML=`${heading}
-      <div class="comparison-meta"><span>${t(`两组使用同一份 B1 ${entry.id} 引擎配置`,`Both arms share the same B1 ${entry.id} engine configuration`)}</span>${resultLink}</div>
+      <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
       <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${notes[i]}</small></article>`).join('')}</div>
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
         <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(r.time_reduction_percent)}%</strong></span>
@@ -1488,6 +1562,7 @@
       ${metricChart('mean_ttft_ms',t('首 token 时延 ↓','Time to first token ↓'),'s',1000)}
       ${metricChart('mean_tpot_ms',t('逐 token 时延 ↓','Time per output token ↓'),'ms',1,t('此负载未记录客户端逐 token 时延','Client time per output token unavailable for this workload'))}
       ${metricChart('relative_cost_per_token',t('单位输出 token 的加速卡成本估算 ↓','Estimated accelerator cost per output token ↓'),t('直连 = 1','Direct = 1'),1)}</div>
+      ${contextSection()}
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
@@ -1496,7 +1571,14 @@
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
       if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首内容 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first content-token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
       if(key==='quality')return {title:t('质量与评分明细','Quality and grading'),body:table([t('指标','Metric'),roles.B0,roles.B1],entry.quality_rows.map(row=>[t(row.label_zh,row.label_en),row.direct,row.controller]))+`<p>${esc(t(entry.quality_note_zh,entry.quality_note_en))}</p>`};
-      if(key==='supplement')return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:`<p>${t('本专项没有对应补测数据。','There are no corresponding supplementary measurements for this comparison.')}</p>`};
+      if(key==='supplement'&&context)return {title:t('上下文与四租户补测','Context and four-tenant supplement'),body:
+        table([...t(['工况','路径','完成请求','输出 token/s'],['Scenario','Path','Completed requests','Output token/s']),
+          'TTFT mean / ms','TTFT P95 / ms','TTFT P99 / ms','TPOT mean / ms','TPOT P95 / ms','TPOT P99 / ms'],
+          context.phases.flatMap((phase,index)=>[
+            [roles.B0,phase.direct.metrics],[roles.B1,phase.controller.metrics]
+          ].map(([label,m])=>[contextRows[index].label,label,m.successful,n(m.output_tokens_per_second),
+            ...[m.ttft_ms,m.tpot_ms].flatMap(value=>['mean','p95','p99'].map(q=>n(value[q])))])))+
+        `<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
       return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p><p>${esc(t(entry.limitations_zh,entry.limitations_en))}</p><p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a> · ${resultLink}</p>`};
     },panel);
     panel.dataset.engineRelease=entry.id;
