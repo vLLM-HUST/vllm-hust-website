@@ -5,6 +5,7 @@ import asyncio
 import hashlib
 import json
 import re
+import shlex
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -64,14 +65,45 @@ async def verify(args):
                             command = await page.locator(
                                 "#engine-install-command"
                             ).inner_text()
-                            assert command.strip() == (
-                                "python -m pip install --no-deps -r "
-                                "https://vllm-hust.sage.org.ai/wheels/r8.txt"
+                            commands = [
+                                shlex.split(line)
+                                for line in command.replace("\\\n", "").splitlines()
+                                if line.strip()
+                            ]
+                            assert [
+                                "git",
+                                "clone",
+                                "https://github.com/DeepLinkNext/DeepLinkEngine.git",
+                            ] in commands
+                            install = next(
+                                args
+                                for args in commands
+                                if args[:3] == ["python", "deeplink.py", "install"]
+                            )
+                            serve = next(
+                                args
+                                for args in commands
+                                if args[:3] == ["python", "deeplink.py", "serve"]
                             )
                             assert (
-                                "curl " not in command
-                                and "install-engine-r8.py" not in command
+                                install[install.index("--out") + 1]
+                                == serve[serve.index("--installation") + 1]
                             )
+                            assert all(
+                                flag in serve
+                                for flag in ("--model", "--physical-devices")
+                            )
+                            assert (
+                                "--no-deps" not in command
+                                and "wheels/r8.txt" not in command
+                            )
+                            manual = await page.locator(
+                                "#install-runtime details pre"
+                            ).text_content()
+                            assert (
+                                "python -m pip install --no-deps -r "
+                                "https://vllm-hust.sage.org.ai/wheels/r8.txt"
+                            ) in manual
                             manifest = root / "wheels/r8.txt"
                             fetched = await page.request.get(
                                 f"{args.url.rstrip('/')}/wheels/r8.txt"
