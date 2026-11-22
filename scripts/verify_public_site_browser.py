@@ -8,21 +8,59 @@ import re
 import shlex
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+from urllib.request import Request, urlopen
 
 from playwright.async_api import async_playwright
 
 
-async def verify_stable_install_manifest(request, release):
-    stable = release["stable_evidence"]
-    manifest_response, receipt_response = await asyncio.gather(
-        request.get(stable["install_manifest_url"], timeout=30000),
-        request.get(stable["arm64_acceptance_url"], timeout=30000),
+def read_release_asset(index, url):
+    matches = [
+        asset for asset in index["assets"] if asset["browser_download_url"] == url
+    ]
+    assert len(matches) == 1, f"Missing stable release asset: {url}"
+    asset = matches[0]
+    size = asset["size"]
+    assert 0 < size <= 65536
+    api_url = asset["url"]
+    assert api_url == (
+        "https://api.github.com/repos/vLLM-HUST/vllm-hust-website/releases/assets/"
+        + str(asset["id"])
     )
-    assert manifest_response.ok, "Stable installation manifest is unavailable"
-    assert receipt_response.ok, "Stable ARM64 acceptance receipt is unavailable"
-    lines = (await manifest_response.text()).splitlines()
+    request = Request(
+        api_url + "?download=1",
+        headers={
+            "Accept": "application/octet-stream",
+            "User-Agent": "vllm-hust-public-site-audit",
+        },
+    )
+    with urlopen(request, timeout=30) as response:
+        raw = response.read(size + 1)
+    assert len(raw) == size
+    assert asset["digest"] == "sha256:" + hashlib.sha256(raw).hexdigest()
+    return raw
+
+
+def verify_stable_install_manifest(release):
+    stable = release["stable_evidence"]
+    url = stable["install_manifest_url"]
+    mirror_prefix = "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/"
+    assert url.startswith(mirror_prefix)
+    tag, _, filename = url.removeprefix(mirror_prefix).partition("/")
+    assert re.fullmatch(r"engine-wheels-r[1-9][0-9]*-v[1-9][0-9]*", tag)
+    assert filename and "/" not in filename
+    request = Request(
+        "https://api.github.com/repos/vLLM-HUST/vllm-hust-website/releases/tags/" + tag,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "vllm-hust-public-site-audit",
+        },
+    )
+    with urlopen(request, timeout=30) as response:
+        index = json.load(response)
+    assert index["tag_name"] == tag
+    lines = read_release_asset(index, url).decode().splitlines()
     assert "--require-hashes" in lines, "Missing hash requirement"
-    receipt = await receipt_response.json()
+    receipt = json.loads(read_release_asset(index, stable["arm64_acceptance_url"]))
     assert receipt["release"] == release["release"]
     assert receipt["linux_architecture"] == "aarch64"
     assert receipt["isolated_venv"] and receipt["serve_dry_run_passed"]
@@ -70,13 +108,9 @@ async def verify(args):
         row for row in catalog["entries"] if row["id"] == catalog["default_release"]
     )
     stable = release["stable_evidence"]
+    verify_stable_install_manifest(release)
     receipts = []
     async with async_playwright() as pw:
-        request = await pw.request.new_context()
-        try:
-            await verify_stable_install_manifest(request, release)
-        finally:
-            await request.dispose()
         browser = await pw.chromium.launch(executable_path=args.browser)
         semaphore = asyncio.Semaphore(3)
 
