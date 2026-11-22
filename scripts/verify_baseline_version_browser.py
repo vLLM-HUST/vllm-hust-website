@@ -337,6 +337,17 @@ with sync_playwright() as playwright:
             for item in catalog.get("comparison_baselines", [])
             if item.get("observations")
         }
+        context_workloads = catalog.get("context_workloads", {})
+        context_inputs = {
+            item["id"]: item["context_input_sha256"]
+            for item in catalog.get("comparison_baselines", [])
+            if "context_input_sha256" in item
+        }
+        release_context_inputs = {
+            item["id"]: item["context_tenant_supplement"]["protocol"]["input_sha256"]
+            for item in catalog["entries"]
+            if item.get("context_tenant_supplement")
+        }
         expected_models = {}
         for entry in catalog["entries"]:
             integration = entry.get("model_integration")
@@ -379,6 +390,13 @@ with sync_playwright() as playwright:
                         page.locator("#comparison-release-select").input_value()
                         == release
                     )
+                    source = context_workloads.get(release_context_inputs.get(release))
+                    if source:
+                        supplement = page.locator("#context-tenant-supplement")
+                        assert all(
+                            name in supplement.inner_text()
+                            for name in source["datasets"]
+                        )
                     checked_matrix.append([width, scheme, baseline, release])
                 continue
             for release in releases:
@@ -393,6 +411,26 @@ with sync_playwright() as playwright:
                 )
                 assert page.locator(".metric-chart").count() == 4
                 assert page.locator("#context-tenant-supplement").count() == 1
+                expected_context_workloads = {}
+                for arm, digest in (
+                    ("B0", context_inputs.get(baseline)),
+                    ("B1", release_context_inputs.get(release)),
+                ):
+                    if digest in context_workloads:
+                        expected_context_workloads[arm] = {
+                            "input_sha256": digest,
+                            **context_workloads[digest],
+                        }
+                if expected_context_workloads:
+                    label = page.locator(
+                        "#context-tenant-supplement [data-context-workloads]"
+                    )
+                    assert label.count() == 1
+                    for role, source in expected_context_workloads.items():
+                        assert role + ":" in label.inner_text()
+                        assert all(
+                            name in label.inner_text() for name in source["datasets"]
+                        )
                 assert all(
                     value
                     not in (
@@ -423,6 +461,12 @@ with sync_playwright() as playwright:
                         baseline,
                         release,
                     )
+                if payload and expected_context_workloads:
+                    assert {
+                        role: source
+                        for role, source in payload["context_workloads"].items()
+                        if source
+                    } == expected_context_workloads
                 if check_candidate:
                     assert (
                         expected_models[release]
