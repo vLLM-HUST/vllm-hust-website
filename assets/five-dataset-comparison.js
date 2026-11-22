@@ -371,6 +371,30 @@
   readComparisonLocation();
   let comparisonBaselines = [];
   const baselineObservations = new Map();
+  const b0RepairReportPath='data/b0-mtp-kv-prefix-repair-v1/report.json';
+  let b0RepairReport;
+  async function loadB0RepairReport(publication) {
+    const matches=publication.files.filter(row=>row.website_path===b0RepairReportPath);
+    if(!matches.length)return;
+    if(matches.length!==1)throw Error('Ambiguous B0 patch retest');
+    const response=await fetch('./'+b0RepairReportPath,{cache:'no-cache'});
+    if(!response.ok)throw Error('B0 patch retest unavailable');
+    const raw=await response.arrayBuffer();
+    const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),byte=>byte.toString(16).padStart(2,'0')).join('');
+    if(digest!==matches[0].sha256||raw.byteLength!==matches[0].bytes)throw Error('B0 patch retest checksum mismatch');
+    const report=JSON.parse(new TextDecoder().decode(raw));
+    if(report.schema!=='deeplinkengine-mtp-selected-kv-prefix-repair/v1'||report.scope!=='patched-variants-only'||
+       report.model!=='Qwen3.5-35B-A3B'||report.tensor_parallel_size!==2||report.accelerator!=='Ascend 910B2'||
+       !report.versions||!report.workload)throw Error('B0 patch retest identity mismatch');
+    return report;
+  }
+  function b0RepairResult(baseline) {
+    const version=baseline.id.match(/^official-(0\.23\.0|0\.30\.0)$/)?.[1];
+    const result=b0RepairReport?.versions[version];
+    if(result?.upstream_image_manifest!==baseline.image_digest||
+       result?.original_release_ft_eligible!==false)return;
+    return result;
+  }
   let baselineCardMappings = new Map();
   const baselineCardPath = 'data/b0-archived-card-provenance-v1.json';
   let contextWorkloads = new Map();
@@ -532,6 +556,9 @@
           else if(['partial','published'].includes(item.status))throw Error('Missing B0 observations');
         }
       }
+      b0RepairReport=await loadB0RepairReport(publication).catch(error=>{
+        console.warn('B0 patch retest rejected',error);
+      });
       baselineCardMappings=await loadArchivedBaselineCards(publication).catch(error=>{
         console.warn('Archived B0 card provenance rejected',error);
         return new Map();
@@ -2422,6 +2449,15 @@
     const native=observed?.native_timing;
     const nativeStatus=observed?.automatic_ft_audit?.status==='ineligible'?t('算量适用性未通过；F 与效率未计算。','Arithmetic applicability is ineligible; F and efficiency are uncomputed.'):observed?.necessary_work_certified===true?t('算量与效率见本版核验报告。','See this version’s qualification report for arithmetic and efficiency.'):t('算量资格尚未发布。','Arithmetic qualification is unpublished.');
     const nativeDetail=native?'<p>'+esc(t('原生计时；保留原始轮次，不计入五项吞吐图。','Native timing; original runs, separate from fixed-five throughput.'))+'</p>'+table(t(['轮次','原始 T / 秒','输出 token'],['Run','Original T / s','Output tokens']),native.repetitions.map(row=>[row.repetition,row.T_seconds,row.output_tokens]))+'<p>'+esc(nativeStatus)+'</p>':'';
+    const repair=b0RepairResult(baseline);
+    const repairEvidence=repair?pinnedSource('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/reports/b0-mtp-kv-prefix-repair-v1/README.md'):null;
+    const repairLink=repairEvidence?'<p><a href="'+esc(repairEvidence)+'">'+t('Benchmark 记录与复算','Benchmark evidence and replay')+'</a></p>':'';
+    const repairDetail=repair?'<div data-b0-kv-prefix-repair><h3>'+t('MTP KV 补丁复测','MTP KV patch retest')+'</h3><p>'+
+      esc(t('仅限补丁版独立复测，未形成 B0/B1 配对。','Patched variant only, with no verified B0/B1 pair.'))+'</p><p>'+
+      esc(repair.repetitions.length+' × '+b0RepairReport.workload.requests_per_formal_repetition+' '+t('请求','requests')+
+      ' · '+b0RepairReport.workload.output_tokens_per_request+' '+t('输出 token/请求','output tokens/request'))+'</p>'+
+      '<p><strong>'+esc(repair.tflops_per_card_interval.map(value=>Number(value).toFixed(3)).join('–'))+
+      ' TFLOP/s/'+t('卡','card')+'</strong></p>'+repairLink+'</div>':'';
     const b0Configuration={
       id:baseline.id,profile:baseline.profile.url,model:baseline.model,cann:baseline.cann,
       precision:baseline.precision??observed?.precision??null,tensor_parallel_size:baseline.tensor_parallel_size??observed?.tensor_parallel_size??null,
@@ -2466,7 +2502,7 @@
           table(t(['工况','B0 物理卡号','B1 物理卡号'],['Scenario','B0 physical cards','B1 physical cards']),cards)};
       }
       if(key==='metrics'||key==='supplement')return {title:title[key==='metrics'?1:2],body:rawMetrics(key==='metrics'?rows:context)};
-      if(key==='compute')return {title:title[3],body:nativeDetail||'<p>'+esc(reason)+'</p>'+links};
+      if(key==='compute')return {title:title[3],body:(nativeDetail||'<p>'+esc(reason)+'</p>'+links)+repairDetail};
       if(key==='methods')return {title:title[4],body:'<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+
         '<p>'+t('吞吐取成功输出词元数除以含排空的耗时；时延使用各臂原测均值。','Throughput divides successful output tokens by elapsed time including drain. Latencies use each arm’s original means.')+'</p>'+links};
       if(key==='quality')return {title:title[5],body:table(t(['工况','运行臂','正确 / 请求','失败','截断'],['Scenario','Arm','Correct / requests','Failed','Truncated']),scores)+
@@ -2482,7 +2518,7 @@
         [t('B1 运行回执','B1 run receipt'),b1Configuration.receipt_sha256],
         [t('B1 来源清单','B1 source manifest'),b1Configuration.source_manifest_sha256]
       ].filter(([,digest])=>digest).map(([label,digest])=>'<p>'+esc(label)+' · <code>'+esc(digest)+'</code></p>').join('');
-      return {title:title[6],body:links+priorArchives+eventProof+
+      return {title:title[6],body:links+priorArchives+eventProof+repairLink+
         (baseline.evidence?.url?'<p><a href="'+esc(baseline.evidence.url)+'">'+t('B0 原件与 CPU 报告重建','B0 original evidence and CPU report reconstruction')+'</a></p>':'')+
         (baseline.observations?.path?'<p><a href="./'+esc(baseline.observations.path)+'">'+t('B0 机器可读实测','Machine-readable B0 observations')+'</a></p>':'')+
         ((entry.sources||[]).length?'<p>'+entry.sources.map(source=>'<a href="'+esc(pinnedSource(source.url))+'">'+esc(sourceLabel(source.url))+'</a>').join(' · ')+'</p>':'')+
