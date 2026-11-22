@@ -17,6 +17,7 @@
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= 1e-8 * Math.max(1, Math.abs(b));
   const modelIntegrationResults = new Map();
   const submissionAssessments = new Map();
+  const stableAssessments = new Map();
   const table = (heads, rows) => `<div class="focus-table" tabindex="0" role="region" aria-label="${esc(heads.join(' / '))}"><table><thead><tr>${heads.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map((v,i)=>`<${i?'td':'th scope="row"'}>${esc(v)}</${i?'td':'th'}>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const required = ['3.4.1','3.4.2','3.4.3','3.4.4'];
   const names = () => t(['有效算力','吞吐与时延','上下文稳定性','成本与利用率'], ['Effective compute','Throughput and latency','Context stability','Cost and utilization']);
@@ -552,6 +553,9 @@
         await validateVersionComputeReference(entry, publication);
         await validateModelIntegration(entry, publication);
         await loadSubmissionAssessment(entry, publication);
+        if(entry.stable_evidence)await loadStableAssessment(entry, publication, baseline.id).catch(error=>{
+          console.warn('Stable release V2 evidence rejected',error);
+        });
       }
       if(value.entries.find(row=>row.id==='r5').measurements.length) throw Error('r5 has no formal inference');
       if (!Array.isArray(value.attempt_order) || new Set(value.attempt_order).size!==value.attempt_order.length || value.attempt_order.some(id=>!/^r[1-9][0-9]*$/.test(id)||value.order.includes(id)) || value.attempts?.length!==value.attempt_order.length) throw Error('Invalid early-attempt catalog');
@@ -996,26 +1000,34 @@
     return phase.tenants>1?t(`${phase.tenants}租户 / C${phase.concurrency}`,`${phase.tenants} tenants / C${phase.concurrency}`):
       `${cohort.min_tokens/1024}K–${cohort.max_tokens_exclusive/1024}K / C${phase.concurrency}`;
   }
-  function isTerminalReplayC8(supplement, row) {
-    const source = sealedContextWorkload(supplement.protocol?.input_sha256);
-    return source?.datasets.length === 1 && source.datasets[0] === 'Terminal-Bench 2.1'
-      && row.B1.tenants === 1 && row.B1.concurrency === 8;
+  function isTerminalReplayC8(workload, row) {
+    return workload?.datasets.length===1&&workload.datasets[0]==='Terminal-Bench 2.1'
+      &&row.B1.tenants===1&&row.B1.concurrency===8;
   }
   function versionSupplementRows(entry) {
     const a=entry.context_tenant_supplement;
-    if(!a)return [];
-    return a.comparisons.map(row=>{
+    const stable=stableAssessments.get(entry.id)?.targets['4.3'];
+    if(!a&&!stable)return [];
+    const workload=stable?.baseline_context.workload||sealedContextWorkload(a.protocol.input_sha256);
+    const rows=stable?.paired.comparison||a.comparisons;
+    return rows.map(row=>{
       const arms=Object.fromEntries(['B0','B1'].map(role=>{
         const m=row[role].metrics;
         return [role,{...m,mean_ttft_ms:m.ttft_ms.mean,mean_tpot_ms:m.tpot_ms.mean,
-          physical_cards:row[role].physical_cards??a.physical_cards,source_seal_sha256:a.arm_seals[role],
+          physical_cards:stable?.physical_cards[role]??row[role].physical_cards??a.physical_cards,
+          source_seal_sha256:(stable?.paired||a).arm_seals[role],
           relative_cost_per_token:row.B0.metrics.output_tokens_per_second/m.output_tokens_per_second}];
       }));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
-      const cards=cardComparison(row.B0.physical_cards,row.B1.physical_cards);
-      return {id:'real-context-'+row.phase,label:supplementLabel(a,row),arms,changes_percent,...cards,
-              workloadKind:'fixed-data-context',workloadSource:sealedContextWorkload(a.protocol?.input_sha256),
-              workloadLabel:[isTerminalReplayC8(a,row)?terminalReplayWorkloadLabel():contextWorkloadLabel(a),cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
+      const cards=cardComparison(row.B0.physical_cards??stable?.physical_cards.B0,row.B1.physical_cards??stable?.physical_cards.B1);
+      const phase=row.B1;
+      const label=stable?(phase.tenants>1?t('4K / 四租户 C24','4K / four tenants C24'):
+        `${Number(phase.cohort)/1024}K / C${phase.concurrency}`):supplementLabel(a,row);
+      const dataset=stable?workload.datasets.join(' · '):contextWorkloadLabel(a);
+      const replay=isTerminalReplayC8(workload,row)?terminalReplayWorkloadLabel():dataset;
+      return {id:'real-context-'+row.phase,label,arms,changes_percent,...cards,
+              workloadKind:'fixed-data-context',workloadSource:workload,
+              workloadLabel:[replay,cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
     });
   }
   async function loadSubmissionAssessment(entry, publication) {
@@ -1116,6 +1128,19 @@
     </details>`;
   }
   function v2Assessment(entry, rows) {
+    const stable=stableAssessments.get(entry.id);
+    if(stable){
+      const release=entry.stable_evidence;
+      return `<section class="submission-assessment" id="submission-v2">
+        <div class="section-heading"><h2>${t('送测 V2 判定','Submission V2 assessment')}</h2></div>
+        <p><a href="${esc(release.pypi_url)}">PyPI ${esc(release.pypi_version)} ↗</a> ·
+        <a href="${esc(release.install_manifest_url)}">${t('安装清单','Installation manifest')} ↗</a> ·
+        <a href="${esc(release.arm64_acceptance_url)}">${t('ARM64 安装验收','ARM64 installation acceptance')} ↗</a></p>
+        ${candidateAssessment(stable.item,stable.report,stable.value,{rentalDisclosure:true})}</section>`;
+    }
+    if(entry.stable_evidence)return `<section class="submission-assessment" id="submission-v2">
+      <h2>${t('送测 V2 判定','Submission V2 assessment')}</h2>
+      <p data-stable-assessment-unavailable>${t('稳定版 V2 封存证据未通过读取校验。','Stable V2 evidence could not be verified.')}</p></section>`;
     const status=(met,evidence)=>[met?t('达成目标','Target met'):t('未达成目标','Target not met'),evidence].join(' · ');
     const missing=reason=>status(false,reason);
     const assessment=submissionAssessments.get(entry.id);
@@ -1208,6 +1233,18 @@
       ])));
   }
   function versionSupplement(entry, rows, values, control) {
+    const stable=stableAssessments.get(entry.id);
+    if(stable){
+      const cost=stable.targets['4.4'].four_tenant;
+      const cards=stable.targets['4.3'].physical_cards;
+      return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"${cardComparisonAttribute(cardComparison(cards.B0,cards.B1))}>
+        <div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2>
+        <button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
+        <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div>
+        <div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(Number(cost.unit_cost_reduction_percent))}%</strong></div>
+        <div><span>${t('四租户 AI Core 利用率','Four-tenant AI Core utilization')}</span><strong>${n(cost.utilization.B0.mean_percent)} → ${n(cost.utilization.B1.mean_percent)}%</strong></div></div>
+        ${candidateAssessment(stable.item,stable.report,stable.value,{target:'4.3'})}</section>`;
+    }
     const a=entry.context_tenant_supplement;
     const baselineContext=control==='B0'&&/^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():'';
     if(!a){
@@ -1217,7 +1254,8 @@
     }
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     const cards=cardComparison(tenant?.B0.physical_cards,tenant?.B1.physical_cards);
-    const replayBands=a.comparisons.filter(row=>isTerminalReplayC8(a,row))
+    const workload=sealedContextWorkload(a.protocol.input_sha256);
+    const replayBands=a.comparisons.filter(row=>isTerminalReplayC8(workload,row))
       .map(row=>supplementLabel(a,row).replace(' / C8',''));
     const replayLabel=replayBands.length
       ? `<div class="supplement-workload-label" data-workload="terminal-replay" role="note"><strong>${esc(replayBands.join(' · '))}</strong><span>${terminalReplayWorkloadLabel()}</span></div>`
@@ -1273,8 +1311,9 @@
   }
   function assertFormalBaselineIsolation(entry, rows) {
     if(entry.baseline_id!==releaseCatalog.baseline.id)throw Error('Formal comparison lost fixed B0 identity');
+    const context=stableAssessments.get(entry.id)?.targets['4.3'].paired.comparison||entry.context_tenant_supplement?.comparisons||[];
     const ids=[...entry.measurements.map(row=>row.id),
-      ...(entry.context_tenant_supplement?.comparisons||[]).map(row=>'real-context-'+row.phase),
+      ...context.map(row=>'real-context-'+row.phase),
       ...(entry.id==='r8'&&currentR8?['4096-formal','16384-formal']:[])];
     const permitted=new Set(standardRows(ids.map(id=>({id,sourceRecord:true}))).filter(row=>row.sourceRecord).map(row=>row.id));
     if(rows.some(row=>row.arms&&!permitted.has(row.id)))throw Error('Development data cannot enter formal B0/B1 charts');
@@ -1317,12 +1356,12 @@
   }
   const rmsReport='reports/r10-native-rms-20261121/';
   const rmsDescriptor=(entry,file)=>entry.sources.find(source=>source.url.endsWith('/'+rmsReport+file));
-  async function fetchBenchmarkReport(descriptor, websitePath) {
-    const prefix='https://github.com/'+releasePublication.repository+'/blob/main/';
+  async function fetchBenchmarkReport(descriptor, websitePath, publication=releasePublication) {
+    const prefix='https://github.com/'+publication.repository+'/blob/main/';
     if(descriptor.url!==prefix+websitePath.replace(/^data\//,'reports/')){
       throw Error('Unreviewed benchmark report source');
     }
-    const binding=releasePublication.files.filter(file=>file.website_path===websitePath);
+    const binding=publication.files.filter(file=>file.website_path===websitePath);
     if(binding.length!==1||binding[0].bytes!==descriptor.bytes||binding[0].sha256!==descriptor.sha256){
       throw Error('Unbound candidate report');
     }
@@ -1347,23 +1386,56 @@
     });
   }
 
-  async function loadCandidateAssessment(entry) {
+  async function loadCandidateAssessment(entry, publication=releasePublication, baseline=releaseCatalog.baseline.id) {
     const asset=entry.candidate_submission_assessment;
-    const bindings=releasePublication.files.filter(file=>file.website_path===asset.path);
+    const bindings=publication.files.filter(file=>file.website_path===asset.path);
     if(!/^data\/[a-z0-9-]+\.json$/.test(asset.path)||bindings.length!==1||
        bindings[0].sha256!==asset.sha256||bindings[0].bytes!==asset.bytes){
       throw Error('Unbound candidate submission assessment');
     }
     const response=await fetch('./'+asset.path,{cache:'no-cache',signal:AbortSignal.timeout(12000)});
-    const value=await readPublishedJson(releasePublication,asset.path,response);
+    const value=await readPublishedJson(publication,asset.path,response);
     if(value.schema!=='vllm-hust-candidate-v2-assessment/v1'||value.release_family!==entry.id||
-       value.baseline_id!==releaseCatalog.baseline.id||!/^[a-f0-9]{40}$/.test(value.engine_revision)){
+       value.baseline_id!==baseline||!/^[a-f0-9]{40}$/.test(value.engine_revision)){
       throw Error('Candidate assessment identity mismatch');
     }
     return value;
   }
 
-  function candidateAssessment(item, report, value) {
+  async function loadStableAssessment(entry, publication, baseline) {
+    const stable=entry.stable_evidence;
+    const item=candidateReports(entry).find(candidate=>candidate.kind===stable.kind);
+    const sha=value=>/^[a-f0-9]{64}$/.test(value||'');
+    const wheels='https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-'+entry.id+'-v1/';
+    if(!item||entry.publication_status!=='stable'||stable.measured_release!==entry.release+'-'+stable.kind||
+       !/^[a-f0-9]{40}$/.test(stable.engine_commit)||
+       !['sdist_sha256','sdk_sha256','runtime_overlay_sha256','installed_files_canonical_sha256'].every(key=>sha(stable[key]))||
+       !/^\d{4}\.\d{1,2}\.\d{1,2}\.\d+$/.test(stable.pypi_version)||
+       stable.pypi_url!=='https://pypi.org/project/vllm-hust-engine/'+stable.pypi_version+'/'||
+       stable.install_manifest_url!==wheels+entry.id+'-pip-requirements.txt'||
+       stable.arm64_acceptance_url!==wheels+'arm64-clean-install.json'){
+      throw Error('Invalid stable release evidence lock');
+    }
+    const [report,value]=await Promise.all([
+      fetchBenchmarkReport(item.summary,item.websitePath,publication),
+      loadCandidateAssessment(entry,publication,baseline)
+    ]);
+    const record=value.candidates?.[item.kind];
+    if(report.schema!=='vllm-hust-r10-full-fixed-five-evidence/v1'||report.release!==stable.measured_release||
+       report.baseline_id!==baseline||record?.targets?.['4.3']?.candidate_runtime?.runtime_overlay_sha256!==stable.runtime_overlay_sha256||
+       entry.measurements.length!==Object.keys(report.measurements).length||
+       !entry.measurements.every(row=>row.arms.every((arm,index)=>{
+         const expected=report.measurements[row.id]?.[index===0?'B0':'candidate'];
+         return expected&&Object.entries(expected).every(([key,expectedValue])=>key==='role'||
+           JSON.stringify(arm[key])===JSON.stringify(expectedValue));
+       }))){
+      throw Error('Stable release measurements do not match the sealed trial');
+    }
+    candidateAssessment(item,report,value);
+    stableAssessments.set(entry.id,{item,report,value,targets:record.targets});
+  }
+
+  function candidateAssessment(item, report, value, {target,rentalDisclosure=false}={}) {
     const record=value.candidates?.[item.kind], goals=['4.1','4.2','4.3','4.4'];
     const targets=record?.targets;
     const sha=hash=>/^[a-f0-9]{64}$/.test(hash||'');
@@ -1417,19 +1489,17 @@
       ...roles.map(role=>n(Number(area.arms[role].cost_per_million_output_tokens_cny))),
       percent(area.unit_cost_reduction_percent),...roles.map(role=>percent(area.utilization[role].mean_percent))]);
     const sourceNames=t(['原生计时与算量','固定五项原件复算','上下文与四租户封存'],['Native timing and work','Fixed-profile source audit','Context and four-tenant seals']);
-    return '<p>'+esc(report.release)+' · '+esc(record.selection.model)+' · BF16 · TP2 · '+t('固定 0.18 B0','Fixed 0.18 B0')+'</p>'+
-      table(t(['送测 V2','里程碑','结题'],['Submission V2','Milestone','Final']),
-        goals.map((id,i)=>[id+' '+names()[i],status(targets[id].milestone),status(targets[id].final)]))+
-      heading('4.1 · MMLU-Pro 200 / out256',
+    const sections={
+      '4.1':heading('4.1 · MMLU-Pro 200 / out256',
         t(['运行臂','物理卡','三轮计时 / 秒','有效算力下界 / TFLOP/s/卡','效率下界','原生封存 SHA-256'],
           ['Arm','Physical cards','Three runs / s','Effective lower / TFLOP/s/card','Efficiency lower','Native seal SHA-256']),
         roles.map(role=>[role,native.physical_cards[role].join(', '),
           native.arms[role].repetitions.map(run=>Number(run.T_seconds).toFixed(3)).join(' / '),
-          n(Number(compute.achieved_tflops_per_card_lower[role])),percent(compute.efficiency_lower_percent[role]),native.native_seals[role]]))+
-      heading(t('4.2 · 固定五项','4.2 · Five fixed profiles'),
+          n(Number(compute.achieved_tflops_per_card_lower[role])),percent(compute.efficiency_lower_percent[role]),native.native_seals[role]])),
+      '4.2':heading(t('4.2 · 固定五项','4.2 · Five fixed profiles'),
         t(['数据集','吞吐 B1/B0','平均 TTFT B1/B0','平均 TPOT B1/B0','正确率降幅 / pp','里程碑','结题'],
-          ['Dataset','Throughput B1/B0','Mean TTFT B1/B0','Mean TPOT B1/B0','Accuracy drop / pp','Milestone','Final']),speedRows)+
-      heading(t('4.3 · 真实上下文与四租户','4.3 · Real context and four tenants'),
+          ['Dataset','Throughput B1/B0','Mean TTFT B1/B0','Mean TPOT B1/B0','Accuracy drop / pp','Milestone','Final']),speedRows),
+      '4.3':heading(t('4.3 · 真实上下文与四租户','4.3 · Real context and four tenants'),
         t(['数据集','工况','B0 tok/s','B1 tok/s','B0 成功','B1 成功','B0 TTFT P95 / ms','B1 TTFT P95 / ms','B0 物理卡','B1 物理卡'],
           ['Dataset','Workload','B0 tok/s','B1 tok/s','B0 successes','B1 successes','B0 TTFT P95 / ms','B1 TTFT P95 / ms','B0 cards','B1 cards']),contextRows)+
       '<p>'+t('16K/4K 吞吐','16K/4K throughput')+' '+percent(Number(context.measured_ratios.throughput)*100)+
@@ -1439,12 +1509,20 @@
       ' · TTFT P95/P99 '+ratio(context.measured_window_ratios.ttft_p95)+' / '+ratio(context.measured_window_ratios.ttft_p99)+
       ' · TPOT P95/P99 '+ratio(context.measured_window_ratios.tpot_p95)+' / '+ratio(context.measured_window_ratios.tpot_p99)+'</p>'+
       '<details><summary>'+t('任务 ID 与上下文封存','Task IDs and context seals')+'</summary><p>'+esc(workload.task_ids.join(' · '))+'</p>'+
-      table(t(['运行臂','原始封存 SHA-256'],['Arm','Original seal SHA-256']),roles.map(role=>[role,context.paired.arm_seals[role]]))+'</details>'+
-      heading(t('4.4 · 公开租金折算','4.4 · Published rental estimate'),
+      table(t(['运行臂','原始封存 SHA-256'],['Arm','Original seal SHA-256']),roles.map(role=>[role,context.paired.arm_seals[role]]))+'</details>',
+      '4.4':heading(t('4.4 · 公开租金折算','4.4 · Published rental estimate'),
         t(['工况','B0 元/百万输出词元','B1 元/百万输出词元','成本降幅','B0 AI Core','B1 AI Core'],
           ['Workload','B0 CNY/million output tokens','B1 CNY/million output tokens','Cost reduction','B0 AI Core','B1 AI Core']),costRows)+
-      '<p><a href="'+esc(rent.source_url)+'">'+esc(rent.publisher)+' ↗</a> · '+Number(rent.monthly_cost_per_card_cny).toLocaleString(t('zh-CN','en-US'))+' '+t('元/卡月','CNY/card-month')+'</p>'+
-      '<p>'+sources.map((source,i)=>'<a href="'+esc(source.url)+'">'+esc(sourceNames[i])+' ↗</a>').join(' · ')+'</p>';
+      '<p><a href="'+esc(rent.source_url)+'">'+esc(rent.publisher)+' ↗</a> · '+Number(rent.monthly_cost_per_card_cny).toLocaleString(t('zh-CN','en-US'))+' '+t('元/卡月','CNY/card-month')+'</p>'
+    };
+    if(rentalDisclosure)sections['4.4']='<details data-rental-cost open><summary>'+
+      t('4.4 租金来源与单位成本','4.4 Rental source and unit cost')+'</summary>'+sections['4.4']+'</details>';
+    const links='<p>'+sources.map((source,i)=>'<a href="'+esc(source.url)+'">'+esc(sourceNames[i])+' ↗</a>').join(' · ')+'</p>';
+    if(target)return sections[target]+links;
+    return '<p>'+esc(report.release)+' · '+esc(record.selection.model)+' · BF16 · TP2 · '+t('固定 0.18 B0','Fixed 0.18 B0')+'</p>'+
+      table(t(['送测 V2','里程碑','结题'],['Submission V2','Milestone','Final']),
+        goals.map((id,i)=>[id+' '+names()[i],status(targets[id].milestone),status(targets[id].final)]))+
+      Object.values(sections).join('')+links;
   }
 
 
@@ -1532,7 +1610,7 @@
   async function fetchRmsRevision(entry) {
     const descriptor=rmsDescriptor(entry,'summary.json');
     const report=await fetchBenchmarkReport(descriptor,rmsReport.replace(/^reports\//,'data/')+'summary.json');
-    if(report.schema!=='vllm-hust-r10-native-rms-evidence/v1'||report.original_release!==entry.release||
+    if(report.schema!=='vllm-hust-r10-native-rms-evidence/v1'||report.original_release!==(entry.original_candidate_release||entry.release)||
        report.baseline_id!==releaseCatalog.baseline.id)throw Error('Revision identity mismatch');
     return report;
   }
@@ -1570,6 +1648,9 @@
     if(attempt&&key==='compute')return {title,body:fixedBaselineCompute()};
     if(attempt&&key==='supplement')return {title,body:fixedBaselineContext()};
     if(attempt&&key!=='metrics')return {title,body:`<p>${esc(t(entry.reason_zh,entry.reason_en))}</p><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号；本次未形成完整配对报告。','r1–r3 identify attempts preceding frozen r4; this attempt did not produce a complete paired report.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><code>${esc(entry.source.sha256)}</code>`};
+    const stable=stableAssessments.get(entry.id);
+    if(stable&&['compute','supplement'].includes(key))return {title,body:
+      candidateAssessment(stable.item,stable.report,stable.value,{target:key==='compute'?'4.1':'4.3'})};
     if(key==='compute')return {title,body:versionComputeReferenceDetails(entry)};
     if(key==='supplement')return {title,body:versionSupplementDetails(entry,rows)||`<p>${t('本版已发布的连续负载仅在图中列出实测档位。尚缺32K及四租户的完整补测数据；不从其他版本迁入成绩。','Published continuous-load measurements cover the plotted context bands. Complete 32K and four-tenant supplement data are missing for this version; scores are not transferred from another version.')}</p>`};
     if(key==='configuration')return {title,body:`<p>${esc(entry.release)}</p><div class="mod-tags">${entry.mods.map(name=>`<span>${esc(name)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p><a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>`};
@@ -2170,7 +2251,13 @@
     const peak=available.filter(row=>!row.crossCard).reduce((best,row)=>!best||ratio(row)>ratio(best)?row:best,null);
     const throughput=peak?ratio(peak):null;
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id)||row.contextBand==='16k');
-    const reference=sr?null:entry.compute_reference;
+    const compute=stableAssessments.get(entry.id)?.targets['4.1'];
+    const reference=sr?null:entry.compute_reference||(compute?{
+      accepted_scope:'topic4_submission_v2_fixed200_max256_three_formal_runs',
+      arms:{B1:{efficiency_lower_percent:compute.efficiency_lower_percent.B1}},
+      milestone_met:compute.milestone.met,
+      final_numeric_met:compute.final.met
+    }:null);
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
     const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('B0 核算见详情；本版 B1 尚未发布','B0 accounting in details; current B1 unpublished'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('固定 B0 已保留；本版 B1 暂无测量','Fixed B0 retained; current B1 measurements unpublished'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('固定 B0 已保留；本版 B1 暂无补测','Fixed B0 retained; current B1 supplement unpublished'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('本版 B1 成本与利用率尚未汇总','Current B1 cost and utilization are unpublished')];
     const observation=singleArmObservation(entry);
