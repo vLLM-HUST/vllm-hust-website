@@ -44,9 +44,20 @@ def verify(args):
         files = manifest.request.get(
             args.url.rstrip("/") + "/data/benchmark-source-manifest.json"
         ).json()["files"]
-        full_pair = any(
-            row["website_path"] == "data/controller-r8-fixed-profiles-repeat-v1.json"
-            for row in files
+        published = {row["website_path"] for row in files}
+        fixed_path = "data/controller-r8-fixed-profiles-repeat-v1.json"
+        streaming_path = "data/controller-r8-streamed-heavy-load-v1.json"
+        compute_path = "data/controller-r8-mmlu256-service-compute-v1.json"
+
+        def published_result(path):
+            if path not in published:
+                return None
+            response = manifest.request.get(args.url.rstrip("/") + "/" + path)
+            assert response.ok, path
+            return response.json()
+
+        fixed, streaming, compute = map(
+            published_result, (fixed_path, streaming_path, compute_path)
         )
         manifest.close()
         for width in (1440, 390):
@@ -125,7 +136,7 @@ def verify(args):
                             root.locator(
                                 'a[href="./b0-b1.html?release=r8&controlplane=request-throttling"]'
                             )
-                        ).to_have_count(1 if full_pair and identity == "r8" else 0)
+                        ).to_have_count(1 if fixed and identity == "r8" else 0)
                         for detail in page.locator(".control-details").all():
                             detail.locator("summary").focus()
                             page.keyboard.press("Enter")
@@ -144,7 +155,61 @@ def verify(args):
                                 "SWE-bench Pro public trace",
                                 "Terminal-Bench public trace",
                             ], rows
-                            assert ("暂缓" if language == "zh" else "Deferred") in text
+                            if fixed and identity == "r8":
+                                hle = next(
+                                    row
+                                    for row in fixed["profiles"]
+                                    if row["id"] == "hle"
+                                )
+                                row = (
+                                    root.get_by_role("row")
+                                    .filter(has_text="Humanity’s Last Exam")
+                                    .first
+                                )
+                                expect(row.locator("td").first).to_have_text(
+                                    f"{hle['direct']['elapsed_seconds']:,.2f}"
+                                )
+                                for side in ("direct", "controller"):
+                                    groups = hle[side]["quality"]["groups"].values()
+                                    correct = sum(
+                                        group["successes"] for group in groups
+                                    )
+                                    total = sum(group["total"] for group in groups)
+                                    assert f"{correct} / {total}" in root.text_content()
+                            else:
+                                assert (
+                                    "暂缓" if language == "zh" else "Deferred"
+                                ) in text
+                        if streaming and identity == "r8":
+                            values = [
+                                f"{streaming[side]['elapsed_seconds']:,.2f} s"
+                                for side in ("direct", "controller")
+                            ]
+                            expect(
+                                root.locator(".control-bar-line output")
+                            ).to_have_text(values)
+                            expect(
+                                root.locator(f'a[href="./{streaming_path}"]')
+                            ).to_have_count(1)
+                        if compute and identity == "r8":
+                            expect(
+                                root.get_by_role(
+                                    "heading",
+                                    name=(
+                                        "服务侧矩阵算力下界"
+                                        if language == "zh"
+                                        else "Service-side matrix compute lower bound"
+                                    ),
+                                )
+                            ).to_be_visible()
+                            expect(root).to_contain_text("V2 4.1")
+                            expect(
+                                root.locator(f'a[href="./{compute_path}"]')
+                            ).to_have_count(1)
+                        else:
+                            expect(
+                                root.locator(f'a[href="./{compute_path}"]')
+                            ).to_have_count(0)
                         await_name = f"{identity}-{width}-{theme}-{language}.png"
                         page.evaluate("window.scrollTo(0, 0)")
                         page.screenshot(
@@ -163,6 +228,29 @@ def verify(args):
                     }
                 )
                 context.close()
+        page = browser.new_page()
+        page.goto(args.url.rstrip("/") + "/controlplane/?release=r6#results")
+        expect(page.locator("#control-results")).to_have_attribute("data-loaded", "r6")
+        page.close()
+        if fixed and streaming and compute:
+            page = browser.new_page()
+            for path in (fixed_path, streaming_path, compute_path):
+                page.route(
+                    "**/" + path,
+                    lambda route: route.fulfill(
+                        status=200, content_type="application/json", body="{}"
+                    ),
+                )
+            page.goto(args.url.rstrip("/") + "/controlplane/?release=r8#results")
+            root = page.locator("#control-results")
+            expect(root).to_have_attribute("data-loaded", "r8")
+            expect(root.locator(".control-summary")).to_have_count(1)
+            for path in (fixed_path, streaming_path, compute_path):
+                expect(root.locator(f'a[href="./{path}"]')).to_have_count(0)
+            receipts.append(
+                {"rejection": "optional supplement checksum", "status": "passed"}
+            )
+            page.close()
         for failure in ("checksum", "publisher", "missing"):
             context = browser.new_context()
             page = context.new_page()
@@ -251,13 +339,11 @@ def verify(args):
                 "data-loaded", "instance-controller-scaling/v1"
             )
             expect(scaling.locator("tbody tr")).to_have_count(2)
-            page.wait_for_function(
-                """() => {
+            page.wait_for_function("""() => {
                     const nav = document.querySelector('.site-nav').getBoundingClientRect();
                     const heading = document.querySelector('#results-title').getBoundingClientRect();
                     return heading.top >= nav.bottom && heading.bottom <= innerHeight;
-                }"""
-            )
+                }""")
             publication = page.request.get(
                 args.url.rstrip("/") + "/data/instance-controller-scaling-v1.json"
             ).json()
