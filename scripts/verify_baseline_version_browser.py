@@ -302,6 +302,14 @@ def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
 
 def verify_candidate_reports(page, entry, commit):
     expected_reports = {"native-rms": 21, "contiguous-restore": 28}
+    v2_source = entry.get("candidate_submission_assessment")
+    assessment = None
+    if v2_source:
+        response = page.request.get(args.base_url.rstrip("/") + "/" + v2_source["path"])
+        raw = response.body()
+        assert response.ok and len(raw) == v2_source["bytes"]
+        assert hashlib.sha256(raw).hexdigest() == v2_source["sha256"]
+        assessment = json.loads(raw)
     panels = page.locator("[data-candidate-report]")
     assert panels.count() == len(expected_reports)
     for kind, count in expected_reports.items():
@@ -321,29 +329,63 @@ def verify_candidate_reports(page, entry, commit):
         assert response.ok and len(raw) == source["bytes"]
         assert hashlib.sha256(raw).hexdigest() == source["sha256"]
         report = json.loads(raw)
-        panel.locator("summary").click()
+        panel.locator(":scope > summary").click()
         panel.locator("[data-candidate-metrics][data-state=loaded]").wait_for(
             timeout=20000
         )
         assert "672" in panel.inner_text()
-        assert panel.locator("table").first.locator("tbody tr").count() == count
-        assert panel.locator("table").last.locator("tbody tr").count() == 4
+        tables = panel.locator("[data-candidate-metrics] table")
+        assert tables.first.locator("tbody tr").count() == count
+        assert tables.last.locator("tbody tr").count() == 4
         assert set(
-            panel.locator("table")
-            .first.locator("tbody tr td:last-child")
-            .all_text_contents()
+            tables.first.locator("tbody tr td:last-child").all_text_contents()
         ) == {
             arm["source_seal_sha256"]
             for arms in report["measurements"].values()
             for arm in arms.values()
         }
+        if assessment:
+            verify_candidate_v2(panel, assessment["candidates"][kind], report)
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
-        panel.locator("summary").click()
+        panel.locator(":scope > summary").click()
     history = page.locator("#rms-revision")
     history.locator("summary").click()
     history.locator(".rms-revision-metrics[data-state=loaded]").wait_for(timeout=20000)
     assert history.locator("tbody tr").count() == 12
     history.locator("summary").click()
+
+
+def verify_candidate_v2(panel, record, report):
+    v2 = panel.locator("[data-candidate-v2][data-state=loaded]")
+    v2.wait_for(timeout=20000)
+    targets = record["targets"]
+    assert record["selection"]["release"] == report["release"]
+    pass_text = ("达成", "未达成") if args.language == "zh" else ("Met", "Not met")
+    rows = v2.locator("table").first.locator("tbody tr").all()
+    assert len(rows) == 4
+    for index, row in enumerate(rows, 1):
+        assert row.locator("td").all_text_contents() == [
+            pass_text[not targets[f"4.{index}"][gate]["met"]]
+            for gate in ("milestone", "final")
+        ]
+    text = v2.inner_text()
+    assert record["selection"]["release"] in text
+    assert "MMLU-Pro 200 / out256" in text
+    assert "Terminal-Bench 2.1" in text and "C24" in text
+    assert f"{float(targets['4.1']['efficiency_lower_percent']['B1']):.2f}%" in text
+    assert targets["4.1"]["native"]["native_seals"]["B1"] in text
+    assert (
+        f"{float(targets['4.4']['four_tenant']['unit_cost_reduction_percent']):.2f}%"
+        in text
+    )
+    assert set(
+        v2.locator("a").evaluate_all("(nodes) => nodes.map(node => node.href)")
+    ) >= {source["url"] for source in record["sources"].values()}
+    seal = v2.locator("details")
+    seal.locator("summary").click()
+    assert targets["4.3"]["paired"]["arm_seals"]["B1"] in seal.inner_text()
+    for task in targets["4.3"]["baseline_context"]["workload"]["task_ids"]:
+        assert task in seal.inner_text()
 
 
 def verify_candidate_checksum(page):
@@ -357,9 +399,30 @@ def verify_candidate_checksum(page):
     )
     page.goto(base + "?release=r10")
     panel = page.locator("[data-candidate-report='native-rms']")
-    panel.locator("summary").click()
+    panel.locator(":scope > summary").click()
     panel.locator("[data-candidate-metrics][data-state=unavailable]").wait_for()
     assert panel.locator("tbody tr").count() == 0
+    page.unroute(pattern)
+
+
+def verify_candidate_v2_checksum(page, entry):
+    source = entry.get("candidate_submission_assessment")
+    if not source:
+        return
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    pattern = "**/" + source["path"]
+    page.route(
+        pattern,
+        lambda route: route.fulfill(
+            status=200, content_type="application/json", body="{}"
+        ),
+    )
+    page.goto(base + "?release=" + entry["id"])
+    panel = page.locator("[data-candidate-report='native-rms']")
+    panel.locator(":scope > summary").click()
+    panel.locator("[data-candidate-v2][data-state=unavailable]").wait_for()
+    assert panel.locator("[data-candidate-v2] tbody tr").count() == 0
+    panel.locator("[data-candidate-metrics][data-state=loaded]").wait_for()
     page.unroute(pattern)
 
 
@@ -854,6 +917,7 @@ with sync_playwright() as playwright:
         verify_legacy_links(page, catalog)
         if width == 1366 and scheme == "light":
             verify_candidate_checksum(page)
+            verify_candidate_v2_checksum(page, release_entries["r10"])
             verify_archived_cards_checksum(
                 page, next(iter(archived_card_mappings.values()))
             )
