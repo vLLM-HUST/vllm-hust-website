@@ -1582,7 +1582,7 @@
   async function loadControllerContext(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerContextPath))return null;
     const response=await fetch('./'+controllerContextPath,{cache:'no-cache'});
-    const value=await readControllerPublication(publication,controllerContextPath,response);
+    const value=await readPublishedJson(publication,controllerContextPath,response);
     const expected=[['4096',8,1],['16384',8,1],['32768',8,1],['multi-tenant',24,4]];
     const completeLatency=row=>['mean','p95','p99'].every(key=>Number.isFinite(row?.[key])&&row[key]>0);
     if(value.schema!=='controller-context-tenant-pair/v1'||value.engine_release!==entry.engine_release
@@ -1613,7 +1613,7 @@
   async function loadControllerHeavyLoadRepeat(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerHeavyLoadRepeatPath))return null;
     const response=await fetch('./'+controllerHeavyLoadRepeatPath,{cache:'no-cache'});
-    const value=await readControllerPublication(publication,controllerHeavyLoadRepeatPath,response);
+    const value=await readPublishedJson(publication,controllerHeavyLoadRepeatPath,response);
     const source=entry.result.direct;
     if(value.schema!=='controller-r8-heavy-load-repeat/v1'||value.engine_release!==entry.engine_release||
       value.program_state_residency!==entry.state_resident_seats||!/^\d{4}-\d{2}-\d{2}$/.test(value.date)||
@@ -1633,7 +1633,7 @@
   async function loadControllerFixedProfiles(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerFixedProfilesPath))return null;
     const response=await fetch('./'+controllerFixedProfilesPath,{cache:'no-cache'});
-    const value=await readControllerPublication(publication,controllerFixedProfilesPath,response);
+    const value=await readPublishedJson(publication,controllerFixedProfilesPath,response);
     if(value.schema!=='controller-r8-fixed-profiles-repeat/v1'||value.engine_release!==entry.engine_release||
       value.state_resident_seats!==entry.state_resident_seats||
       value.profiles?.map(row=>row.id).join()!==fixedProfiles.map(([id])=>id).join())
@@ -1677,7 +1677,7 @@
   async function loadControllerCompute(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerComputePath))return null;
     const response=await fetch('./'+controllerComputePath,{cache:'no-cache'});
-    const value=await readControllerPublication(publication,controllerComputePath,response);
+    const value=await readPublishedJson(publication,controllerComputePath,response);
     if(value.schema!=='controller-r8-mmlu256-service-compute/v1'||value.engine_release!==entry.engine_release||
        value.state_resident_seats!==entry.state_resident_seats||value.accelerators!==2||value.native_efficiency_certified!==false||
        !/^[a-f0-9]{64}$/.test(value.source_formula_sha256)||!/^[a-f0-9]{64}$/.test(value.model_config_sha256))
@@ -1699,7 +1699,7 @@
   async function loadControllerTimingSupplement(publication,entry,path) {
     if(!publication.files.some(file=>file.website_path===path))return null;
     const response=await fetch('./'+path,{cache:'no-cache'});
-    const value=await readControllerPublication(publication,path,response);
+    const value=await readPublishedJson(publication,path,response);
     const streaming=path===controllerStreamingPath;
     const schema=streaming?'controller-r8-streamed-heavy-load/v1':'controller-r8-closed-loop-c8/v1';
     if(value.schema!==schema||value.engine_release!==entry.engine_release||value.state_resident_seats!==entry.state_resident_seats)
@@ -1727,7 +1727,7 @@
   async function loadControllerUtilization(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerUtilizationPath))return null;
     const response=await fetch('./'+controllerUtilizationPath,{cache:'no-cache'});
-    const value=await readControllerPublication(publication,controllerUtilizationPath,response);
+    const value=await readPublishedJson(publication,controllerUtilizationPath,response);
     const expected=[...fixedProfiles.map(([id])=>id),'swe-heavy','4096-formal','16384-formal'].sort().join();
     if(value.schema!=='controller-r8-ai-core-utilization/v1'||value.engine_release!==entry.engine_release||
       value.state_resident_seats!==entry.state_resident_seats||Object.keys(value.rows||{}).sort().join()!==expected)
