@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import hashlib
 import json
+import os
 import re
 import shlex
 from pathlib import Path
@@ -11,6 +12,17 @@ from urllib.parse import unquote, urlsplit
 from urllib.request import Request, urlopen
 
 from playwright.async_api import async_playwright
+
+
+def release_request(url, accept):
+    request = Request(
+        url,
+        headers={"Accept": accept, "User-Agent": "vllm-hust-public-site-audit"},
+    )
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token:
+        request.add_unredirected_header("Authorization", f"Bearer {token}")
+    return request
 
 
 def read_release_asset(index, url):
@@ -26,13 +38,7 @@ def read_release_asset(index, url):
         "https://api.github.com/repos/vLLM-HUST/vllm-hust-website/releases/assets/"
         + str(asset["id"])
     )
-    request = Request(
-        api_url + "?download=1",
-        headers={
-            "Accept": "application/octet-stream",
-            "User-Agent": "vllm-hust-public-site-audit",
-        },
-    )
+    request = release_request(api_url + "?download=1", "application/octet-stream")
     with urlopen(request, timeout=30) as response:
         raw = response.read(size + 1)
     assert len(raw) == size
@@ -48,12 +54,9 @@ def verify_stable_install_manifest(release):
     tag, _, filename = url.removeprefix(mirror_prefix).partition("/")
     assert re.fullmatch(r"engine-wheels-r[1-9][0-9]*-v[1-9][0-9]*", tag)
     assert filename and "/" not in filename
-    request = Request(
+    request = release_request(
         "https://api.github.com/repos/vLLM-HUST/vllm-hust-website/releases/tags/" + tag,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "vllm-hust-public-site-audit",
-        },
+        "application/vnd.github+json",
     )
     with urlopen(request, timeout=30) as response:
         index = json.load(response)
