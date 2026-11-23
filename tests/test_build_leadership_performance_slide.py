@@ -5,6 +5,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -954,7 +955,7 @@ def test_proof_git_isolates_config_and_never_propagates_credentials(
     assert observed["command"][-1] == "https://github.com/org/repo.git"
     environment = observed["env"]
     assert isinstance(environment, dict)
-    assert environment["GIT_CONFIG_GLOBAL"] == "/dev/null"
+    assert environment["GIT_CONFIG_GLOBAL"] == os.devnull
     assert environment["GIT_CONFIG_NOSYSTEM"] == "1"
     assert environment["GIT_CONFIG_COUNT"] == "0"
     assert environment["GIT_NO_REPLACE_OBJECTS"] == "1"
@@ -1182,7 +1183,10 @@ def test_benchmark_commit_binds_exact_registry_and_snapshot_bytes(
         check=True,
     )
     subprocess.run(["git", "-C", str(repo), "config", "user.name", "Test"], check=True)
-    subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "-c", "core.autocrlf=false", "add", "."],
+        check=True,
+    )
     subprocess.run(["git", "-C", str(repo), "commit", "-qm", "fixture"], check=True)
     commit = subprocess.run(
         ["git", "-C", str(repo), "rev-parse", "HEAD"],
