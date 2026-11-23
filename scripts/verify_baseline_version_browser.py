@@ -204,7 +204,15 @@ def verify_development_priority(page, releases, baselines):
 
 
 def verify_full_baseline_details(
-    page, source, label, width, scheme, prefix="", repair=None, commit=None
+    page,
+    source,
+    label,
+    width,
+    scheme,
+    prefix="",
+    repair=None,
+    commit=None,
+    ft_pair=None,
 ):
     """Read the two existing dialogs; do not invent paired goals or grades."""
     expected_tracks = [
@@ -292,12 +300,30 @@ def verify_full_baseline_details(
         )
         assert interval in patch_detail.inner_text()
         assert "3 × 200" in patch_detail.inner_text()
-        assert patch_detail.locator("a").get_attribute("href") == (
+        assert patch_detail.locator(":scope > p > a").get_attribute("href") == (
             f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
             "reports/b0-mtp-kv-prefix-repair-v1/README.md"
         )
     else:
         assert patch_detail.count() == 0
+    comparison_detail = dialog.locator("[data-r10-patched-b0-ft]")
+    if ft_pair:
+        pair, b1 = ft_pair
+        assert comparison_detail.is_visible()
+        detail = comparison_detail.inner_text()
+        for values in (
+            b1["tflops_per_card_interval"],
+            pair["B1_over_B0_effective_compute_interval"],
+        ):
+            assert "–".join(f"{float(value):.3f}" for value in values) in detail
+        for arm in (pair["B0"], b1):
+            assert f"{float(arm['T_seconds']):.3f} s" in detail
+        assert comparison_detail.locator("a").get_attribute("href") == (
+            f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
+            "reports/r10-stable-patched-b0-ft-20261123-v1/README.md"
+        )
+    else:
+        assert comparison_detail.count() == 0
     page.screenshot(
         path=str(args.output / f"{prefix}compute-{width}-{scheme}.png"), full_page=True
     )
@@ -608,6 +634,26 @@ with sync_playwright() as playwright:
             assert repair_report["scope"] == "patched-variants-only"
             repair_versions = repair_report["versions"]
             assert set(repair_versions) == {"0.23.0", "0.30.0"}
+        ft_source = next(
+            (
+                file
+                for file in publication["files"]
+                if file["website_path"]
+                == "data/r10-stable-patched-b0-ft-20261123-v1/report.json"
+            ),
+            None,
+        )
+        formal_ft = (
+            read_descriptor({**ft_source, "path": ft_source["website_path"]})
+            if ft_source
+            else None
+        )
+        if formal_ft:
+            assert set(formal_ft["pairs"]) == {"0.23.0", "0.30.0"}
+            assert all(
+                pair["B1_native_seal_sha256"] == formal_ft["B1"]["native_seal_sha256"]
+                for pair in formal_ft["pairs"].values()
+            )
         source = next(
             file
             for file in publication["files"]
@@ -809,6 +855,21 @@ with sync_playwright() as playwright:
                         baseline,
                         release,
                     )
+                    published_pair = (
+                        formal_ft["pairs"].get(baseline.removeprefix("official-"))
+                        if formal_ft and release == "r10"
+                        else None
+                    )
+                    if published_pair:
+                        assert payload["native_fixed200_ft"] == {
+                            **published_pair,
+                            "B1": formal_ft["B1"],
+                            "protocol": formal_ft["protocol"],
+                            "report": f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
+                            "reports/r10-stable-patched-b0-ft-20261123-v1/README.md",
+                        }
+                    else:
+                        assert "native_fixed200_ft" not in payload
                 if payload and expected_context_workloads:
                     assert {
                         role: source
@@ -980,6 +1041,12 @@ with sync_playwright() as playwright:
                             assert dialog.locator("table").count() >= 1
                         page.keyboard.press("Escape")
                     assert len(set(titles)) == len(titles)
+                    ft_version = baseline.removeprefix("official-")
+                    ft_pair = (
+                        (formal_ft["pairs"][ft_version], formal_ft["B1"])
+                        if formal_ft and ft_version in formal_ft["pairs"]
+                        else None
+                    )
                     verify_full_baseline_details(
                         page,
                         independent_baselines[baseline],
@@ -997,6 +1064,7 @@ with sync_playwright() as playwright:
                         ),
                         repair=repair_versions.get(baseline.removeprefix("official-")),
                         commit=commit,
+                        ft_pair=ft_pair,
                     )
                 if baseline != "original018-cann8.5.1":
                     assert (
