@@ -121,6 +121,19 @@ def check_product_views(page, taxonomy):
     expect(page.locator(".mod-reference[open] #plugin-standard")).to_be_visible()
     page.locator('.mod-reference-links a[href="#mod-test-protocol"]').click()
     expect(page.locator(".mod-reference[open] #mod-test-protocol")).to_be_visible()
+    # Grouping shares a project card without removing constituent MOD anchors.
+    page.goto(f"{base_url}?product=continuum#mooncake", wait_until="domcontentloaded")
+    expect(
+        page.locator("#mooncake-vllm-connectors details[open] #mooncake")
+    ).to_be_visible()
+    assert "product=continuum" not in page.url
+    page.locator("[data-plugin-search]").fill("simllm-migration")
+    expect(page.locator("#pegaflow")).to_have_count(0)
+    page.evaluate("location.hash = 'pegaflow'")
+    expect(
+        page.locator("#pegaflow-vllm-connectors details[open] #pegaflow")
+    ).to_be_visible()
+
     page.goto(f"{base_url}?product=unknown", wait_until="domcontentloaded")
     expect(all_products).to_have_attribute("aria-pressed", "true")
     expect(cards).to_have_count(len(original))

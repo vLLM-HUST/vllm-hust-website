@@ -471,13 +471,23 @@
     if (modelSelect) modelSelect.closest('label').hidden = ['continuum', 'control-plane'].includes(selectedProduct);
   }
 
+  function resetCatalogFilters() {
+    selectedType = 'extensions';
+    selectedPhase = 'all';
+    selectedScenario = 'all';
+    selectedModel = '';
+    search.value = '';
+    if (modelSelect) modelSelect.value = '';
+    if (performanceData && frontierData && window.PluginPerformance) {
+      performanceResults = PluginPerformance.summarize(performanceData, frontierData);
+    }
+  }
+
   document.querySelector('.mod-products').addEventListener('click', event => {
     const button = event.target.closest('[data-product-filter]');
     if (!button || !registry) return;
     selectedProduct = button.dataset.productFilter;
-    selectedType = 'extensions'; selectedPhase = 'all'; selectedScenario = 'all'; selectedModel = ''; search.value = '';
-    if (modelSelect) modelSelect.value = '';
-    if (performanceData && frontierData && window.PluginPerformance) performanceResults = PluginPerformance.summarize(performanceData, frontierData);
+    resetCatalogFilters();
     const url = new URL(location.href);
     if (selectedProduct === 'all') url.searchParams.delete('product'); else url.searchParams.set('product', selectedProduct);
     url.hash = ''; history.replaceState(null, '', url);
@@ -1233,13 +1243,14 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
-  function projectComponentsPanel(items) {
+  function projectComponentsPanel(items, primaryId) {
     if (!Array.isArray(items) || items.length < 2) return null;
     const panel = element("section", "plugin-project-components");
     panel.append(element("span", "plugin-community-label", copy().projectComponents));
     const list = element("div", "plugin-project-component-list");
     items.forEach((component) => {
       const row = element("div", "plugin-project-component");
+      if (component.id !== primaryId) row.id = component.id;
       const heading = element("div", "plugin-project-component-head");
       heading.append(
         element("strong", "", local(component, "name")),
@@ -1707,7 +1718,7 @@ vllm-hust-ext extension check ${extensionId}`
     const repositoryMetrics = community?.querySelector(".plugin-repo-metrics");
     repositoryMetrics?.remove();
     if (community) card.append(community);
-    const projectComponents = projectComponentsPanel(projectItems);
+    const projectComponents = projectComponentsPanel(projectItems, item.id);
     const phases = phaseTags(item);
     if (phases) card.append(phases);
     const scenarios = scenarioTags(item);
@@ -2172,16 +2183,7 @@ vllm-hust-ext extension check ${extensionId}`
       renderDiscoveryNavigation();
       renderCatalog();
       renderBoundaries();
-      const linkedCard = document.getElementById(window.location.hash.slice(1));
-      if (linkedCard && catalog.contains(linkedCard)) {
-        linkedCard.scrollIntoView();
-        const controls = document.querySelector(".plugin-controls");
-        const topBar = document.querySelector(".site-nav");
-        const obstruction = controls && getComputedStyle(controls).position === "sticky"
-          ? controls.getBoundingClientRect().bottom
-          : (topBar?.getBoundingClientRect().bottom || 0);
-        window.scrollBy(0, -obstruction - 12);
-      }
+      revealCatalogAnchor();
     })
     .catch((error) => {
       status.textContent = (language() === "zh" ? "生态目录加载失败：" : "The ecosystem catalog could not be loaded: ") + error.message;
@@ -2227,6 +2229,42 @@ vllm-hust-ext extension check ${extensionId}`
     renderBoundaries();
     renderPortfolio();
   };
+  function revealCatalogAnchor() {
+    if (!registry || !location.hash) return;
+    let id;
+    try {
+      id = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return;
+    }
+    const project = catalogProjects().find(({ items }) => items.some(item => item.id === id));
+    if (!project) return;
+    let target = document.getElementById(id);
+    if (!target || !catalog.contains(target)) {
+      if (!matchesProduct(project.primary)) {
+        selectedProduct = 'all';
+        const url = new URL(location.href);
+        url.searchParams.delete('product');
+        history.replaceState(null, '', url);
+      }
+      resetCatalogFilters();
+      renderFilters();
+      renderDiscoveryNavigation();
+      renderCatalog();
+      target = document.getElementById(id);
+    }
+    if (!target || !catalog.contains(target)) return;
+    const details = target.closest('.plugin-technical-details');
+    if (details) details.open = true;
+    target.scrollIntoView();
+    const controls = document.querySelector(".plugin-controls");
+    const topBar = document.querySelector(".site-nav");
+    const obstruction = controls && getComputedStyle(controls).position === "sticky"
+      ? controls.getBoundingClientRect().bottom
+      : (topBar?.getBoundingClientRect().bottom || 0);
+    window.scrollBy(0, -obstruction - 12);
+  }
+
   function revealReferenceAnchor() {
     const node = document.getElementById(location.hash.slice(1));
     if (!node) return;
@@ -2236,6 +2274,7 @@ vllm-hust-ext extension check ${extensionId}`
     }
     if (expanded) requestAnimationFrame(() => node.scrollIntoView());
   }
+  window.addEventListener('hashchange', revealCatalogAnchor);
   window.addEventListener('hashchange', revealReferenceAnchor);
   window.addEventListener('load', revealReferenceAnchor);
   window.addEventListener("vllm-hust-language-change", renderLanguage);
