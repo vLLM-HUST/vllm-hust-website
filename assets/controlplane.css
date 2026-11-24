@@ -1,5 +1,5 @@
 body[data-page="controlplane"] .engine-hero h1 { font-size:clamp(2.3rem,5.4vw,4.6rem); overflow-wrap:anywhere; }
-#results, #deploy { scroll-margin-top: 96px; }
+#results, #deploy, #native-reference { scroll-margin-top: 96px; }
 .control-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin:24px 0; }
 .control-summary article { background:var(--engine-panel); border:1px solid var(--engine-line); border-radius:12px; padding:20px; }
 .control-summary strong { display:block; font-size:clamp(1.6rem,3vw,2.25rem); margin:8px 0; }

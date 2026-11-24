@@ -11,8 +11,9 @@
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const n = v => Number.isFinite(v) ? v.toFixed(2) : '—';
   const {
-    controllerFixedProfilesPath,controllerComputePath,controllerStreamingPath,controllerC8Path,
-    readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerTimingSupplement
+    controllerFixedProfilesPath,controllerComputePath,controllerNativeComputePath,controllerStreamingPath,controllerC8Path,
+    readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerNativeCompute,
+    controllerNativeComputeDetails,loadControllerTimingSupplement
   }=window.vllmHustControllerEvidence;
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= 1e-8 * Math.max(1, Math.abs(b));
   const modelIntegrationResults = new Map();
@@ -1763,7 +1764,7 @@
       results.set(entry.id,{entry,commit:publication.commit,latency:null,context:null,repeat:null,fixed:null,compute:null,streaming:null,c8:null,utilization:null});
     }
     const r8=results.get('r8');
-    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute,r8.streaming,r8.c8,r8.utilization]=await Promise.all([
+    if(r8)[r8.latency,r8.context,r8.repeat,r8.fixed,r8.compute,r8.nativeCompute,r8.streaming,r8.c8,r8.utilization]=await Promise.all([
       loadControllerLatency(publication,r8.entry).catch(error=>{
         console.warn('Controller latency supplement rejected',error);
         return null;
@@ -1782,6 +1783,10 @@
       }),
       loadControllerCompute(publication,r8.entry).catch(error=>{
         console.warn('Controller service compute supplement rejected',error);
+        return null;
+      }),
+      loadControllerNativeCompute(publication,r8.entry).catch(error=>{
+        console.warn('Controller native compute supplement rejected',error);
         return null;
       }),
       loadControllerTimingSupplement(publication,r8.entry,controllerStreamingPath).catch(error=>{
@@ -1932,7 +1937,7 @@
       panel.innerHTML=heading+`<p>${esc(message)}</p>`;
       return;
     }
-    const {entry,commit,latency,context,repeat,fixed,compute,streaming,c8,utilization}=pair;
+    const {entry,commit,latency,context,repeat,fixed,compute,nativeCompute,streaming,c8,utilization}=pair;
     const profiles=fixed?fixed.profiles.map((row,index)=>({...row,label:entry.profiles[index].label})):entry.profiles;
     const a=entry.result.direct,b=entry.result.request_throttling_controller;
     const roles={B0:t(`B1 ${entry.id} 直连`,`B1 ${entry.id} direct`),B1:controllerName()};
@@ -2059,10 +2064,13 @@
     const context16k=contextRows.find(row=>row.id==='16384'&&throughputRatio(row)!==null)
       ||chartRows.find(row=>row.id==='16384-formal'&&throughputRatio(row)!==null);
     const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
-    const values=['—',peak?n(throughput)+'×':'—',context16k?n(throughputRatio(context16k))+'×':'—',
+    const summaryNames=comparisonSummaryNames();
+    summaryNames[0]=t('参考效率下界','Reference efficiency lower bound');
+    const values=[nativeCompute?'≥'+nativeCompute.arms.controller.efficiency_percent_lower+'%':'—',peak?n(throughput)+'×':'—',context16k?n(throughputRatio(context16k))+'×':'—',
       peak?n(100*(1-1/throughput))+'%':'—'];
     const notes=[
-      compute?t('参考效率待核算 · 服务侧算力见详情','Reference efficiency pending · service compute in details'):t('参考效率待核算','Reference efficiency pending'),
+      nativeCompute?t('经控制器 · MMLU-Pro 200 / out256 · 双卡原生计时','Via controller · MMLU-Pro 200 / out256 · two-card native timing'):
+        t('原生参考效率待核验','Native reference efficiency pending verification'),
       peak?`${peak.label} · ${t('相对同配置引擎直连','Compared with direct access to the same engine')}`:t('暂无配对实测','No paired measurements'),
       context16k?`${context16k.label} · ${t('相对同配置引擎直连','Compared with direct access to the same engine')}`:t('暂无 16K 配对实测','No paired 16K measurements'),
       peak?`${peak.label} · ${t('同费率单位输出 token 加速卡成本估算','Estimated accelerator cost per output token at equal rates')}`:t('暂无配对实测','No paired measurements')
@@ -2170,9 +2178,11 @@
     panel.innerHTML=`${heading}
       <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
       <p class="release-coverage-summary">${fixedPairSummary(rows)}</p>
-      <div class="goal-grid">${comparisonSummaryNames().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${esc(notes[i])}</small></article>`).join('')}</div>
-      ${compute?`<p class="comparison-meta" data-controller-native-efficiency>${t('V2 4.1 尚缺控制面工况的原生双卡计时、完整必要算量和经核验的同工况参考上界。','V2 4.1 for this controller setup still needs native two-card timing, complete necessary work and a verified upper bound for the matched reference.')}
-        <a href="./test-plan.html">${t('V2 核验口径','V2 verification protocol')} ↗</a></p>`:''}
+      <div class="goal-grid">${summaryNames.map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${esc(notes[i])}</small></article>`).join('')}</div>
+      ${nativeCompute?`<p class="comparison-meta" data-controller-native-efficiency>
+        <span>${t('两臂均已证明达到 50%。现有下界不足以证明 90%。','Both paths establish the 50% milestone. The bounds do not establish 90%.')}</span>
+        <button type="button" data-detail="native-compute">${t('直连与限流层原生参考效率','Direct and controller native reference efficiency')} ↗</button></p>`:
+        compute?`<p class="comparison-meta" data-controller-native-efficiency>${t('服务侧矩阵算力见耗时详情。','Service-side matrix compute is available in the timing details.')}</p>`:''}
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
         <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(timeReduction)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
@@ -2191,6 +2201,8 @@
       ${contextSection()}
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
     bindDetails(key=>{
+      if(key==='native-compute'&&nativeCompute)return {title:t('V2 4.1 双卡原生参考效率','V2 4.1 Two-card native reference efficiency'),
+        body:controllerNativeComputeDetails(nativeCompute,commit,t,table)};
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
         `<p>${trajectoryLabel} · ${esc(latestDirect.requests??latestDirect.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(latestDirect.output_tokens)} ${t('输出 token / 组','output tokens per arm')} ${trajectorySource}</p>
         <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${tailDetails()}${engineLatency()}${repeatDetails()}${computeDetails()}`};
@@ -2237,6 +2249,7 @@
         [streaming,controllerStreamingPath,t('SWE Trace Heavy Load 流式补测','SWE Trace Heavy Load streaming pair')],
         [c8,controllerC8Path,t('4K / 16K 闭环并发 8','4K / 16K closed-loop concurrency 8')],
         [context,controllerContextPath,t('三档上下文和四租户','Three context ranges and four tenants')],
+        [nativeCompute,controllerNativeComputePath,t('V2 4.1 双卡原生参考效率','V2 4.1 Two-card native reference efficiency')],
         [compute,controllerComputePath,t('服务侧矩阵算力下界','Service-side matrix compute lower bound')],
         [utilization,controllerUtilizationPath,t('双卡 AI Core 采样区间','Two-card AI Core sampling interval')]
       ].filter(([available])=>available);
