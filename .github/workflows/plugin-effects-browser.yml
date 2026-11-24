@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 005a4b6925e521678e756da2eb6080937facdcc7 # pragma: allowlist secret
+          ref: dc7b2a9b70175a1def11c870070de5feadde6b9e # pragma: allowlist secret
           path: benchmark
           sparse-checkout: |
             website-publication
@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 005a4b6925e521678e756da2eb6080937facdcc7 # pragma: allowlist secret
+          ref: dc7b2a9b70175a1def11c870070de5feadde6b9e # pragma: allowlist secret
           path: .publication-policy
           persist-credentials: false
           sparse-checkout: scripts/build_public_site.py
@@ -46,7 +46,7 @@ jobs:
           python benchmark/scripts/sync_website_publication.py publish --revision "$(git -C benchmark rev-parse HEAD)" --website website
           python .publication-policy/scripts/build_public_site.py \
             --website website --output public-site \
-            --policy-revision 005a4b6925e521678e756da2eb6080937facdcc7
+            --policy-revision dc7b2a9b70175a1def11c870070de5feadde6b9e
           python -m pip install playwright
           python -m playwright install --with-deps chromium
       - name: Verify all visible MOD results, languages, themes and viewports
