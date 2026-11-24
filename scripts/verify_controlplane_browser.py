@@ -104,6 +104,16 @@ def verify(args):
                         if language == "zh"
                         else "Request Throttling Controller | vLLM-HUST"
                     )
+                    github_org = "https://github.com/vLLM-HUST/"
+                    expect(page.locator("#control-guide-link")).to_have_attribute(
+                        "href",
+                        github_org + "ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md",
+                    )
+                    expect(page.locator("#control-protocol-link")).to_have_attribute(
+                        "href",
+                        github_org
+                        + "vllm-hust-benchmark/blob/main/reports/controller-r8-full-coverage-20261122/README.md",
+                    )
                     expect(page.locator("#control-deploy-copy")).to_contain_text(
                         "请求限流控制器"
                         if language == "zh"
