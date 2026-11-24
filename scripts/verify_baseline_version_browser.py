@@ -679,11 +679,13 @@ with sync_playwright() as playwright:
             ]
         }
         release_entries = {entry["id"]: entry for entry in catalog["entries"]}
-        archive = catalog.get("archived_r10")
-        report_entry = archive or release_entries["r10"]
+        r10_archive = catalog.get("archived_r10")
+        report_entry = r10_archive or release_entries["r10"]
         report_query = "?release=r10"
-        if archive:
-            report_query += "&revision=" + archive["stable_evidence"]["pypi_version"]
+        if r10_archive:
+            report_query += (
+                "&revision=" + r10_archive["stable_evidence"]["pypi_version"]
+            )
         expected_baselines = {catalog["baseline"]["id"]} | {
             item["id"] for item in catalog.get("comparison_baselines", [])
         }
@@ -794,7 +796,7 @@ with sync_playwright() as playwright:
                             for name in source["datasets"]
                         )
                     if release == "r10":
-                        if archive:
+                        if r10_archive:
                             assert page.locator("[data-candidate-report]").count() == 0
                         else:
                             verify_candidate_reports(page, report_entry, commit)
@@ -951,7 +953,7 @@ with sync_playwright() as playwright:
                             payload["configuration"]["B1"]["settings"]
                             == release_entries[release]["settings"]
                         )
-                        if archive:
+                        if r10_archive:
                             assert "candidate_reports" not in payload
                         else:
                             assert {
@@ -1110,7 +1112,7 @@ with sync_playwright() as playwright:
         verify_legacy_links(page, catalog)
         verify_stable_default(page, catalog)
         if width == 1366 and scheme == "light":
-            if archive:
+            if r10_archive:
                 base = args.base_url.rstrip("/") + "/b0-b1.html"
                 page.goto(base + report_query)
                 page.locator("[data-candidate-report]").first.wait_for()
