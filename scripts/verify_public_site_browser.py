@@ -4,12 +4,96 @@ import argparse
 import asyncio
 import hashlib
 import json
+import os
 import re
 import shlex
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+from urllib.request import Request, urlopen
 
 from playwright.async_api import async_playwright
+
+
+def release_request(url, accept):
+    request = Request(
+        url,
+        headers={"Accept": accept, "User-Agent": "vllm-hust-public-site-audit"},
+    )
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token:
+        request.add_unredirected_header("Authorization", f"Bearer {token}")
+    return request
+
+
+def read_release_asset(index, url):
+    matches = [
+        asset for asset in index["assets"] if asset["browser_download_url"] == url
+    ]
+    assert len(matches) == 1, f"Missing stable release asset: {url}"
+    asset = matches[0]
+    size = asset["size"]
+    assert 0 < size <= 65536
+    api_url = asset["url"]
+    assert api_url == (
+        "https://api.github.com/repos/vLLM-HUST/vllm-hust-website/releases/assets/"
+        + str(asset["id"])
+    )
+    request = release_request(api_url + "?download=1", "application/octet-stream")
+    with urlopen(request, timeout=30) as response:
+        raw = response.read(size + 1)
+    assert len(raw) == size
+    assert asset["digest"] == "sha256:" + hashlib.sha256(raw).hexdigest()
+    return raw
+
+
+def verify_stable_install_manifest(release):
+    stable = release["stable_evidence"]
+    url = stable["install_manifest_url"]
+    mirror_prefix = "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/"
+    assert url.startswith(mirror_prefix)
+    tag, _, filename = url.removeprefix(mirror_prefix).partition("/")
+    assert re.fullmatch(r"engine-wheels-r[1-9][0-9]*-v[1-9][0-9]*", tag)
+    assert filename and "/" not in filename
+    request = release_request(
+        "https://api.github.com/repos/vLLM-HUST/vllm-hust-website/releases/tags/" + tag,
+        "application/vnd.github+json",
+    )
+    with urlopen(request, timeout=30) as response:
+        index = json.load(response)
+    assert index["tag_name"] == tag
+    lines = read_release_asset(index, url).decode().splitlines()
+    assert "--require-hashes" in lines, "Missing hash requirement"
+    receipt = json.loads(read_release_asset(index, stable["arm64_acceptance_url"]))
+    assert receipt["release"] == release["release"]
+    assert receipt["linux_architecture"] == "aarch64"
+    assert receipt["isolated_venv"] and receipt["serve_dry_run_passed"]
+    assert not receipt["model_started"] and not receipt["npu_initialized"]
+    assert receipt["sdist"]["sha256"] == stable["sdist_sha256"]
+    assert receipt["sdk_sha256"] == stable["sdk_sha256"]
+    assert receipt["sdist"]["filename"] == (
+        f"vllm_hust_engine-{stable['pypi_version']}.tar.gz"
+    )
+    wheel_hashes = receipt["wheel_sha256"]
+    assert len(wheel_hashes) == 3
+    expected = {receipt["sdist"]["filename"]: stable["sdist_sha256"], **wheel_hashes}
+    prefix = stable["install_manifest_url"].rsplit("/", 1)[0] + "/"
+    requirements = [
+        shlex.split(line) for line in lines if line and not line.startswith(("#", "--"))
+    ]
+    observed = {}
+    names = set()
+    for name, operator, url, digest in requirements:
+        filename = unquote(urlsplit(url).path.rsplit("/", 1)[1])
+        assert operator == "@" and url.startswith(prefix)
+        assert filename not in observed and name not in names
+        assert re.fullmatch(r"--hash=sha256:[a-f0-9]{64}", digest)
+        observed[filename] = digest.removeprefix("--hash=sha256:")
+        names.add(name)
+    assert names == {"vllm-hust-engine", "vllm", "vllm-ascend", "vllm-hust-runtime"}
+    assert observed == expected, (
+        "Stable installation files differ from the accepted package"
+    )
+    assert all(name.endswith("-cp312-cp312-linux_aarch64.whl") for name in wheel_hashes)
 
 
 async def verify(args):
@@ -20,6 +104,14 @@ async def verify(args):
         raw = (root / item["website_path"]).read_bytes()
         assert len(raw) == item["bytes"]
         assert hashlib.sha256(raw).hexdigest() == item["sha256"], item["website_path"]
+    catalog_path = "data/engine-release-history-v1.json"
+    assert any(item["website_path"] == catalog_path for item in manifest["files"])
+    catalog = json.loads((root / catalog_path).read_bytes())
+    release = next(
+        row for row in catalog["entries"] if row["id"] == catalog["default_release"]
+    )
+    stable = release["stable_evidence"]
+    verify_stable_install_manifest(release)
     receipts = []
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(executable_path=args.browser)
@@ -93,17 +185,32 @@ async def verify(args):
                                 flag in serve
                                 for flag in ("--model", "--physical-devices")
                             )
+                            assert "--no-deps" not in command
+                            assert "--engine-version" not in install
+                            assert serve[serve.index("--physical-devices") + 1] == (
+                                "$DEEPLINK_PHYSICAL_DEVICES"
+                            )
+                            url = stable["install_manifest_url"]
                             assert (
-                                "--no-deps" not in command
-                                and "wheels/r8.txt" not in command
+                                await page.locator(
+                                    "#engine-install-source"
+                                ).get_attribute("href")
+                                == url
+                            )
+                            assert (
+                                stable["pypi_version"]
+                                in await page.locator(
+                                    "#engine-install-copy"
+                                ).inner_text()
                             )
                             manual = await page.locator(
                                 "#install-runtime details pre"
                             ).text_content()
-                            assert (
-                                "python -m pip install --no-deps -r "
-                                "https://vllm-hust.sage.org.ai/wheels/r8.txt"
-                            ) in manual
+                            pip = shlex.split(manual.splitlines()[0])
+                            assert pip[:4] == ["python", "-m", "pip", "install"]
+                            assert "--no-deps" in pip
+                            assert pip[pip.index("-r") + 1] == url
+                            assert "vllm-hust-engine verify" in manual.splitlines()
                             manifest = root / "wheels/r8.txt"
                             fetched = await page.request.get(
                                 f"{args.url.rstrip('/')}/wheels/r8.txt"

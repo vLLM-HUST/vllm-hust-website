@@ -5,7 +5,7 @@ import copy
 import hashlib
 import json
 import os
-from decimal import ROUND_FLOOR, Decimal
+from decimal import Decimal, ROUND_FLOOR
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -98,8 +98,7 @@ def assert_current_compute_reference(root, entry, lang):
 
 
 def assert_release_control_readable(page, root):
-    contrast = root.locator("#comparison-release-select").evaluate(
-        """select => {
+    contrast = root.locator("#comparison-release-select").evaluate("""select => {
           const luminance = rgb => {
             const channels = rgb.match(/[0-9.]+/g).slice(0,3).map(Number)
               .map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
@@ -109,8 +108,7 @@ def assert_release_control_readable(page, root):
             const css=getComputedStyle(el),a=luminance(css.color),b=luminance(css.backgroundColor);
             return {ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),background:css.backgroundColor};
           });
-        }"""
-    )
+        }""")
     assert all(c["ratio"] >= 4.5 for c in contrast), contrast
     assert all(c["background"] != "rgba(0, 0, 0, 0)" for c in contrast), contrast
     select = root.locator("#comparison-release-select")
@@ -219,6 +217,8 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     menu.select_option("r6")
     expect(panel).to_have_attribute("data-engine-release", "r6")
     expect(panel.locator("#controller-trajectory-result")).to_contain_text("30.06%")
+    expect(panel.locator(".release-coverage-summary")).to_contain_text("0/5")
+    expect(panel.locator(".result-card strong").first).to_have_text("—")
     menu.select_option("r9")
     expect(panel).not_to_have_attribute("data-engine-release", "r8")
     expect(panel).to_contain_text("B1 r9")
@@ -365,9 +365,11 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         f"{100 * (1 - b['elapsed_seconds'] / a['elapsed_seconds']):.2f}%"
     )
     cache = " → ".join(
-        f"{arm['cached_input_percent']:.2f}%"
-        if arm["cached_input_percent"] is not None
-        else "—"
+        (
+            f"{arm['cached_input_percent']:.2f}%"
+            if arm["cached_input_percent"] is not None
+            else "—"
+        )
         for arm in (a, b)
     )
     expect(evidence).to_contain_text(cache)
@@ -412,6 +414,22 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         expect(root.locator("#controller-context-tenant .metric-chart")).to_have_count(
             4
         )
+        context_panel = root.locator("#controller-context-tenant")
+        tenant = context_panel.locator('[data-profile="multi-tenant"]').first
+        expect(tenant).to_contain_text("Terminal-Bench 2.1")
+        context_panel.locator('[data-detail="supplement"]').click()
+        supplement = root.locator("dialog")
+        context_windows = supplement.locator("table").filter(
+            has_text="控制器完成数" if lang == "zh" else "Controller completions"
+        )
+        expect(context_windows.locator("tbody tr")).to_have_count(5)
+        expect(context_windows.locator("tbody tr").last).to_contain_text("240–300")
+        page.keyboard.press("Escape")
+        expect(supplement).not_to_be_visible()
+    if compute:
+        expect(root.locator("[data-controller-native-efficiency]")).to_contain_text(
+            "V2 4.1"
+        )
     if c8:
         for summary in c8["rows"]:
             row = performance.locator(
@@ -433,9 +451,11 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
             row = device_chart.locator(f'[data-profile="{displayed}"]')
             expect(row.locator(".bar-value")).to_have_text(
                 [
-                    f"{pair[side]['mean_percent']:.2f}"
-                    if pair[side]["coverage_complete"]
-                    else "—"
+                    (
+                        f"{pair[side]['mean_percent']:.2f}"
+                        if pair[side]["coverage_complete"]
+                        else "—"
+                    )
                     for side in ("direct", "controller")
                 ]
             )
@@ -446,12 +466,16 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     if compute:
         lower = compute["arms"]["controller"]["target_matrix_tflops_per_card_lower"]
         expect(dialog).to_contain_text(f"≥{int(100 * lower) / 100:.2f}")
+    if streaming:
+        expect(
+            dialog.locator('a[href="./data/controller-r8-streamed-heavy-load-v1.json"]')
+        ).to_have_count(1)
     if latency:
         engine = latency["multi_turn_engine"]
         engine_table = dialog.locator("table").filter(
-            has_text="引擎侧首 token 时延"
-            if lang == "zh"
-            else "Engine time to first token"
+            has_text=(
+                "引擎侧首 token 时延" if lang == "zh" else "Engine time to first token"
+            )
         )
         for index, (metric, divisor) in enumerate(
             (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1))
@@ -489,11 +513,42 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     expect(
         dialog.locator("tbody tr").filter(has_text="SWE Trace Heavy Load")
     ).to_contain_text(f"{1875 * 2e6 / (30 * 86400 * output_rates[1]):.2f}")
+    if context:
+        tenant_phase = next(
+            row for row in context["phases"] if row["id"] == "multi-tenant"
+        )
+        direct, controlled = (
+            tenant_phase[side]["metrics"]["output_tokens_per_second"]
+            for side in ("direct", "controller")
+        )
+        expect(dialog).to_contain_text(f"{100 * (direct / controlled - 1):.3f}%")
     page.keyboard.press("Escape")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     control.select_option("")
     expect(panel).to_have_count(0)
     assert dashboard_layout(page.locator("#five-dataset-comparison")) == layout
+
+
+def assert_terminal_replay_labels(root, lang):
+    replay = (
+        "Terminal-Bench 2.1 离线请求回放 · 并发 8"
+        if lang == "zh"
+        else "Terminal-Bench 2.1 offline request replay · concurrency 8"
+    )
+    label = root.locator('#context-tenant-supplement [data-workload="terminal-replay"]')
+    expect(label).to_contain_text(replay)
+    for band in ("4K–8K", "16K–24K", "32K–48K"):
+        expect(label).to_contain_text(band)
+    for phase in ("4096", "16384", "32768"):
+        labels = root.locator(
+            f'[data-profile="real-context-{phase}-formal"] .chart-workload-label'
+        )
+        expect(labels).to_have_count(4)
+        expect(labels).to_contain_text([replay] * 4)
+    for label in root.locator(
+        '[data-profile="real-context-multi-tenant-formal"] .chart-workload-label'
+    ).all():
+        expect(label).not_to_contain_text(replay)
 
 
 def assert_model_integration(page, root, entry, url, lang):
@@ -972,6 +1027,7 @@ def verify(url, output):
                     extra = published_r8["context_tenant_supplement"]
                     supplement = root.locator("#context-tenant-supplement")
                     expect(supplement).to_have_attribute("data-source-release", "r8")
+                    assert_terminal_replay_labels(root, lang)
                     for row in extra["comparisons"]:
                         for key, divisor in [
                             ("output_tokens_per_second", 1),
@@ -992,9 +1048,11 @@ def verify(url, output):
                                     else (
                                         metrics["ttft_ms"]["mean"]
                                         if key == "mean_ttft_ms"
-                                        else metrics["tpot_ms"]["mean"]
-                                        if key == "mean_tpot_ms"
-                                        else metrics[key]
+                                        else (
+                                            metrics["tpot_ms"]["mean"]
+                                            if key == "mean_tpot_ms"
+                                            else metrics[key]
+                                        )
                                     )
                                     / divisor
                                 )
@@ -1152,6 +1210,8 @@ def verify(url, output):
                         expect(root).to_have_attribute(
                             "data-release", entry["id"], timeout=30000
                         )
+                        if entry["id"] == "r9":
+                            assert_terminal_replay_labels(root, lang)
                         if entry.get("model_integration"):
                             assert dashboard_layout(root) == r8_layout
                             assert_model_integration(page, root, entry, url, lang)

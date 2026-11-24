@@ -327,7 +327,7 @@ def test_catalog_groups_related_components_without_erasing_contracts() -> None:
         )
 
     assert "function catalogProjects()" in SCRIPT
-    assert "function projectComponentsPanel(items)" in SCRIPT
+    assert "function projectComponentsPanel(items, primaryId)" in SCRIPT
     assert "copy().projectComponents" in SCRIPT
     assert "renderCard(project.primary, project.items)" in SCRIPT
     assert "card.dataset.projectComponentCount = String(projectItems.length)" in SCRIPT
@@ -1195,7 +1195,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=catalog-attribution-20261119" in PAGE
-    assert "plugins-page.js?v=catalog-attribution-20261119" in PAGE
+    assert "plugins-page.js?v=catalog-component-links-20261123" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES

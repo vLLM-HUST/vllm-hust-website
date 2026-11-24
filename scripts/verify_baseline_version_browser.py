@@ -1,6 +1,7 @@
 """Check the assembled site's B0/B1 selectors; does not generate measurements."""
 
 import argparse
+from decimal import Decimal, ROUND_DOWN
 import hashlib
 import json
 import os
@@ -202,7 +203,17 @@ def verify_development_priority(page, releases, baselines):
     verify_original()
 
 
-def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
+def verify_full_baseline_details(
+    page,
+    source,
+    label,
+    width,
+    scheme,
+    prefix="",
+    repair=None,
+    commit=None,
+    ft_pair=None,
+):
     """Read the two existing dialogs; do not invent paired goals or grades."""
     expected_tracks = [
         [
@@ -281,6 +292,38 @@ def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
     assert (
         "算量适用性未通过" in text or "Arithmetic applicability is ineligible" in text
     )
+    patch_detail = dialog.locator("[data-b0-kv-prefix-repair]")
+    if repair:
+        assert patch_detail.is_visible()
+        interval = "–".join(
+            f"{float(value):.3f}" for value in repair["tflops_per_card_interval"]
+        )
+        assert interval in patch_detail.inner_text()
+        assert "3 × 200" in patch_detail.inner_text()
+        assert patch_detail.locator(":scope > p > a").get_attribute("href") == (
+            f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
+            "reports/b0-mtp-kv-prefix-repair-v1/README.md"
+        )
+    else:
+        assert patch_detail.count() == 0
+    comparison_detail = dialog.locator("[data-r10-patched-b0-ft]")
+    if ft_pair:
+        pair, b1 = ft_pair
+        assert comparison_detail.is_visible()
+        detail = comparison_detail.inner_text()
+        for values in (
+            b1["tflops_per_card_interval"],
+            pair["B1_over_B0_effective_compute_interval"],
+        ):
+            assert "–".join(f"{float(value):.3f}" for value in values) in detail
+        for arm in (pair["B0"], b1):
+            assert f"{float(arm['T_seconds']):.3f} s" in detail
+        assert comparison_detail.locator("a").get_attribute("href") == (
+            f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
+            "reports/r10-stable-patched-b0-ft-20261123-v1/README.md"
+        )
+    else:
+        assert comparison_detail.count() == 0
     page.screenshot(
         path=str(args.output / f"{prefix}compute-{width}-{scheme}.png"), full_page=True
     )
@@ -302,6 +345,14 @@ def verify_full_baseline_details(page, source, label, width, scheme, prefix=""):
 
 def verify_candidate_reports(page, entry, commit):
     expected_reports = {"native-rms": 21, "contiguous-restore": 28}
+    v2_source = entry.get("candidate_submission_assessment")
+    assessment = None
+    if v2_source:
+        response = page.request.get(args.base_url.rstrip("/") + "/" + v2_source["path"])
+        raw = response.body()
+        assert response.ok and len(raw) == v2_source["bytes"]
+        assert hashlib.sha256(raw).hexdigest() == v2_source["sha256"]
+        assessment = json.loads(raw)
     panels = page.locator("[data-candidate-report]")
     assert panels.count() == len(expected_reports)
     for kind, count in expected_reports.items():
@@ -321,29 +372,63 @@ def verify_candidate_reports(page, entry, commit):
         assert response.ok and len(raw) == source["bytes"]
         assert hashlib.sha256(raw).hexdigest() == source["sha256"]
         report = json.loads(raw)
-        panel.locator("summary").click()
+        panel.locator(":scope > summary").click()
         panel.locator("[data-candidate-metrics][data-state=loaded]").wait_for(
             timeout=20000
         )
         assert "672" in panel.inner_text()
-        assert panel.locator("table").first.locator("tbody tr").count() == count
-        assert panel.locator("table").last.locator("tbody tr").count() == 4
+        tables = panel.locator("[data-candidate-metrics] table")
+        assert tables.first.locator("tbody tr").count() == count
+        assert tables.last.locator("tbody tr").count() == 4
         assert set(
-            panel.locator("table")
-            .first.locator("tbody tr td:last-child")
-            .all_text_contents()
+            tables.first.locator("tbody tr td:last-child").all_text_contents()
         ) == {
             arm["source_seal_sha256"]
             for arms in report["measurements"].values()
             for arm in arms.values()
         }
+        if assessment:
+            verify_candidate_v2(panel, assessment["candidates"][kind], report)
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
-        panel.locator("summary").click()
+        panel.locator(":scope > summary").click()
     history = page.locator("#rms-revision")
     history.locator("summary").click()
     history.locator(".rms-revision-metrics[data-state=loaded]").wait_for(timeout=20000)
     assert history.locator("tbody tr").count() == 12
     history.locator("summary").click()
+
+
+def verify_candidate_v2(panel, record, report):
+    v2 = panel.locator("[data-candidate-v2][data-state=loaded]")
+    v2.wait_for(timeout=20000)
+    targets = record["targets"]
+    assert record["selection"]["release"] == report["release"]
+    pass_text = ("达成", "未达成") if args.language == "zh" else ("Met", "Not met")
+    rows = v2.locator("table").first.locator("tbody tr").all()
+    assert len(rows) == 4
+    for index, row in enumerate(rows, 1):
+        assert row.locator("td").all_text_contents() == [
+            pass_text[not targets[f"4.{index}"][gate]["met"]]
+            for gate in ("milestone", "final")
+        ]
+    text = v2.inner_text()
+    assert record["selection"]["release"] in text
+    assert "MMLU-Pro 200 / out256" in text
+    assert "Terminal-Bench 2.1" in text and "C24" in text
+    assert f"{float(targets['4.1']['efficiency_lower_percent']['B1']):.2f}%" in text
+    assert targets["4.1"]["native"]["native_seals"]["B1"] in text
+    assert (
+        f"{float(targets['4.4']['four_tenant']['unit_cost_reduction_percent']):.2f}%"
+        in text
+    )
+    assert set(
+        v2.locator("a").evaluate_all("(nodes) => nodes.map(node => node.href)")
+    ) >= {source["url"] for source in record["sources"].values()}
+    seal = v2.locator("details")
+    seal.locator("summary").click()
+    assert targets["4.3"]["paired"]["arm_seals"]["B1"] in seal.inner_text()
+    for task in targets["4.3"]["baseline_context"]["workload"]["task_ids"]:
+        assert task in seal.inner_text()
 
 
 def verify_candidate_checksum(page):
@@ -357,9 +442,33 @@ def verify_candidate_checksum(page):
     )
     page.goto(base + "?release=r10")
     panel = page.locator("[data-candidate-report='native-rms']")
-    panel.locator("summary").click()
+    panel.locator(":scope > summary").click()
     panel.locator("[data-candidate-metrics][data-state=unavailable]").wait_for()
     assert panel.locator("tbody tr").count() == 0
+    page.unroute(pattern)
+
+
+def verify_candidate_v2_checksum(page, entry):
+    source = entry.get("candidate_submission_assessment")
+    if not source:
+        return
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    pattern = "**/" + source["path"]
+    page.route(
+        pattern,
+        lambda route: route.fulfill(
+            status=200, content_type="application/json", body="{}"
+        ),
+    )
+    page.goto(base + "?release=" + entry["id"])
+    if entry.get("stable_evidence"):
+        page.locator("#submission-v2 [data-stable-assessment-unavailable]").wait_for()
+        assert page.locator("#submission-v2 tbody tr").count() == 0
+    panel = page.locator("[data-candidate-report='native-rms']")
+    panel.locator(":scope > summary").click()
+    panel.locator("[data-candidate-v2][data-state=unavailable]").wait_for()
+    assert panel.locator("[data-candidate-v2] tbody tr").count() == 0
+    panel.locator("[data-candidate-metrics][data-state=loaded]").wait_for()
     page.unroute(pattern)
 
 
@@ -386,6 +495,52 @@ def verify_archived_cards_checksum(page, archived_record):
     assert row["baselineObservation"]["physical_cards"] is None
     assert "baselineCardMapping" not in row
     page.unroute(pattern)
+
+
+def verify_stable_default(page, catalog):
+    entry = next(
+        row for row in catalog["entries"] if row["id"] == catalog["default_release"]
+    )
+    stable = entry.get("stable_evidence")
+    if stable is None:
+        return
+    base = args.base_url.rstrip("/")
+    page.goto(base + "/b0-b1.html")
+    page.locator("#submission-v2").wait_for()
+    assert page.locator("#comparison-release-select").input_value() == entry["id"]
+    assert (
+        page.locator("#comparison-baseline-select").input_value()
+        == catalog["baseline"]["id"]
+    )
+    response = page.request.get(
+        base + "/" + entry["candidate_submission_assessment"]["path"]
+    )
+    assert response.ok
+    record = response.json()["candidates"][stable["kind"]]
+    block = page.locator("#submission-v2")
+    assert stable["measured_release"] in block.inner_text()
+    assert (
+        block.get_by_role(
+            "link", name="PyPI " + stable["pypi_version"], exact=False
+        ).get_attribute("href")
+        == stable["pypi_url"]
+    )
+    words = ("达成", "未达成") if args.language == "zh" else ("Met", "Not met")
+    for index, row in enumerate(
+        block.locator("table").first.locator("tbody tr").all(), 1
+    ):
+        assert row.locator("td").all_text_contents() == [
+            words[not record["targets"][f"4.{index}"][gate]["met"]]
+            for gate in ("milestone", "final")
+        ]
+    assert "Terminal-Bench 2.1" in block.inner_text()
+    expected = Decimal(record["targets"]["4.1"]["efficiency_lower_percent"]["B1"])
+    lower = expected.quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    assert (
+        page.locator(".goal-grid article").first.locator("strong").inner_text()
+        == f"≥{lower}%"
+    )
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
 
 
 def verify_legacy_links(page, catalog):
@@ -463,6 +618,42 @@ with sync_playwright() as playwright:
             args.base_url.rstrip("/") + "/data/benchmark-source-manifest.json"
         ).json()
         commit = publication["commit"]
+        repair_source = next(
+            (
+                file
+                for file in publication["files"]
+                if file["website_path"] == "data/b0-mtp-kv-prefix-repair-v1/report.json"
+            ),
+            None,
+        )
+        repair_versions = {}
+        if repair_source:
+            repair_report = read_descriptor(
+                {**repair_source, "path": repair_source["website_path"]}
+            )
+            assert repair_report["scope"] == "patched-variants-only"
+            repair_versions = repair_report["versions"]
+            assert set(repair_versions) == {"0.23.0", "0.30.0"}
+        ft_source = next(
+            (
+                file
+                for file in publication["files"]
+                if file["website_path"]
+                == "data/r10-stable-patched-b0-ft-20261123-v1/report.json"
+            ),
+            None,
+        )
+        formal_ft = (
+            read_descriptor({**ft_source, "path": ft_source["website_path"]})
+            if ft_source
+            else None
+        )
+        if formal_ft:
+            assert set(formal_ft["pairs"]) == {"0.23.0", "0.30.0"}
+            assert all(
+                pair["B1_native_seal_sha256"] == formal_ft["B1"]["native_seal_sha256"]
+                for pair in formal_ft["pairs"].values()
+            )
         source = next(
             file
             for file in publication["files"]
@@ -649,7 +840,12 @@ with sync_playwright() as playwright:
                 if check_candidate or check_baseline:
                     if (
                         check_baseline
-                        and baseline in ("official-0.23.0", "official-0.30.0")
+                        and baseline
+                        in (
+                            "official-0.23.0",
+                            "official-0.30.0",
+                            "candidate-0.28.0rc1-source",
+                        )
                         and release == "r10"
                     ):
                         payload = download_selection(page)
@@ -659,6 +855,21 @@ with sync_playwright() as playwright:
                         baseline,
                         release,
                     )
+                    published_pair = (
+                        formal_ft["pairs"].get(baseline.removeprefix("official-"))
+                        if formal_ft and release == "r10"
+                        else None
+                    )
+                    if published_pair:
+                        assert payload["native_fixed200_ft"] == {
+                            **published_pair,
+                            "B1": formal_ft["B1"],
+                            "protocol": formal_ft["protocol"],
+                            "report": f"https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/{commit}/"
+                            "reports/r10-stable-patched-b0-ft-20261123-v1/README.md",
+                        }
+                    else:
+                        assert "native_fixed200_ft" not in payload
                 if payload and expected_context_workloads:
                     assert {
                         role: source
@@ -808,7 +1019,12 @@ with sync_playwright() as playwright:
                                 == "continuous-synthetic"
                             )
                 if (
-                    baseline in ("official-0.23.0", "official-0.30.0")
+                    baseline
+                    in (
+                        "official-0.23.0",
+                        "official-0.30.0",
+                        "candidate-0.28.0rc1-source",
+                    )
                     and release == "r10"
                 ):
                     descriptor = next(
@@ -825,13 +1041,30 @@ with sync_playwright() as playwright:
                             assert dialog.locator("table").count() >= 1
                         page.keyboard.press("Escape")
                     assert len(set(titles)) == len(titles)
+                    ft_version = baseline.removeprefix("official-")
+                    ft_pair = (
+                        (formal_ft["pairs"][ft_version], formal_ft["B1"])
+                        if formal_ft and ft_version in formal_ft["pairs"]
+                        else None
+                    )
                     verify_full_baseline_details(
                         page,
                         independent_baselines[baseline],
-                        descriptor["label"],
+                        descriptor.get("label_en", descriptor["label"])
+                        if args.language == "en"
+                        else descriptor["label"],
                         width,
                         scheme,
-                        prefix="official030-" if baseline == "official-0.30.0" else "",
+                        prefix=(
+                            "official030-"
+                            if baseline == "official-0.30.0"
+                            else "candidate028-"
+                            if baseline == "candidate-0.28.0rc1-source"
+                            else ""
+                        ),
+                        repair=repair_versions.get(baseline.removeprefix("official-")),
+                        commit=commit,
+                        ft_pair=ft_pair,
                     )
                 if baseline != "original018-cann8.5.1":
                     assert (
@@ -852,8 +1085,10 @@ with sync_playwright() as playwright:
         observe_exports(page)
         verify_development_priority(page, releases, baselines)
         verify_legacy_links(page, catalog)
+        verify_stable_default(page, catalog)
         if width == 1366 and scheme == "light":
             verify_candidate_checksum(page)
+            verify_candidate_v2_checksum(page, release_entries["r10"])
             verify_archived_cards_checksum(
                 page, next(iter(archived_card_mappings.values()))
             )

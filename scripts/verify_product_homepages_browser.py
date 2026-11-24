@@ -121,10 +121,14 @@ def verify_publications(page, product, language):
 
 
 def verify_engine_mod_creators(page, language):
-    """The release shortcut reveals named creators without mixing in advisors."""
-    page.locator("#engine-mod-badge-link").focus()
-    page.keyboard.press("Enter")
+    """The historical r8 MOD table retains its verified creators."""
+    expect(page.locator("#engine-mod-badge-link")).to_have_attribute(
+        "href", "./b0-b1.html?release=r10"
+    )
     table = page.locator("#r8-mods .r8-mod-table")
+    disclosure = page.locator(".engine-fold").filter(has=table)
+    disclosure.locator(":scope > summary").focus()
+    page.keyboard.press("Enter")
     expect(table).to_be_visible()
     expect(table.locator("caption")).to_have_text(
         "r8 已包含的 MOD 与制作者"
@@ -153,7 +157,6 @@ def verify_engine_mod_creators(page, language):
         expect(creator).to_have_attribute("href", f"https://github.com/{login}")
         assert creator.evaluate(CONTRAST) >= 4.5, identifier
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
-    disclosure = page.locator(".engine-fold").filter(has=table)
     disclosure.locator(":scope > summary").focus()
     page.keyboard.press("Enter")
     expect(table).not_to_be_visible()
@@ -964,31 +967,41 @@ def main():
                         in install
                     )
                     assert (
-                        "--model /models/Qwen3.5-35B-A3B --physical-devices 0,7"
+                        '--model /models/Qwen3.5-35B-A3B --physical-devices "$DEEPLINK_PHYSICAL_DEVICES"'
                         in install
                     )
-                    assert "--no-deps" not in install and "wheels/r8.txt" not in install
+                    assert (
+                        "--no-deps" not in install and "requirements.txt" not in install
+                    )
+                    manifest_url = (
+                        "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/"
+                        "engine-wheels-r10-v1/r10-pip-requirements.txt"
+                    )
                     expect(page.locator("#engine-install-source")).to_have_attribute(
-                        "href", "https://vllm-hust.sage.org.ai/wheels/r8.txt"
+                        "href", manifest_url
+                    )
+                    expect(page.locator("#engine-install-copy")).to_contain_text(
+                        "2026.11.21.10"
                     )
                     expect(page.locator("#engine-install-source")).to_contain_text(
-                        "历史 r8" if language == "zh" else "Historical r8"
+                        "r10 哈希锁定" if language == "zh" else "r10 hash-locked"
                     )
                     manual = page.locator("#install-runtime details pre").text_content()
                     assert (
-                        "python -m pip install --no-deps -r https://vllm-hust.sage.org.ai/wheels/r8.txt"
+                        "python -m pip install --no-cache-dir --force-reinstall --no-deps -r "
+                        + manifest_url
                         in manual
                     )
-                    assert (
-                        "python -m pip uninstall vllm vllm-ascend vllm-hust-runtime"
-                        in manual
+                    assert "vllm-hust-engine verify" in manual
+                    expect(page.locator(".engine-profile-top strong")).to_have_text(
+                        "B1 r10"
                     )
                     expect(
                         page.locator(".engine-profile .diagram-caption")
                     ).to_contain_text(
-                        "历史配置示例"
+                        "默认稳定版配置"
                         if language == "zh"
-                        else "Historical configuration",
+                        else "Default stable configuration",
                         use_inner_text=True,
                     )
                     expect(page.locator("#engine-try-title")).to_have_text(

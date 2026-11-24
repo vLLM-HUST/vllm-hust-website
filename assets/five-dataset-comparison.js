@@ -10,9 +10,14 @@
   const t = (zh, en) => window.vllmHustSite.getCurrentLang() === 'zh' ? zh : en;
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const n = v => Number.isFinite(v) ? v.toFixed(2) : '—';
+  const {
+    controllerFixedProfilesPath,controllerComputePath,controllerStreamingPath,controllerC8Path,
+    readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerTimingSupplement
+  }=window.vllmHustControllerEvidence;
   const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= 1e-8 * Math.max(1, Math.abs(b));
   const modelIntegrationResults = new Map();
   const submissionAssessments = new Map();
+  const stableAssessments = new Map();
   const table = (heads, rows) => `<div class="focus-table" tabindex="0" role="region" aria-label="${esc(heads.join(' / '))}"><table><thead><tr>${heads.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map((v,i)=>`<${i?'td':'th scope="row"'}>${esc(v)}</${i?'td':'th'}>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const required = ['3.4.1','3.4.2','3.4.3','3.4.4'];
   const names = () => t(['有效算力','吞吐与时延','上下文稳定性','成本与利用率'], ['Effective compute','Throughput and latency','Context stability','Cost and utilization']);
@@ -366,6 +371,64 @@
   readComparisonLocation();
   let comparisonBaselines = [];
   const baselineObservations = new Map();
+  const b0RepairReportPath='data/b0-mtp-kv-prefix-repair-v1/report.json';
+  const r10PatchedFtPath='data/r10-stable-patched-b0-ft-20261123-v1/report.json';
+  let b0RepairReport;
+  let r10PatchedFt;
+  async function loadPatchedEvidence(publication,path) {
+    const matches=publication.files.filter(row=>row.website_path===path);
+    if(!matches.length)return;
+    if(matches.length!==1)throw Error('Ambiguous patched B0 evidence');
+    const response=await fetch('./'+path,{cache:'no-cache'});
+    if(!response.ok)throw Error('Patched B0 evidence unavailable');
+    const raw=await response.arrayBuffer();
+    const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',raw)),byte=>byte.toString(16).padStart(2,'0')).join('');
+    if(digest!==matches[0].sha256||raw.byteLength!==matches[0].bytes)throw Error('Patched B0 evidence checksum mismatch');
+    return JSON.parse(new TextDecoder().decode(raw));
+  }
+  async function loadB0RepairReport(publication) {
+    const report=await loadPatchedEvidence(publication,b0RepairReportPath);
+    if(!report)return;
+    if(report.schema!=='deeplinkengine-mtp-selected-kv-prefix-repair/v1'||report.scope!=='patched-variants-only'||
+       report.model!=='Qwen3.5-35B-A3B'||report.tensor_parallel_size!==2||report.accelerator!=='Ascend 910B2'||
+       !report.versions||!report.workload)throw Error('B0 patch retest identity mismatch');
+    return report;
+  }
+  async function loadR10PatchedFt(publication) {
+    const report=await loadPatchedEvidence(publication,r10PatchedFtPath);
+    if(!report)return;
+    const protocol=report.protocol, current=report.B1;
+    const previous=publication.files.find(row=>row.website_path===b0RepairReportPath);
+    const positive=value=>typeof value==='string'&&Number.isFinite(Number(value))&&Number(value)>0;
+    const validInterval=values=>Array.isArray(values)&&values.length===2&&
+      values.every(positive)&&Number(values[0])<=Number(values[1]);
+    if(!b0RepairReport||report.schema!=='vllm-hust-r10-stable-patched-b0-ft/v1'||
+       report.previous_b0_public_report_sha256!==previous?.sha256||protocol?.model!=='Qwen3.5-35B-A3B'||
+       protocol?.tensor_parallel_size!==2||protocol?.native_formal_repetitions!==3||
+       protocol?.native_formal_requests_per_repetition!==200||current?.release!=='full-answer-b1-20261121-r10'||
+       current?.package_version!=='2026.11.21.10'||!/^[a-f0-9]{64}$/.test(current?.native_seal_sha256||'')||
+       !validInterval(current.tflops_per_card_interval)||!positive(current.T_seconds)||
+       !report.pairs||Object.keys(report.pairs).length!==2)throw Error('R10 patched B0 comparison identity mismatch');
+    for(const version of ['0.23.0','0.30.0']){
+      const pair=report.pairs[version], previousB0=b0RepairReport.versions[version];
+      if(!previousB0||pair?.B1_native_seal_sha256!==current.native_seal_sha256||
+         pair?.B0?.source_variant!=='selected-kv-prefix-repair'||pair.B0.version!==version||
+         pair.B0.upstream_image_manifest!==previousB0.upstream_image_manifest||
+         pair.B0.native_seal_sha256!==previousB0.repaired_native_seal_sha256||
+         pair.B0.T_seconds!==previousB0.T_seconds||
+         !validInterval(pair.B0.tflops_per_card_interval)||
+         !pair.B0.tflops_per_card_interval.every((rate,index)=>rate===previousB0.tflops_per_card_interval[index])||
+         !validInterval(pair.B1_over_B0_effective_compute_interval))throw Error('Patched B0 pair identity mismatch');
+    }
+    return report;
+  }
+  function b0RepairResult(baseline) {
+    const version=baseline.id.match(/^official-(0\.23\.0|0\.30\.0)$/)?.[1];
+    const result=b0RepairReport?.versions[version];
+    if(result?.upstream_image_manifest!==baseline.image_digest||
+       result?.original_release_ft_eligible!==false)return;
+    return result;
+  }
   let baselineCardMappings = new Map();
   const baselineCardPath = 'data/b0-archived-card-provenance-v1.json';
   let contextWorkloads = new Map();
@@ -527,6 +590,12 @@
           else if(['partial','published'].includes(item.status))throw Error('Missing B0 observations');
         }
       }
+      b0RepairReport=await loadB0RepairReport(publication).catch(error=>{
+        console.warn('B0 patch retest rejected',error);
+      });
+      r10PatchedFt=await loadR10PatchedFt(publication).catch(error=>{
+        console.warn('R10 patched B0 comparison rejected',error);
+      });
       baselineCardMappings=await loadArchivedBaselineCards(publication).catch(error=>{
         console.warn('Archived B0 card provenance rejected',error);
         return new Map();
@@ -548,6 +617,9 @@
         await validateVersionComputeReference(entry, publication);
         await validateModelIntegration(entry, publication);
         await loadSubmissionAssessment(entry, publication);
+        if(entry.stable_evidence)await loadStableAssessment(entry, publication, baseline.id).catch(error=>{
+          console.warn('Stable release V2 evidence rejected',error);
+        });
       }
       if(value.entries.find(row=>row.id==='r5').measurements.length) throw Error('r5 has no formal inference');
       if (!Array.isArray(value.attempt_order) || new Set(value.attempt_order).size!==value.attempt_order.length || value.attempt_order.some(id=>!/^r[1-9][0-9]*$/.test(id)||value.order.includes(id)) || value.attempts?.length!==value.attempt_order.length) throw Error('Invalid early-attempt catalog');
@@ -992,21 +1064,34 @@
     return phase.tenants>1?t(`${phase.tenants}租户 / C${phase.concurrency}`,`${phase.tenants} tenants / C${phase.concurrency}`):
       `${cohort.min_tokens/1024}K–${cohort.max_tokens_exclusive/1024}K / C${phase.concurrency}`;
   }
+  function isTerminalReplayC8(workload, row) {
+    return workload?.datasets.length===1&&workload.datasets[0]==='Terminal-Bench 2.1'
+      &&row.B1.tenants===1&&row.B1.concurrency===8;
+  }
   function versionSupplementRows(entry) {
     const a=entry.context_tenant_supplement;
-    if(!a)return [];
-    return a.comparisons.map(row=>{
+    const stable=stableAssessments.get(entry.id)?.targets['4.3'];
+    if(!a&&!stable)return [];
+    const workload=stable?.baseline_context.workload||sealedContextWorkload(a.protocol.input_sha256);
+    const rows=stable?.paired.comparison||a.comparisons;
+    return rows.map(row=>{
       const arms=Object.fromEntries(['B0','B1'].map(role=>{
         const m=row[role].metrics;
         return [role,{...m,mean_ttft_ms:m.ttft_ms.mean,mean_tpot_ms:m.tpot_ms.mean,
-          physical_cards:row[role].physical_cards??a.physical_cards,source_seal_sha256:a.arm_seals[role],
+          physical_cards:stable?.physical_cards[role]??row[role].physical_cards??a.physical_cards,
+          source_seal_sha256:(stable?.paired||a).arm_seals[role],
           relative_cost_per_token:row.B0.metrics.output_tokens_per_second/m.output_tokens_per_second}];
       }));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
-      const cards=cardComparison(row.B0.physical_cards,row.B1.physical_cards);
-      return {id:'real-context-'+row.phase,label:supplementLabel(a,row),arms,changes_percent,...cards,
-              workloadKind:'fixed-data-context',workloadSource:sealedContextWorkload(a.protocol?.input_sha256),
-              workloadLabel:[contextWorkloadLabel(a),cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
+      const cards=cardComparison(row.B0.physical_cards??stable?.physical_cards.B0,row.B1.physical_cards??stable?.physical_cards.B1);
+      const phase=row.B1;
+      const label=stable?(phase.tenants>1?t('4K / 四租户 C24','4K / four tenants C24'):
+        `${Number(phase.cohort)/1024}K / C${phase.concurrency}`):supplementLabel(a,row);
+      const dataset=stable?workload.datasets.join(' · '):contextWorkloadLabel(a);
+      const replay=isTerminalReplayC8(workload,row)?terminalReplayWorkloadLabel():dataset;
+      return {id:'real-context-'+row.phase,label,arms,changes_percent,...cards,
+              workloadKind:'fixed-data-context',workloadSource:workload,
+              workloadLabel:[replay,cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
     });
   }
   async function loadSubmissionAssessment(entry, publication) {
@@ -1107,6 +1192,19 @@
     </details>`;
   }
   function v2Assessment(entry, rows) {
+    const stable=stableAssessments.get(entry.id);
+    if(stable){
+      const release=entry.stable_evidence;
+      return `<section class="submission-assessment" id="submission-v2">
+        <div class="section-heading"><h2>${t('送测 V2 判定','Submission V2 assessment')}</h2></div>
+        <p><a href="${esc(release.pypi_url)}">PyPI ${esc(release.pypi_version)} ↗</a> ·
+        <a href="${esc(release.install_manifest_url)}">${t('安装清单','Installation manifest')} ↗</a> ·
+        <a href="${esc(release.arm64_acceptance_url)}">${t('ARM64 安装验收','ARM64 installation acceptance')} ↗</a></p>
+        ${candidateAssessment(stable.item,stable.report,stable.value,{rentalDisclosure:true})}</section>`;
+    }
+    if(entry.stable_evidence)return `<section class="submission-assessment" id="submission-v2">
+      <h2>${t('送测 V2 判定','Submission V2 assessment')}</h2>
+      <p data-stable-assessment-unavailable>${t('稳定版 V2 封存证据未通过读取校验。','Stable V2 evidence could not be verified.')}</p></section>`;
     const status=(met,evidence)=>[met?t('达成目标','Target met'):t('未达成目标','Target not met'),evidence].join(' · ');
     const missing=reason=>status(false,reason);
     const assessment=submissionAssessments.get(entry.id);
@@ -1199,6 +1297,18 @@
       ])));
   }
   function versionSupplement(entry, rows, values, control) {
+    const stable=stableAssessments.get(entry.id);
+    if(stable){
+      const cost=stable.targets['4.4'].four_tenant;
+      const cards=stable.targets['4.3'].physical_cards;
+      return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"${cardComparisonAttribute(cardComparison(cards.B0,cards.B1))}>
+        <div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2>
+        <button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
+        <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div>
+        <div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(Number(cost.unit_cost_reduction_percent))}%</strong></div>
+        <div><span>${t('四租户 AI Core 利用率','Four-tenant AI Core utilization')}</span><strong>${n(cost.utilization.B0.mean_percent)} → ${n(cost.utilization.B1.mean_percent)}%</strong></div></div>
+        ${candidateAssessment(stable.item,stable.report,stable.value,{target:'4.3'})}</section>`;
+    }
     const a=entry.context_tenant_supplement;
     const baselineContext=control==='B0'&&/^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext():'';
     if(!a){
@@ -1208,11 +1318,17 @@
     }
     const tenant=a.comparisons.find(row=>row.B1.tenants>1);
     const cards=cardComparison(tenant?.B0.physical_cards,tenant?.B1.physical_cards);
+    const workload=sealedContextWorkload(a.protocol.input_sha256);
+    const replayBands=a.comparisons.filter(row=>isTerminalReplayC8(workload,row))
+      .map(row=>supplementLabel(a,row).replace(' / C8',''));
+    const replayLabel=replayBands.length
+      ? `<div class="supplement-workload-label" data-workload="terminal-replay" role="note"><strong>${esc(replayBands.join(' · '))}</strong><span>${terminalReplayWorkloadLabel()}</span></div>`
+      : '';
     return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}"${cardComparisonAttribute(cards)}><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
       <p>${esc(a.report_date)} · ${esc(contextWorkloadLabel(a))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
       ${cards.cardLabel?`<p>${esc(cardComparisonLabel(cards))}</p>`:''}
       <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant?.equal_rate_same_card_count_unit_cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant?.B0.utilization.mean_percent)} → ${n(tenant?.B1.utilization.mean_percent)}%</strong></div></div>
-      <figure><div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(contextWorkloadLabel(a))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure></section>`;
+      <figure>${replayLabel}<div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(contextWorkloadLabel(a))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure></section>`;
   }
   function versionSupplementDetails(entry, contextRows) {
     const a=entry.context_tenant_supplement;
@@ -1259,8 +1375,9 @@
   }
   function assertFormalBaselineIsolation(entry, rows) {
     if(entry.baseline_id!==releaseCatalog.baseline.id)throw Error('Formal comparison lost fixed B0 identity');
+    const context=stableAssessments.get(entry.id)?.targets['4.3'].paired.comparison||entry.context_tenant_supplement?.comparisons||[];
     const ids=[...entry.measurements.map(row=>row.id),
-      ...(entry.context_tenant_supplement?.comparisons||[]).map(row=>'real-context-'+row.phase),
+      ...context.map(row=>'real-context-'+row.phase),
       ...(entry.id==='r8'&&currentR8?['4096-formal','16384-formal']:[])];
     const permitted=new Set(standardRows(ids.map(id=>({id,sourceRecord:true}))).filter(row=>row.sourceRecord).map(row=>row.id));
     if(rows.some(row=>row.arms&&!permitted.has(row.id)))throw Error('Development data cannot enter formal B0/B1 charts');
@@ -1303,12 +1420,12 @@
   }
   const rmsReport='reports/r10-native-rms-20261121/';
   const rmsDescriptor=(entry,file)=>entry.sources.find(source=>source.url.endsWith('/'+rmsReport+file));
-  async function fetchBenchmarkReport(descriptor, websitePath) {
-    const prefix='https://github.com/'+releasePublication.repository+'/blob/main/';
+  async function fetchBenchmarkReport(descriptor, websitePath, publication=releasePublication) {
+    const prefix='https://github.com/'+publication.repository+'/blob/main/';
     if(descriptor.url!==prefix+websitePath.replace(/^data\//,'reports/')){
       throw Error('Unreviewed benchmark report source');
     }
-    const binding=releasePublication.files.filter(file=>file.website_path===websitePath);
+    const binding=publication.files.filter(file=>file.website_path===websitePath);
     if(binding.length!==1||binding[0].bytes!==descriptor.bytes||binding[0].sha256!==descriptor.sha256){
       throw Error('Unbound candidate report');
     }
@@ -1333,16 +1450,159 @@
     });
   }
 
+  async function loadCandidateAssessment(entry, publication=releasePublication, baseline=releaseCatalog.baseline.id) {
+    const asset=entry.candidate_submission_assessment;
+    const bindings=publication.files.filter(file=>file.website_path===asset.path);
+    if(!/^data\/[a-z0-9-]+\.json$/.test(asset.path)||bindings.length!==1||
+       bindings[0].sha256!==asset.sha256||bindings[0].bytes!==asset.bytes){
+      throw Error('Unbound candidate submission assessment');
+    }
+    const response=await fetch('./'+asset.path,{cache:'no-cache',signal:AbortSignal.timeout(12000)});
+    const value=await readPublishedJson(publication,asset.path,response);
+    if(value.schema!=='vllm-hust-candidate-v2-assessment/v1'||value.release_family!==entry.id||
+       value.baseline_id!==baseline||!/^[a-f0-9]{40}$/.test(value.engine_revision)){
+      throw Error('Candidate assessment identity mismatch');
+    }
+    return value;
+  }
+
+  async function loadStableAssessment(entry, publication, baseline) {
+    const stable=entry.stable_evidence;
+    const item=candidateReports(entry).find(candidate=>candidate.kind===stable.kind);
+    const sha=value=>/^[a-f0-9]{64}$/.test(value||'');
+    const wheels='https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-'+entry.id+'-v1/';
+    if(!item||entry.publication_status!=='stable'||stable.measured_release!==entry.release+'-'+stable.kind||
+       !/^[a-f0-9]{40}$/.test(stable.engine_commit)||
+       !['sdist_sha256','sdk_sha256','runtime_overlay_sha256','installed_files_canonical_sha256'].every(key=>sha(stable[key]))||
+       !/^\d{4}\.\d{1,2}\.\d{1,2}\.\d+$/.test(stable.pypi_version)||
+       stable.pypi_url!=='https://pypi.org/project/vllm-hust-engine/'+stable.pypi_version+'/'||
+       stable.install_manifest_url!==wheels+entry.id+'-pip-requirements.txt'||
+       stable.arm64_acceptance_url!==wheels+'arm64-clean-install.json'){
+      throw Error('Invalid stable release evidence lock');
+    }
+    const [report,value]=await Promise.all([
+      fetchBenchmarkReport(item.summary,item.websitePath,publication),
+      loadCandidateAssessment(entry,publication,baseline)
+    ]);
+    const record=value.candidates?.[item.kind];
+    if(report.schema!=='vllm-hust-r10-full-fixed-five-evidence/v1'||report.release!==stable.measured_release||
+       report.baseline_id!==baseline||record?.targets?.['4.3']?.candidate_runtime?.runtime_overlay_sha256!==stable.runtime_overlay_sha256||
+       entry.measurements.length!==Object.keys(report.measurements).length||
+       !entry.measurements.every(row=>row.arms.every((arm,index)=>{
+         const expected=report.measurements[row.id]?.[index===0?'B0':'candidate'];
+         return expected&&Object.entries(expected).every(([key,expectedValue])=>key==='role'||
+           JSON.stringify(arm[key])===JSON.stringify(expectedValue));
+       }))){
+      throw Error('Stable release measurements do not match the sealed trial');
+    }
+    candidateAssessment(item,report,value);
+    stableAssessments.set(entry.id,{item,report,value,targets:record.targets});
+  }
+
+  function candidateAssessment(item, report, value, {target,rentalDisclosure=false}={}) {
+    const record=value.candidates?.[item.kind], goals=['4.1','4.2','4.3','4.4'];
+    const targets=record?.targets;
+    const sha=hash=>/^[a-f0-9]{64}$/.test(hash||'');
+    const prefix='https://github.com/DeepLinkNext/DeepLinkEngine/blob/'+value.engine_revision+'/evidence/';
+    const sources=['compute_audit','original_evidence_audit','context_audit'].map(key=>record?.sources?.[key]);
+    const fail=()=>{throw Error('Candidate assessment evidence does not match its fixed trial');};
+    if(record?.selection?.release!==report.release||record.selection.baseline_id!==report.baseline_id||
+       record.selection.status!=='candidate'||record.selection.version!==value.release_family+'-'+item.kind||
+       record.fixed_five?.sha256!==item.summary.sha256||record.fixed_five?.bytes!==item.summary.bytes||
+       !goals.every(id=>['milestone','final'].every(gate=>typeof targets?.[id]?.[gate]?.met==='boolean'))||
+       !sources.every(source=>source?.url?.startsWith(prefix)&&sha(source.sha256)&&Number.isInteger(source.bytes)&&source.bytes>0))fail();
+
+    const [compute,performance,context,cost]=goals.map(id=>targets[id]);
+    const roles=['B0','B1'], native=compute.native, workload=context.baseline_context.workload;
+    const phases=['4096-formal','16384-formal','32768-formal','multi-tenant-formal'];
+    if(native.release!==report.release||native.baseline_id!==report.baseline_id||
+       context.paired.comparison.map(row=>row.phase).join()!==phases.join()||
+       !workload.datasets?.length||!workload.task_ids?.length||
+       !roles.every(role=>sha(native.native_seals[role])&&native.arms[role].repetitions.length===3&&
+         sha(context.paired.arm_seals[role])&&context.physical_cards[role]?.length===2))fail();
+    const costAreas=[cost.mmlu_full_answers,cost.four_tenant],rent=cost.published_rental;
+    if(cost.cost_basis!=='published_rental'||!/^https:\/\/[^\s]+$/.test(rent.source_url)||
+       !roles.every((role,i)=>costAreas[0].arms[role].measurement_seal_sha256===
+         report.measurements.mmlu[i===0?'B0':'candidate'].source_seal_sha256&&
+         costAreas[1].arms[role].measurement_seal_sha256===context.paired.arm_seals[role]))fail();
+
+    const status=gate=>gate.met?t('达成','Met'):t('未达成','Not met');
+    const heading=(label,fields,rows)=>'<h4>'+esc(label)+'</h4>'+table(fields,rows);
+    const ratio=value=>n(Number(value))+'×';
+    const percent=value=>n(Number(value))+'%';
+    const speedRows=fixedProfiles.map(([id])=>{
+      const {B0,candidate}=report.measurements[id],row=performance.datasets[id];
+      const ratios=row.ratios;
+      const metrics={throughput_ratio:'output_tokens_per_second',ttft_ratio:'mean_ttft_ms',tpot_ratio:'mean_tpot_ms'};
+      if(!record.datasets[id]||!Object.entries(metrics).every(([key,metric])=>
+        close(Number(ratios[key]),candidate[metric]/B0[metric])))fail();
+      const drop=row.quality?.drop_pp;
+      const quality=drop==null?'—':typeof drop==='object'?
+        Object.entries(drop).map(([track,value])=>track+' '+n(Number(value))).join(' / '):n(Number(drop));
+      const dataset=t(record.datasets[id],record.datasets[id].replace(' 公开轨迹',' public traces'));
+      return [dataset,...Object.keys(metrics).map(key=>ratio(ratios[key])),
+        quality,status(row.milestone),status(row.final)];
+    });
+    const dataName=workload.datasets.join(' / ');
+    const contextRows=context.paired.comparison.map((row,i)=>[dataName,
+      ['4K / C8','16K / C8','32K / C8',t('4K / 四租户 C24','4K / four tenants C24')][i],
+      ...roles.map(role=>n(row[role].metrics.output_tokens_per_second)),
+      ...roles.map(role=>String(row[role].metrics.successful)),
+      ...roles.map(role=>n(row[role].metrics.ttft_ms.p95)),...roles.map(role=>context.physical_cards[role].join(', '))]);
+    const costRows=costAreas.map((area,i)=>[i===0?t('MMLU-Pro 200 完整回答','MMLU-Pro 200 full answers'):dataName+' · 4K / C24',
+      ...roles.map(role=>n(Number(area.arms[role].cost_per_million_output_tokens_cny))),
+      percent(area.unit_cost_reduction_percent),...roles.map(role=>percent(area.utilization[role].mean_percent))]);
+    const sourceNames=t(['原生计时与算量','固定五项原件复算','上下文与四租户封存'],['Native timing and work','Fixed-profile source audit','Context and four-tenant seals']);
+    const sections={
+      '4.1':heading('4.1 · MMLU-Pro 200 / out256',
+        t(['运行臂','物理卡','三轮计时 / 秒','有效算力下界 / TFLOP/s/卡','效率下界','原生封存 SHA-256'],
+          ['Arm','Physical cards','Three runs / s','Effective lower / TFLOP/s/card','Efficiency lower','Native seal SHA-256']),
+        roles.map(role=>[role,native.physical_cards[role].join(', '),
+          native.arms[role].repetitions.map(run=>Number(run.T_seconds).toFixed(3)).join(' / '),
+          n(Number(compute.achieved_tflops_per_card_lower[role])),percent(compute.efficiency_lower_percent[role]),native.native_seals[role]])),
+      '4.2':heading(t('4.2 · 固定五项','4.2 · Five fixed profiles'),
+        t(['数据集','吞吐 B1/B0','平均 TTFT B1/B0','平均 TPOT B1/B0','正确率降幅 / pp','里程碑','结题'],
+          ['Dataset','Throughput B1/B0','Mean TTFT B1/B0','Mean TPOT B1/B0','Accuracy drop / pp','Milestone','Final']),speedRows),
+      '4.3':heading(t('4.3 · 真实上下文与四租户','4.3 · Real context and four tenants'),
+        t(['数据集','工况','B0 tok/s','B1 tok/s','B0 成功','B1 成功','B0 TTFT P95 / ms','B1 TTFT P95 / ms','B0 物理卡','B1 物理卡'],
+          ['Dataset','Workload','B0 tok/s','B1 tok/s','B0 successes','B1 successes','B0 TTFT P95 / ms','B1 TTFT P95 / ms','B0 cards','B1 cards']),contextRows)+
+      '<p>'+t('16K/4K 吞吐','16K/4K throughput')+' '+percent(Number(context.measured_ratios.throughput)*100)+
+      ' · TTFT P95 '+ratio(context.measured_ratios.ttft_p95)+
+      ' · '+t('32K 窗口最大/最小','32K window max/min')+
+      ' · '+t('吞吐','Throughput')+' '+ratio(context.measured_window_ratios.throughput)+
+      ' · TTFT P95/P99 '+ratio(context.measured_window_ratios.ttft_p95)+' / '+ratio(context.measured_window_ratios.ttft_p99)+
+      ' · TPOT P95/P99 '+ratio(context.measured_window_ratios.tpot_p95)+' / '+ratio(context.measured_window_ratios.tpot_p99)+'</p>'+
+      '<details><summary>'+t('任务 ID 与上下文封存','Task IDs and context seals')+'</summary><p>'+esc(workload.task_ids.join(' · '))+'</p>'+
+      table(t(['运行臂','原始封存 SHA-256'],['Arm','Original seal SHA-256']),roles.map(role=>[role,context.paired.arm_seals[role]]))+'</details>',
+      '4.4':heading(t('4.4 · 公开租金折算','4.4 · Published rental estimate'),
+        t(['工况','B0 元/百万输出词元','B1 元/百万输出词元','成本降幅','B0 AI Core','B1 AI Core'],
+          ['Workload','B0 CNY/million output tokens','B1 CNY/million output tokens','Cost reduction','B0 AI Core','B1 AI Core']),costRows)+
+      '<p><a href="'+esc(rent.source_url)+'">'+esc(rent.publisher)+' ↗</a> · '+Number(rent.monthly_cost_per_card_cny).toLocaleString(t('zh-CN','en-US'))+' '+t('元/卡月','CNY/card-month')+'</p>'
+    };
+    if(rentalDisclosure)sections['4.4']='<details data-rental-cost open><summary>'+
+      t('4.4 租金来源与单位成本','4.4 Rental source and unit cost')+'</summary>'+sections['4.4']+'</details>';
+    const links='<p>'+sources.map((source,i)=>'<a href="'+esc(source.url)+'">'+esc(sourceNames[i])+' ↗</a>').join(' · ')+'</p>';
+    if(target)return sections[target]+links;
+    return '<p>'+esc(report.release)+' · '+esc(record.selection.model)+' · BF16 · TP2 · '+t('固定 0.18 B0','Fixed 0.18 B0')+'</p>'+
+      table(t(['送测 V2','里程碑','结题'],['Submission V2','Milestone','Final']),
+        goals.map((id,i)=>[id+' '+names()[i],status(targets[id].milestone),status(targets[id].final)]))+
+      Object.values(sections).join('')+links;
+  }
+
+
   function candidateReportPanels(entry) {
     return candidateReports(entry).map(item=>`<details class="comparison-revision" data-candidate-report="${esc(item.kind)}">
-      <summary>${esc(entry.id+' · '+item.label)} · ${t('固定五项和两档 C8','Five fixed profiles and both C8 bands')}</summary>
+      <summary>${esc(entry.id+' · '+item.label)} · ${entry.candidate_submission_assessment?
+        t('固定 0.18 B0 · V2 实测与判定','Fixed 0.18 B0 · V2 measurements and verdicts'):t('固定五项和两档 C8','Five fixed profiles and both C8 bands')}</summary>
       <p>${t('报告使用封存的固定 0.18 B0。各候选保留自己的评分和运行配置。','This report uses the sealed fixed 0.18 B0. Each candidate retains its own grades and configuration.')}</p>
       <p><a href="${esc(pinnedSource(item.readme.url))}">${t('完整报告与配置','Full report and configuration')} ↗</a> · <a href="${esc(pinnedSource(item.summary.url))}">JSON ↗</a></p>
+      ${entry.candidate_submission_assessment?'<div data-candidate-v2 aria-live="polite"></div>':''}
       <div data-candidate-metrics aria-live="polite"></div>
     </details>`).join('');
   }
 
   function bindCandidateReports(entry) {
+    let assessment;
     const labels={mmlu:'MMLU-Pro 200',hle:'HLE-Verified 200',frontier:'FrontierScience 160',
       swe:'SWE-bench Pro · 64 requests',terminal:'Terminal-Bench 2.1 · 48 requests',
       '4096-formal':t('4K / C8 · 合成请求','4K / C8 · Synthetic requests'),
@@ -1350,6 +1610,7 @@
     for(const item of candidateReports(entry)){
       const disclosure=root.querySelector(`[data-candidate-report="${item.kind}"]`);
       const panel=disclosure.querySelector('[data-candidate-metrics]');
+      const v2Panel=disclosure.querySelector('[data-candidate-v2]');
       disclosure.addEventListener('toggle',async()=>{
         if(!disclosure.open||['loaded','loading'].includes(panel.dataset.state))return;
         panel.dataset.state='loading';
@@ -1383,6 +1644,16 @@
               ['Scenario','Arm','Requests','Failed','Correct','Unresolved','tok/s','Mean TTFT / ms','Mean TPOT / ms','TTFT P95/P99 / ms','TPOT P95/P99 / ms','E2E P95/P99 / ms','Seal SHA-256']),rows)+
             table(t(['裁判阶段','计划','已记录','未决'],['Judge phase','Planned','Recorded','Unresolved']),judgeRows);
           panel.dataset.state='loaded';
+          if(v2Panel){
+            try{
+              assessment??=loadCandidateAssessment(entry);
+              v2Panel.innerHTML=candidateAssessment(item,report,await assessment);
+              v2Panel.dataset.state='loaded';
+            }catch{
+              v2Panel.dataset.state='unavailable';
+              v2Panel.textContent=t('未能校验本版 V2 证据。','Could not verify V2 evidence for this candidate.');
+            }
+          }
         }catch{
           panel.dataset.state='unavailable';
           panel.textContent=t('未能校验候选汇总。可从上方入口查看该版原件。','The candidate summary could not be verified. Use the fixed report link above.');
@@ -1403,7 +1674,7 @@
   async function fetchRmsRevision(entry) {
     const descriptor=rmsDescriptor(entry,'summary.json');
     const report=await fetchBenchmarkReport(descriptor,rmsReport.replace(/^reports\//,'data/')+'summary.json');
-    if(report.schema!=='vllm-hust-r10-native-rms-evidence/v1'||report.original_release!==entry.release||
+    if(report.schema!=='vllm-hust-r10-native-rms-evidence/v1'||report.original_release!==(entry.original_candidate_release||entry.release)||
        report.baseline_id!==releaseCatalog.baseline.id)throw Error('Revision identity mismatch');
     return report;
   }
@@ -1441,6 +1712,9 @@
     if(attempt&&key==='compute')return {title,body:fixedBaselineCompute()};
     if(attempt&&key==='supplement')return {title,body:fixedBaselineContext()};
     if(attempt&&key!=='metrics')return {title,body:`<p>${esc(t(entry.reason_zh,entry.reason_en))}</p><p>${esc(entry.run)}</p><p>${t('r1–r3为冻结r4前同批实验的尝试编号；本次未形成完整配对报告。','r1–r3 identify attempts preceding frozen r4; this attempt did not produce a complete paired report.')}</p><p><a href="${esc(entry.source.url)}">${t('全部尝试及退出回执','All attempts and exit receipts')} ↗</a></p><code>${esc(entry.source.sha256)}</code>`};
+    const stable=stableAssessments.get(entry.id);
+    if(stable&&['compute','supplement'].includes(key))return {title,body:
+      candidateAssessment(stable.item,stable.report,stable.value,{target:key==='compute'?'4.1':'4.3'})};
     if(key==='compute')return {title,body:versionComputeReferenceDetails(entry)};
     if(key==='supplement')return {title,body:versionSupplementDetails(entry,rows)||`<p>${t('本版已发布的连续负载仅在图中列出实测档位。尚缺32K及四租户的完整补测数据；不从其他版本迁入成绩。','Published continuous-load measurements cover the plotted context bands. Complete 32K and four-tenant supplement data are missing for this version; scores are not transferred from another version.')}</p>`};
     if(key==='configuration')return {title,body:`<p>${esc(entry.release)}</p><div class="mod-tags">${entry.mods.map(name=>`<span>${esc(name)}</span>`).join('')}</div><p>E${entry.settings.E}/R${entry.settings.R} · MTP${entry.settings.MTP} · ${entry.settings.graph} · State${entry.settings.state_gib_per_rank}GiB/rank · KV${entry.settings.kv_gib_per_rank}GiB/rank</p><a href="${esc(entry.profile.url)}">${t('冻结版本与MOD配置','Frozen version and MOD configuration')} ↗</a>`};
@@ -1470,10 +1744,6 @@
   const controllerLatencyPath = 'data/controller-r8-latency-v1.json';
   const controllerContextPath = 'data/controller-r8-context-tenant-v1.json';
   const controllerHeavyLoadRepeatPath = 'data/controller-r8-heavy-load-repeat-v1.json';
-  const controllerFixedProfilesPath = 'data/controller-r8-fixed-profiles-repeat-v1.json';
-  const controllerComputePath = 'data/controller-r8-mmlu256-service-compute-v1.json';
-  const controllerStreamingPath = 'data/controller-r8-streamed-heavy-load-v1.json';
-  const controllerC8Path = 'data/controller-r8-closed-loop-c8-v1.json';
   const controllerUtilizationPath = 'data/controller-r8-ai-core-utilization-v1.json';
   const controllerName = () => t('请求限流控制器','Request Throttling Controller');
   let controllerResults;
@@ -1550,15 +1820,6 @@
     }
   }
 
-  async function readPublishedJson(publication,path,response) {
-    const bindings=publication.files.filter(file=>file.website_path===path);
-    if(bindings.length!==1||!response.ok)throw Error('Published asset unavailable or ambiguous');
-    const bytes=await response.arrayBuffer();
-    const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
-    if(bindings[0].bytes!==bytes.byteLength||bindings[0].sha256!==hash)throw Error('Published asset checksum mismatch');
-    return JSON.parse(new TextDecoder().decode(bytes));
-  }
-
   async function loadControllerLatency(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerLatencyPath))return null;
     const response=await fetch('./'+controllerLatencyPath,{cache:'no-cache'});
@@ -1630,100 +1891,6 @@
     return value;
   }
 
-  async function loadControllerFixedProfiles(publication,entry) {
-    if(!publication.files.some(file=>file.website_path===controllerFixedProfilesPath))return null;
-    const response=await fetch('./'+controllerFixedProfilesPath,{cache:'no-cache'});
-    const value=await readPublishedJson(publication,controllerFixedProfilesPath,response);
-    if(value.schema!=='controller-r8-fixed-profiles-repeat/v1'||value.engine_release!==entry.engine_release||
-      value.state_resident_seats!==entry.state_resident_seats||
-      value.profiles?.map(row=>row.id).join()!==fixedProfiles.map(([id])=>id).join())
-      throw Error('Unmatched fixed profile repeat');
-    const counts={mmlu:200,hle:200,frontier:160,swe:64,terminal:48};
-    const positive=value=>Number.isFinite(value)&&value>0;
-    for(const row of value.profiles){
-      const expected=counts[row.id];
-      if(row.status!=='complete'||row.same_client_request_bodies!==true||row.same_per_case_engine_prompt_tokens!==true)
-        throw Error('Incomplete fixed-profile pair');
-      for(const arm of [row.direct,row.controller]){
-        if(arm.planned!==expected||arm.successful!==expected||arm.release_errors!==0||
-          !positive(arm.elapsed_seconds)||!positive(arm.output_tokens)||
-          !close(arm.output_tokens_per_second,arm.output_tokens/arm.elapsed_seconds)||
-          arm.time_to_first_output_seconds?.n!==expected||!positive(arm.time_to_first_output_seconds?.mean)||
-          !Number.isInteger(arm.time_per_output_token_ms?.n)||arm.time_per_output_token_ms.n<1||
-          arm.time_per_output_token_ms.n>expected||!positive(arm.time_per_output_token_ms.mean))
-          throw Error('Invalid fixed-profile metrics');
-        const quality=arm.quality;
-        const count=(number,limit)=>Number.isInteger(number)&&number>=0&&number<=limit;
-        if(row.id==='mmlu'&&(!count(quality?.correct,expected)||quality.planned!==expected))
-          throw Error('Incomplete MMLU-Pro grades');
-        if(row.id==='hle'){
-          const groups=Object.values(quality?.groups||{});
-          if(groups.some(group=>!count(group.total,expected)||!count(group.successes,group.total)||!count(group.unresolved,group.total))||
-             groups.reduce((sum,group)=>sum+group.total,0)!==expected)
-            throw Error('Incomplete Humanity’s Last Exam grades');
-        }
-        if(row.id==='frontier'&&Object.entries({olympiad:100,research:60}).some(([track,total])=>{
-          const grade=quality?.tracks?.[track];
-          return grade?.total!==total||!count(grade.successes,total)||!count(grade.judge_invalid,total);
-        }))throw Error('Incomplete FrontierScience grades');
-      }
-      if(!close(row.time_reduction_percent,100*(1-row.controller.elapsed_seconds/row.direct.elapsed_seconds))||
-         !close(row.output_token_change_percent,100*(row.controller.output_tokens/row.direct.output_tokens-1)))
-        throw Error('Fixed-profile summary does not match the measured arms');
-    }
-    return value;
-  }
-
-  async function loadControllerCompute(publication,entry) {
-    if(!publication.files.some(file=>file.website_path===controllerComputePath))return null;
-    const response=await fetch('./'+controllerComputePath,{cache:'no-cache'});
-    const value=await readPublishedJson(publication,controllerComputePath,response);
-    if(value.schema!=='controller-r8-mmlu256-service-compute/v1'||value.engine_release!==entry.engine_release||
-       value.state_resident_seats!==entry.state_resident_seats||value.accelerators!==2||value.native_efficiency_certified!==false||
-       !/^[a-f0-9]{64}$/.test(value.source_formula_sha256)||!/^[a-f0-9]{64}$/.test(value.model_config_sha256))
-      throw Error('Unmatched service compute measurement');
-    for(const side of ['direct','controller']){
-      const arm=value.arms?.[side];
-      if(arm?.rounds?.map(r=>r.repetition).join()!=='1,2,3'||arm.rounds.some(r=>r.requests!==200||r.input_tokens!==282265||
-        !Number.isSafeInteger(r.target_matrix_work_lower_flops)||r.target_matrix_work_lower_flops<=0||
-        !Number.isInteger(r.output_tokens)||r.output_tokens<200||r.output_tokens>51200||
-        !Number.isFinite(r.elapsed_seconds)||r.elapsed_seconds<=0))throw Error('Incomplete three-round service compute evidence');
-      const sum=key=>arm.rounds.reduce((a,r)=>a+r[key],0);
-      const seconds=sum('elapsed_seconds'), work=sum('target_matrix_work_lower_flops');
-      if(!close(arm.synchronized_service_seconds,seconds)||!close(arm.target_matrix_tflops_per_card_lower,work/(2e12*seconds))||
-        !close(arm.output_tokens_per_second,sum('output_tokens')/seconds))throw Error('Service compute summary does not match the sealed rounds');
-    }
-    return value;
-  }
-
-  async function loadControllerTimingSupplement(publication,entry,path) {
-    if(!publication.files.some(file=>file.website_path===path))return null;
-    const response=await fetch('./'+path,{cache:'no-cache'});
-    const value=await readPublishedJson(publication,path,response);
-    const streaming=path===controllerStreamingPath;
-    const schema=streaming?'controller-r8-streamed-heavy-load/v1':'controller-r8-closed-loop-c8/v1';
-    if(value.schema!==schema||value.engine_release!==entry.engine_release||value.state_resident_seats!==entry.state_resident_seats)
-      throw Error('Unmatched timing supplement');
-    const positive=value=>Number.isFinite(value)&&value>0;
-    if(!streaming&&(value.concurrency!==8||value.rows?.map(row=>row.id).join()!=='4096-formal,16384-formal'))
-      throw Error('Incomplete original closed-loop C8 intervals');
-    for(const row of streaming?[value]:value.rows){
-      for(const arm of [row.direct,row.controller]){
-        const time=streaming?arm.elapsed_seconds:arm.cohort_wall_seconds;
-        if(!positive(time)||!positive(arm.mean_ttft_ms)||!positive(arm.mean_tpot_ms)||
-          !Number.isInteger(arm.requests)||!positive(arm.requests)||!close(arm.output_tokens_per_second,arm.output_tokens/time))
-          throw Error('Incomplete requests or timing observations');
-        if(streaming&&(arm.requests!==entry.result.direct.successful_requests||arm.output_tokens!==entry.result.direct.output_tokens||
-          arm.tpot_requests<1||arm.tpot_requests>arm.requests||
-          (arm.cached_input_percent!==null&&(!Number.isFinite(arm.cached_input_percent)||arm.cached_input_percent<0||arm.cached_input_percent>100))))
-          throw Error('Unmatched streamed heavy-load census');
-        if(!streaming&&(arm.phase!==row.id||time<300||arm.seconds!==300||arm.output_tokens!==256*arm.requests))
-          throw Error('Unmatched standardized C8 window or output budget');
-      }
-    }
-    return value;
-  }
-
   async function loadControllerUtilization(publication,entry) {
     if(!publication.files.some(file=>file.website_path===controllerUtilizationPath))return null;
     const response=await fetch('./'+controllerUtilizationPath,{cache:'no-cache'});
@@ -1789,6 +1956,8 @@
       });
       return {id:p.id,...pairedMetrics(...metrics)};
     }));
+    const contextWorkload=sealedContextWorkload(context?.input_sha256);
+    const contextDataset=contextWorkload?.datasets.join(' / ')||t('数据集身份待核验','Dataset identity pending verification');
     const contextRows=(context?.phases||[]).map(phase=>{
       const labels={4096:'4K–8K / C8',16384:'16K–24K / C8',32768:'32K–48K / C8',
         'multi-tenant':t('四租户 / C24','Four tenants / C24')};
@@ -1798,7 +1967,7 @@
         p99_tpot_ms:arm.metrics.tpot_ms.p99,
         aicore_percent:arm.sampled_aicore_mean_percent
       }));
-      return {id:phase.id,label:labels[phase.id],...pairedMetrics(...metrics)};
+      return {id:phase.id,label:labels[phase.id]+' · '+contextDataset,...pairedMetrics(...metrics)};
     });
     const contextSection=()=>{
       if(!contextRows.length)return '';
@@ -1820,6 +1989,7 @@
         ${table(t(['工况','直连采样利用率','控制器采样利用率'],['Scenario','Direct sampled utilization','Controller sampled utilization']),
           contextRows.map(row=>[row.label,...['B0','B1'].map(role=>Number.isFinite(row.arms[role].aicore_percent)?n(row.arms[role].aicore_percent)+'%':'—')]))}
         ${table(t(['租户','直连完成请求','控制器完成请求','直连 token/s','控制器 token/s'],['Tenant','Direct completions','Controller completions','Direct token/s','Controller token/s']),tenantRows)}
+        ${contextWorkload?`<p>${esc(formatContextWorkload(contextWorkload))} · <a href="./${controllerContextPath}">${t('冻结输入与逐阶段执行摘要','Sealed input and per-phase execution digests')} ↗</a></p>`:''}
         <p><a href="./${controllerContextPath}">${t('阶段、窗口与逐租户原始汇总','Source summary by phase, window and tenant')} ↗</a></p>
       </section>`;
     };
@@ -1871,11 +2041,13 @@
     const latestDirect=streaming?.direct||a, latestController=streaming?.controller||b;
     const batchTime=`${n(latestDirect.elapsed_seconds)} → ${n(latestController.elapsed_seconds)} s`;
     const timeReduction=100*(1-latestController.elapsed_seconds/latestDirect.elapsed_seconds);
+    const trajectorySource=streaming?`<a href="./${controllerStreamingPath}">${t('本批流式来源','Source for this streaming batch')} ↗</a>`:'';
+    const c8Label=id=>(id==='4096-formal'?'4K':'16K')+' / C8 · '+t('独立闭环','Independent closed loop');
     const cacheHit=[latestDirect,latestController].map(arm=>Number.isFinite(arm.cached_input_percent)?n(arm.cached_input_percent)+'%':'—').join(' → ');
     const chartRows=[...rows];
     chartRows.splice(rows.findIndex(row=>row.id==='swe')+1,0,trajectory);
     for(const row of c8?.rows||[]){
-      const label=row.id==='4096-formal'?'4K / C8':'16K / C8';
+      const label=c8Label(row.id);
       const fields=[row.direct,row.controller].map(arm=>({output_tokens_per_second:arm.output_tokens_per_second,
         mean_ttft_ms:arm.mean_ttft_ms,mean_tpot_ms:arm.mean_tpot_ms}));
       chartRows.push({id:row.id,label,...pairedMetrics(...fields)});
@@ -1883,15 +2055,17 @@
     const source='https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/'+(latency?.report_revision||commit)+'/'+entry.report_path;
     const resultLink=`<a href="./controlplane/?release=${esc(entry.id)}#results">${t('请求限流控制器专题','Request Throttling Controller overview')} ↗</a>`;
     const peak=peakThroughputPair([...chartRows,...contextRows]);
-    const throughput=peak?throughputRatio(peak):null;
-    const context16k=contextRows.find(row=>row.id==='16384')||chartRows.find(row=>row.id==='16384-formal');
+    const throughput=throughputRatio(peak);
+    const context16k=contextRows.find(row=>row.id==='16384'&&throughputRatio(row)!==null)
+      ||chartRows.find(row=>row.id==='16384-formal'&&throughputRatio(row)!==null);
     const lowerRate=value=>(Math.floor(value*100)/100).toFixed(2);
-    const values=['—',peak?n(throughput)+'×':'—',context16k?n(throughputRatio(context16k))+'×':'—',peak?n(100*(1-1/throughput))+'%':'—'];
+    const values=['—',peak?n(throughput)+'×':'—',context16k?n(throughputRatio(context16k))+'×':'—',
+      peak?n(100*(1-1/throughput))+'%':'—'];
     const notes=[
       compute?t('参考效率待核算 · 服务侧算力见详情','Reference efficiency pending · service compute in details'):t('参考效率待核算','Reference efficiency pending'),
-      peak?[peak.label,t('已发布场景最高吞吐比','Highest published throughput ratio')].join(' · '):t('暂无配对实测','No paired measurements'),
-      context16k?[context16k.label,t('相对同配置引擎直连吞吐','Throughput vs the same direct engine')].join(' · '):t('暂无 16K 配对实测','No paired 16K measurements'),
-      peak?[peak.label,t('同费率单位输出 token 成本降低','Lower output token cost at equal rates')].join(' · '):t('暂无配对实测','No paired measurements')
+      peak?`${peak.label} · ${t('相对同配置引擎直连','Compared with direct access to the same engine')}`:t('暂无配对实测','No paired measurements'),
+      context16k?`${context16k.label} · ${t('相对同配置引擎直连','Compared with direct access to the same engine')}`:t('暂无 16K 配对实测','No paired 16K measurements'),
+      peak?`${peak.label} · ${t('同费率单位输出 token 加速卡成本估算','Estimated accelerator cost per output token at equal rates')}`:t('暂无配对实测','No paired measurements')
     ];
     const settings=t(`两组共同配置 · 执行上限 ${entry.max_num_seqs} · 状态驻留数 ${entry.state_resident_seats} · 跨轮缓存复用 · TP2`,`Shared settings · execution limit ${entry.max_num_seqs} · resident states ${entry.state_resident_seats} · cross-turn cache reuse · TP2`);
     const metricChart=(key,title,unit,divisor,reason)=>{
@@ -1919,7 +2093,7 @@
         }
       }
       const supplements=[...(streaming?[{...streaming,label:trajectoryLabel}]:[]),
-        ...(c8?.rows||[]).map(row=>({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'}))];
+        ...(c8?.rows||[]).map(row=>({...row,label:c8Label(row.id)}))];
       for(const row of supplements){
         for(const side of ['direct','controller']){
           const arm=row[side];
@@ -1933,6 +2107,22 @@
         ['Profile','Path','Completions','TTFT P95 (s)','TTFT P99 (s)','TPOT P95 (ms)','TPOT P99 (ms)','End-to-end P95 (s)','End-to-end P99 (s)']),
         measurements.map(([label,side,count,...values])=>[label,side==='direct'?roles.B0:roles.B1,count,...values.map(value=>n(Number.isFinite(value)?value:null))]))}`;
     };
+    const contextWindowsDetails=()=>{
+      const phase=context.phases.find(row=>row.id==='32768');
+      if(!phase)return '';
+      const {direct,controller}=phase;
+      const windows=direct.windows;
+      if(!Array.isArray(windows)||!Array.isArray(controller.windows)||windows.length!==5||controller.windows.length!==windows.length||
+         windows.some((row,i)=>row.submission_start_seconds!==controller.windows[i]?.submission_start_seconds||
+           row.submission_end_seconds!==controller.windows[i]?.submission_end_seconds))return '';
+      const fields=window=>[window.metrics?.successful??'—',n(window.metrics?.ttft_ms?.p99),n(window.metrics?.tpot_ms?.p99)];
+      const rows=windows.map((window,i)=>{
+        return [`${window.submission_start_seconds}–${window.submission_end_seconds}`,...fields(window),...fields(controller.windows[i])];
+      });
+      return `<h3>32K–48K / C8 · ${esc(contextDataset)} · ${t('五个提交窗口','Five submission windows')}</h3>
+        ${table(t(['窗口（秒）','直连完成数','直连 TTFT P99 / ms','直连 TPOT P99 / ms','控制器完成数','控制器 TTFT P99 / ms','控制器 TPOT P99 / ms'],
+          ['Window (s)','Direct completions','Direct TTFT P99 / ms','Direct TPOT P99 / ms','Controller completions','Controller TTFT P99 / ms','Controller TPOT P99 / ms']),rows)}`;
+    };
     const costDetails=()=>{
       const monthlyRent=1875,occupiedCards=2;
       const quote='https://news.smm.cn/news/TCNOQJBAJVZYJ73BMVU7G5GJZXQ462A4U6NN4CY';
@@ -1941,10 +2131,19 @@
         row.label,
         ...['B0','B1'].map(side=>n(cost(row.arms[side])))
       ]);
+      const tenant=contextRows.find(row=>row.id==='multi-tenant');
+      const tenantDetails=tenant?`<h3>${esc(tenant.label)}</h3>${table([t('同一正式区间','Same measured interval'),roles.B0,roles.B1],[
+        [t('成本估算（元/百万输出 token）','Estimated cost (CNY/million output tokens)'),...['B0','B1'].map(side=>n(cost(tenant.arms[side])))],
+        [t('加速卡单位成本变化','Change in accelerator unit cost'),'—',`${tenant.changes_percent.relative_cost_per_token.toFixed(3)}%`],
+        [t('双卡 AI Core 采样利用率','Sampled two-card AI Core utilization'),...['B0','B1'].map(side=>{
+          const percent=tenant.arms[side].aicore_percent;
+          return Number.isFinite(percent)?n(percent)+'%':'—';
+        })]
+      ])}`:'';
       return `<h3>${t('每百万输出 token 加速卡成本估算','Estimated accelerator cost per million output tokens')}</h3>
         <p>${t('沿用引擎送测的公开租赁报价。每张卡每月 1,875 元，按 30 天分摊。两组各用两张卡。','The engine assessment uses a published rental quote of CNY 1,875 per accelerator per 30-day month. Each arm uses two accelerators.')}
         <a href="${quote}">${t('上海有色网报价','Shanghai Metals Market quote')} ↗</a></p>
-        ${table([t('负载（元/百万输出 token）','Profile (CNY/million output tokens)'),roles.B0,roles.B1],values)}`;
+        ${table([t('负载（元/百万输出 token）','Profile (CNY/million output tokens)'),roles.B0,roles.B1],values)}${tenantDetails}`;
     };
     const utilizationChart=()=>{
       if(!utilization)return '';
@@ -1972,6 +2171,8 @@
       <div class="comparison-meta"><span>${t(`基于 B1 ${entry.id}，直连与控制器组共用下方实验配置`,`Both arms use the experiment configuration below, based on B1 ${entry.id}`)}</span>${resultLink}</div>
       <p class="release-coverage-summary">${fixedPairSummary(rows)}</p>
       <div class="goal-grid">${comparisonSummaryNames().map((name,i)=>`<article class="result-card"><span>${name}</span><strong>${values[i]}</strong><small>${esc(notes[i])}</small></article>`).join('')}</div>
+      ${compute?`<p class="comparison-meta" data-controller-native-efficiency>${t('V2 4.1 尚缺控制面工况的原生双卡计时、完整必要算量和经核验的同工况参考上界。','V2 4.1 for this controller setup still needs native two-card timing, complete necessary work and a verified upper bound for the matched reference.')}
+        <a href="./test-plan.html">${t('V2 核验口径','V2 verification protocol')} ↗</a></p>`:''}
       <p class="comparison-meta" id="controller-trajectory-result"><strong>${trajectoryLabel}</strong>
         <span>${t('整批耗时','Batch time')} ${batchTime} · ${t('缩短','Reduction')} <strong>${n(timeReduction)}%</strong></span>
         <span>${t('输入 token 缓存命中率','Cached input tokens')} ${cacheHit}</span></p>
@@ -1991,7 +2192,7 @@
       <div class="detail-actions">${[['methods',t('公式与比较方式','Formulas and comparison')],['quality',t('质量与评分明细','Quality and grading')],['evidence',t('原始证据','Original evidence')]].map(([key,label])=>`<button type="button" data-detail="${key}">${label} ↗</button>`).join('')}</div>${detailDialog('controller')}`;
     bindDetails(key=>{
       if(key==='metrics')return {title:t('耗时与请求时延','Batch and request latency'),body:
-        `<p>${trajectoryLabel} · ${esc(a.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(a.output_tokens)} ${t('输出 token / 组','output tokens per arm')}</p>
+        `<p>${trajectoryLabel} · ${esc(latestDirect.requests??latestDirect.successful_requests)} ${t('请求 / 组','requests per arm')} · ${esc(latestDirect.output_tokens)} ${t('输出 token / 组','output tokens per arm')} ${trajectorySource}</p>
         <p>${t('输入 token 缓存命中','Cached input tokens')} ${cacheHit}</p>${table(t(['负载','直连（秒）','加控制器（秒）','耗时缩短','输出 token 变化'],['Profile','Direct (s)','Controller (s)','Time reduction','Output token change']),summaryRows)}${tailDetails()}${engineLatency()}${repeatDetails()}${computeDetails()}`};
       if(key==='configuration')return {title:t('运行配置','Run configuration'),body:`<p>${esc(entry.engine_release)}</p><ul>${entry.overrides.map(v=>`<li>${esc(t(v.zh,v.en))}</li>`).join('')}</ul>`};
       if(key==='methods')return {title:t('公式与比较方式','Formulas and comparison'),body:`<p>${t('客户端逐 token 时延为响应结束减首个模型输出 token 到达，再除以输出 token 数减一，逐请求等权平均。多轮回放的引擎侧时延来自覆盖整批业务请求的引擎计数器增量。','Client time per output token is the response end minus the first model output token arrival, divided by the output token count minus one and averaged equally across requests. Multi-turn engine latencies come from engine counter deltas over the full batch.')}</p><p>${t('相同卡数和费率下，加速卡单位成本比 = 直连输出吞吐 ÷ 加控制器后的输出吞吐。两组均为两张 Ascend 910B2。','With the same accelerator count and rate, accelerator unit-cost ratio equals direct output throughput divided by controller output throughput. Both arms used two Ascend 910B2 cards.')}</p>${costDetails()}<p><a href="${esc(source)}">${t('原始报告','Original report')} ↗</a></p>`};
@@ -2030,7 +2231,7 @@
             [roles.B0,phase.direct.metrics],[roles.B1,phase.controller.metrics]
           ].map(([label,m])=>[contextRows[index].label,label,m.successful,n(m.output_tokens_per_second),
             ...[m.ttft_ms,m.tpot_ms].flatMap(value=>['mean','p95','p99'].map(q=>n(value[q])))])))+
-        `<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
+        contextWindowsDetails()+`<p><a href="./${controllerContextPath}">${t('逐阶段、逐窗口与租户数据','Source data by phase, window and tenant')} ↗</a></p>`};
       const pairedSources=[
         [fixed,controllerFixedProfilesPath,t('五项固定负载与评分','Five fixed profiles and grades')],
         [streaming,controllerStreamingPath,t('SWE Trace Heavy Load 流式补测','SWE Trace Heavy Load streaming pair')],
@@ -2039,7 +2240,9 @@
         [compute,controllerComputePath,t('服务侧矩阵算力下界','Service-side matrix compute lower bound')],
         [utilization,controllerUtilizationPath,t('双卡 AI Core 采样区间','Two-card AI Core sampling interval')]
       ].filter(([available])=>available);
-      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh.replace('SWE-smith',trajectoryLabel+' 的 '),entry.scope_en.replace('SWE-smith',trajectoryLabel)))}</p>${pairedSources.length?`<ul>${pairedSources.map(([,path,label])=>`<li><a href="./${path}">${esc(label)} ↗</a></li>`).join('')}</ul>`:''}<p><a href="${esc(source)}">${t('历史原始报告','Historical report')} ↗</a> · ${resultLink}</p>`};
+      return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p>
+        ${c8?`<p>${t('独立闭环 C8 的公开记录未列出输入摘要或数据集身份。','The published independent closed-loop C8 record does not identify the workload input digest or dataset.')}</p>`:''}
+        ${pairedSources.length?`<ul>${pairedSources.map(([,path,label])=>`<li><a href="./${path}">${esc(label)} ↗</a></li>`).join('')}</ul>`:''}<p><a href="${esc(source)}">${t('历史原始报告','Historical report')} ↗</a> · ${resultLink}</p>`};
     },panel);
     panel.dataset.engineRelease=entry.id;
   }
@@ -2103,15 +2306,18 @@
     return {title:t('测量范围与证据','Measurement scope and evidence'),body:`<p>${esc(t(entry.scope_zh,entry.scope_en))}</p><p><a href="./${srPath}">${t('公开汇总','Public summary')} ↗</a> · <a href="${esc(entry.release_url)}">${t('私有 Release','Private Release')} ↗</a></p>`};
   }
   function comparisonSummaryNames() {
-    return t(['有效算力下界','最高吞吐比','16K 吞吐比','最高同费率降幅'],['Effective compute bound','Peak throughput ratio','16K throughput ratio','Best equal-rate cost reduction']);
+    return t(['有效算力下界','最高吞吐比','16K 吞吐比','最高同费率降幅'],
+      ['Effective compute bound','Peak throughput ratio','16K throughput ratio','Best equal-rate cost reduction']);
   }
 
   function throughputRatio(row) {
-    return row.arms.B1.output_tokens_per_second/row.arms.B0.output_tokens_per_second;
+    const baseline=row?.arms?.B0?.output_tokens_per_second;
+    const candidate=row?.arms?.B1?.output_tokens_per_second;
+    return [baseline,candidate].every(value=>Number.isFinite(value)&&value>0)?candidate/baseline:null;
   }
 
   function peakThroughputPair(rows) {
-    return rows.filter(row=>row.arms&&!row.crossCard)
+    return rows.filter(row=>!row.crossCard&&throughputRatio(row)!==null)
       .reduce((best,row)=>!best||throughputRatio(row)>throughputRatio(best)?row:best,null);
   }
 
@@ -2131,9 +2337,15 @@
     const rows=sr?originalRows:withFixedBaseline(originalRows),available=rows.filter(row=>row.arms);
     if(!attempt&&!sr)assertFormalBaselineIsolation(entry,rows);
     const peak=peakThroughputPair(available);
-    const throughput=peak?throughputRatio(peak):null;
+    const throughput=throughputRatio(peak);
     const context=available.find(row=>row.id==='real-context-16384-formal')||available.find(row=>/^16384/.test(row.id)||row.contextBand==='16k');
-    const reference=sr?null:entry.compute_reference;
+    const compute=stableAssessments.get(entry.id)?.targets['4.1'];
+    const reference=sr?null:entry.compute_reference||(compute?{
+      accepted_scope:'topic4_submission_v2_fixed200_max256_three_formal_runs',
+      arms:{B1:{efficiency_lower_percent:compute.efficiency_lower_percent.B1}},
+      milestone_met:compute.milestone.met,
+      final_numeric_met:compute.final.met
+    }:null);
     const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
     const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('B0 核算见详情；本版 B1 尚未发布','B0 accounting in details; current B1 unpublished'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('固定 B0 已保留；本版 B1 暂无测量','Fixed B0 retained; current B1 measurements unpublished'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('固定 B0 已保留；本版 B1 暂无补测','Fixed B0 retained; current B1 supplement unpublished'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('本版 B1 成本与利用率尚未汇总','Current B1 cost and utilization are unpublished')];
     const observation=singleArmObservation(entry);
@@ -2237,7 +2449,13 @@
           source_seal_sha256:fixedBaseline.context.seal_sha256
         }
       }))]}:baselineObservations.get(baseline.id);
-    const reason=observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
+    const repair=b0RepairResult(baseline);
+    const ftPair=repair&&entry.id==='r10'&&entry.release===r10PatchedFt?.B1.release
+      ?r10PatchedFt.pairs[baseline.id.slice('official-'.length)]:null;
+    const reason=ftPair?t('固定 200 条原生 F/T 对照见有效算力参考。','See Compute reference for the fixed-200 native F/T comparison.'):
+      observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
+    const goalNote=ftPair?t('本项暂无大纲配对结果','No paired outline result for this goal'):
+      t('所选组合暂无核验配对','No verified pair for the selected combination');
     const candidateModel=entry.id==='r6'?data.hardware.model:
       ((!entry.measurements?.length&&modelIntegrationResults.get(entry.id)?.candidate.model)||entry.model||fixedBaseline.model);
     const sourceRows=entry.id==='r6'?r6ArmRows('B1'):attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
@@ -2297,6 +2515,24 @@
     const native=observed?.native_timing;
     const nativeStatus=observed?.automatic_ft_audit?.status==='ineligible'?t('算量适用性未通过；F 与效率未计算。','Arithmetic applicability is ineligible; F and efficiency are uncomputed.'):observed?.necessary_work_certified===true?t('算量与效率见本版核验报告。','See this version’s qualification report for arithmetic and efficiency.'):t('算量资格尚未发布。','Arithmetic qualification is unpublished.');
     const nativeDetail=native?'<p>'+esc(t('原生计时；保留原始轮次，不计入五项吞吐图。','Native timing; original runs, separate from fixed-five throughput.'))+'</p>'+table(t(['轮次','原始 T / 秒','输出 token'],['Run','Original T / s','Output tokens']),native.repetitions.map(row=>[row.repetition,row.T_seconds,row.output_tokens]))+'<p>'+esc(nativeStatus)+'</p>':'';
+    const repairEvidence=repair?pinnedSource('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/reports/b0-mtp-kv-prefix-repair-v1/README.md'):null;
+    const repairLink=repairEvidence?'<p><a href="'+esc(repairEvidence)+'">'+t('Benchmark 记录与复算','Benchmark evidence and replay')+'</a></p>':'';
+    const formatFtInterval=values=>values.map(value=>Number(value).toFixed(3)).join('–');
+    const comparisonEvidence=ftPair?pinnedSource('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/reports/r10-stable-patched-b0-ft-20261123-v1/README.md'):null;
+    const comparisonLink=ftPair?'<p><a href="'+esc(comparisonEvidence)+'">'+
+      t('正式 F/T 对照与复算','Formal F/T comparison and replay')+'</a></p>':'';
+    const comparisonDetail=ftPair?'<div data-r10-patched-b0-ft><p><strong>R10 '+
+      esc(formatFtInterval(r10PatchedFt.B1.tflops_per_card_interval))+' TFLOP/s/'+t('卡','card')+'</strong> · '+
+      esc(t('R10 / 补丁版 B0','R10 / patched B0')+' '+formatFtInterval(ftPair.B1_over_B0_effective_compute_interval))+'×</p><p>'+
+      t('三轮合计计时','Elapsed time over three rounds')+' · B0 '+esc(Number(ftPair.B0.T_seconds).toFixed(3))+' s · R10 '+
+      esc(Number(r10PatchedFt.B1.T_seconds).toFixed(3))+' s</p>'+comparisonLink+'</div>':'';
+    const repairDetail=repair?'<div data-b0-kv-prefix-repair><h3>'+t('MTP KV 补丁复测','MTP KV patch retest')+'</h3><p>'+
+      esc(ftPair?t('使用同序输入、同一预热和采样设置的补丁版 B0 与 R10。','Patched B0 and R10 used the same ordered inputs, warmup and sampling.'):
+        t('这组独立复测覆盖带补丁的 B0。','This retest covers the patched B0.'))+'</p><p>'+
+      esc(repair.repetitions.length+' × '+b0RepairReport.workload.requests_per_formal_repetition+' '+t('请求','requests')+
+      ' · '+b0RepairReport.workload.output_tokens_per_request+' '+t('输出 token/请求','output tokens/request'))+'</p>'+
+      '<p><strong>'+(ftPair?'B0 ':'')+esc(formatFtInterval(repair.tflops_per_card_interval))+
+      ' TFLOP/s/'+t('卡','card')+'</strong></p>'+repairLink+comparisonDetail+'</div>':'';
     const b0Configuration={
       id:baseline.id,profile:baseline.profile.url,model:baseline.model,cann:baseline.cann,
       precision:baseline.precision??observed?.precision??null,tensor_parallel_size:baseline.tensor_parallel_size??observed?.tensor_parallel_size??null,
@@ -2341,7 +2577,8 @@
           table(t(['工况','B0 物理卡号','B1 物理卡号'],['Scenario','B0 physical cards','B1 physical cards']),cards)};
       }
       if(key==='metrics'||key==='supplement')return {title:title[key==='metrics'?1:2],body:rawMetrics(key==='metrics'?rows:context)};
-      if(key==='compute')return {title:title[3],body:nativeDetail||'<p>'+esc(reason)+'</p>'+links};
+      if(key==='compute')return {title:title[3],body:(ftPair?'<h3>'+t('官方原版 B0','Unmodified official B0')+'</h3>':'')+
+        (nativeDetail||'<p>'+esc(reason)+'</p>'+links)+repairDetail};
       if(key==='methods')return {title:title[4],body:'<p>'+esc(reason)+'</p><p>'+esc(note)+'</p>'+
         '<p>'+t('吞吐取成功输出词元数除以含排空的耗时；时延使用各臂原测均值。','Throughput divides successful output tokens by elapsed time including drain. Latencies use each arm’s original means.')+'</p>'+links};
       if(key==='quality')return {title:title[5],body:table(t(['工况','运行臂','正确 / 请求','失败','截断'],['Scenario','Arm','Correct / requests','Failed','Truncated']),scores)+
@@ -2357,14 +2594,14 @@
         [t('B1 运行回执','B1 run receipt'),b1Configuration.receipt_sha256],
         [t('B1 来源清单','B1 source manifest'),b1Configuration.source_manifest_sha256]
       ].filter(([,digest])=>digest).map(([label,digest])=>'<p>'+esc(label)+' · <code>'+esc(digest)+'</code></p>').join('');
-      return {title:title[6],body:links+priorArchives+eventProof+
+      return {title:title[6],body:links+priorArchives+eventProof+repairLink+comparisonLink+
         (baseline.evidence?.url?'<p><a href="'+esc(baseline.evidence.url)+'">'+t('B0 原件与 CPU 报告重建','B0 original evidence and CPU report reconstruction')+'</a></p>':'')+
         (baseline.observations?.path?'<p><a href="./'+esc(baseline.observations.path)+'">'+t('B0 机器可读实测','Machine-readable B0 observations')+'</a></p>':'')+
         ((entry.sources||[]).length?'<p>'+entry.sources.map(source=>'<a href="'+esc(pinnedSource(source.url))+'">'+esc(sourceLabel(source.url))+'</a>').join(' · ')+'</p>':'')+
         table(t(['工况','B0 封存 SHA-256','B1 封存 SHA-256'],['Scenario','B0 seal SHA-256','B1 seal SHA-256']),sealedRows)};
     };
     root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
-      <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${t('所选组合暂无核验配对','No verified pair for the selected combination')}</small></article>`).join('')}</div>
+      <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${goalNote}</small></article>`).join('')}</div>
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],entry.settings?frozenSettings(entry.settings):t('配置以各自来源为准','See each source for configuration'))}
       ${coverageView(rows)}<section><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${esc(reason)}</p><div class="metric-grid">
       ${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,performanceRows,performanceRows.map(row=>row.label),roles)}
@@ -2385,6 +2622,7 @@
     root.querySelector('#comparison-export').onclick=()=>{
       const payload={schema:'selected-b0-b1-observations/v1',baseline:baseline.id,candidate:entry.id,paired:false,reason,rows,context,context_workloads:contextSources,configuration:{B0:b0Configuration,B1:b1Configuration},
         native_timing:observed?.native_timing??null,automatic_ft_audit:observed?.automatic_ft_audit??null};
+      if(ftPair)payload.native_fixed200_ft={...ftPair,B1:r10PatchedFt.B1,protocol:r10PatchedFt.protocol,report:comparisonEvidence};
       const reports=candidateReports(entry).map(({kind,summary,readme,websitePath})=>({
         kind,baseline:releaseCatalog.baseline.id,summary:{...summary,path:websitePath,url:pinnedSource(summary.url)},report:pinnedSource(readme.url)
       }));

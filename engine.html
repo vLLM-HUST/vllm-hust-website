@@ -49,27 +49,27 @@
 
 </div>
 
-</div><aside aria-label="Historical B1 r8" class="product-diagram engine-profile">
-<div class="diagram-caption"><span class="lang-zh">历史配置示例</span><span class="lang-en">Historical configuration</span></div><div class="engine-profile-top"><strong>B1 r8</strong><time datetime="2026-11-17">2026-11-17</time></div>
+</div><aside aria-label="Stable B1 r10" class="product-diagram engine-profile">
+<div class="diagram-caption"><span class="lang-zh">默认稳定版配置</span><span class="lang-en">Default stable configuration</span></div><div class="engine-profile-top"><strong>B1 r10</strong><time datetime="2026-11-21">2026-11-21</time></div>
 <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
-<div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>H2D async copy · E36/R54 · Tail256</strong></div>
+<div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>Contiguous restore · E36/R54 · MTP2 · FULL</strong></div>
 <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
-<p class="engine-mod-chips"><a href="#r8-mods" id="engine-mod-badge-link" style="color:inherit">10 MODs and their creators ↗</a></p>
+<p class="engine-mod-chips"><a href="./b0-b1.html?release=r10" id="engine-mod-badge-link" style="color:inherit">r10 configuration and measurements ↗</a></p>
 </aside></section><section aria-label="Engine capabilities" class="product-capabilities"><article><h3><span class="lang-zh">安装与服务</span><span class="lang-en">Install &amp; serve</span></h3><p><span class="lang-zh">自动准备独立环境，安装引擎并启动推理服务。</span><span class="lang-en">Prepare a private environment, install the engine and serve inference.</span></p></article><article><h3><span class="lang-zh">优化执行</span><span class="lang-en">Optimized execution</span></h3><p><span class="lang-zh">组合执行图、调度与 KV 数据通路优化。</span><span class="lang-en">Combined graph, scheduling and KV data-path optimizations.</span></p></article><article><h3><span class="lang-zh">MOD 扩展</span><span class="lang-en">Extend with MODs</span></h3><p><span class="lang-zh">组合和验证新优化，保留各版本的配置与结果。</span><span class="lang-en">Build and validate optimizations while retaining each version’s configuration and results.</span></p></article></section><section class="product-workspace" id="workflow"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2><span class="lang-zh">安装，运行，继续优化。</span><span class="lang-en">Install. Run. Build on it.</span></h2></div><div class="product-start-grid"><section aria-labelledby="engine-install-title" class="engine-section" id="install-runtime" style="scroll-margin-top:96px">
 <h2 id="engine-install-title">Install and serve</h2>
-<p id="engine-install-copy">The installer selects the latest stable release, prepares a private Python environment and verifies the engine files automatically.</p>
+<p id="engine-install-copy">The installer selects the latest stable release from PyPI. The current default is r10 contiguous restore (2026.11.21.10). It prepares an isolated Python environment and verifies the engine files.</p>
 <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">git clone https://github.com/DeepLinkNext/DeepLinkEngine.git
 cd DeepLinkEngine
 python deeplink.py install --out /workspace/deeplink-install
 python deeplink.py serve --installation /workspace/deeplink-install \
-  --model /models/Qwen3.5-35B-A3B --physical-devices 0,7</code></pre>
-<p class="engine-note" id="engine-install-scope">Prepare the Ascend driver, CANN and model weights first. Set the two physical device IDs to your allocation. Installation records the selected version; serving reuses it.</p>
-<details><summary id="engine-install-details">Environment and historical r8 installation</summary>
-<p id="engine-install-deps">Historical r8 dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. Prepare them first when using the manual command below; --no-deps preserves them. Qualified r8 model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.</p>
-<p id="engine-install-sdk-note">The historical r8 manifest pins Engine 2026.11.17.8.post2 and all three runtime wheels. pip checks all four artifact hashes. In this manual route, --no-deps preserves the prepared vendor environment and does not install Torch, Triton-Ascend or CANN. Installation does not start a model. Use --engine-version VERSION with the automatic installer to select a historical release.</p>
-<p><a href="https://vllm-hust.sage.org.ai/wheels/r8.txt" id="engine-install-source">Historical r8 installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/">PyPI</a></p>
-<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-deps -r https://vllm-hust.sage.org.ai/wheels/r8.txt
-python -m pip uninstall vllm vllm-ascend vllm-hust-runtime</code></pre>
+  --model /models/Qwen3.5-35B-A3B --physical-devices "$DEEPLINK_PHYSICAL_DEVICES"</code></pre>
+<p class="engine-note" id="engine-install-scope">Prepare the Ascend driver, CANN and model weights first. Set DEEPLINK_PHYSICAL_DEVICES to the two assigned card IDs, separated by a comma. Installation records the selected version; serving reuses it.</p>
+<details><summary id="engine-install-details">Environment and direct r10 installation</summary>
+<p id="engine-install-deps">Use Linux ARM64, CPython 3.12, CANN 9.1.0, two Ascend 910B2 cards, Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0 and Transformers 5.14.1. Prepare the vendor dependencies first for direct installation.</p>
+<p id="engine-install-sdk-note">The r10 manifest pins Engine 2026.11.21.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.</p>
+<p><a href="https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-pip-requirements.txt" id="engine-install-source">r10 hash-locked installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.21.10/">PyPI 2026.11.21.10</a></p>
+<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-cache-dir --force-reinstall --no-deps -r https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-pip-requirements.txt
+vllm-hust-engine verify</code></pre>
 </details>
 </section><section aria-labelledby="engine-try-title" class="engine-section" id="try-r8">
 <h2 id="engine-try-title">Tests and reports</h2>
@@ -81,12 +81,12 @@ cp benchmark/run-all.example.json evaluation.json
 python run_all.py --config evaluation.json</code></pre>
 <p class="engine-note" id="engine-try-scope">The full run includes all five fixed profiles, the compute reference, 4K/16K/32K and four tenants. Cache cleanup and warmup run automatically; logs follow in the terminal. The repository guide also describes MMLU200 quick mode.</p>
 <p><a href="https://github.com/DeepLinkNext/DeepLinkEngine/blob/main/benchmark/README.md"><span class="lang-zh">完整测试、快速模式与中断接续指南 ↗</span><span class="lang-en">Full tests, quick mode and recovery guide ↗</span></a></p></section></div></section><section class="product-details" id="product-details"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">深入了解</span><span class="lang-en">DETAILS</span></p><h2><span class="lang-zh">版本、实现与复现</span><span class="lang-en">Release, implementation &amp; reproduction</span></h2><p><span class="lang-zh">展开查看冻结配置、原件与历史。</span><span class="lang-en">Expand for the frozen stack, artifacts and history.</span></p></div><div class="engine-detail-grid"><details class="engine-fold"><summary><span class="lang-zh">实测图表与计算方式</span><span class="lang-en">Measurements &amp; methodology</span></summary><section aria-labelledby="engine-current-title" class="engine-section" id="r8-current-results" style="scroll-margin-top:96px">
-<span aria-hidden="true" id="results"></span><h2 id="engine-current-title">B0 → r8 · current 4K / 16K continuous load</h2>
+<span aria-hidden="true" id="results"></span><h2 id="engine-current-title">Historical B0 → r8 · 4K / 16K continuous load</h2>
 <p id="engine-current-performance-copy">Throughput 3.06× / 2.68×; mean TTFT −52.8% / −48.4%, TPOT −68.5% / −65.4%. Zero failed requests.</p>
 <figure style="margin:20px 0"><a aria-label="Open full-size comparison chart" href="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg"><img alt="B0 and r8 measured throughput, TTFT and TPOT at 4K and 16K" height="1440" src="./data/r8-continuous-20261117/continuous-B0-r8-v1.svg" style="display:block;width:100%;height:auto" width="2160"/></a><figcaption class="engine-note" id="engine-current-caption">C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.</figcaption></figure>
 <details><summary id="engine-current-method">Method, original data and CPU replay</summary>
 <p id="engine-current-method-copy">Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.</p>
-<p><a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip" id="engine-current-raw">Original streams and portable CPU replay ↗</a> · <a href="./data/r8-continuous-20261117/summary-v1.json" id="engine-current-stats">Statistics and tail latency ↗</a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json" id="engine-current-manifest">Current release manifest ↗</a></p>
+<p><a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-first-current-B0-B1-continuous-pair-raw-and-CPU-replay-v1.zip" id="engine-current-raw">Original streams and portable CPU replay ↗</a> · <a href="./data/r8-continuous-20261117/summary-v1.json" id="engine-current-stats">Statistics and tail latency ↗</a> · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json" id="engine-current-manifest">Historical r8 release manifest ↗</a></p>
 </details>
 </section></details><details class="engine-fold"><summary><span id="engine-config-summary">MODs, creators and resource budgets</span></summary> <section aria-labelledby="engine-stack-title" class="engine-section" id="composition">
 <h2 id="engine-stack-title">What is frozen in r8</h2>
@@ -114,7 +114,7 @@ python run_all.py --config evaluation.json</code></pre>
 <article><h3 id="engine-mod-title">Three combined changes</h3><p id="engine-mod-copy">Guarded asynchronous H2D progress copy; E36/R54; priority for existing eligible 1–256-token prefill tails.</p></article>
 <article><h3 id="engine-worker-title">Fixed resource budget</h3><p id="engine-worker-copy">Host State 4 GiB/rank, device KV 20 GiB/rank, prefill budget 4096 tokens. The 10 runtime overlay files match the current C15 candidate byte for byte.</p></article>
 </div>
-</section></details><details class="engine-fold"><summary><span id="engine-download-summary">Downloads, checksums and reproduction</span></summary> <section aria-labelledby="engine-release-title" class="engine-section engine-release" id="release">
+</section></details><details class="engine-fold"><summary><span id="engine-download-summary">Historical r8 downloads and reproduction</span></summary> <section aria-labelledby="engine-release-title" class="engine-section engine-release" id="release">
 <div>
 <p class="engine-kicker" id="engine-release-kicker">2026-11-17 · Frozen release</p><h2 id="engine-release-title">Download B1 r8</h2><p id="engine-release-copy">One file restores the pinned tools and runtime sources, runs inference and scoring, generates plots, and follows live logs. Private GitHub credentials are read from .env or environment variables.</p>
 <div class="engine-actions">
@@ -126,10 +126,10 @@ python run_all.py --config evaluation.json</code></pre>
 <li><a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/bd5448c9f266cc0301c3d4cef2a10b9ab98f7205/engines/b1-r8.json" id="engine-source-link">Pinned combination</a></li>
 <li><a href="https://github.com/vLLM-HUST/vllm-hust-engine/blob/bd5448c9f266cc0301c3d4cef2a10b9ab98f7205/mods/active-stack-r8.json" id="engine-mod-link">Complete MOD stack</a></li>
 <li><a href="./engine-r8-development.html" id="engine-evidence-link">Historical development evidence</a></li>
-<li><a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json" id="engine-metrics-link">Current release manifest</a></li>
+<li><a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/download/full-answer-b1-20261117-r8/r8-release-manifest-v3.json" id="engine-metrics-link">Historical r8 release manifest</a></li>
 </ul></details>
 </div>
-</section></details><details class="engine-fold"><summary><span id="engine-archive-summary">Historical reports</span></summary><p><a href="./engine-r8-development.html" id="engine-development-history">r6 → r8 development pairs ↗</a> · <a href="./b0-b1.html?release=r6" id="engine-r6-history">B0/r6 full report ↗</a> · <a href="./b0-b1.html?release=r7">r7 ↗</a> · <a href="./b0-b1.html?release=r5">r5 ↗</a> · <a href="./b0-b1.html?release=r4">r4 ↗</a> · <a href="./b0-b1.html?release=r3">r1–r3 ↗</a> · <a href="./report-history.html" id="engine-history-link">Reports by date ↗</a>
+</section></details><details class="engine-fold"><summary><span id="engine-archive-summary">Historical reports</span></summary><p><a href="./engine-r8-development.html" id="engine-development-history">r6 → r8 development pairs ↗</a> · <a href="./b0-b1.html?release=r6" id="engine-r6-history">B0/r6 full report ↗</a> · <a href="./b0-b1.html?release=r7">r7 ↗</a> · <a href="./b0-b1.html?release=r5">r5 ↗</a> · <a href="./b0-b1.html?release=r4">r4 ↗</a> · <a href="./b0-b1.html?release=r3">r1–r3 ↗</a> · <a href="./report-history.html" id="engine-history-link">Reports by date ↗</a> · <a href="./b0-b1.html?release=r9">r9 ↗</a>
 <a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/reports/b1-sr1-20261118" id="sr1-shortcut">SR experiment details ↗</a></p></details></div></section><section aria-labelledby="stack-title" class="product-stack" id="product-stack"><div class="section-heading"><p class="product-eyebrow">ONE INFERENCE ECOSYSTEM</p><h2 id="stack-title"><span><span class="lang-zh">执行、调度、工作环境，各司其职。</span><span class="lang-en">Execute. Coordinate. Continue.</span></span></h2><p><span><span class="lang-zh">三个产品均通过 MOD 扩展：执行优化、服务策略、上下文与沙箱。</span><span class="lang-en">MODs extend all three products: execution, service policies, context and sandboxes.</span></span></p></div><div class="stack-links"><a href="./engine.html"><span class="stack-number">01</span><strong data-i18n-common="navEngine">Engine</strong><span><span><span class="lang-zh">高效执行推理</span><span class="lang-en">Execute inference efficiently</span></span></span><span aria-hidden="true">↗</span></a><a href="./control-plane.html"><span class="stack-number">02</span><strong data-i18n-common="navControlPlane">Control Plane</strong><span><span><span class="lang-zh">组织推理服务</span><span class="lang-en">Coordinate inference services</span></span></span><span aria-hidden="true">↗</span></a><a href="./continuum.html"><span class="stack-number">03</span><strong data-i18n-common="navContinuum">Continuum</strong><span><span><span class="lang-zh">接续任务与工作环境</span><span class="lang-en">Continue tasks and their workspaces</span></span></span><span aria-hidden="true">↗</span></a></div></section><section aria-labelledby="publications-title" class="product-publications" data-publication-source="https://github.com/ShuhaoZhangTony/shuhaozhangtony.github.io/blob/1afc79099c190cfaf19cd2ca3ea56cdcb51f3914/contents/publications.md" id="publications"><header class="publications-heading"><div><p class="publications-kicker">RESEARCH</p><h2 id="publications-title"><span class="lang-zh">相关论文</span><span class="lang-en">Related publications</span> <span class="publication-count">30</span></h2><p><span class="lang-zh">推理、异构执行与并发状态处理的研究积累。</span><span class="lang-en">Research in inference, heterogeneous execution and concurrent state processing.</span></p></div><a class="publications-all" href="https://shuhaozhangtony.github.io/publications.html"><span class="lang-zh">完整发表列表</span><span class="lang-en">All publications</span> ↗</a></header><details class="publication-library"><summary><span class="lang-zh">浏览全部论文</span><span class="lang-en">Browse all publications</span> <span aria-hidden="true">↗</span></summary><div class="publication-library-body">
 
 <nav aria-label="Publication topics" class="publication-navigation"><a href="#publications-inference"><span class="lang-zh">推理与计算机制</span><span class="lang-en">Inference and computation</span></a><a href="#publications-hardware"><span class="lang-zh">异构执行与硬件感知</span><span class="lang-en">Heterogeneous and hardware-aware execution</span></a><a href="#publications-execution"><span class="lang-zh">压缩与并发状态处理</span><span class="lang-en">Compression and concurrent state processing</span></a></nav>
@@ -305,12 +305,12 @@ python run_all.py --config evaluation.json</code></pre>
   "en": {
     "title": "vLLM-HUST Engine | Install and serve",
     "engine-install-title": "Install and serve",
-    "engine-install-copy": "The installer selects the latest stable release, prepares a private Python environment and verifies the engine files automatically.",
-    "engine-install-scope": "Prepare the Ascend driver, CANN and model weights first. Set the two physical device IDs to your allocation. Installation records the selected version; serving reuses it.",
-    "engine-install-details": "Environment and historical r8 installation",
-    "engine-install-deps": "Historical r8 dependencies: Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0, Transformers 5.14.1 and tokenizers 0.22.2. Prepare them first when using the manual command below; --no-deps preserves them. Qualified r8 model/hardware: Qwen3.5-35B-A3B BF16, two Ascend 910B2 cards, TP2.",
-    "engine-install-sdk-note": "The historical r8 manifest pins Engine 2026.11.17.8.post2 and all three runtime wheels. pip checks all four artifact hashes. In this manual route, --no-deps preserves the prepared vendor environment and does not install Torch, Triton-Ascend or CANN. Installation does not start a model. Use --engine-version VERSION with the automatic installer to select a historical release.",
-    "engine-install-source": "Historical r8 installation manifest ↗",
+    "engine-install-copy": "The installer selects the latest stable release from PyPI. The current default is r10 contiguous restore (2026.11.21.10). It prepares an isolated Python environment and verifies the engine files.",
+    "engine-install-scope": "Prepare the Ascend driver, CANN and model weights first. Set DEEPLINK_PHYSICAL_DEVICES to the two assigned card IDs, separated by a comma. Installation records the selected version; serving reuses it.",
+    "engine-install-details": "Environment and direct r10 installation",
+    "engine-install-deps": "Use Linux ARM64, CPython 3.12, CANN 9.1.0, two Ascend 910B2 cards, Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0 and Transformers 5.14.1. Prepare the vendor dependencies first for direct installation.",
+    "engine-install-sdk-note": "The r10 manifest pins Engine 2026.11.21.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.",
+    "engine-install-source": "r10 hash-locked installation manifest ↗",
     "sr1-shortcut": "SR experiment details ↗",
     "engine-kicker": "Ascend serving stack",
     "engine-owner": "Lead: Shuhao Zhang (张书豪)",
@@ -346,7 +346,7 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-source-link": "Pinned combination",
     "engine-mod-link": "Complete MOD stack",
     "engine-evidence-link": "Historical development evidence",
-    "engine-metrics-link": "Current release manifest",
+    "engine-metrics-link": "Historical r8 release manifest",
     "engine-history-title": "Default release and archives",
     "engine-r4-copy": "The 2026-10-30 r4 originals and all later candidate outcomes remain available.",
     "engine-current-link": "Default r6 manifest ↗",
@@ -377,20 +377,20 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-short-status": "Install · Serve · Extend",
     "engine-config-summary": "MODs, creators and resource budgets",
     "engine-context-summary": "4K / 16K comparisons",
-    "engine-download-summary": "Downloads, checksums and reproduction",
+    "engine-download-summary": "Historical r8 downloads and reproduction",
     "engine-archive-summary": "Historical reports",
     "engine-try-title": "Tests and reports",
     "engine-try-copy": "To run the test matrix, set the model, physical device IDs, cache and a new output directory in evaluation.json, then run the command below. See the guide for first runs and reuse of completed results.",
     "engine-try-scope": "The full run includes all five fixed profiles, the compute reference, 4K/16K/32K and four tenants. Cache cleanup and warmup run automatically; logs follow in the terminal. The repository guide also describes MMLU200 quick mode.",
-    "engine-mod-badge-link": "10 MODs and their creators ↗",
+    "engine-mod-badge-link": "r10 configuration and measurements ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
-    "engine-current-title": "B0 → r8 · current 4K / 16K continuous load",
+    "engine-current-title": "Historical B0 → r8 · 4K / 16K continuous load",
     "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.",
     "engine-current-method": "Method, original data and CPU replay",
     "engine-current-method-copy": "Both arms use the same input recipe and 71 unscored warmups, TP2, concurrency8 and 256 output tokens. Each formal phase submits for300s, then drains; throughput includes the drain. TPOT=(end−first token)/(output tokens−1). Both ranks seal Torch Dynamo and Triton before measurement. These stress measurements are separate from dataset quality and compute-reference efficiency.",
     "engine-current-raw": "Original streams and portable CPU replay ↗",
     "engine-current-stats": "Statistics and tail latency ↗",
-    "engine-current-manifest": "Current release manifest ↗",
+    "engine-current-manifest": "Historical r8 release manifest ↗",
     "engine-current-performance-copy": "Throughput 3.06× / 2.68×; mean TTFT −52.8% / −48.4%, TPOT −68.5% / −65.4%. Zero failed requests.",
     "engine-development-history": "r6 → r8 development pairs ↗",
     "engine-r6-history": "B0/r6 full report ↗"
@@ -398,12 +398,12 @@ python run_all.py --config evaluation.json</code></pre>
   "zh": {
     "title": "vLLM-HUST Engine | 安装与服务",
     "engine-install-title": "安装与服务",
-    "engine-install-copy": "安装器默认选择最新稳定版，自动准备独立 Python 环境并校验引擎文件。",
-    "engine-install-scope": "先准备昇腾驱动、CANN 和模型权重，两张物理卡号填写实际分配值。安装会记录所选版本，启动服务时沿用该版本。",
-    "engine-install-details": "环境与历史 r8 安装",
-    "engine-install-deps": "历史 r8 固定依赖：Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0、Transformers 5.14.1、tokenizers 0.22.2。使用下方手动命令时需预先准备，--no-deps 保留现有供应商环境。r8 已验证范围：Qwen3.5-35B-A3B BF16、双 Ascend 910B2、TP2。",
-    "engine-install-sdk-note": "历史 r8 清单固定 Engine 2026.11.17.8.post2 与三个运行时 wheel，pip 核验全部四包哈希。此手动方式的 --no-deps 保留预先准备的供应商环境，不安装 Torch、Triton-Ascend 或 CANN。安装阶段不启动模型。自动安装器也可用 --engine-version VERSION 选择历史版本。",
-    "engine-install-source": "历史 r8 安装清单 ↗",
+    "engine-install-copy": "安装器从 PyPI 选择最新稳定版。当前默认是 r10 连续写回（2026.11.21.10），自动准备独立 Python 环境并校验引擎文件。",
+    "engine-install-scope": "先准备昇腾驱动、CANN 和模型权重，将 DEEPLINK_PHYSICAL_DEVICES 设置为实际分配的两个物理卡号，以逗号分隔。安装会记录所选版本，启动服务时沿用该版本。",
+    "engine-install-details": "运行环境与 r10 直接安装",
+    "engine-install-deps": "准备 Linux ARM64、CPython 3.12、CANN 9.1.0、双 Ascend 910B2，以及 Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0 和 Transformers 5.14.1。直接安装前先准备供应商依赖。",
+    "engine-install-sdk-note": "r10 清单固定 Engine 2026.11.21.10 和三个 ARM64 运行时 wheel，pip 核验全部四包哈希。安装沿用预先准备的供应商依赖，不启动模型。自动安装器支持 --engine-version VERSION，r9 对应 2026.11.19.9.post1。",
+    "engine-install-source": "r10 哈希锁定安装清单 ↗",
     "sr1-shortcut": "SR 系列实验详情 ↗",
     "engine-kicker": "Ascend 推理服务栈",
     "engine-owner": "负责人：张书豪",
@@ -470,20 +470,20 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-short-status": "安装 · 服务 · 扩展",
     "engine-config-summary": "MOD、制作者与资源配置",
     "engine-context-summary": "4K / 16K 对照图",
-    "engine-download-summary": "下载、校验与复现详情",
+    "engine-download-summary": "历史 r8 下载与复现",
     "engine-archive-summary": "历史报告",
     "engine-try-title": "测试与报告",
     "engine-try-copy": "需要测试时，在 evaluation.json 中填写模型、两张物理卡、缓存和新的输出目录，再运行下方命令。首次运行与已有结果复用见测试指南。",
     "engine-try-scope": "完整测试包含固定五项、有效算力参考、4K/16K/32K 和四租户；自动清理缓存并预热，终端持续显示日志。MMLU200 快速模式见仓库测试指南。",
-    "engine-mod-badge-link": "10 项 MOD 与制作者 ↗",
+    "engine-mod-badge-link": "r10 配置与实测 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
-    "engine-current-title": "B0 → r8 · 新一轮 4K / 16K 连续负载",
+    "engine-current-title": "历史 B0 → r8 · 4K / 16K 连续负载",
     "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项配对结果见 B0/B1 对比页面。",
     "engine-current-method": "计算方式、原件与离线复算",
     "engine-current-method-copy": "两臂相同输入配方与71条非计分预热，TP2、并发8、输出256 token。每个正式阶段提交300秒，再等待全部完成；吞吐计入排空耗时。TPOT=(结束时间−首token时间)/(输出token−1)。两rank在测量前封住Torch Dynamo与Triton编译入口。数据集质量与参考算力效率分别验收。",
     "engine-current-raw": "原始流与独立CPU复算 ↗",
     "engine-current-stats": "统计及尾时延 ↗",
-    "engine-current-manifest": "当前发布清单 ↗",
+    "engine-current-manifest": "r8 历史发布清单 ↗",
     "engine-current-performance-copy": "吞吐 3.06× / 2.68×；平均 TTFT 降低52.8% / 48.4%，TPOT降低68.5% / 65.4%。请求失败0。",
     "engine-development-history": "r6 → r8 开发对照 ↗",
     "engine-r6-history": "B0/r6完整报告 ↗"
