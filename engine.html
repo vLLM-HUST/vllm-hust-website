@@ -50,14 +50,14 @@
 </div>
 
 </div><aside aria-label="Stable B1 r10" class="product-diagram engine-profile">
-<div class="diagram-caption"><span class="lang-zh">默认稳定版配置</span><span class="lang-en">Default stable configuration</span></div><div class="engine-profile-top"><strong>B1 r10</strong><time datetime="2026-11-21">2026-11-21</time></div>
+<div class="diagram-caption"><span class="lang-zh">默认稳定版配置</span><span class="lang-en">Default stable configuration</span></div><div class="engine-profile-top"><strong>B1 r10</strong><time datetime="2026-11-24">2026-11-24</time></div>
 <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
-<div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>Contiguous restore · E36/R54 · MTP2 · FULL</strong></div>
+<div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>3072-token mixed FULL capture · E36/R54 · MTP2</strong></div>
 <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
 <p class="engine-mod-chips"><a href="./b0-b1.html?release=r10" id="engine-mod-badge-link" style="color:inherit">r10 configuration and measurements ↗</a></p>
 </aside></section><section aria-label="Engine capabilities" class="product-capabilities"><article><h3><span class="lang-zh">安装与服务</span><span class="lang-en">Install &amp; serve</span></h3><p><span class="lang-zh">自动准备独立环境，安装引擎并启动推理服务。</span><span class="lang-en">Prepare a private environment, install the engine and serve inference.</span></p></article><article><h3><span class="lang-zh">优化执行</span><span class="lang-en">Optimized execution</span></h3><p><span class="lang-zh">组合执行图、调度与 KV 数据通路优化。</span><span class="lang-en">Combined graph, scheduling and KV data-path optimizations.</span></p></article><article><h3><span class="lang-zh">MOD 扩展</span><span class="lang-en">Extend with MODs</span></h3><p><span class="lang-zh">组合和验证新优化，保留各版本的配置与结果。</span><span class="lang-en">Build and validate optimizations while retaining each version’s configuration and results.</span></p></article></section><section class="product-workspace" id="workflow"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2><span class="lang-zh">安装，运行，继续优化。</span><span class="lang-en">Install. Run. Build on it.</span></h2></div><div class="product-start-grid"><section aria-labelledby="engine-install-title" class="engine-section" id="install-runtime" style="scroll-margin-top:96px">
 <h2 id="engine-install-title">Install and serve</h2>
-<p id="engine-install-copy">The installer selects the latest stable release from PyPI. The current default is r10 contiguous restore (2026.11.21.10). It prepares an isolated Python environment and verifies the engine files.</p>
+<p id="engine-install-copy">The installer selects the latest stable release from PyPI. The current default is r10 with 3072-token mixed capture (2026.11.24.10). It prepares an isolated Python environment and verifies the engine files.</p>
 <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">git clone https://github.com/DeepLinkNext/DeepLinkEngine.git
 cd DeepLinkEngine
 python deeplink.py install --out /workspace/deeplink-install
@@ -66,9 +66,9 @@ python deeplink.py serve --installation /workspace/deeplink-install \
 <p class="engine-note" id="engine-install-scope">Prepare the Ascend driver, CANN and model weights first. Set DEEPLINK_PHYSICAL_DEVICES to the two assigned card IDs, separated by a comma. Installation records the selected version; serving reuses it.</p>
 <details><summary id="engine-install-details">Environment and direct r10 installation</summary>
 <p id="engine-install-deps">Use Linux ARM64, CPython 3.12, CANN 9.1.0, two Ascend 910B2 cards, Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0 and Transformers 5.14.1. Prepare the vendor dependencies first for direct installation.</p>
-<p id="engine-install-sdk-note">The r10 manifest pins Engine 2026.11.21.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.</p>
-<p><a href="https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-pip-requirements.txt" id="engine-install-source">r10 hash-locked installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.21.10/">PyPI 2026.11.21.10</a></p>
-<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-cache-dir --force-reinstall --no-deps -r https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-pip-requirements.txt
+<p id="engine-install-sdk-note">The r10 manifest pins Engine 2026.11.24.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.</p>
+<p><a href="https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-3072-pip-requirements.txt" id="engine-install-source">r10 hash-locked installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.24.10/">PyPI 2026.11.24.10</a></p>
+<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-cache-dir --force-reinstall --no-deps -r https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-3072-pip-requirements.txt
 vllm-hust-engine verify</code></pre>
 </details>
 </section><section aria-labelledby="engine-try-title" class="engine-section" id="try-r8">
@@ -305,11 +305,11 @@ python run_all.py --config evaluation.json</code></pre>
   "en": {
     "title": "vLLM-HUST Engine | Install and serve",
     "engine-install-title": "Install and serve",
-    "engine-install-copy": "The installer selects the latest stable release from PyPI. The current default is r10 contiguous restore (2026.11.21.10). It prepares an isolated Python environment and verifies the engine files.",
+    "engine-install-copy": "The installer selects the latest stable release from PyPI. The current default is r10 with 3072-token mixed capture (2026.11.24.10). It prepares an isolated Python environment and verifies the engine files.",
     "engine-install-scope": "Prepare the Ascend driver, CANN and model weights first. Set DEEPLINK_PHYSICAL_DEVICES to the two assigned card IDs, separated by a comma. Installation records the selected version; serving reuses it.",
     "engine-install-details": "Environment and direct r10 installation",
     "engine-install-deps": "Use Linux ARM64, CPython 3.12, CANN 9.1.0, two Ascend 910B2 cards, Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0 and Transformers 5.14.1. Prepare the vendor dependencies first for direct installation.",
-    "engine-install-sdk-note": "The r10 manifest pins Engine 2026.11.21.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.",
+    "engine-install-sdk-note": "The r10 manifest pins Engine 2026.11.24.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.",
     "engine-install-source": "r10 hash-locked installation manifest ↗",
     "sr1-shortcut": "SR experiment details ↗",
     "engine-kicker": "Ascend serving stack",
@@ -398,11 +398,11 @@ python run_all.py --config evaluation.json</code></pre>
   "zh": {
     "title": "vLLM-HUST Engine | 安装与服务",
     "engine-install-title": "安装与服务",
-    "engine-install-copy": "安装器从 PyPI 选择最新稳定版。当前默认是 r10 连续写回（2026.11.21.10），自动准备独立 Python 环境并校验引擎文件。",
+    "engine-install-copy": "安装器从 PyPI 选择最新稳定版。当前默认是 r10 3072 token 混合图（2026.11.24.10），自动准备独立 Python 环境并校验引擎文件。",
     "engine-install-scope": "先准备昇腾驱动、CANN 和模型权重，将 DEEPLINK_PHYSICAL_DEVICES 设置为实际分配的两个物理卡号，以逗号分隔。安装会记录所选版本，启动服务时沿用该版本。",
     "engine-install-details": "运行环境与 r10 直接安装",
     "engine-install-deps": "准备 Linux ARM64、CPython 3.12、CANN 9.1.0、双 Ascend 910B2，以及 Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0 和 Transformers 5.14.1。直接安装前先准备供应商依赖。",
-    "engine-install-sdk-note": "r10 清单固定 Engine 2026.11.21.10 和三个 ARM64 运行时 wheel，pip 核验全部四包哈希。安装沿用预先准备的供应商依赖，不启动模型。自动安装器支持 --engine-version VERSION，r9 对应 2026.11.19.9.post1。",
+    "engine-install-sdk-note": "r10 清单固定 Engine 2026.11.24.10 和三个 ARM64 运行时 wheel，pip 核验全部四包哈希。安装沿用预先准备的供应商依赖，不启动模型。自动安装器支持 --engine-version VERSION，r9 对应 2026.11.19.9.post1。",
     "engine-install-source": "r10 哈希锁定安装清单 ↗",
     "sr1-shortcut": "SR 系列实验详情 ↗",
     "engine-kicker": "Ascend 推理服务栈",
