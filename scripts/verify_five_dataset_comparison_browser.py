@@ -952,7 +952,9 @@ def verify(url, output):
                         expect(windows).to_have_count(5)
                         previous = revision["previous_version"]
                         expect(
-                            root.locator(f'a[href="./b0-b1.html?release=r10&revision={previous}"]')
+                            root.locator(
+                                f'a[href="./b0-b1.html?release=r10&revision={previous}"]'
+                            )
                         ).to_be_visible()
                     assert_release_control_readable(page, root)
                     assert page.evaluate(
