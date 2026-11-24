@@ -46,8 +46,7 @@ def read_release_asset(index, url):
     return raw
 
 
-def verify_stable_install_manifest(release):
-    stable = release["stable_evidence"]
+def verify_stable_install_manifest(release, stable):
     url = stable["install_manifest_url"]
     mirror_prefix = "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/"
     assert url.startswith(mirror_prefix)
@@ -65,18 +64,65 @@ def verify_stable_install_manifest(release):
     assert "--require-hashes" in lines, "Missing hash requirement"
     receipt = json.loads(read_release_asset(index, stable["arm64_acceptance_url"]))
     assert receipt["release"] == release["release"]
-    assert receipt["linux_architecture"] == "aarch64"
-    assert receipt["isolated_venv"] and receipt["serve_dry_run_passed"]
-    assert not receipt["model_started"] and not receipt["npu_initialized"]
-    assert receipt["sdist"]["sha256"] == stable["sdist_sha256"]
-    assert receipt["sdk_sha256"] == stable["sdk_sha256"]
-    assert receipt["sdist"]["filename"] == (
-        f"vllm_hust_engine-{stable['pypi_version']}.tar.gz"
-    )
-    wheel_hashes = receipt["wheel_sha256"]
+    filename = f"vllm_hust_engine-{stable['pypi_version']}.tar.gz"
+    prefix = url.rsplit("/", 1)[0] + "/"
+    if release.get("r10_revision"):
+        assert receipt["version"] == stable["pypi_version"]
+        assert receipt["installer_cli_verified"] and receipt["serve_dry_run"]
+        assert receipt["capture_3072"] and not receipt["model_loaded"]
+        assert not receipt["reserved_devices"] and receipt["runtime_files"] > 0
+        assert re.fullmatch(
+            r"[a-f0-9]{64}", receipt["installed_files_canonical_sha256"]
+        )
+
+        # The public package index binds the exact source archive independently
+        # of the GitHub release that hosts the runtime wheels.
+        package_url = (
+            f"https://pypi.org/pypi/vllm-hust-engine/{stable['pypi_version']}/json"
+        )
+        with urlopen(package_url, timeout=30) as response:
+            package = json.load(response)
+        assert package["info"]["version"] == stable["pypi_version"]
+        (archive,) = (
+            item
+            for item in package["urls"]
+            if item["packagetype"] == "sdist" and item["filename"] == filename
+        )
+        (mirror,) = (
+            item
+            for item in index["assets"]
+            if item["browser_download_url"] == prefix + filename
+        )
+        sdist_sha256 = archive["digests"]["sha256"]
+        assert (
+            mirror["digest"] == f"sha256:{sdist_sha256}"
+            and mirror["size"] == archive["size"]
+        )
+        wheel_hashes = {}
+        for row in receipt["native_artifacts"]:
+            assert unquote(row["url"]).startswith(prefix)
+            assert unquote(row["url"]).rsplit("/", 1)[-1] == row["name"]
+            (mirror,) = (
+                item
+                for item in index["assets"]
+                if unquote(item["browser_download_url"]) == unquote(row["url"])
+            )
+            assert (
+                mirror["digest"] == f"sha256:{row['sha256']}"
+                and mirror["size"] == row["bytes"]
+            )
+            wheel_hashes[row["name"]] = row["sha256"]
+    else:
+        assert receipt["linux_architecture"] == "aarch64"
+        assert receipt["isolated_venv"] and receipt["serve_dry_run_passed"]
+        assert not receipt["model_started"] and not receipt["npu_initialized"]
+        assert receipt["sdist"]["sha256"] == stable["sdist_sha256"]
+        assert receipt["sdk_sha256"] == stable["sdk_sha256"]
+        assert receipt["sdist"]["filename"] == filename
+        sdist_sha256 = stable["sdist_sha256"]
+        wheel_hashes = receipt["wheel_sha256"]
     assert len(wheel_hashes) == 3
-    expected = {receipt["sdist"]["filename"]: stable["sdist_sha256"], **wheel_hashes}
-    prefix = stable["install_manifest_url"].rsplit("/", 1)[0] + "/"
+    expected = {filename: sdist_sha256, **wheel_hashes}
     requirements = [
         shlex.split(line) for line in lines if line and not line.startswith(("#", "--"))
     ]
@@ -110,8 +156,8 @@ async def verify(args):
     release = next(
         row for row in catalog["entries"] if row["id"] == catalog["default_release"]
     )
-    stable = release["stable_evidence"]
-    verify_stable_install_manifest(release)
+    stable = release.get("r10_revision") or release["stable_evidence"]
+    verify_stable_install_manifest(release, stable)
     receipts = []
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(executable_path=args.browser)
