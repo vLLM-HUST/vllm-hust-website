@@ -431,7 +431,7 @@ def verify_candidate_v2(panel, record, report):
         assert task in seal.inner_text()
 
 
-def verify_candidate_checksum(page):
+def verify_candidate_checksum(page, report_query):
     base = args.base_url.rstrip("/") + "/b0-b1.html"
     pattern = "**/data/r10-native-rms-fixed-five-*/summary.json"
     page.route(
@@ -440,7 +440,7 @@ def verify_candidate_checksum(page):
             status=200, content_type="application/json", body="{}"
         ),
     )
-    page.goto(base + "?release=r10")
+    page.goto(base + report_query)
     panel = page.locator("[data-candidate-report='native-rms']")
     panel.locator(":scope > summary").click()
     panel.locator("[data-candidate-metrics][data-state=unavailable]").wait_for()
@@ -448,7 +448,7 @@ def verify_candidate_checksum(page):
     page.unroute(pattern)
 
 
-def verify_candidate_v2_checksum(page, entry):
+def verify_candidate_v2_checksum(page, entry, report_query):
     source = entry.get("candidate_submission_assessment")
     if not source:
         return
@@ -460,7 +460,7 @@ def verify_candidate_v2_checksum(page, entry):
             status=200, content_type="application/json", body="{}"
         ),
     )
-    page.goto(base + "?release=" + entry["id"])
+    page.goto(base + report_query)
     if entry.get("stable_evidence"):
         page.locator("#submission-v2 [data-stable-assessment-unavailable]").wait_for()
         assert page.locator("#submission-v2 tbody tr").count() == 0
@@ -501,11 +501,22 @@ def verify_stable_default(page, catalog):
     entry = next(
         row for row in catalog["entries"] if row["id"] == catalog["default_release"]
     )
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    page.goto(base)
+    archive = catalog.get("archived_r10")
+    if entry.get("r10_revision"):
+        revision = entry["r10_revision"]
+        assessment = page.locator("[data-r10-revision]")
+        assessment.wait_for()
+        assert assessment.get_attribute("data-r10-revision") == revision["pypi_version"]
+        assert page.locator("[data-r10-stability-windows] tbody tr").count() == 5
+        assert page.locator("[data-candidate-report]").count() == 0
+        version = revision["previous_version"]
+        page.locator(f'a[href="./b0-b1.html?release=r10&revision={version}"]').click()
+        entry = archive
     stable = entry.get("stable_evidence")
     if stable is None:
         return
-    base = args.base_url.rstrip("/")
-    page.goto(base + "/b0-b1.html")
     page.locator("#submission-v2").wait_for()
     assert page.locator("#comparison-release-select").input_value() == entry["id"]
     assert (
@@ -666,6 +677,11 @@ with sync_playwright() as playwright:
             ]
         }
         release_entries = {entry["id"]: entry for entry in catalog["entries"]}
+        archive = catalog.get("archived_r10")
+        report_entry = archive or release_entries["r10"]
+        report_query = "?release=r10"
+        if archive:
+            report_query += "&revision=" + archive["stable_evidence"]["pypi_version"]
         expected_baselines = {catalog["baseline"]["id"]} | {
             item["id"] for item in catalog.get("comparison_baselines", [])
         }
@@ -776,7 +792,10 @@ with sync_playwright() as playwright:
                             for name in source["datasets"]
                         )
                     if release == "r10":
-                        verify_candidate_reports(page, release_entries[release], commit)
+                        if archive:
+                            assert page.locator("[data-candidate-report]").count() == 0
+                        else:
+                            verify_candidate_reports(page, report_entry, commit)
                     if release == "r7":
                         supplement = page.locator("#context-tenant-supplement")
                         for source in release_entries[release]["measurements"]:
@@ -857,7 +876,9 @@ with sync_playwright() as playwright:
                     )
                     published_pair = (
                         formal_ft["pairs"].get(baseline.removeprefix("official-"))
-                        if formal_ft and release == "r10"
+                        if formal_ft
+                        and release_entries.get(release, {}).get("release")
+                        == formal_ft["B1"]["release"]
                         else None
                     )
                     if published_pair:
@@ -928,12 +949,12 @@ with sync_playwright() as playwright:
                             payload["configuration"]["B1"]["settings"]
                             == release_entries[release]["settings"]
                         )
-                        assert {
-                            item["kind"] for item in payload["candidate_reports"]
-                        } == {
-                            "native-rms",
-                            "contiguous-restore",
-                        }
+                        if archive:
+                            assert "candidate_reports" not in payload
+                        else:
+                            assert {
+                                item["kind"] for item in payload["candidate_reports"]
+                            } == {"native-rms", "contiguous-restore"}
                     if release == "r6":
                         report = page.request.get(
                             args.base_url.rstrip("/")
@@ -1044,7 +1065,7 @@ with sync_playwright() as playwright:
                     ft_version = baseline.removeprefix("official-")
                     ft_pair = (
                         (formal_ft["pairs"][ft_version], formal_ft["B1"])
-                        if formal_ft and ft_version in formal_ft["pairs"]
+                        if published_pair is not None
                         else None
                     )
                     verify_full_baseline_details(
@@ -1087,8 +1108,21 @@ with sync_playwright() as playwright:
         verify_legacy_links(page, catalog)
         verify_stable_default(page, catalog)
         if width == 1366 and scheme == "light":
-            verify_candidate_checksum(page)
-            verify_candidate_v2_checksum(page, release_entries["r10"])
+            if archive:
+                base = args.base_url.rstrip("/") + "/b0-b1.html"
+                page.goto(base + report_query)
+                page.locator("[data-candidate-report]").first.wait_for()
+                verify_candidate_reports(page, report_entry, commit)
+                if formal_ft:
+                    version = next(iter(formal_ft["pairs"]))
+                    page.goto(base + report_query + "&b0=official-" + version)
+                    page.locator("#comparison-export").wait_for()
+                    assert (
+                        read_export_blob(page)["native_fixed200_ft"]["B1"]
+                        == formal_ft["B1"]
+                    )
+            verify_candidate_checksum(page, report_query)
+            verify_candidate_v2_checksum(page, report_entry, report_query)
             verify_archived_cards_checksum(
                 page, next(iter(archived_card_mappings.values()))
             )

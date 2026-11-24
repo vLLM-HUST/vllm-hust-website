@@ -2794,6 +2794,12 @@
       if(request!==releaseRequest)return;
       const url=new URL(location.href);
       if(releaseFallback)url.searchParams.set('release',selectedRelease);
+      if(!selectedRevision&&selectedRelease==='r10'&&releaseCatalog.archived_r10&&
+         selectedBaseline===releaseCatalog.baseline.id&&/^#(?:method-4|metric-4)$/.test(url.hash)){
+        selectedRevision=r10ArchivedVersion;
+        url.searchParams.set('release',selectedRelease);
+        url.searchParams.set('revision',selectedRevision);
+      }
       if(!archivedR10Selected())url.searchParams.delete('revision');
       if(controllerFallback)url.searchParams.delete('controlplane');
       if(!comparisonBaselines.some(item=>item.id===selectedBaseline)){
