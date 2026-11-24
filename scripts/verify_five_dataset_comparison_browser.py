@@ -20,6 +20,7 @@ CONTROLLER_SUPPLEMENTS = {
     "streaming": "data/controller-r8-streamed-heavy-load-v1.json",
     "context": "data/controller-r8-context-tenant-v1.json",
     "compute": "data/controller-r8-mmlu256-service-compute-v1.json",
+    "native_compute": "data/controller-r8-mmlu256-native-compute-v1.json",
     "c8": "data/controller-r8-closed-loop-c8-v1.json",
     "utilization": "data/controller-r8-ai-core-utilization-v1.json",
 }
@@ -251,6 +252,7 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     streaming = supplements.get("streaming")
     context = supplements.get("context")
     compute = supplements.get("compute")
+    native = supplements.get("native_compute")
     c8 = supplements.get("c8")
     utilization = supplements.get("utilization")
     profiles = (
@@ -338,10 +340,10 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         + f" {len(complete)}/5"
     )
     expect(root.locator(".result-card > span")).to_have_text(
-        ["有效算力下界", "最高吞吐比", "16K 吞吐比", "最高同费率降幅"]
+        ["参考效率下界", "最高吞吐比", "16K 吞吐比", "最高同费率降幅"]
         if lang == "zh"
         else [
-            "Effective compute bound",
+            "Reference efficiency lower bound",
             "Peak throughput ratio",
             "16K throughput ratio",
             "Best equal-rate cost reduction",
@@ -349,7 +351,9 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     )
     expect(root.locator(".result-card strong")).to_have_text(
         [
-            "—",
+            f"≥{native['arms']['controller']['efficiency_percent_lower']}%"
+            if native
+            else "—",
             f"{peak:.2f}×",
             f"{context_16k[1] / context_16k[0]:.2f}×" if context_16k else "—",
             f"{100 * (1 - 1 / peak):.2f}%",
@@ -426,10 +430,23 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         expect(context_windows.locator("tbody tr").last).to_contain_text("240–300")
         page.keyboard.press("Escape")
         expect(supplement).not_to_be_visible()
-    if compute:
+    native_button = root.locator('[data-detail="native-compute"]')
+    if native:
         expect(root.locator("[data-controller-native-efficiency]")).to_contain_text(
-            "V2 4.1"
+            "50%"
         )
+        native_button.click()
+        details = root.locator("dialog [data-controller-native-compute]")
+        expect(details).to_be_visible()
+        for arm in native["arms"].values():
+            expect(details).to_contain_text(f"≥{arm['efficiency_percent_lower']}%")
+        expect(details).to_contain_text("90%")
+        target = "./" + CONTROLLER_SUPPLEMENTS["native_compute"]
+        expect(details.locator(f'a[href="{target}"]')).to_have_count(1)
+        page.keyboard.press("Escape")
+        expect(native_button).to_be_focused()
+    else:
+        expect(native_button).to_have_count(0)
     if c8:
         for summary in c8["rows"]:
             row = performance.locator(

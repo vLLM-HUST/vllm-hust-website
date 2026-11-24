@@ -48,6 +48,7 @@ def verify(args):
         fixed_path = "data/controller-r8-fixed-profiles-repeat-v1.json"
         streaming_path = "data/controller-r8-streamed-heavy-load-v1.json"
         compute_path = "data/controller-r8-mmlu256-service-compute-v1.json"
+        native_path = "data/controller-r8-mmlu256-native-compute-v1.json"
 
         def published_result(path):
             if path not in published:
@@ -56,8 +57,8 @@ def verify(args):
             assert response.ok, path
             return response.json()
 
-        fixed, streaming, compute = map(
-            published_result, (fixed_path, streaming_path, compute_path)
+        fixed, streaming, compute, native = map(
+            published_result, (fixed_path, streaming_path, compute_path, native_path)
         )
         manifest.close()
         for width in (1440, 390):
@@ -220,6 +221,20 @@ def verify(args):
                             expect(
                                 root.locator(f'a[href="./{compute_path}"]')
                             ).to_have_count(0)
+                        native_result = root.locator("[data-controller-native-compute]")
+                        if native and identity == "r8":
+                            expect(native_result).to_be_visible()
+                            for arm in native["arms"].values():
+                                expect(native_result).to_contain_text(
+                                    f"≥{arm['efficiency_percent_lower']}%"
+                                )
+                            expect(native_result).to_contain_text("50%")
+                            expect(native_result).to_contain_text("90%")
+                            expect(
+                                native_result.locator(f'a[href="./{native_path}"]')
+                            ).to_have_count(1)
+                        else:
+                            expect(native_result).to_have_count(0)
                         await_name = f"{identity}-{width}-{theme}-{language}.png"
                         page.evaluate("window.scrollTo(0, 0)")
                         page.screenshot(
@@ -244,7 +259,10 @@ def verify(args):
         page.close()
         if fixed and streaming and compute:
             page = browser.new_page()
-            for path in (fixed_path, streaming_path, compute_path):
+            optional_paths = [fixed_path, streaming_path, compute_path]
+            if native:
+                optional_paths.append(native_path)
+            for path in optional_paths:
                 page.route(
                     "**/" + path,
                     lambda route: route.fulfill(
@@ -255,8 +273,9 @@ def verify(args):
             root = page.locator("#control-results")
             expect(root).to_have_attribute("data-loaded", "r8")
             expect(root.locator(".control-summary")).to_have_count(1)
-            for path in (fixed_path, streaming_path, compute_path):
+            for path in optional_paths:
                 expect(root.locator(f'a[href="./{path}"]')).to_have_count(0)
+            expect(root.locator("[data-controller-native-compute]")).to_have_count(0)
             receipts.append(
                 {"rejection": "optional supplement checksum", "status": "passed"}
             )

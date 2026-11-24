@@ -26,7 +26,8 @@
   let publication, selected, data, latest;
   const {
     controllerFixedProfilesPath,controllerComputePath,controllerStreamingPath,
-    readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerTimingSupplement
+    readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerNativeCompute,
+    controllerNativeComputeDetails,loadControllerTimingSupplement
   }=window.vllmHustControllerEvidence;
   const root = document.getElementById('control-results');
   const t = (cn, english) => document.documentElement.lang === 'zh' ? cn : english;
@@ -55,7 +56,7 @@
   function render() {
     if(!data) return;
     const e=data.releases.find(row=>row.id===selected),r=e.result;
-    const {fixed,streaming,compute}=selected===latest?.id?latest:{};
+    const {fixed,streaming,compute,nativeCompute}=selected===latest?.id?latest:{};
     const a=streaming?.direct||r.direct,b=streaming?.controller||r.request_throttling_controller;
     const profileLabels=new Map(e.profiles.map(row=>[row.id,row.label]));
     const profiles=fixed?.profiles||e.profiles;
@@ -93,7 +94,7 @@
       ${table([t('必要矩阵计算速率下界（TFLOP/s/卡）','Necessary matrix work lower rate (TFLOP/s per accelerator)'),t('直连引擎','Direct engine'),t('加限流层','With controller')],
         [[t('整批服务计时，含双卡同步','Service batch timing including both accelerator fences'),
           ...['direct','controller'].map(side=>'≥'+num(Math.floor(compute.arms[side].target_matrix_tflops_per_card_lower*100)/100))]])}
-      <p class="control-scope">${t('V2 4.1 尚缺控制面工况的原生双卡计时、完整必要算量和经核验的同工况参考上界。','V2 4.1 for this controller setup still needs native two-card timing, complete necessary work and a verified upper bound for the matched reference.')}
+      <p class="control-scope">${t('服务侧记录覆盖整批服务和双卡同步。','Service-side records cover the entire service batch and the two-card fence.')}
         <a href="./${controllerComputePath}">${t('逐轮记录','Per-round records')} ↗</a>
         <a href="./test-plan.html">${t('V2 核验口径','V2 verification protocol')} ↗</a></p>`:'';
     root.innerHTML=`<div class="control-toolbar"><label for="control-release">${t('版本与历史记录','Version and history')}</label><select id="control-release">${data.releases.map(v=>`<option value="${esc(v.id)}" ${v.id===selected?'selected':''}>${esc(t(v.label.replace(en['control-title'], zh['control-title']),v.label))}</option>`).join('')}</select><a href="${esc(source)}">${t('首轮报告与证据','Initial report and evidence')} ↗</a>${comparisonLink}${streamingLink}</div>
@@ -108,6 +109,9 @@
         ${fixed?`<a href="./${controllerFixedProfilesPath}">${t('五项复测与评分来源','Fixed repeat and grading source')} ↗</a>`:''}</p>
       ${table(t(['数据集','直连秒','限流秒','耗时缩短','输出 token 变化'],['Dataset','Direct (s)','Controller (s)','Time reduction','Output token change']),rows)}
       <details class="control-details"><summary>${t('质量、截断与时延','Quality, truncation and latency')}</summary>${table(t(['指标','直连引擎','加限流层'],['Metric','Direct engine','With controller']),qualityRows)}<p>${esc(fixed?t('公开轨迹只统计回放性能。','Public traces report replay performance.'):t(e.quality_note_zh,e.quality_note_en))}</p>${table(t(['数据集','直连 HTTP P95 / P99 秒','限流 HTTP P95 / P99 秒'],['Dataset','Direct HTTP P95 / P99 (s)','Controller HTTP P95 / P99 (s)']),profiles.filter(p=>p.status==='complete').map(p=>[profileLabels.get(p.id),`${num(p.direct.latency_seconds.p95)} / ${num(p.direct.latency_seconds.p99)}`,`${num(p.controller.latency_seconds.p95)} / ${num(p.controller.latency_seconds.p99)}`]))}</details>
+      ${e.id==='r8'?`<h3 id="native-reference">${t('V2 4.1 双卡原生参考效率','V2 4.1 Two-card native reference efficiency')}</h3>
+        ${nativeCompute?controllerNativeComputeDetails(nativeCompute,publication.commit,t,table):
+          `<p class="control-scope">${t('当前发布源的原生参考效率待核验。','Native reference efficiency is awaiting verification in the current publication.')}</p>`}`:''}
       ${serviceCompute}
       <details class="control-details"><summary>${t('变更记录与适用边界','Changelog and boundaries')}</summary><ul>${e.changelog.map(v=>`<li><strong>${esc(v.date)}</strong> ${esc(t(v.zh,v.en))}</li>`).join('')}</ul></details>`;
     document.getElementById('control-release').addEventListener('change',event=>{selected=event.target.value;render();document.getElementById('control-release').focus();});
@@ -124,12 +128,13 @@
         console.warn('Controller '+label+' supplement rejected',error);
         return null;
       });
-      const [fixed,streaming,compute]=await Promise.all([
+      const [fixed,streaming,compute,nativeCompute]=await Promise.all([
         optional('fixed profiles',loadControllerFixedProfiles(publication,entry)),
         optional('streaming',loadControllerTimingSupplement(publication,entry,controllerStreamingPath)),
-        optional('service compute',loadControllerCompute(publication,entry))
+        optional('service compute',loadControllerCompute(publication,entry)),
+        optional('native compute',loadControllerNativeCompute(publication,entry))
       ]);
-      latest={id:entry.id,fixed,streaming,compute};
+      latest={id:entry.id,fixed,streaming,compute,nativeCompute};
     }
     const requested=new URLSearchParams(location.search).get('release');
     selected=data.releases.some(entry=>entry.id===requested)?requested:data.default_release;
