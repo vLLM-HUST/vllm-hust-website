@@ -1258,24 +1258,23 @@
       const result=release.assessment_4_3;
       const status=met=>met?t('达成目标','Target met'):t('未达成目标','Target not met');
       const mark=(met,reason)=>status(met)+' · '+reason;
-      const missing=reason=>mark(false,reason);
       const milestone=result.measured_ratios,windows=result.measured_window_ratios;
       const tail=`${n(Number(milestone.ttft_p95))}× / ${n(Number(milestone.ttft_p99))}×`;
       const spread=`${n(Number(windows.throughput))}× · ${n(Number(windows.tpot_p95))}× / ${n(Number(windows.tpot_p99))}×`;
-      const score=t('待本版独立核算','Current-release compute reference pending');
-      const five=t('待本版固定五项配对','Current-release fixed-five pairs pending');
+      const score=t('待核算 · 本版有效算力参考','Pending calculation · current-release compute reference');
+      const five=t('待补测 · 本版固定五项配对','Pending measurements · current-release fixed-five pairs');
       return `<section class="submission-assessment" id="submission-v2" data-r10-revision="${esc(release.pypi_version)}">
-        <div class="section-heading"><h2>${t('V5 阶段判定','V5 milestone and final assessment')}</h2></div>
+        <div class="section-heading"><h2>${t('新版实测进度与 4.3 判定','Revision progress and 4.3 assessment')}</h2></div>
         <p><a href="${esc(release.pypi_url)}">PyPI ${esc(release.pypi_version)} ↗</a> ·
         <a href="${esc(release.install_manifest_url)}">${t('安装清单','Installation manifest')} ↗</a> ·
         <a href="${esc(release.arm64_acceptance_url)}">${t('ARM64 安装验收','ARM64 installation acceptance')} ↗</a></p>
         ${table(t(['项目','里程碑','结题'],['Target','Milestone','Final']),[
-          ['4.1',missing(score),missing(score)],
-          ['4.2',missing(five),missing(five)],
+          ['4.1',score,score],
+          ['4.2',five,five],
           ['4.3',mark(result.milestone.met,t('16K／4K TTFT P95／P99 ','16K / 4K TTFT P95 / P99 ')+tail),
             mark(result.final.met,t('32K 五窗吞吐／TPOT P95／P99 波动 ','32K five-window throughput / TPOT P95 / P99 spreads ')+spread)],
-          ['4.4',missing(t('待本版 MMLU 完整回答及成本','Current-release MMLU full answers and cost pending')),
-            missing(t('已完成四租户回归；整体成本验收证据待齐','Four-tenant regression recorded; overall cost qualification pending'))],
+          ['4.4',t('待补测 · 本版 MMLU 完整回答及成本','Pending measurements · current-release MMLU full answers and cost'),
+            t('证据未齐 · 已完成四租户回归','Evidence incomplete · four-tenant regression complete')],
         ])}</section>`;
     }
     const stable=stableAssessment(entry);
