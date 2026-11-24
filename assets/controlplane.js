@@ -139,6 +139,9 @@
     const requested=new URLSearchParams(location.search).get('release');
     selected=data.releases.some(entry=>entry.id===requested)?requested:data.default_release;
     render();
+    if(location.hash==='#native-reference'){
+      requestAnimationFrame(()=>document.getElementById('native-reference')?.scrollIntoView());
+    }
   }
   new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   load().catch(error=>{root.innerHTML=`<div class="control-error"><p>${t('结果来源校验未通过，暂不展示性能数值。','Result provenance verification failed; measurements are not displayed.')}</p><a href="https://github.com/vLLM-HUST/vllm-hust-benchmark/tree/main/reports">${t('查看原始报告','View original reports')} ↗</a></div>`;root.setAttribute('aria-busy','false');root.dataset.error=error.message;});

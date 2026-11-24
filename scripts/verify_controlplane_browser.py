@@ -257,6 +257,13 @@ def verify(args):
         page.goto(args.url.rstrip("/") + "/controlplane/?release=r6#results")
         expect(page.locator("#control-results")).to_have_attribute("data-loaded", "r6")
         page.close()
+        if native:
+            page = browser.new_page()
+            page.goto(
+                args.url.rstrip("/") + "/controlplane/?release=r8#native-reference"
+            )
+            expect(page.locator("#native-reference")).to_be_in_viewport()
+            page.close()
         if fixed and streaming and compute:
             page = browser.new_page()
             optional_paths = [fixed_path, streaming_path, compute_path]
