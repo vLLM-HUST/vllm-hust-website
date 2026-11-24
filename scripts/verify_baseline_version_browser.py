@@ -524,7 +524,9 @@ def verify_stable_default(page, catalog):
         == catalog["baseline"]["id"]
     )
     response = page.request.get(
-        base + "/" + entry["candidate_submission_assessment"]["path"]
+        args.base_url.rstrip("/")
+        + "/"
+        + entry["candidate_submission_assessment"]["path"]
     )
     assert response.ok
     record = response.json()["candidates"][stable["kind"]]
