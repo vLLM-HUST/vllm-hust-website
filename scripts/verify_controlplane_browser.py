@@ -104,6 +104,16 @@ def verify(args):
                         if language == "zh"
                         else "Request Throttling Controller | vLLM-HUST"
                     )
+                    github_org = "https://github.com/vLLM-HUST/"
+                    expect(page.locator("#control-guide-link")).to_have_attribute(
+                        "href",
+                        github_org + "ride/blob/main/docs/guides/INSTALL_AND_DEPLOY.md",
+                    )
+                    expect(page.locator("#control-protocol-link")).to_have_attribute(
+                        "href",
+                        github_org
+                        + "vllm-hust-benchmark/blob/main/reports/controller-r8-full-coverage-20261122/README.md",
+                    )
                     expect(page.locator("#control-deploy-copy")).to_contain_text(
                         "请求限流控制器"
                         if language == "zh"
@@ -327,6 +337,11 @@ def verify(args):
                 expect(
                     routing.get_by_role("cell", name=verdict, exact=True)
                 ).to_be_visible()
+                expect(page).to_have_title(
+                    "缓存控制器 · vLLM-HUST"
+                    if language == "zh"
+                    else "KV Controller · vLLM-HUST"
+                )
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= innerWidth + 1"
                 )
@@ -364,6 +379,11 @@ def verify(args):
                 if page.locator("html").get_attribute("lang") != language:
                     page.locator("#langToggle").click()
                 expect(scaling.get_by_role("heading", name=title)).to_be_visible()
+                expect(page).to_have_title(
+                    "实例控制器 · vLLM-HUST"
+                    if language == "zh"
+                    else "Instance Controller · vLLM-HUST"
+                )
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= innerWidth + 1"
                 )

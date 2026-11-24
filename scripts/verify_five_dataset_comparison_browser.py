@@ -217,6 +217,8 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     menu.select_option("r6")
     expect(panel).to_have_attribute("data-engine-release", "r6")
     expect(panel.locator("#controller-trajectory-result")).to_contain_text("30.06%")
+    expect(panel.locator(".release-coverage-summary")).to_contain_text("0/5")
+    expect(panel.locator(".result-card strong").first).to_have_text("—")
     menu.select_option("r9")
     expect(panel).not_to_have_attribute("data-engine-release", "r8")
     expect(panel).to_contain_text("B1 r9")
@@ -304,9 +306,54 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     if streaming:
         a, b = streaming["direct"], streaming["controller"]
     output_rates = [arm["output_tokens"] / arm["elapsed_seconds"] for arm in (a, b)]
-    throughput_change = 100 * (output_rates[1] / output_rates[0] - 1)
-    expect(root.locator(".result-card").nth(1).locator("strong")).to_have_text(
-        f"{throughput_change:+.2f}%"
+    complete = [profile for profile in profiles if profile["status"] == "complete"]
+    rate_pairs = [
+        (
+            profile["direct"]["output_tokens_per_second"],
+            profile["controller"]["output_tokens_per_second"],
+        )
+        for profile in complete
+    ] + [tuple(output_rates)]
+    c8_pairs = {
+        row["id"]: (
+            row["direct"]["output_tokens_per_second"],
+            row["controller"]["output_tokens_per_second"],
+        )
+        for row in (c8 or {}).get("rows", [])
+    }
+    context_pairs = {
+        str(row["id"]): (
+            row["direct"]["metrics"]["output_tokens_per_second"],
+            row["controller"]["metrics"]["output_tokens_per_second"],
+        )
+        for row in (context or {}).get("phases", [])
+    }
+    peak = max(
+        after / before
+        for before, after in [*rate_pairs, *c8_pairs.values(), *context_pairs.values()]
+    )
+    context_16k = context_pairs.get("16384") or c8_pairs.get("16384-formal")
+    expect(root.locator(".release-coverage-summary")).to_have_text(
+        ("固定五项配对" if lang == "zh" else "Fixed-profile pairs")
+        + f" {len(complete)}/5"
+    )
+    expect(root.locator(".result-card > span")).to_have_text(
+        ["有效算力下界", "最高吞吐比", "16K 吞吐比", "最高同费率降幅"]
+        if lang == "zh"
+        else [
+            "Effective compute bound",
+            "Peak throughput ratio",
+            "16K throughput ratio",
+            "Best equal-rate cost reduction",
+        ]
+    )
+    expect(root.locator(".result-card strong")).to_have_text(
+        [
+            "—",
+            f"{peak:.2f}×",
+            f"{context_16k[1] / context_16k[0]:.2f}×" if context_16k else "—",
+            f"{100 * (1 - 1 / peak):.2f}%",
+        ]
     )
     evidence = root.locator("#controller-trajectory-result")
     expect(evidence).to_contain_text("SWE Trace Heavy Load")
@@ -380,17 +427,8 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
         page.keyboard.press("Escape")
         expect(supplement).not_to_be_visible()
     if compute:
-        expect(root.locator(".result-card").first.locator("span")).to_have_text(
-            "服务侧矩阵算力下界"
-            if lang == "zh"
-            else "Service-side matrix compute lower bound"
-        )
         expect(root.locator("[data-controller-native-efficiency]")).to_contain_text(
             "V2 4.1"
-        )
-        lower = compute["arms"]["controller"]["target_matrix_tflops_per_card_lower"]
-        expect(root.locator(".result-card").first.locator("strong")).to_have_text(
-            f"≥{int(100 * lower) / 100:.2f}"
         )
     if c8:
         for summary in c8["rows"]:
@@ -425,6 +463,9 @@ def assert_controller_special(page, root, entry, layout, lang, latency, suppleme
     dialog = root.locator("dialog")
     expect(dialog).to_be_visible()
     expect(dialog.locator("tbody tr").nth(4)).to_contain_text("SWE Trace Heavy Load")
+    if compute:
+        lower = compute["arms"]["controller"]["target_matrix_tflops_per_card_lower"]
+        expect(dialog).to_contain_text(f"≥{int(100 * lower) / 100:.2f}")
     if streaming:
         expect(
             dialog.locator('a[href="./data/controller-r8-streamed-heavy-load-v1.json"]')
