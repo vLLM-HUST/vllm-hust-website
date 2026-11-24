@@ -948,6 +948,27 @@ def verify(url, output):
                         expect(assessment).to_have_attribute(
                             "data-r10-revision", revision["pypi_version"]
                         )
+                        rows = assessment.locator("tbody tr")
+                        incomplete = (
+                            (
+                                ("待核算", "待核算"),
+                                ("待补测", "待补测"),
+                                ("待补测", "证据未齐"),
+                            )
+                            if lang == "zh"
+                            else (
+                                ("Pending calculation", "Pending calculation"),
+                                ("Pending measurements", "Pending measurements"),
+                                ("Pending measurements", "Evidence incomplete"),
+                            )
+                        )
+                        for index, statuses in zip((0, 1, 3), incomplete, strict=True):
+                            cells = rows.nth(index).locator("td")
+                            for column, status in enumerate(statuses):
+                                expect(cells.nth(column)).to_contain_text(status)
+                                expect(cells.nth(column)).not_to_contain_text(
+                                    "未达成目标" if lang == "zh" else "Target not met"
+                                )
                         windows = root.locator("[data-r10-stability-windows] tbody tr")
                         expect(windows).to_have_count(5)
                         previous = revision["previous_version"]
