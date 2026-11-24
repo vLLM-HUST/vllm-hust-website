@@ -633,7 +633,9 @@
            archive.baseline_id!==baseline.id||archive.stable_evidence?.pypi_version!==r10ArchivedVersion){
           throw Error('Invalid archived R10 release');
         }
-        await loadStableAssessment(archive,publication,baseline.id);
+        await loadStableAssessment(archive,publication,baseline.id).catch(error=>{
+          console.warn('Archived R10 V2 evidence rejected',error);
+        });
       }
       if(value.entries.find(row=>row.id==='r5').measurements.length) throw Error('r5 has no formal inference');
       if (!Array.isArray(value.attempt_order) || new Set(value.attempt_order).size!==value.attempt_order.length || value.attempt_order.some(id=>!/^r[1-9][0-9]*$/.test(id)||value.order.includes(id)) || value.attempts?.length!==value.attempt_order.length) throw Error('Invalid early-attempt catalog');
@@ -2794,6 +2796,12 @@
       if(request!==releaseRequest)return;
       const url=new URL(location.href);
       if(releaseFallback)url.searchParams.set('release',selectedRelease);
+      if(!selectedRevision&&selectedRelease==='r10'&&releaseCatalog.archived_r10&&
+         selectedBaseline===releaseCatalog.baseline.id&&/^#(?:method-4|metric-4)$/.test(url.hash)){
+        selectedRevision=r10ArchivedVersion;
+        url.searchParams.set('release',selectedRelease);
+        url.searchParams.set('revision',selectedRevision);
+      }
       if(!archivedR10Selected())url.searchParams.delete('revision');
       if(controllerFallback)url.searchParams.delete('controlplane');
       if(!comparisonBaselines.some(item=>item.id===selectedBaseline)){

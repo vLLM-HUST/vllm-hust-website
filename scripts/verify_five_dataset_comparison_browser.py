@@ -942,6 +942,20 @@ def verify(url, output):
                         assert_paired_version(page, root, current, catalog)
                     if current.get("submission_assessment"):
                         assert_submission_assessment(page, root, current, url, lang)
+                    if current.get("r10_revision"):
+                        revision = current["r10_revision"]
+                        assessment = root.locator("[data-r10-revision]")
+                        expect(assessment).to_have_attribute(
+                            "data-r10-revision", revision["pypi_version"]
+                        )
+                        windows = root.locator("[data-r10-stability-windows] tbody tr")
+                        expect(windows).to_have_count(5)
+                        previous = revision["previous_version"]
+                        expect(
+                            root.locator(
+                                f'a[href="./b0-b1.html?release=r10&revision={previous}"]'
+                            )
+                        ).to_be_visible()
                     assert_release_control_readable(page, root)
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth+1"

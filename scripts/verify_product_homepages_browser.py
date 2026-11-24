@@ -975,13 +975,13 @@ def main():
                     )
                     manifest_url = (
                         "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/"
-                        "engine-wheels-r10-v1/r10-pip-requirements.txt"
+                        "engine-wheels-r10-v1/r10-3072-pip-requirements.txt"
                     )
                     expect(page.locator("#engine-install-source")).to_have_attribute(
                         "href", manifest_url
                     )
                     expect(page.locator("#engine-install-copy")).to_contain_text(
-                        "2026.11.21.10"
+                        "2026.11.24.10"
                     )
                     expect(page.locator("#engine-install-source")).to_contain_text(
                         "r10 哈希锁定" if language == "zh" else "r10 hash-locked"
