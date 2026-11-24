@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 2d3228fa97423524154f2667c6478a41cc45a3ed # pragma: allowlist secret
+          ref: c3b30bed4781df1d20101678779ce8879a711b31 # pragma: allowlist secret
           path: benchmark
           persist-credentials: false
           sparse-checkout: |
@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 2d3228fa97423524154f2667c6478a41cc45a3ed # pragma: allowlist secret
+          ref: c3b30bed4781df1d20101678779ce8879a711b31 # pragma: allowlist secret
           path: publication-policy
           persist-credentials: false
           sparse-checkout: scripts/build_public_site.py
@@ -80,7 +80,7 @@ jobs:
         run: |
           python publication-policy/scripts/build_public_site.py \
             --website website --output public-site \
-            --policy-revision 2d3228fa97423524154f2667c6478a41cc45a3ed
+            --policy-revision c3b30bed4781df1d20101678779ce8879a711b31
       - name: Attach verified deployment provenance
         run: cp "$RUNNER_TEMP/release-sources.json" public-site/deployment-provenance.json
       - name: Verify the final public comparison page
