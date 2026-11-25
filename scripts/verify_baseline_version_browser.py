@@ -876,9 +876,60 @@ with sync_playwright() as playwright:
                         )
                         if run and run[field] is None
                     ]
+                    mmlu = page.locator('.dataset-coverage [data-dataset="mmlu"]')
                     if missing:
-                        mmlu = page.locator('.dataset-coverage [data-dataset="mmlu"]')
                         assert " / ".join(missing) in mmlu.inner_text()
+                    else:
+                        assert mmlu.locator("small").count() == 0
+                    for field, divisor in (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1)):
+                        value = run[field]
+                        chart_value = page.locator(
+                            f'[data-metric="{field}"] [data-profile="mmlu"] .bar-line'
+                        ).first.locator(".bar-value")
+                        assert chart_value.inner_text() == (
+                            "—" if value is None else f"{value / divisor:.2f}"
+                        )
+                    tenant_profile = next(
+                        r
+                        for r in independent_baselines[baseline]["profiles"]
+                        if r["id"] == "real-context-multi-tenant-formal"
+                    )
+                    utilization = tenant_profile.get("utilization")
+                    panel = page.locator("[data-b0-c24-utilization]")
+                    if utilization:
+                        assert panel.count() == 1
+                        actual = [
+                            row.locator("th, td").all_inner_texts()
+                            for row in panel.locator("tbody tr").all()
+                        ]
+                        expected = [
+                            [
+                                f"{'卡' if args.language == 'zh' else 'Card'} {card}",
+                                f"{value:.2f}%",
+                            ]
+                            for card, value in sorted(
+                                utilization["per_card_percent"].items(),
+                                key=lambda entry: int(entry[0]),
+                            )
+                        ]
+                        expected.append(
+                            [
+                                "双卡均值"
+                                if args.language == "zh"
+                                else "Two-card mean",
+                                f"{utilization['mean_percent']:.2f}%",
+                            ]
+                        )
+                        assert actual == expected, (actual, expected)
+                        assert (
+                            page.locator(".goal-grid .result-card")
+                            .nth(3)
+                            .locator("a[href='#selected-c24-utilization']")
+                            .count()
+                            == 1
+                        )
+                    else:
+                        assert panel.count() == 0
                 if (
                     release == "r10"
                     and r10_archive
