@@ -1080,7 +1080,8 @@
     }
     const publicSource=a.raw_asset.public_download;
     if(publicSource&&(!/^data\/[a-z0-9/-]+\.(?:json|tar\.gz|zip)$/.test(publicSource.path||'')||
-       publicSource.sha256!==a.raw_asset.sha256||publicSource.bytes!==a.raw_asset.bytes||
+       (publicSource.original_sha256??publicSource.sha256)!==a.raw_asset.sha256||
+       (!publicSource.original_sha256&&publicSource.bytes!==a.raw_asset.bytes)||
        !publication.files.some(row=>row.website_path===publicSource.path&&
          row.sha256===publicSource.sha256&&row.bytes===publicSource.bytes)))fail();
     const chart=a.chart;
