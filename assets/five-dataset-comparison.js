@@ -386,6 +386,8 @@
   readComparisonLocation();
   let comparisonBaselines = [];
   const baselineObservations = new Map();
+  const independentRentalPath='data/b0-independent-rental-observations-v1.json';
+  let independentRental=null;
   const b0RepairReportPath='data/b0-mtp-kv-prefix-repair-v1/report.json';
   const r10PatchedFtPath='data/r10-stable-patched-b0-ft-20261123-v1/report.json';
   let b0RepairReport;
@@ -603,6 +605,43 @@
     }
     return publicationCheck;
   }
+  async function loadIndependentRental(publication, catalog) {
+    if(!publication.files.some(file=>file.website_path===independentRentalPath))return null;
+    const response=await fetch('./'+independentRentalPath,{cache:'no-cache'});
+    const data=await readPublishedJson(publication,independentRentalPath,response);
+    const official=catalog.entries.find(entry=>entry.submission_assessment?.path===data.rental_quote_source?.path);
+    const approved=official&&submissionAssessments.get(official)?.quote;
+    const same=(left,right)=>left?.path===right?.path&&left?.sha256===right?.sha256&&left?.bytes===right?.bytes;
+    const ids=['mmlu','real-context-multi-tenant-formal'];
+    if(data.schema!=='vllm-hust-independent-b0-rental-observations/v1'||data.inference_reruns!==0||
+       !approved||!same(data.rental_quote_source,official.submission_assessment)||
+       Object.keys(approved).some(key=>data.rental_quote?.[key]!==approved[key]))throw Error('Invalid B0 rental source');
+    const rate=Number(approved.cny_per_card_month);
+    for(const [id,record] of Object.entries(data.baselines||{})){
+      const item=catalog.comparison_baselines.find(baseline=>baseline.id===id);
+      const observed=baselineObservations.get(id);
+      if(!item||!observed||!same(record.observations,item.observations)||!same(data.sse_replay,observed.original_sse_replay)||
+         Object.keys(record.workloads||{}).length!==ids.length)throw Error('Invalid B0 rental run identity');
+      for(const key of ids){
+        const profile=observed.profiles.find(row=>row.id===key);
+        const row=record.workloads[key], arm=profile?.arm, utilization=row?.utilization;
+        if(!arm||!row||row.measurement_seal_sha256!==arm.source_seal_sha256||
+           row.source_metric?.path!==profile.source_metric?.path||row.source_metric?.sha256!==profile.source_metric?.sha256||
+           row.successful_output_tokens!==arm.output_tokens||row.duration_seconds!==arm.duration_seconds||
+           !validPhysicalCards(row.physical_cards)||!utilization||utilization.missing_seconds!==0||
+           !close(utilization.covered_seconds,row.duration_seconds))throw Error('Invalid B0 rental window');
+        const cardValues=row.physical_cards.map(card=>utilization.per_card_percent?.[card]);
+        if(Object.keys(utilization.per_card_percent||{}).length!==row.physical_cards.length||
+           !cardValues.every(value=>Number.isFinite(value)&&value>=0&&value<=100)||
+           !close(utilization.mean_percent,cardValues.reduce((total,value)=>total+value,0)/cardValues.length)||
+           !close(row.estimated_cny_per_million_successful_output_tokens,
+                  1e6*rate*row.physical_cards.length*row.duration_seconds/(30*86400*row.successful_output_tokens))){
+          throw Error('Inconsistent B0 rental observations');
+        }
+      }
+    }
+    return data;
+  }
   async function loadReleaseCatalog() {
     if (releaseCatalog) return;
     if (catalogRequest) return catalogRequest;
@@ -678,6 +717,10 @@
           console.warn('Stable release V2 evidence rejected',error);
         });
       }
+      independentRental=await loadIndependentRental(publication,value).catch(error=>{
+        console.warn('Independent B0 rental observations rejected',error);
+        return null;
+      });
       if(value.archived_r10){
         const archive=value.archived_r10;
         if(archive.id!=='r10'||archive.release!=='full-answer-b1-20261121-r10'||
@@ -2706,8 +2749,23 @@
     const b1TenantUtilization=alternate&&isC24(supplement?.protocol.phases.find(phase=>phase.id==='multi-tenant'))&&
       utilizationTable('B1',tenantCandidate?.B1.utilization,supplement.raw_asset.url,
         t('B1 上下文与四租户原件','B1 context and four-tenant evidence'));
-    const tenantUtilization=b0TenantUtilization||b1TenantUtilization?
-      `<div id="selected-c24-utilization" tabindex="-1">${b0TenantUtilization||''}${b1TenantUtilization||''}</div>`:'';
+    const b0Rental=alternate?independentRental?.baselines?.[baseline.id]:null;
+    const rentalTable=b0Rental?`<div data-b0-rental-observations>
+      <h3>${t('B0 单臂实测与租金折算','B0 measurements and rental estimates')}</h3>
+      <p>${t('按各臂原测窗口和公开租金折算','Based on the original measurement windows and the published rental rate')}
+        · <a href="${esc(independentRental.rental_quote.url)}">${n(Number(independentRental.rental_quote.cny_per_card_month))}
+        ${t('元/卡月','CNY/card-month')}</a> · <a href="./${independentRentalPath}">${t('数据和封存摘要','Data and evidence digests')}</a></p>
+      ${table(t(['工况','元/百万成功输出 token','双卡平均 AI Core','逐卡 AI Core'],
+                ['Workload','CNY per million successful output tokens','Mean AI Core, two cards','AI Core per card']),
+        [['mmlu','MMLU-Pro 200'],['real-context-multi-tenant-formal',t('4K 四租户 C24','4K four tenants C24')]]
+        .map(([id,label])=>{
+          const row=b0Rental.workloads[id];
+          return [label,n(row.estimated_cny_per_million_successful_output_tokens),n(row.utilization.mean_percent)+'%',
+            row.physical_cards.map(card=>t('卡 ','Card ')+card+' · '+n(row.utilization.per_card_percent[card])+'%').join(' / ')];
+        }))}
+    </div>`:'';
+    const tenantUtilization=b0TenantUtilization||b1TenantUtilization||rentalTable?
+      `<div id="selected-c24-utilization" tabindex="-1">${rentalTable}${b0TenantUtilization||''}${b1TenantUtilization||''}</div>`:'';
     const goalNotes=[
       ftPair?t('已有补丁版 F/T 专项，见下方','Patched B0 F/T comparison below'):
         observed?.automatic_ft_audit?.status==='ineligible'?
@@ -2878,6 +2936,8 @@
     root.querySelector('#comparison-export').onclick=()=>{
       const payload={schema:'selected-b0-b1-observations/v1',baseline:baseline.id,candidate:entry.id,paired:false,reason,rows,context,context_workloads:contextSources,configuration:{B0:b0Configuration,B1:b1Configuration},
         native_timing:observed?.native_timing??null,automatic_ft_audit:observed?.automatic_ft_audit??null};
+      if(b0Rental)payload.independent_b0_rental={quote:independentRental.rental_quote,
+        source:independentRentalPath,workloads:b0Rental.workloads};
       if(ftPair)payload.native_fixed200_ft={...ftPair,B1:r10PatchedFt.B1,protocol:r10PatchedFt.protocol,report:comparisonEvidence};
       const reports=candidateReports(entry).map(({kind,summary,readme,websitePath})=>({
         kind,baseline:releaseCatalog.baseline.id,summary:{...summary,path:websitePath,url:pinnedSource(summary.url)},report:pinnedSource(readme.url)
