@@ -388,6 +388,8 @@
   const baselineObservations = new Map();
   const independentRentalPath='data/b0-independent-rental-observations-v1.json';
   let independentRental=null;
+  const baselineIndicatorPath='data/b0-four-indicators-20261125-v1/report.json';
+  let baselineIndicators=null;
   const b0RepairReportPath='data/b0-mtp-kv-prefix-repair-v1/report.json';
   const r10PatchedFtPath='data/r10-stable-patched-b0-ft-20261123-v1/report.json';
   let b0RepairReport;
@@ -642,6 +644,50 @@
     }
     return data;
   }
+
+  async function loadBaselineIndicators(publication,catalog) {
+    if(!publication.files.some(file=>file.website_path===baselineIndicatorPath))return null;
+    const response=await fetch('./'+baselineIndicatorPath,{cache:'no-cache'});
+    const report=await readPublishedJson(publication,baselineIndicatorPath,response);
+    const identifiers=[catalog.baseline.id,...catalog.comparison_baselines.map(row=>row.id)];
+    if(report.schema!=='vllm-hust-b0-four-indicators/v1'||report.scope!=='standalone-b0'||
+       report.official_v2_baseline_id!==catalog.baseline.id||report.model!==fixedBaseline.model||
+       report.tensor_parallel_size!==2||Object.keys(report.baselines||{}).length!==identifiers.length)
+      throw Error('Standalone B0 indicator identity differs');
+    const sourceKnown=record=>record&&publication.files.some(file=>file.website_path===record.path&&
+      file.sha256===record.sha256&&file.bytes===record.bytes);
+    if(!sourceKnown(report.rental_quote_source))throw Error('Standalone B0 quote source differs');
+    for(const id of identifiers){
+      const row=report.baselines[id];
+      const ft=row?.['4.1'], perf=row?.['4.2'], context=row?.['4.3'], cost=row?.['4.4'];
+      if(![ft,perf,context,cost].every(section=>sourceKnown(section?.source)))
+        throw Error('Standalone B0 indicator source differs');
+      const alternate=catalog.comparison_baselines.find(item=>item.id===id);
+      const expectedIdentity=alternate?id.replace(/^(official|candidate)-/,'')+'-selected-kv-prefix-repair':'original-0.18';
+      const observationSource=alternate?.observations??ft.source;
+      if(ft.identity!==expectedIdentity||[perf,context,cost].some(section=>
+         section.source.path!==observationSource.path||section.source.sha256!==observationSource.sha256))
+        throw Error('Standalone B0 runtime or observation binding differs');
+      if(ft.workload!=='MMLU-Pro fixed 200, native out256'||ft.formal_repetitions!==3||
+        ![ft.efficiency_lower_percent,ft.T_seconds,ft.reference_tflops_per_card_upper].every(value=>Number(value)>0)||
+        !Array.isArray(ft.F_interval)||ft.F_interval.length!==2||
+        !ft.F_interval.every(value=>Number.isSafeInteger(value)&&value>0)||
+        !close(Number(ft.efficiency_lower_percent),100*ft.F_interval[0]/(2*Number(ft.T_seconds)*1e12*Number(ft.reference_tflops_per_card_upper))))
+        throw Error('Standalone B0 compute interval differs');
+      if(perf.profiles.map(item=>item.id).join('/')!=='mmlu/hle/frontier/swe/terminal'||
+         context.phases.map(item=>item.phase).join('/')!=='4096-formal/16384-formal/32768-formal/multi-tenant-formal'||
+         ![...perf.profiles,...context.phases].every(item=>/^[0-9a-f]{64}$/.test(item.source_seal_sha256)&&
+           [item.output_tokens_per_second,item.ttft_mean_ms,item.tpot_mean_ms].every(value=>Number.isFinite(value)&&value>=0)))
+        throw Error('Standalone B0 performance population differs');
+      const rate=Number(report.rental_quote.cny_per_card_month);
+      for(const [key,profile] of [['mmlu',perf.profiles[0]],['c24',context.phases[3]]]){
+        const expected=1e6*rate*report.tensor_parallel_size*profile.duration_seconds/(30*86400*profile.output_tokens);
+        if(profile.failed!==0||!close(cost.estimated_cny_per_million_successful_output_tokens[key],expected))
+          throw Error('Standalone B0 rental comparison differs');
+      }
+    }
+    return report;
+  }
   async function loadReleaseCatalog() {
     if (releaseCatalog) return;
     if (catalogRequest) return catalogRequest;
@@ -719,6 +765,10 @@
       }
       independentRental=await loadIndependentRental(publication,value).catch(error=>{
         console.warn('Independent B0 rental observations rejected',error);
+        return null;
+      });
+      baselineIndicators=await loadBaselineIndicators(publication,value).catch(error=>{
+        console.warn('Standalone B0 indicators rejected',error);
         return null;
       });
       if(value.archived_r10){
@@ -1029,7 +1079,75 @@
     ${releaseFallback?`<p class="release-fallback" role="status">${t('链接中的 B1 版本无效，已显示最新正式版。','The B1 version in the link is unknown. Showing the latest frozen release.')}</p>`:''}
     ${controllerFallback?`<p class="controller-fallback" role="status">${t('链接中的控制面无效，已选无。','The control plane in the link is unknown. None is selected.')}</p>`:''}`;
   }
+
+  function renderBaselineIndicators() {
+    const row=baselineIndicators?.baselines?.[selectedBaseline];
+    const anchor=root.querySelector('.goal-grid');
+    if(!row||!anchor||root.querySelector('[data-b0-four-indicators]'))return;
+    const ft=row['4.1'], perf=row['4.2'], context=row['4.3'], cost=row['4.4'];
+    const link=section=>'<a href="./'+esc(section.source.path)+'">'+t('来源','Source')+'</a>';
+    const labels=['MMLU-Pro 200','HLE 200','FrontierScience 160','SWE-bench Pro','Terminal-Bench'];
+    const scenarios=['4K C8','16K C8','32K C8',t('4K 四租户 C24','4K four-tenant C24')];
+    const costs=cost.estimated_cny_per_million_successful_output_tokens;
+    const description=t('4.1 使用固定 200 题 native out256。4.2–4.4 使用该版本原测。','4.1 uses fixed 200 native out256. 4.2–4.4 use this version’s original measurements.');
+    const identity=ft.identity.endsWith('selected-kv-prefix-repair')?
+      t('MTP2 KV 前缀补丁复测','MTP2 KV-prefix patched retest'):
+      t('原始 0.18','Original 0.18');
+    const scope=t('B0 四项实测原值','B0 standalone indicator values');
+    const perfTable=table(t(['固定工况','完成 / 请求','输出 tok/s','平均 TTFT · ms','平均 TPOT · ms'],
+                             ['Fixed profile','Completed / requests','Output tok/s','Mean TTFT · ms','Mean TPOT · ms']),
+      perf.profiles.map((item,i)=>[labels[i],item.successful+' / '+item.requests,n(item.output_tokens_per_second),
+                                          n(item.ttft_mean_ms),n(item.tpot_mean_ms)]));
+    const original=selectedBaseline===baselineIndicators.official_v2_baseline_id;
+    const contextEvidence=original?
+      fixedBaseline.context.observations.map(item=>item.B0):
+      ['4096-formal','16384-formal','32768-formal','multi-tenant-formal'].map(phase=>
+        baselineObservations.get(selectedBaseline).profiles.find(item=>item.id==='real-context-'+phase));
+    const latencyHeader=t(['TTFT P95 / P99 · ms','TPOT P95 / P99 · ms'],['TTFT P95 / P99 · ms','TPOT P95 / P99 · ms']);
+    const percentileValues=metrics=>[metrics.ttft_ms,metrics.tpot_ms].map(stat=>n(stat.p95)+' / '+n(stat.p99));
+    const contextTable=table([...t(['工况','完成 / 请求','输出 tok/s'],['Scenario','Completed / requests','Output tok/s']),...latencyHeader],
+      context.phases.map((item,i)=>[scenarios[i],item.successful+' / '+item.requests,n(item.output_tokens_per_second),
+        ...percentileValues(contextEvidence[i].arm??contextEvidence[i].metrics)]));
+    const contextWindows=table([...t(['32K 正式窗口','完成 / 请求','输出 tok/s'],
+                            ['32K measurement window','Completed / requests','Output tok/s']),...latencyHeader],
+      contextEvidence[2].windows.map(({metrics},i)=>[i+1,metrics.successful+' / '+metrics.requests,
+        n(metrics.output_tokens_per_second),...percentileValues(metrics)]));
+    const publishedFormalMmlu=original?[...submissionAssessments.entries()].find(([entry])=>
+      entry.submission_assessment?.path===baselineIndicators.rental_quote_source.path)?.[1].targets['4.4'].formal_cost?.mmlu:null;
+    const historicalMmlu=independentRental?.baselines?.[selectedBaseline]?.workloads?.mmlu;
+    const mmluWindow=original?publishedFormalMmlu?.utilization.B0:historicalMmlu?.utilization;
+    const mmluCost=original?Number(publishedFormalMmlu?.arms.B0.cost_per_million_output_tokens_cny):costs.mmlu;
+    const factors=t(['工况','AI Core 双卡均值','元/百万成功输出 token'],['Scenario','Two-card AI Core mean','CNY/M successful output tokens']);
+    const costTable=table(factors,[
+      [original?t('R10 正式 MMLU200 窗口','R10 formal MMLU200 window'):'MMLU-Pro 200',n(mmluWindow?.mean_percent)+'%',n(mmluCost)],
+      [scenarios[3],n(cost.c24_device_utilization.mean_ai_core_percent)+'%',n(costs.c24)]
+    ]);
+    const costEvidence=original?baselineIndicators.rental_quote_source:cost.rental_projection;
+    if(root.querySelector('[data-outline-scope]'))anchor.style.display='none';
+    anchor.insertAdjacentHTML('afterend',`<section class="comparison-supplement" data-b0-four-indicators="${esc(selectedBaseline)}">
+      <div class="section-heading"><h2>${scope}</h2><a href="./${baselineIndicatorPath}">${t('下载数据','Download data')}</a></div>
+      <p class="chart-scale-note">${description}</p>
+      <div class="metric-grid">
+        <article class="result-card" data-b0-indicator="4.1"><span>${t('4.1 参考效率下界','4.1 Reference efficiency lower bound')}</span>
+          <strong>${n(Number(ft.efficiency_lower_percent))}%</strong><small>${identity} · ${link(ft)}</small></article>
+        <article class="result-card" data-b0-indicator="4.2"><span>${t('4.2 固定工况性能','4.2 Fixed-workload performance')}</span>
+          <strong>${n(perf.profiles[0].output_tokens_per_second)} tok/s</strong>
+          <small>MMLU-Pro 200 · ${perf.profiles.length}/5 ${t('工况有实测','profiles measured')} · ${link(perf)}</small></article>
+        <article class="result-card" data-b0-indicator="4.3"><span>${t('4.3 上下文与四租户','4.3 Context and four tenants')}</span>
+          <strong>${n(context.ttft_p95_16k_over_4k)}×</strong>
+          <small>${t('16K / 4K P95 TTFT','16K / 4K P95 TTFT')} · ${link(context)}</small></article>
+        <article class="result-card" data-b0-indicator="4.4"><span>${t('4.4 C24 租金折算成本','4.4 C24 rental cost estimate')}</span>
+          <strong>${n(costs.c24)} ${t('元/百万 token','CNY/M token')}</strong>
+          <small>${t('C24 AI Core','C24 AI Core')} ${n(cost.c24_device_utilization.mean_ai_core_percent)}% ·
+            MMLU ${n(mmluCost)} ${t('元/百万 token','CNY/M token')} · ${link(cost)}</small></article>
+      </div>
+      <details><summary>${t('查看性能、上下文窗口和成本明细','View performance, context windows and cost details')}</summary>
+        ${perfTable}${contextTable}${contextWindows}${costTable}
+        <p>${t('MMLU200 算力采样与成本窗口','MMLU200 utilization and cost window')} · ${link({source:costEvidence})}</p>
+      </details></section>`);
+  }
   function bindMenu() {
+    renderBaselineIndicators();
     root.querySelector('#comparison-controlplane-select').addEventListener('change',event=>{
       selectedController=event.target.value;
       if(controllerFallback){

@@ -1,12 +1,13 @@
 """Check the assembled site's B0/B1 selectors; does not generate measurements."""
 
 import argparse
-from decimal import Decimal, ROUND_DOWN
 import hashlib
 import json
 import os
+from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
+
 from playwright.sync_api import sync_playwright
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -721,6 +722,20 @@ with sync_playwright() as playwright:
             if rental_descriptor
             else None
         )
+        indicators_path = "data/b0-four-indicators-20261125-v1/report.json"
+        indicators_descriptor = next(
+            (
+                row
+                for row in publication["files"]
+                if row["website_path"] == indicators_path
+            ),
+            None,
+        )
+        indicators = (
+            read_descriptor({**indicators_descriptor, "path": indicators_path})
+            if indicators_descriptor
+            else None
+        )
         repair_source = next(
             (
                 file
@@ -853,6 +868,42 @@ with sync_playwright() as playwright:
         )
         for baseline in baselines:
             page.select_option("#comparison-baseline-select", baseline)
+            if indicators:
+                indicator = page.locator(f'[data-b0-four-indicators="{baseline}"]')
+                indicator.wait_for(state="visible")
+                ids = indicator.locator("[data-b0-indicator]").evaluate_all(
+                    "(cards)=>cards.map(card=>card.dataset.b0Indicator)"
+                )
+                assert ids == ["4.1", "4.2", "4.3", "4.4"]
+                assert "—" not in "".join(
+                    indicator.locator("strong").all_text_contents()
+                )
+                record = indicators["baselines"][baseline]
+                efficiency = indicator.locator(
+                    '[data-b0-indicator="4.1"] strong'
+                ).inner_text()
+                assert (
+                    abs(
+                        float(efficiency.rstrip("%"))
+                        - float(record["4.1"]["efficiency_lower_percent"])
+                    )
+                    <= 0.011
+                )
+                for metric in ids:
+                    source_url = indicator.locator(
+                        f'[data-b0-indicator="{metric}"] a'
+                    ).get_attribute("href")
+                    assert source_url == "./" + record[metric]["source"]["path"]
+                indicator.locator("summary").click()
+                assert [
+                    table.locator("tbody tr").count()
+                    for table in indicator.locator("table").all()
+                ] == [5, 4, 5, 2]
+                indicator.locator("summary").click()
+                if baseline != catalog["baseline"]["id"]:
+                    assert not page.locator(
+                        '[data-comparison="selected-b0"] .goal-grid'
+                    ).is_visible()
             if baseline == "original018-cann8.5.1":
                 for release in (item for item in releases if item.startswith("sr")):
                     page.select_option("#comparison-release-select", release)
