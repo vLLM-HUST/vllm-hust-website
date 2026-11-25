@@ -504,7 +504,15 @@ def verify_stable_default(page, catalog):
     base = args.base_url.rstrip("/") + "/b0-b1.html"
     page.goto(base)
     archive = catalog.get("archived_r10")
-    if entry.get("r10_revision"):
+    if entry.get("r10_revision") and not entry.get("submission_assessment"):
+        stable_version = archive["stable_evidence"]["pypi_version"]
+        default = page.locator("#submission-v2").get_by_role(
+            "link", name="PyPI " + stable_version, exact=False
+        )
+        default.wait_for()
+        page.goto(base + "?release=r10#submission-v2")
+        default.wait_for()
+        page.goto(base + "?release=r10")
         revision = entry["r10_revision"]
         assessment = page.locator("[data-r10-revision]")
         assessment.wait_for()

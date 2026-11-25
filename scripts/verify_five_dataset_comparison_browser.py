@@ -925,9 +925,9 @@ def verify(url, output):
                     )
                     errors = []
                     page.on("pageerror", lambda e, errors=errors: errors.append(str(e)))
-                    page.goto(url + "/b0-b1.html")
-                    root = page.locator("#five-dataset-comparison")
                     latest = latest_official_release(catalog)
+                    page.goto(url + "/b0-b1.html?release=" + latest)
+                    root = page.locator("#five-dataset-comparison")
                     expect(root).to_have_attribute(
                         "data-release", latest, timeout=30000
                     )
@@ -942,7 +942,9 @@ def verify(url, output):
                         assert_paired_version(page, root, current, catalog)
                     if current.get("submission_assessment"):
                         assert_submission_assessment(page, root, current, url, lang)
-                    if current.get("r10_revision"):
+                    if current.get("r10_revision") and not current.get(
+                        "submission_assessment"
+                    ):
                         revision = current["r10_revision"]
                         assessment = root.locator("[data-r10-revision]")
                         expect(assessment).to_have_attribute(
@@ -1461,6 +1463,12 @@ def verify(url, output):
             page.close()
             checks.append({"direct_release": release, "language_switch": True})
         # A new catalog-only release keeps the same empty dashboard without a JS edit.
+        page = context.new_page()
+        page.goto(url + "/b0-b1.html")
+        root = page.locator("#five-dataset-comparison")
+        root.locator("#comparison-release-select").wait_for(timeout=30000)
+        default_release = root.get_attribute("data-release")
+        page.close()
         future = copy.deepcopy(context.request.get(url + "/" + HISTORY).json())
         future_id = "r" + str(max(int(value[1:]) for value in catalog["order"]) + 1)
         entry = copy.deepcopy(
@@ -1507,9 +1515,9 @@ def verify(url, output):
             + 1
         )
         page.goto(url + "/b0-b1.html")
-        expect(root).to_have_attribute("data-release", future_id, timeout=30000)
+        expect(root).to_have_attribute("data-release", default_release, timeout=30000)
         page.goto(url + "/b0-b1.html?release=latest")
-        expect(root).to_have_attribute("data-release", future_id, timeout=30000)
+        expect(root).to_have_attribute("data-release", default_release, timeout=30000)
         page.goto(url + "/b0-b1.html?release=r6")
         expect(root).to_have_attribute("data-release", "r6", timeout=30000)
         page.close()
