@@ -711,6 +711,16 @@ with sync_playwright() as playwright:
             args.base_url.rstrip("/") + "/data/benchmark-source-manifest.json"
         ).json()
         commit = publication["commit"]
+        rental_path = "data/b0-independent-rental-observations-v1.json"
+        rental_descriptor = next(
+            (row for row in publication["files"] if row["website_path"] == rental_path),
+            None,
+        )
+        rental = (
+            read_descriptor({**rental_descriptor, "path": rental_path})
+            if rental_descriptor
+            else None
+        )
         repair_source = next(
             (
                 file
@@ -924,6 +934,31 @@ with sync_playwright() as playwright:
                     == ["—"] * 4
                 )
                 if release == "r9" and baseline in independent_baselines:
+                    rental_record = (
+                        rental["baselines"].get(baseline) if rental else None
+                    )
+                    rental_table = page.locator("[data-b0-rental-observations]")
+                    assert rental_table.count() == bool(rental_record)
+                    if rental_record:
+                        values = list(rental_record["workloads"].values())
+                        rows = rental_table.locator("tbody tr")
+                        assert rows.count() == len(values)
+                        for row, measurement in zip(rows.all(), values, strict=True):
+                            cells = row.locator("th, td").all_inner_texts()
+                            cost = measurement[
+                                "estimated_cny_per_million_successful_output_tokens"
+                            ]
+                            utilization = measurement["utilization"]
+                            assert cells[1:3] == [
+                                f"{cost:.2f}",
+                                f"{utilization['mean_percent']:.2f}%",
+                            ]
+                        assert page.locator("#submission-v2").count() == 0
+                        assert read_export_blob(page)["independent_b0_rental"] == {
+                            "source": rental_path,
+                            "quote": rental["rental_quote"],
+                            "workloads": rental_record["workloads"],
+                        }
                     run = next(
                         (
                             r["arm"]
