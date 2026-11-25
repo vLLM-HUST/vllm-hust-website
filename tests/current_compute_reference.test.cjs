@@ -12,15 +12,49 @@ function sandbox() {
   const source = fs.readFileSync(path.join(__dirname, '..', 'assets', 'five-dataset-comparison.js'), 'utf8');
   const marker = '  showRelease();\n})();';
   assert.ok(source.endsWith(marker + '\n'));
-  const context = { console, TextDecoder, URL, URLSearchParams, crypto: webcrypto,
-    location: { href: 'https://example.test/b0-b1.html', hash: '', search: '' }, document: { getElementById: () => ({}) },
+  const context = { console, TextDecoder, URL, URLSearchParams, AbortSignal, crypto: webcrypto,
+    location: { href: 'https://example.test/b0-b1.html', hash: '', search: '' }, document: { getElementById: () => ({}), addEventListener() {}, visibilityState: 'visible' },
     window: { addEventListener() {}, vllmHustSite: { getCurrentLang: () => 'en' } } };
   vm.createContext(context);
   const evidence = fs.readFileSync(path.join(__dirname, '..', 'assets', 'controller-evidence.js'), 'utf8');
   vm.runInContext(evidence, context);
-  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, latestCompleteRelease, stableAssessments, submissionAssessments, linkedDetailKey, transportAssetBytes, loadFixedBaseline, withFixedBaseline, setFixedBaseline: value=>{fixedBaseline=value;} };\n})();'), context);
+  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, latestCompleteRelease, stableAssessments, submissionAssessments, linkedDetailKey, transportAssetBytes, loadFixedBaseline, withFixedBaseline, openPublicationIsCurrent, setReleasePublication: value=>{releasePublication=value;releaseCatalog={};}, setFixedBaseline: value=>{fixedBaseline=value;} };\n})();'), context);
   return context;
 }
+
+test('returning to an open comparison checks for a newer published dataset', async () => {
+  const context = sandbox();
+  const { openPublicationIsCurrent, setReleasePublication } = context.computeTest;
+  const original = { repository: 'vLLM-HUST/vllm-hust-benchmark', status: 'published-source', commit: 'a'.repeat(40), files: [] };
+  let fetched = 0;
+  let reloaded = 0;
+  let manifest = original;
+  context.location.reload = () => { reloaded++; };
+  context.fetch = async (url, options) => {
+    assert.equal(url, './data/benchmark-source-manifest.json');
+    assert.equal(options.cache, 'no-cache');
+    fetched++;
+    return { ok: true, json: async () => manifest };
+  };
+  assert.equal(await openPublicationIsCurrent(), true);
+  assert.equal(fetched, 0);
+  setReleasePublication(original);
+  context.document.visibilityState = 'hidden';
+  assert.equal(await openPublicationIsCurrent(), true);
+  assert.equal(fetched, 0);
+  context.document.visibilityState = 'visible';
+  assert.deepEqual(await Promise.all([openPublicationIsCurrent(), openPublicationIsCurrent()]), [true, true]);
+  assert.equal(fetched, 1);
+  assert.equal(reloaded, 0);
+  manifest = { ...original, commit: 'b'.repeat(40), status: 'unpublished' };
+  context.console = { warn() {} };
+  assert.equal(await openPublicationIsCurrent(), true);
+  assert.equal(reloaded, 0);
+  manifest = { ...manifest, status: 'published-source' };
+  assert.deepEqual(await Promise.all([openPublicationIsCurrent(), openPublicationIsCurrent()]), [false, false]);
+  assert.equal(fetched, 3);
+  assert.equal(reloaded, 1);
+});
 
 test('default reports advance only when a newer release itself passes all four targets', () => {
   const { latestCompleteRelease, stableAssessments, submissionAssessments } = sandbox().computeTest;
