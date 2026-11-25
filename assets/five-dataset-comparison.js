@@ -2581,10 +2581,9 @@
     const repair=b0RepairResult(baseline);
     const ftPair=repair&&entry.id==='r10'&&entry.release===r10PatchedFt?.B1.release
       ?r10PatchedFt.pairs[baseline.id.slice('official-'.length)]:null;
-    const reason=ftPair?t('固定 200 条原生 F/T 对照见有效算力参考。','See Compute reference for the fixed-200 native F/T comparison.'):
-      observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
-    const goalNote=ftPair?t('本项暂无大纲配对结果','No paired outline result for this goal'):
-      t('所选组合暂无核验配对','No verified pair for the selected combination');
+    const reason=observed?t('各臂实测原值分别列示。','Measurements are listed separately for each arm.'):
+      t('B0 原值待发布。','B0 observations are awaiting publication.');
+    const alternate=!originalBaselineSelected();
     const candidateModel=entry.id==='r6'?data.hardware.model:
       ((!entry.measurements?.length&&modelIntegrationResults.get(entry.id)?.candidate.model)||entry.model||fixedBaseline.model);
     const sourceRows=entry.id==='r6'?r6ArmRows('B1'):attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
@@ -2621,6 +2620,31 @@
     });
     const isContext=row=>continuousProfile(row.id)||row.id.startsWith('real-context-');
     const context=rows.filter(isContext),performanceRows=rows.filter(row=>!isContext(row));
+    const measured=(records,arm)=>records.filter(row=>Number.isFinite(row[arm]?.output_tokens_per_second)).length;
+    const fixed=rows.filter(row=>fixedProfiles.some(([id])=>id===row.id));
+    const fixedContext=context.filter(row=>row.id.startsWith('real-context-'));
+    const coverage=(records,total)=>`B0 ${measured(records,'baselineObservation')}/${total} · B1 ${measured(records,'observation')}/${total}`;
+    const mmlu=rows.find(row=>row.id==='mmlu'), b0Mmlu=mmlu.baselineObservation;
+    const missingLatency=b0Mmlu?Object.entries({TTFT:b0Mmlu.mean_ttft_ms,TPOT:b0Mmlu.mean_tpot_ms})
+      .filter(([,value])=>!Number.isFinite(value)).map(([name])=>name).join(' / '):'';
+    if(alternate&&missingLatency)mmlu.coverageNote=t(
+      `已发布吞吐，B0 公开记录缺 ${missingLatency}`,`Throughput published, B0 public record lacks ${missingLatency}`);
+    const goalNotes=[
+      ftPair?t('已有补丁版 F/T 专项，见下方','Patched B0 F/T comparison below'):
+        observed?.automatic_ft_audit?.status==='ineligible'?
+          t('原版 B0 已测原生时间，算量核验未通过','Original B0 has native timing, but arithmetic qualification failed'):
+          t('缺所选工况的原生算量或参考核验','Native work or reference qualification is missing'),
+      coverage(fixed,fixedProfiles.length)+' · '+(missingLatency?
+        t(`MMLU-Pro 的 B0 缺 ${missingLatency}`,`B0 MMLU-Pro lacks ${missingLatency}`):
+        t('固定负载独立实测','Fixed profiles measured independently')),
+      coverage(fixedContext,4)+' · '+t('三档上下文与四租户的原值覆盖','Raw coverage across three context ranges and four tenants'),
+      t('缺同工况成本与逐卡利用率的配对核验','Paired cost and per-card utilization for a matched workload are unverified')
+    ];
+    const scopeLink=new URLSearchParams({release:entry.id,b0:releaseCatalog.baseline.id});
+    if(archivedR10Selected())scopeLink.set('revision',selectedRevision);
+    const outlineScope=alternate?`<p class="comparison-meta" data-outline-scope>
+      <span>${t('课题四 V2 正式判定使用固定 B0 0.18。','Topic 4 V2 acceptance uses the fixed B0 0.18.')}</span>
+      ${entry===releaseEntry()?`<a href="./b0-b1.html?${esc(scopeLink.toString())}#acceptance-stages">${t('查看同版 B1 的正式判定','View formal assessment for this B1')} ↗</a>`:''}</p>`:'';
     const rawMetrics=selected=>table(t(
       ['工况','B0 数据集或负载','B1 数据集或负载','B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],
       ['Scenario','B0 dataset or workload','B1 dataset or workload','B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms']
@@ -2649,7 +2673,16 @@
     const formatFtInterval=values=>values.map(value=>Number(value).toFixed(3)).join('–');
     const comparisonEvidence=ftPair?pinnedSource('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/reports/r10-stable-patched-b0-ft-20261123-v1/README.md'):null;
     const comparisonLink=ftPair?'<p><a href="'+esc(comparisonEvidence)+'">'+
-      t('正式 F/T 对照与复算','Formal F/T comparison and replay')+'</a></p>':'';
+      t('F/T 专项对照与复算','F/T comparison and replay')+'</a></p>':'';
+    const archivedPair=repair&&entry.id==='r10'&&releaseCatalog.archived_r10&&
+      r10PatchedFt?.pairs[baseline.id.slice('official-'.length)];
+    const archivedParams=new URLSearchParams({release:'r10',revision:r10ArchivedVersion,b0:baseline.id});
+    const supplementalFt=ftPair?`<p class="comparison-meta" data-b0-ft-overview>
+      <span>${t('历史 R10 与所选版本 B0 补丁版 · MMLU-Pro 200 / out256','Archived R10 and patched B0 for the selected version · MMLU-Pro 200 / out256')}
+      · ${t('有效算力比','Effective-compute ratio')} <strong>${esc(formatFtInterval(ftPair.B1_over_B0_effective_compute_interval))}×</strong></span>
+      <a href="${esc(comparisonEvidence)}">${t('专项报告与原件','Supplemental report and evidence')} ↗</a></p>`:
+      archivedPair?`<p class="comparison-meta" data-b0-ft-archive><a href="./b0-b1.html?${esc(archivedParams.toString())}">
+      ${t('查看历史 R10 与此 B0 补丁版的 F/T 对照','View archived R10 against this patched B0')} ↗</a></p>`:'';
     const comparisonDetail=ftPair?'<div data-r10-patched-b0-ft><p><strong>R10 '+
       esc(formatFtInterval(r10PatchedFt.B1.tflops_per_card_interval))+' TFLOP/s/'+t('卡','card')+'</strong> · '+
       esc(t('R10 / 补丁版 B0','R10 / patched B0')+' '+formatFtInterval(ftPair.B1_over_B0_effective_compute_interval))+'×</p><p>'+
@@ -2729,8 +2762,11 @@
         ((entry.sources||[]).length?'<p>'+entry.sources.map(source=>'<a href="'+esc(pinnedSource(source.url))+'">'+esc(sourceLabel(source.url))+'</a>').join(' · ')+'</p>':'')+
         table(t(['工况','B0 封存 SHA-256','B1 封存 SHA-256'],['Scenario','B0 seal SHA-256','B1 seal SHA-256']),sealedRows)};
     };
-    root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
-      <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${goalNote}</small></article>`).join('')}</div>
+    root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}${outlineScope||
+      `<div class="comparison-meta"><span>${esc(reason)}</span></div>`}
+      <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${alternate?'4.'+(i+1)+' ':''}${name}</span><strong>—</strong>
+        <small>${esc(alternate?goalNotes[i]:t('所选组合暂无核验配对','No verified pair for the selected combination'))}</small></article>`).join('')}</div>
+      ${supplementalFt}
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],entry.settings?frozenSettings(entry.settings):t('配置以各自来源为准','See each source for configuration'))}
       ${coverageView(rows)}<section><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${esc(reason)}</p><div class="metric-grid">
       ${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,performanceRows,performanceRows.map(row=>row.label),roles)}
