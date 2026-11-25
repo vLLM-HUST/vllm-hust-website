@@ -576,6 +576,66 @@ def verify_stable_default(page, catalog):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
 
 
+def verify_r10_revision_routes(page, catalog):
+    current = next(row for row in catalog["entries"] if row["id"] == "r10")
+    version = current.get("r10_revision", {}).get("pypi_version")
+    archive = catalog.get("archived_r10")
+    if not (version and archive and current.get("submission_assessment")):
+        return
+
+    base = args.base_url.rstrip("/") + "/b0-b1.html"
+    fixed = catalog["baseline"]["id"]
+    alternate = "candidate-0.28.0rc1-source"
+    controller = "request-throttling"
+    archived_version = archive["stable_evidence"]["pypi_version"]
+    root = page.locator("#five-dataset-comparison")
+    live_report = root.locator(
+        '#submission-v2 a[href="./' + current["submission_assessment"]["path"] + '"]'
+    )
+
+    def check(baseline, selected_version, *, control=None):
+        page.wait_for_function(
+            """([baseline, revision]) => {
+                const root = document.getElementById('five-dataset-comparison');
+                return root.getAttribute('aria-busy') === 'false' &&
+                    root.dataset.baselineId === baseline &&
+                    new URL(location.href).searchParams.get('revision') === revision;
+            }""",
+            arg=[baseline, selected_version],
+            timeout=60000,
+        )
+        if control:
+            assert (
+                page.locator("#comparison-controlplane-select").input_value() == control
+            )
+
+    query = urlencode({"release": "r10", "revision": version, "b0": fixed})
+    page.goto(base + "?" + query + "#submission-v2")
+    check(fixed, version)
+    live_report.wait_for()
+    page.reload()
+    check(fixed, version)
+    live_report.wait_for()
+
+    page.select_option("#comparison-baseline-select", alternate)
+    check(alternate, version)
+    page.select_option("#comparison-controlplane-select", controller)
+    root.locator("[data-r10-revision-link]").click()
+    check(alternate, archived_version, control=controller)
+    root.locator("[data-r10-revision-link]").click()
+    check(alternate, version, control=controller)
+
+    href = root.locator("[data-outline-scope] a").get_attribute("href")
+    assert parse_qs(urlparse(href).query) == {
+        "release": ["r10"],
+        "b0": [fixed],
+        "revision": [version],
+    }
+    root.locator("[data-outline-scope] a").click()
+    check(fixed, version)
+    live_report.wait_for()
+
+
 def verify_legacy_links(page, catalog):
     base = args.base_url.rstrip("/") + "/b0-b1.html"
     page.goto(base + "?release=unknown&b0=unknown&controlplane=unknown")
@@ -849,10 +909,14 @@ with sync_playwright() as playwright:
                     formal = parse_qs(
                         urlparse(scope.locator("a").get_attribute("href")).query
                     )
-                    assert formal == {
+                    expected = {
                         "release": [release],
                         "b0": [catalog["baseline"]["id"]],
                     }
+                    revision = release_entries[release].get("r10_revision", {})
+                    if release == "r10" and revision.get("pypi_version"):
+                        expected["revision"] = [revision["pypi_version"]]
+                    assert formal == expected
                 assert (
                     page.locator(
                         '[data-comparison="selected-b0"] .goal-grid .result-card strong'
@@ -1230,6 +1294,7 @@ with sync_playwright() as playwright:
         verify_development_priority(page, releases, baselines)
         verify_legacy_links(page, catalog)
         verify_stable_default(page, catalog)
+        verify_r10_revision_routes(page, catalog)
         if width == 1366 and scheme == "light":
             if r10_archive:
                 base = args.base_url.rstrip("/") + "/b0-b1.html"
