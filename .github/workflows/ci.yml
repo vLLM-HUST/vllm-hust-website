@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 8ff7917025fabc5351ae6c025fdb34bcfca25d53 # pragma: allowlist secret
+          ref: 405bb088e5fbc80d3ba5b4de251706bb310fe685 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -40,9 +40,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision 8ff7917025fabc5351ae6c025fdb34bcfca25d53 --website .
+            --revision 405bb088e5fbc80d3ba5b4de251706bb310fe685 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision 8ff7917025fabc5351ae6c025fdb34bcfca25d53 --website .
+            --revision 405bb088e5fbc80d3ba5b4de251706bb310fe685 --website .
       - name: Assemble pinned benchmark navigation
         env:
           GH_TOKEN: ${{ github.token }}
@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 8ff7917025fabc5351ae6c025fdb34bcfca25d53 # pragma: allowlist secret
+          ref: 405bb088e5fbc80d3ba5b4de251706bb310fe685 # pragma: allowlist secret
           path: .publication-policy
           persist-credentials: false
           sparse-checkout: scripts/build_public_site.py
@@ -80,7 +80,7 @@ jobs:
         run: |
           python .publication-policy/scripts/build_public_site.py \
             --website . --output "$RUNNER_TEMP/public-site" \
-            --policy-revision 8ff7917025fabc5351ae6c025fdb34bcfca25d53
+            --policy-revision 405bb088e5fbc80d3ba5b4de251706bb310fe685
 
   browser:
     runs-on: ubuntu-latest
@@ -99,7 +99,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
-          ref: 8ff7917025fabc5351ae6c025fdb34bcfca25d53 # pragma: allowlist secret
+          ref: 405bb088e5fbc80d3ba5b4de251706bb310fe685 # pragma: allowlist secret
           path: .benchmark-source
           persist-credentials: false
           sparse-checkout: |
@@ -109,9 +109,9 @@ jobs:
       - name: Project and verify the committed benchmark publication
         run: |
           python .benchmark-source/scripts/sync_website_publication.py publish \
-            --revision 8ff7917025fabc5351ae6c025fdb34bcfca25d53 --website .
+            --revision 405bb088e5fbc80d3ba5b4de251706bb310fe685 --website .
           python .benchmark-source/scripts/sync_website_publication.py check \
-            --revision 8ff7917025fabc5351ae6c025fdb34bcfca25d53 --website .
+            --revision 405bb088e5fbc80d3ba5b4de251706bb310fe685 --website .
       - name: Install browser test dependencies
         run: |
           python -m pip install playwright
