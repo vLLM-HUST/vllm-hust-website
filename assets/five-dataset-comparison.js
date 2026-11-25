@@ -1078,6 +1078,12 @@
       if(!close(row.B1.metrics.output_tokens_per_second/row.B0.metrics.output_tokens_per_second,row.throughput_ratio) ||
          !close(100*(1-1/row.throughput_ratio),row.equal_rate_same_card_count_unit_cost_reduction_percent))fail();
     }
+    const publicSource=a.raw_asset.public_download;
+    if(publicSource&&(!/^data\/[a-z0-9/-]+\.(?:json|tar\.gz|zip)$/.test(publicSource.path||'')||
+       (publicSource.original_sha256??publicSource.sha256)!==a.raw_asset.sha256||
+       (!publicSource.original_sha256&&publicSource.bytes!==a.raw_asset.bytes)||
+       !publication.files.some(row=>row.website_path===publicSource.path&&
+         row.sha256===publicSource.sha256&&row.bytes===publicSource.bytes)))fail();
     const chart=a.chart;
     if(entry.r10_revision&&!chart)return;
     if(!/^data\/[a-z0-9/-]+\.svg$/.test(chart?.path||'') || !/^[a-f0-9]{64}$/.test(chart?.sha256||''))fail();
@@ -1092,9 +1098,10 @@
   function validateR10Revision(entry) {
     const revision=entry.r10_revision,a=entry.context_tenant_supplement;
     const result=revision.assessment_4_3;
+    const percentileMethod=entry.submission_assessment?'nearest_rank':'linear_interpolation_(n-1)q';
     const phases=['4096-formal','16384-formal','32768-formal','multi-tenant-formal'];
     const mirror='https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/';
-    const fail=()=>{throw Error('Invalid V5 R10 revision comparison');};
+    const fail=()=>{throw Error('Invalid R10 revision comparison');};
     if(entry.id!=='r10'||entry.release!=='full-answer-b1-20261124-r10'||(entry.measurements.length&&!entry.submission_assessment)||
        revision.pypi_version!=='2026.11.24.10'||revision.previous_version!==r10ArchivedVersion||
        revision.pypi_url!=='https://pypi.org/project/vllm-hust-engine/'+revision.pypi_version+'/'||
@@ -1105,7 +1112,7 @@
        a.protocol.output_tokens!==256||a.protocol.measurement_window_seconds!==60||
        a.protocol.phases.some((phase,i)=>phase.warmup_seconds!==60||phase.formal_seconds!==300||
          phase.concurrency!==(i===3?24:8)||phase.tenants!==(i===3?4:1))||
-       result?.percentile_method!=='linear_interpolation_(n-1)q'||
+       result?.percentile_method!==percentileMethod||
        !['B0','B1'].every(role=>result.blocking_errors?.[role]?.length===0))fail();
     const [short,medium,long]=a.comparisons.map(row=>row.B1);
     const fields={
@@ -1372,7 +1379,7 @@
       :missing((b0&&b1?`MMLU200 · ${t('同费率估算','Equal-rate estimate')} ${n(100*(1-b0.output_tokens_per_second/b1.output_tokens_per_second))}% · `:'')+
       t('待核验完整回答的正式计量及同区间双卡利用率','Full-answer metering and matched two-card utilization require verification'));
     const costFinal=assessment
-      ?status(assessment.targets['4.4'].final.met,`${t('4K 四租户 · 跨卡对照','4K four tenants · cross-card comparison')} · ${t('公开租金折算','Published rental rate')} −${n(assessment.tenantCost.reduction)}% · AI Core ${n(assessment.tenantUtilization)}%`)
+      ?status(assessment.targets['4.4'].final.met,`${t('4K 四租户','4K four tenants')} · ${cardComparisonLabel(assessment.tenantCost.cards)} · ${t('公开租金折算','Published rental rate')} −${n(assessment.tenantCost.reduction)}% · AI Core ${n(assessment.tenantUtilization)}%`)
       :missing((tenant?`${t('同费率估算','Equal-rate estimate')} ${n(tenant.equal_rate_same_card_count_unit_cost_reduction_percent)}% · AI Core ${n(tenant.B1.utilization.mean_percent)}% · `:'')+
       (tenant?t('待核验四租户封存与公开租赁报价核算','Four-tenant seals and the public rental calculation require verification'):t('缺四租户实测及同区间双卡采样','Four-tenant measurements and matched two-card sampling are missing')));
     return `<section class="submission-assessment" id="submission-v2">
@@ -1432,7 +1439,7 @@
       <p>${esc(a.report_date)} · ${esc(contextWorkloadLabel(a))} · ${esc(t('固定输出预算','Fixed output budget'))} ${a.protocol.output_tokens}</p>
       ${cards.cardLabel?`<p>${esc(cardComparisonLabel(cards))}</p>`:''}
       <div class="supplement-highlights"><div><span>${t(`16K 相对 ${control} 吞吐`,`16K throughput vs ${control}`)}</span><strong>${values[2]}</strong></div><div><span>${t('四租户成本降低','Four-tenant cost reduction')}</span><strong>${n(tenant?.equal_rate_same_card_count_unit_cost_reduction_percent)}%</strong></div><div><span>${t('四租户AI Core利用率','Four-tenant AI Core utilization')}</span><strong>${n(tenant?.B0.utilization.mean_percent)} → ${n(tenant?.B1.utilization.mean_percent)}%</strong></div></div>
-      ${entry.r10_revision?r10StabilityWindows(entry):`<figure>${replayLabel}<div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(contextWorkloadLabel(a))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure>`}</section>`;
+      ${entry.r10_revision?replayLabel+r10StabilityWindows(entry):`<figure>${replayLabel}<div class="supplement-plot" tabindex="0" role="region" aria-label="${t('上下文与租户配对曲线，可横向滚动','Context and tenant paired curves; scroll horizontally')}"><img src="./${esc(a.chart.path)}" alt="${esc(contextWorkloadLabel(a))}" loading="lazy"></div><figcaption>${t('保留全部提交窗口、完整排空及租户分布；采样利用率与有效算力分别报告。','All submission windows, complete drain and tenant distributions are retained. Sampled utilization is separate from effective compute.')}</figcaption></figure>`}</section>`;
   }
   function r10StabilityWindows(entry) {
     const row=entry.context_tenant_supplement.comparisons.find(phase=>phase.phase==='32768-formal');
@@ -1440,10 +1447,11 @@
     const total=row.B1.metrics.output_tokens_per_second;
     const change=100*(total/previous-1);
     return `<div data-r10-stability-windows>${table(t(
-      ['32K 窗口','B0 token/s','B1 token/s','B1 TPOT P95 / ms','B1 TPOT P99 / ms'],
-      ['32K window','B0 token/s','B1 token/s','B1 TPOT P95 / ms','B1 TPOT P99 / ms']),
+      ['32K 窗口','B0 token/s','B1 token/s','B1 TTFT P95 / ms','B1 TTFT P99 / ms','B1 TPOT P95 / ms','B1 TPOT P99 / ms'],
+      ['32K window','B0 token/s','B1 token/s','B1 TTFT P95 / ms','B1 TTFT P99 / ms','B1 TPOT P95 / ms','B1 TPOT P99 / ms']),
       row.B1.windows.map((window,i)=>[i+1,n(row.B0.windows[i].metrics.output_tokens_per_second),
-        n(window.metrics.output_tokens_per_second),n(window.metrics.tpot_ms.p95),n(window.metrics.tpot_ms.p99)]))}
+        n(window.metrics.output_tokens_per_second),n(window.metrics.ttft_ms.p95),n(window.metrics.ttft_ms.p99),
+        n(window.metrics.tpot_ms.p95),n(window.metrics.tpot_ms.p99)]))}
       <p>${t('32K 整段吞吐','Overall 32K throughput')} ${n(total)} token/s ·
       ${t('相对 2026.11.21.10','vs 2026.11.21.10')} ${n(change)}%</p></div>`;
   }
@@ -1460,7 +1468,7 @@
       <p>${t('每阶段预热','Each phase warms up for')} ${a.protocol.phases[0].warmup_seconds}s · ${t('正式提交','formal submissions')} ${a.protocol.phases[0].formal_seconds}s ${t('后完整排空；吞吐分母包含排空。','plus complete drain, included in throughput duration.')} ${t('本专项不测任务质量或租户安全隔离，也不产生有效算力效率。','This supplement does not measure task quality, security isolation or effective-compute efficiency.')}</p>
       ${table(t(['工况','数据集来源','请求 B0 / B1','token/s B0 / B1','吞吐比','P99 TTFT ms B0 / B1','P99 TPOT ms B0 / B1'],['Scenario','Dataset source','Requests B0 / B1','tok/s B0 / B1','Throughput ratio','P99 TTFT ms B0 / B1','P99 TPOT ms B0 / B1']),rows)}
       ${tenant?table(t(['租户','B0 完成','B1 完成'],['Tenant','B0 completed','B1 completed']),Object.keys(tenant.B1.per_tenant).map(id=>[id,tenant.B0.per_tenant[id]?.successful??'—',tenant.B1.per_tenant[id].successful])):''}
-      <p><a href="${esc(a.raw_asset.url)}">${t('完整原件、全部窗口与复算入口','Complete originals, all windows and reproduction')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>`;
+      <p><a href="${esc(a.raw_asset.public_download?'./'+a.raw_asset.public_download.path:a.raw_asset.url)}">${t('全部窗口与复算入口','All windows and reproduction')} ↗</a><br><code>${esc(a.raw_asset.sha256)}</code></p>`;
   }
   function versionRows(entry) {
     const observations=observationRows(entry);
