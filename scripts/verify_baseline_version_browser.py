@@ -307,9 +307,20 @@ def verify_full_baseline_details(
     else:
         assert patch_detail.count() == 0
     comparison_detail = dialog.locator("[data-r10-patched-b0-ft]")
+    overview = page.locator("[data-b0-ft-overview]")
     if ft_pair:
         pair, b1 = ft_pair
         assert comparison_detail.is_visible()
+        interval = "–".join(
+            f"{float(value):.3f}"
+            for value in pair["B1_over_B0_effective_compute_interval"]
+        )
+        assert interval in overview.inner_text()
+        assert overview.locator("a").get_attribute("href") == comparison_detail.locator(
+            "a"
+        ).get_attribute("href")
+        formal = page.locator("[data-outline-scope] a").get_attribute("href")
+        assert parse_qs(urlparse(formal).query)["revision"] == [b1["package_version"]]
         detail = comparison_detail.inner_text()
         for values in (
             b1["tflops_per_card_interval"],
@@ -324,6 +335,7 @@ def verify_full_baseline_details(
         )
     else:
         assert comparison_detail.count() == 0
+        assert overview.count() == 0
     page.screenshot(
         path=str(args.output / f"{prefix}compute-{width}-{scheme}.png"), full_page=True
     )
@@ -831,6 +843,105 @@ with sync_playwright() as playwright:
                 )
                 assert page.locator(".metric-chart").count() == 4
                 assert page.locator("#context-tenant-supplement").count() == 1
+                scope = page.locator("[data-outline-scope]")
+                assert "0.18" in scope.inner_text()
+                if release in release_entries:
+                    formal = parse_qs(
+                        urlparse(scope.locator("a").get_attribute("href")).query
+                    )
+                    assert formal == {
+                        "release": [release],
+                        "b0": [catalog["baseline"]["id"]],
+                    }
+                assert (
+                    page.locator(
+                        '[data-comparison="selected-b0"] .goal-grid .result-card strong'
+                    ).all_text_contents()
+                    == ["—"] * 4
+                )
+                if release == "r9" and baseline in independent_baselines:
+                    run = next(
+                        (
+                            r["arm"]
+                            for r in independent_baselines[baseline]["profiles"]
+                            if r["id"] == "mmlu"
+                        ),
+                        None,
+                    )
+                    missing = [
+                        name
+                        for name, field in (
+                            ("TTFT", "mean_ttft_ms"),
+                            ("TPOT", "mean_tpot_ms"),
+                        )
+                        if run and run[field] is None
+                    ]
+                    mmlu = page.locator('.dataset-coverage [data-dataset="mmlu"]')
+                    if missing:
+                        assert " / ".join(missing) in mmlu.inner_text()
+                    else:
+                        assert mmlu.locator("small").count() == 0
+                    for field, divisor in (("mean_ttft_ms", 1000), ("mean_tpot_ms", 1)):
+                        value = run[field]
+                        chart_value = page.locator(
+                            f'[data-metric="{field}"] [data-profile="mmlu"] .bar-line'
+                        ).first.locator(".bar-value")
+                        assert chart_value.inner_text() == (
+                            "—" if value is None else f"{value / divisor:.2f}"
+                        )
+                    tenant_profile = next(
+                        r
+                        for r in independent_baselines[baseline]["profiles"]
+                        if r["id"] == "real-context-multi-tenant-formal"
+                    )
+                    utilization = tenant_profile.get("utilization")
+                    panel = page.locator("[data-b0-c24-utilization]")
+                    if utilization:
+                        assert panel.count() == 1
+                        actual = [
+                            row.locator("th, td").all_inner_texts()
+                            for row in panel.locator("tbody tr").all()
+                        ]
+                        expected = [
+                            [
+                                f"{'卡' if args.language == 'zh' else 'Card'} {card}",
+                                f"{value:.2f}%",
+                            ]
+                            for card, value in sorted(
+                                utilization["per_card_percent"].items(),
+                                key=lambda entry: int(entry[0]),
+                            )
+                        ]
+                        expected.append(
+                            [
+                                "双卡均值"
+                                if args.language == "zh"
+                                else "Two-card mean",
+                                f"{utilization['mean_percent']:.2f}%",
+                            ]
+                        )
+                        assert actual == expected, (actual, expected)
+                        assert (
+                            page.locator(".goal-grid .result-card")
+                            .nth(3)
+                            .locator("a[href='#selected-c24-utilization']")
+                            .count()
+                            == 1
+                        )
+                    else:
+                        assert panel.count() == 0
+                if (
+                    release == "r10"
+                    and r10_archive
+                    and formal_ft
+                    and baseline.removeprefix("official-") in formal_ft["pairs"]
+                ):
+                    archive = page.locator("[data-b0-ft-archive] a")
+                    assert parse_qs(urlparse(archive.get_attribute("href")).query) == {
+                        "release": ["r10"],
+                        "revision": [r10_archive["stable_evidence"]["pypi_version"]],
+                        "b0": [baseline],
+                    }
                 expected_context_workloads = {}
                 for arm, digest in (
                     ("B0", context_inputs.get(baseline)),

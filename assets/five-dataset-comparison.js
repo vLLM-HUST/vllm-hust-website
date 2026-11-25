@@ -2589,10 +2589,9 @@
     const repair=b0RepairResult(baseline);
     const ftPair=repair&&entry.id==='r10'&&entry.release===r10PatchedFt?.B1.release
       ?r10PatchedFt.pairs[baseline.id.slice('official-'.length)]:null;
-    const reason=ftPair?t('固定 200 条原生 F/T 对照见有效算力参考。','See Compute reference for the fixed-200 native F/T comparison.'):
-      observed?t('分别实测 · 尚无核验配对','Separate measurements · no verified pair'):t('B0 结果待发布 · 保留 B1 原值','B0 results pending · B1 measurements retained');
-    const goalNote=ftPair?t('本项暂无大纲配对结果','No paired outline result for this goal'):
-      t('所选组合暂无核验配对','No verified pair for the selected combination');
+    const reason=observed?t('各臂实测原值分别列示。','Measurements are listed separately for each arm.'):
+      t('B0 原值待发布。','B0 observations are awaiting publication.');
+    const alternate=!originalBaselineSelected();
     const candidateModel=entry.id==='r6'?data.hardware.model:
       ((!entry.measurements?.length&&modelIntegrationResults.get(entry.id)?.candidate.model)||entry.model||fixedBaseline.model);
     const sourceRows=entry.id==='r6'?r6ArmRows('B1'):attemptIds.includes(entry.id)?[]:srIds.includes(entry.id)?srRows(entry):versionRows(entry);
@@ -2629,6 +2628,61 @@
     });
     const isContext=row=>continuousProfile(row.id)||row.id.startsWith('real-context-');
     const context=rows.filter(isContext),performanceRows=rows.filter(row=>!isContext(row));
+    const measured=(records,arm)=>records.filter(row=>Number.isFinite(row[arm]?.output_tokens_per_second)).length;
+    const fixed=rows.filter(row=>fixedProfiles.some(([id])=>id===row.id));
+    const fixedContext=context.filter(row=>row.id.startsWith('real-context-'));
+    const coverage=(records,total)=>`B0 ${measured(records,'baselineObservation')}/${total} · B1 ${measured(records,'observation')}/${total}`;
+    const mmlu=rows.find(row=>row.id==='mmlu'), b0Mmlu=mmlu.baselineObservation;
+    const missingLatency=b0Mmlu?Object.entries({TTFT:b0Mmlu.mean_ttft_ms,TPOT:b0Mmlu.mean_tpot_ms})
+      .filter(([,value])=>!Number.isFinite(value)).map(([name])=>name).join(' / '):'';
+    if(alternate&&missingLatency)mmlu.coverageNote=t(
+      `已发布吞吐，B0 公开记录缺 ${missingLatency}`,`Throughput published, B0 public record lacks ${missingLatency}`);
+    const tenantBaseline=baselineProfiles.get('real-context-multi-tenant-formal');
+    const supplement=entry.context_tenant_supplement;
+    const tenantCandidate=supplement?.comparisons.find(row=>row.phase==='multi-tenant-formal');
+    const isC24=phase=>phase?.cohort==='4096'&&phase.tenants===4&&phase.concurrency===24;
+    const validPercent=value=>Number.isFinite(value)&&value>=0&&value<=100;
+    function utilizationTable(role, utilization, link, sourceLabel) {
+      const cards=Object.entries(utilization?.per_card_percent||{});
+      if(cards.length!==2||!cards.every(([card,value])=>/^(0|[1-9][0-9]*)$/.test(card)&&validPercent(value))||
+        !validPercent(utilization.mean_percent)||!Number.isFinite(utilization.covered_seconds)||
+        utilization.covered_seconds<=0||!Number.isFinite(utilization.missing_seconds)||utilization.missing_seconds<0)return '';
+      return `<div data-${role.toLowerCase()}-c24-utilization>
+        <h3>${role} · ${t('4K 四租户 C24 正式窗口的 AI Core 采样','AI Core sampling for the formal 4K four-tenant C24 window')}</h3>
+        ${table(t(['设备','AI Core 利用率'],['Device','AI Core utilization']),[
+          ...cards.map(([card,value])=>[t('卡 '+card,'Card '+card),n(value)+'%']),
+          [t('双卡均值','Two-card mean'),n(utilization.mean_percent)+'%']
+        ])}
+        <p>${t('采样覆盖','Sample coverage')} ${n(utilization.covered_seconds)} s ·
+          ${t('采样缺口','Sampling gap')} ${n(utilization.missing_seconds)} s ·
+          <a href="${esc(link)}">${sourceLabel}</a></p>
+      </div>`;
+    }
+    const b0TenantUtilization=alternate&&isC24(tenantBaseline)&&
+      utilizationTable('B0',tenantBaseline.utilization,'./'+baseline.observations.path,
+        t('B0 机器可读实测','Machine-readable B0 observations'));
+    const b1TenantUtilization=alternate&&isC24(supplement?.protocol.phases.find(phase=>phase.id==='multi-tenant'))&&
+      utilizationTable('B1',tenantCandidate?.B1.utilization,supplement.raw_asset.url,
+        t('B1 上下文与四租户原件','B1 context and four-tenant evidence'));
+    const tenantUtilization=b0TenantUtilization||b1TenantUtilization?
+      `<div id="selected-c24-utilization" tabindex="-1">${b0TenantUtilization||''}${b1TenantUtilization||''}</div>`:'';
+    const goalNotes=[
+      ftPair?t('已有补丁版 F/T 专项，见下方','Patched B0 F/T comparison below'):
+        observed?.automatic_ft_audit?.status==='ineligible'?
+          t('原版 B0 已测原生时间，算量核验未通过','Original B0 has native timing, but arithmetic qualification failed'):
+          t('缺所选工况的原生算量或参考核验','Native work or reference qualification is missing'),
+      t('固定负载已发布','Published fixed workloads')+' · '+coverage(fixed,fixedProfiles.length)+' · '+(missingLatency?
+        t(`MMLU-Pro 的 B0 缺 ${missingLatency}`,`B0 MMLU-Pro lacks ${missingLatency}`):
+        t('固定负载独立实测','Fixed profiles measured independently')),
+      coverage(fixedContext,4)+' · '+t('三档上下文与四租户的原值覆盖','Raw coverage across three context ranges and four tenants'),
+      (b0TenantUtilization?t('B0 有四租户逐卡采样 · ','B0 has four-tenant per-card samples · '):'')+
+        t('缺同工况成本与逐卡利用率的配对核验','Paired cost and per-card utilization for a matched workload are unverified')
+    ];
+    const scopeLink=new URLSearchParams({release:entry.id,b0:releaseCatalog.baseline.id});
+    if(archivedR10Selected())scopeLink.set('revision',selectedRevision);
+    const outlineScope=alternate?`<p class="comparison-meta" data-outline-scope>
+      <span>${t('课题四 V2 正式判定使用固定 B0 0.18。','Topic 4 V2 acceptance uses the fixed B0 0.18.')}</span>
+      ${entry===releaseEntry()?`<a href="./b0-b1.html?${esc(scopeLink.toString())}#acceptance-stages">${t('查看同版 B1 的正式判定','View formal assessment for this B1')} ↗</a>`:''}</p>`:'';
     const rawMetrics=selected=>table(t(
       ['工况','B0 数据集或负载','B1 数据集或负载','B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms'],
       ['Scenario','B0 dataset or workload','B1 dataset or workload','B0 token/s','B1 token/s','B0 TTFT / ms','B1 TTFT / ms','B0 TPOT / ms','B1 TPOT / ms']
@@ -2657,7 +2711,16 @@
     const formatFtInterval=values=>values.map(value=>Number(value).toFixed(3)).join('–');
     const comparisonEvidence=ftPair?pinnedSource('https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/main/reports/r10-stable-patched-b0-ft-20261123-v1/README.md'):null;
     const comparisonLink=ftPair?'<p><a href="'+esc(comparisonEvidence)+'">'+
-      t('正式 F/T 对照与复算','Formal F/T comparison and replay')+'</a></p>':'';
+      t('F/T 专项对照与复算','F/T comparison and replay')+'</a></p>':'';
+    const archivedPair=repair&&entry.id==='r10'&&releaseCatalog.archived_r10&&
+      r10PatchedFt?.pairs[baseline.id.slice('official-'.length)];
+    const archivedParams=new URLSearchParams({release:'r10',revision:r10ArchivedVersion,b0:baseline.id});
+    const supplementalFt=ftPair?`<p class="comparison-meta" data-b0-ft-overview>
+      <span>${t('历史 R10 与所选版本 B0 补丁版 · MMLU-Pro 200 / out256','Archived R10 and patched B0 for the selected version · MMLU-Pro 200 / out256')}
+      · ${t('有效算力比','Effective-compute ratio')} <strong>${esc(formatFtInterval(ftPair.B1_over_B0_effective_compute_interval))}×</strong></span>
+      <a href="${esc(comparisonEvidence)}">${t('专项报告与原件','Supplemental report and evidence')} ↗</a></p>`:
+      archivedPair?`<p class="comparison-meta" data-b0-ft-archive><a href="./b0-b1.html?${esc(archivedParams.toString())}">
+      ${t('查看历史 R10 与此 B0 补丁版的 F/T 对照','View archived R10 against this patched B0')} ↗</a></p>`:'';
     const comparisonDetail=ftPair?'<div data-r10-patched-b0-ft><p><strong>R10 '+
       esc(formatFtInterval(r10PatchedFt.B1.tflops_per_card_interval))+' TFLOP/s/'+t('卡','card')+'</strong> · '+
       esc(t('R10 / 补丁版 B0','R10 / patched B0')+' '+formatFtInterval(ftPair.B1_over_B0_effective_compute_interval))+'×</p><p>'+
@@ -2731,21 +2794,29 @@
         [t('B1 运行回执','B1 run receipt'),b1Configuration.receipt_sha256],
         [t('B1 来源清单','B1 source manifest'),b1Configuration.source_manifest_sha256]
       ].filter(([,digest])=>digest).map(([label,digest])=>'<p>'+esc(label)+' · <code>'+esc(digest)+'</code></p>').join('');
-      return {title:title[6],body:links+priorArchives+eventProof+repairLink+comparisonLink+
+      const replayUrl=observed?.original_sse_replay?.report_url;
+      const replayLink=/^https:\/\/github\.com\/vLLM-HUST\/vllm-hust-benchmark\/blob\/main\/reports\/[a-z0-9/_-]+\.md$/i.test(replayUrl||'')?
+        '<p><a href="'+esc(pinnedSource(replayUrl))+'">'+
+        t('原请求流复算与计时口径','Original stream replay and timing method')+'</a></p>':'';
+      return {title:title[6],body:links+priorArchives+eventProof+repairLink+comparisonLink+replayLink+
         (baseline.evidence?.url?'<p><a href="'+esc(baseline.evidence.url)+'">'+t('B0 原件与 CPU 报告重建','B0 original evidence and CPU report reconstruction')+'</a></p>':'')+
         (baseline.observations?.path?'<p><a href="./'+esc(baseline.observations.path)+'">'+t('B0 机器可读实测','Machine-readable B0 observations')+'</a></p>':'')+
         ((entry.sources||[]).length?'<p>'+entry.sources.map(source=>'<a href="'+esc(pinnedSource(source.url))+'">'+esc(sourceLabel(source.url))+'</a>').join(' · ')+'</p>':'')+
         table(t(['工况','B0 封存 SHA-256','B1 封存 SHA-256'],['Scenario','B0 seal SHA-256','B1 seal SHA-256']),sealedRows)};
     };
-    root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}<div class="comparison-meta"><span>${esc(reason)}</span></div>
-      <div class="goal-grid">${names().map(name=>`<article class="result-card"><span>${name}</span><strong>—</strong><small>${goalNote}</small></article>`).join('')}</div>
+    root.innerHTML=`<section class="comparison-dashboard" data-comparison="selected-b0">${releaseMenu()}${outlineScope||
+      `<div class="comparison-meta"><span>${esc(reason)}</span></div>`}
+      <div class="goal-grid">${names().map((name,i)=>`<article class="result-card"><span>${alternate?'4.'+(i+1)+' ':''}${name}</span><strong>—</strong>
+        <small>${esc(alternate?goalNotes[i]:t('所选组合暂无核验配对','No verified pair for the selected combination'))}
+        ${i===3&&tenantUtilization?`<br><a href="#selected-c24-utilization" data-c24-samples-link>${t('查看逐卡采样','View per-card samples')} ↗</a>`:''}</small></article>`).join('')}</div>
+      ${supplementalFt}
       ${frozenProfile(entry.id,{B0:baseline.cann,B1:'—'},entry.mods||[],entry.settings?frozenSettings(entry.settings):t('配置以各自来源为准','See each source for configuration'))}
       ${coverageView(rows)}<section><div class="section-heading"><h2>${t('性能与成本','Performance and cost')}</h2><button type="button" data-detail="metrics">${t('查看数值','View metrics')} ↗</button></div><p class="chart-scale-note">${esc(reason)}</p><div class="metric-grid">
       ${chart('output_tokens_per_second',t('输出吞吐 ↑','Output throughput ↑'),'token/s',1,performanceRows,performanceRows.map(row=>row.label),roles)}
       ${chart('mean_ttft_ms',t('首token时延 ↓','Time to first token ↓'),'s',1000,performanceRows,performanceRows.map(row=>row.label),roles)}
       ${chart('mean_tpot_ms',t('逐token时延 ↓','Time per output token ↓'),'ms',1,performanceRows,performanceRows.map(row=>row.label),roles)}
       ${chart('relative_cost_per_token',t('单位输出token成本 ↓','Cost per output token ↓'),'—',1,performanceRows,performanceRows.map(row=>row.label),roles)}</div></section>
-      <section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('查看数值','View metrics')} ↗</button></div><div class="supplement-highlights">${[t('16K 吞吐比','16K throughput ratio'),t('32K 吞吐比','32K throughput ratio'),t('四租户收益','Four-tenant improvement')].map(label=>`<div><span>${label}</span><strong>—</strong></div>`).join('')}</div>${contextDescription}<div class="supplement-plot${context.length?'':' missing-plot'}" style="background:transparent">${context.length?contextTable:esc(reason)}</div></section>
+      <section id="context-tenant-supplement"><div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2><button type="button" data-detail="supplement">${t('查看数值','View metrics')} ↗</button></div><div class="supplement-highlights">${[t('16K 吞吐比','16K throughput ratio'),t('32K 吞吐比','32K throughput ratio'),t('四租户收益','Four-tenant improvement')].map(label=>`<div><span>${label}</span><strong>—</strong></div>`).join('')}</div>${contextDescription}<div class="supplement-plot${context.length?'':' missing-plot'}" style="background:transparent">${context.length?contextTable:esc(reason)}</div>${tenantUtilization}</section>
       <div class="detail-actions">${['compute','methods','quality','evidence'].map(key=>`<button type="button" data-detail="${key}">${t({compute:'有效算力参考',methods:'公式与比较方式',quality:'质量与评分明细',evidence:'原始证据'}[key],{compute:'Compute reference',methods:'Methods',quality:'Quality',evidence:'Evidence'}[key])} ↗</button>`).join('')}<button type="button" id="comparison-export">${t('导出所选组合','Export selection')}</button></div>${detailDialog()}</section>`;
     root.querySelector('#context-tenant-supplement').insertAdjacentHTML('afterend',candidateReportPanels(entry));
     bindCandidateReports(entry);
@@ -2756,6 +2827,12 @@
       [b1Configuration.release,candidateModel,t('运行时见配置原件','Runtime in the configuration source')].filter(Boolean).join(' · ');
     root.querySelector('[data-detail="controller-progress"]')?.remove();
     bindMenu();bindDetails(detail);
+    root.querySelector('[data-c24-samples-link]')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const samples=root.querySelector('#selected-c24-utilization');
+      samples.focus({preventScroll:true});
+      samples.scrollIntoView({block:'start'});
+    });
     root.querySelector('#comparison-export').onclick=()=>{
       const payload={schema:'selected-b0-b1-observations/v1',baseline:baseline.id,candidate:entry.id,paired:false,reason,rows,context,context_workloads:contextSources,configuration:{B0:b0Configuration,B1:b1Configuration},
         native_timing:observed?.native_timing??null,automatic_ft_audit:observed?.automatic_ft_audit??null};
