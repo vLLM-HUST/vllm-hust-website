@@ -350,10 +350,10 @@
   let selectableIds = [...releaseIds,...attemptIds,...srIds];
   const controllerOption = 'request-throttling';
   const validRelease = id => /^(?:r[1-9][0-9]*|sr[1-9][0-9]*)$/.test(id||'');
-  let selectedRelease, selectedBaseline, selectedController, selectedRevision;
+  let selectedRelease, selectedBaseline, selectedController, selectedRevision, automaticRelease;
   const r10ArchivedVersion='2026.11.21.10';
   const archivedR10Selected=()=>selectedRelease==='r10'&&selectedRevision===r10ArchivedVersion;
-  const stableAssessment=entry=>entry.stable_evidence?stableAssessments.get(entry.id):undefined;
+  const stableAssessment=entry=>stableAssessments.get(entry);
   let baselineFallback = false, releaseFallback = false, controllerFallback = false;
   function readComparisonLocation() {
     const url=new URL(location.href), params=url.searchParams;
@@ -367,6 +367,8 @@
     const controller=params.get('controlplane');
     selectedRelease=validRelease(requested)?requested:null;
     selectedRevision=params.get('revision');
+    automaticRelease=!selectedRevision&&!params.has('comparison')&&
+      (!requested||requested==='latest'||(validRelease(requested)&&url.hash==='#submission-v2'));
     releaseFallback=!!requested&&requested!=='latest'&&!validRelease(requested);
     controllerFallback=!!controller&&controller!==controllerOption;
     baselineFallback=false;
@@ -548,6 +550,20 @@
     const official=catalog.order.filter(id=>!isFrozenCandidate(catalog.entries.find(entry=>entry.id===id)));
     if(!official.length)throw Error('No official frozen release');
     return official.reduce((latest,id)=>BigInt(id.slice(1))>BigInt(latest.slice(1))?id:latest);
+  }
+  function latestCompleteRelease(catalog, family) {
+    const archived=catalog.archived_r10;
+    return [...catalog.entries,...(archived?[archived]:[])]
+      .filter(entry=>{
+        const targets=(stableAssessment(entry)||submissionAssessments.get(entry))?.targets;
+        return (!family||entry.id===family)&&!isFrozenCandidate(entry)&&
+          ['4.1','4.2','4.3','4.4'].every(id=>
+            targets?.[id]?.milestone?.met===true&&targets[id].final?.met===true);
+      })
+      .sort((a,b)=>{
+        if(a.id!==b.id)return BigInt(a.id.slice(1))>BigInt(b.id.slice(1))?-1:1;
+        return b.frozen_date.localeCompare(a.frozen_date);
+      })[0];
   }
   async function loadReleaseCatalog() {
     if (releaseCatalog) return;
@@ -925,10 +941,10 @@
       <div class="release-links">
       ${developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}">${t('B0 / B1 对比','B0 / B1 comparison')} ↗</a>`:`<a class="fixed-b0-identity" href="${esc(comparisonBaselines.find(item=>item.id===selectedBaseline)?.profile.url||releaseCatalog?.baseline.profile.url||'./engine.html')}">${originalBaselineSelected()?'B0 · vLLM0.18 / Ascend0.18':t('B0 来源','B0 source')} ↗</a>`}
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:developmentRelease()&&!developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}&amp;comparison=development">${t('查看本版专项配对','View this release’s development pair')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
-      <a class="latest-release-link" href="./b0-b1.html">${t('最新正式版','Latest frozen release')} ↗</a>
+      <a class="latest-release-link" href="./b0-b1.html">${t('默认实测结果','Default benchmark results')} ↗</a>
       ${selectedRelease==='r10'&&releaseCatalog?.archived_r10?archivedR10Selected()
-        ? `<a href="./b0-b1.html?release=r10">${t('r10 修订版 2026.11.24.10','R10 revision 2026.11.24.10')} ↗</a>`
-        : `<a href="./b0-b1.html?release=r10&amp;revision=2026.11.21.10">${t('r10 历史版 2026.11.21.10','Archived R10 2026.11.21.10')} ↗</a>` : ''}
+        ? `<a href="./b0-b1.html?release=r10">${t('查看最新 r10 修订','View the latest R10 revision')} ↗</a>`
+        : `<a href="./b0-b1.html?release=r10&amp;revision=${esc(releaseCatalog.archived_r10.stable_evidence.pypi_version)}">${t('r10 历史版','Archived R10')} ${esc(releaseCatalog.archived_r10.stable_evidence.pypi_version)} ↗</a>` : ''}
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
       </div>
     </div>${baselineFallback?`<p class="baseline-fallback" role="status">${t('链接中的基线版本无效，已显示固定送测 B0。','The baseline in the link is unknown. Showing the fixed submission B0.')}</p>`:''}
@@ -957,6 +973,7 @@
     root.querySelector('#comparison-release-select').addEventListener('change',event=>{
       selectedRelease=event.target.value;
       selectedRevision=null;
+      automaticRelease=false;
       releaseFallback=false;
       const url=new URL(location.href);url.searchParams.set('release',selectedRelease);url.searchParams.delete('revision');if(url.searchParams.has('b0')||!developmentRelease())url.searchParams.delete('comparison');history.replaceState(null,'',url);
       showRelease();
@@ -1078,7 +1095,7 @@
     const phases=['4096-formal','16384-formal','32768-formal','multi-tenant-formal'];
     const mirror='https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/';
     const fail=()=>{throw Error('Invalid V5 R10 revision comparison');};
-    if(entry.id!=='r10'||entry.release!=='full-answer-b1-20261124-r10'||entry.measurements.length||
+    if(entry.id!=='r10'||entry.release!=='full-answer-b1-20261124-r10'||(entry.measurements.length&&!entry.submission_assessment)||
        revision.pypi_version!=='2026.11.24.10'||revision.previous_version!==r10ArchivedVersion||
        revision.pypi_url!=='https://pypi.org/project/vllm-hust-engine/'+revision.pypi_version+'/'||
        revision.install_manifest_url!==mirror+'r10-3072-pip-requirements.txt'||
@@ -1237,8 +1254,10 @@
     if(!close(Number(cost.utilization_gain_pp),gain)||!close(Number(cost.four_tenant_ai_core_mean_percent),tenantUtilization)||
        cost.milestone.met!==(serving.datasets.mmlu.quality.met&&mmluCost.reduction>=10&&gain>=10)||
        cost.final.met!==(allTenants&&tenantCost.reduction>=30&&tenantUtilization>=80))fail();
+    if(entry.r10_revision&&['milestone','final'].some(gate=>
+      targets['4.3'][gate].met!==entry.r10_revision.assessment_4_3[gate].met))fail();
     if(entry.submission_report)await verifiedAsset(entry.submission_report,'html');
-    submissionAssessments.set(entry.id,{targets,quote,rate,mmluCost,tenantCost,gain,tenantUtilization});
+    submissionAssessments.set(entry,{targets,quote,rate,mmluCost,tenantCost,gain,tenantUtilization});
   }
   function rentalCostDetails(assessment) {
     const {quote,rate,mmluCost,tenantCost}=assessment;
@@ -1253,7 +1272,7 @@
     </details>`;
   }
   function v2Assessment(entry, rows) {
-    if(entry.r10_revision){
+    if(entry.r10_revision&&!submissionAssessments.has(entry)){
       const release=entry.r10_revision;
       const result=release.assessment_4_3;
       const status=met=>met?t('达成目标','Target met'):t('未达成目标','Target not met');
@@ -1292,7 +1311,7 @@
       <p data-stable-assessment-unavailable>${t('稳定版 V2 封存证据未通过读取校验。','Stable V2 evidence could not be verified.')}</p></section>`;
     const status=(met,evidence)=>[met?t('达成目标','Target met'):t('未达成目标','Target not met'),evidence].join(' · ');
     const missing=reason=>status(false,reason);
-    const assessment=submissionAssessments.get(entry.id);
+    const assessment=submissionAssessments.get(entry);
     const source=(anchor,label)=>`<a href="./test-plan.html#${anchor}-${t('zh','en')}">${label} ↗</a>`;
     const certificate=entry.compute_reference?.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'
       ?entry.compute_reference:null;
@@ -1594,7 +1613,7 @@
       throw Error('Stable release measurements do not match the sealed trial');
     }
     candidateAssessment(item,report,value);
-    stableAssessments.set(entry.id,{item,report,value,targets:record.targets});
+    stableAssessments.set(entry,{item,report,value,targets:record.targets});
   }
 
   function candidateAssessment(item, report, value, {target,rentalDisclosure=false}={}) {
@@ -2785,6 +2804,15 @@
       if(request!==releaseRequest)return;
       if(loaded[2]&&/^sr/.test(selectedRelease||''))throw loaded[2];
       selectableIds=[...releaseIds,...attemptIds,...srIds];
+      if(automaticRelease){
+        const recommended=selectedBaseline===releaseCatalog.baseline.id&&
+          latestCompleteRelease(releaseCatalog,selectedRelease);
+        if(recommended){
+          selectedRelease=recommended.id;
+          selectedRevision=recommended===releaseCatalog.archived_r10?recommended.stable_evidence.pypi_version:null;
+        }
+        automaticRelease=false;
+      }
       if(!selectableIds.includes(selectedRelease)){
         releaseFallback=releaseFallback||!!selectedRelease;
         selectedRelease=latestFrozenRelease(releaseCatalog);
@@ -2795,7 +2823,7 @@
       if(request!==releaseRequest)return;
       const url=new URL(location.href);
       if(releaseFallback)url.searchParams.set('release',selectedRelease);
-      if(!selectedRevision&&selectedRelease==='r10'&&releaseCatalog.archived_r10&&
+      if(!selectedRevision&&selectedRelease==='r10'&&releaseCatalog.archived_r10&&!submissionAssessments.has(releaseEntry())&&
          selectedBaseline===releaseCatalog.baseline.id&&/^#(?:method-4|metric-4)$/.test(url.hash)){
         selectedRevision=r10ArchivedVersion;
         url.searchParams.set('release',selectedRelease);

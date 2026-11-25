@@ -18,9 +18,30 @@ function sandbox() {
   vm.createContext(context);
   const evidence = fs.readFileSync(path.join(__dirname, '..', 'assets', 'controller-evidence.js'), 'utf8');
   vm.runInContext(evidence, context);
-  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, linkedDetailKey, transportAssetBytes, loadFixedBaseline, withFixedBaseline, setFixedBaseline: value=>{fixedBaseline=value;} };\n})();'), context);
+  vm.runInContext(source.replace(marker, '  globalThis.computeTest = { computeBound, validateVersionComputeReference, versionComputeReferenceDetails, latestFrozenRelease, latestCompleteRelease, stableAssessments, submissionAssessments, linkedDetailKey, transportAssetBytes, loadFixedBaseline, withFixedBaseline, setFixedBaseline: value=>{fixedBaseline=value;} };\n})();'), context);
   return context;
 }
+
+test('default reports advance only when a newer release itself passes all four targets', () => {
+  const { latestCompleteRelease, stableAssessments, submissionAssessments } = sandbox().computeTest;
+  const archive = { id: 'r10', frozen_date: '2026-11-21' };
+  const revision = { id: 'r10', frozen_date: '2026-11-24' };
+  const next = { id: 'r11', frozen_date: '2026-11-25' };
+  const candidate = { id: 'r12', frozen_date: '2026-11-25', publication_status: 'frozen-candidate' };
+  const catalog = { archived_r10: archive, entries: [revision, next, candidate] };
+  const pass = { milestone: { met: true }, final: { met: true } };
+  const targets = Object.fromEntries(['4.1', '4.2', '4.3', '4.4'].map(id => [id, pass]));
+  assert.equal(latestCompleteRelease(catalog), undefined);
+  stableAssessments.set(archive, { targets });
+  submissionAssessments.set(next, { targets: { ...targets, '4.3': { ...pass, final: { met: false } } } });
+  submissionAssessments.set(candidate, { targets });
+  assert.equal(latestCompleteRelease(catalog), archive);
+  submissionAssessments.set(revision, { targets });
+  assert.equal(latestCompleteRelease(catalog), revision);
+  submissionAssessments.set(next, { targets });
+  assert.equal(latestCompleteRelease(catalog), next);
+  assert.equal(latestCompleteRelease(catalog, 'r10'), revision);
+});
 
 function fixture(context, efficiency='50') {
   const makeArm = () => ({ F_interval: ['1000000000000', '2000000000000'], T_seconds: '1',
