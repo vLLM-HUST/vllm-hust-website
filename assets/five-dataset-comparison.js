@@ -565,14 +565,41 @@
         return b.frozen_date.localeCompare(a.frozen_date);
       })[0];
   }
+  async function readReleasePublication(signal) {
+    const response = await fetch('./data/benchmark-source-manifest.json',{cache:'no-cache',signal});
+    if (!response.ok) throw Error('Release manifest unavailable');
+    const publication = await response.json();
+    if (publication.repository !== 'vLLM-HUST/vllm-hust-benchmark' ||
+        publication.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(publication.commit) ||
+        !Array.isArray(publication.files)) throw Error('Invalid release catalog publisher');
+    return publication;
+  }
+  let publicationCheck;
+  function openPublicationIsCurrent() {
+    if (!releaseCatalog || document.visibilityState !== 'visible') return Promise.resolve(true);
+    if (!publicationCheck) {
+      const loaded = releasePublication;
+      publicationCheck = (async () => {
+        try {
+          const current = await readReleasePublication(AbortSignal.timeout(5000));
+          if (releaseCatalog && releasePublication === loaded && current.commit !== loaded.commit) {
+            // Load the matching presentation and verified evidence together.
+            location.reload();
+            return false;
+          }
+        } catch (error) {
+          console.warn('Release publication recheck unavailable',error);
+        }
+        return true;
+      })().finally(()=>{publicationCheck=undefined;});
+    }
+    return publicationCheck;
+  }
   async function loadReleaseCatalog() {
     if (releaseCatalog) return;
     if (catalogRequest) return catalogRequest;
     catalogRequest = (async () => {
-      const response = await fetch('./data/benchmark-source-manifest.json',{cache:'no-cache'});
-      if (!response.ok) throw Error('Release manifest unavailable');
-      const publication = await response.json();
-      if (publication.repository !== 'vLLM-HUST/vllm-hust-benchmark' || publication.status !== 'published-source' || !/^[a-f0-9]{40}$/.test(publication.commit)) throw Error('Invalid release catalog publisher');
+      const publication = await readReleasePublication();
       const entries = publication.files.filter(row=>row.website_path===historyPath);
       if (entries.length!==1) throw Error('Ambiguous release catalog source');
       const result = await fetch('./'+historyPath,{cache:'no-cache'});
@@ -2885,6 +2912,7 @@
     const request=++releaseRequest;
     root.setAttribute('aria-busy','true');delete root.dataset.error;
     try {
+      if(!await openPublicationIsCurrent()||request!==releaseRequest)return;
       const loaded=await Promise.all([loadReleaseCatalog(), controllerProgress ? Promise.resolve() : loadControllerProgress(), loadSr().then(()=>null,error=>error), loadControllerResults().catch(error=>console.warn('Controller results rejected',error))]);
       if(request!==releaseRequest)return;
       if(loaded[2]&&/^sr/.test(selectedRelease||''))throw loaded[2];
@@ -2933,6 +2961,8 @@
   window.addEventListener('vllm-hust:langchange',render);
   window.addEventListener('hashchange',openLinkedDetail);
   window.addEventListener('popstate',()=>{readComparisonLocation();showRelease();});
+  window.addEventListener('focus',openPublicationIsCurrent);
+  document.addEventListener('visibilitychange',openPublicationIsCurrent);
   window.addEventListener('pageshow',event=>{
     if(!event.persisted)return;
     releaseCatalog=null;catalogRequest=null;srEntries=null;srIds=[];controllerResults=null;
