@@ -824,8 +824,35 @@ def assert_submission_assessment(page, root, entry, url, lang):
         expect(record).to_contain_text(f"B0 {before} → B1 {after}")
     supplement = root.locator("#context-tenant-supplement")
     expect(supplement).to_have_attribute("data-source-release", entry["id"])
-    image = supplement.locator("img")
-    assert image.evaluate("async el=>{await el.decode();return el.naturalWidth>0}")
+    if entry.get("r10_revision") and not entry["context_tenant_supplement"].get(
+        "chart"
+    ):
+        windows = supplement.locator("[data-r10-stability-windows]")
+        rows = windows.locator("tbody tr")
+        expect(rows).to_have_count(5)
+        expect(windows).to_contain_text("B1 TTFT P95 / ms")
+        expect(windows).to_contain_text("B1 TTFT P99 / ms")
+        long_context = next(
+            row
+            for row in entry["context_tenant_supplement"]["comparisons"]
+            if row["phase"] == "32768-formal"
+        )
+        for index, window in enumerate(long_context["B1"]["windows"]):
+            cells = rows.nth(index).locator("th, td")
+            expect(cells.nth(3)).to_have_text(
+                f"{window['metrics']['ttft_ms']['p95']:.2f}"
+            )
+            expect(cells.nth(4)).to_have_text(
+                f"{window['metrics']['ttft_ms']['p99']:.2f}"
+            )
+        expect(supplement.locator('[data-workload="terminal-replay"]')).to_contain_text(
+            "Terminal-Bench 2.1 离线请求回放 · 并发 8"
+            if lang == "zh"
+            else "Terminal-Bench 2.1 offline request replay · concurrency 8"
+        )
+    else:
+        image = supplement.locator("img")
+        assert image.evaluate("async el=>{await el.decode();return el.naturalWidth>0}")
 
     assessment = root.locator("#submission-v2")
     for index, goal in enumerate(("4.1", "4.2", "4.3", "4.4")):
