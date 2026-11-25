@@ -978,8 +978,8 @@
       ${modelIntegrationResults.has(selectedRelease)?`<a href="./b0-b1.html?release=${esc(selectedRelease)}#development-comparison">${t('书生适配开发对照','Intern adaptation development comparison')} ↗</a>`:developmentRelease()&&!developmentComparison()?`<a href="./b0-b1.html?release=${esc(selectedRelease)}&amp;comparison=development">${t('查看本版专项配对','View this release’s development pair')} ↗</a>`:`<a href="./engine-r8-development.html">${t('开发对照详情','Development evidence')} ↗</a>`}
       <a class="latest-release-link" href="./b0-b1.html">${t('默认实测结果','Default benchmark results')} ↗</a>
       ${selectedRelease==='r10'&&releaseCatalog?.archived_r10?archivedR10Selected()
-        ? `<a data-r10-revision-link href="${esc(r10RevisionHref(currentR10Version()))}">${t('查看最新 r10 修订','View the latest R10 revision')} ↗</a>`
-        : `<a data-r10-revision-link href="${esc(r10RevisionHref(r10ArchivedVersion))}">${t('r10 历史版','Archived R10')} ${esc(r10ArchivedVersion)} ↗</a>` : ''}
+        ? `<a data-r10-revision-link data-r10-route-version="${esc(currentR10Version()||'')}" href="${esc(r10RevisionHref(currentR10Version()))}">${t('查看最新 r10 修订','View the latest R10 revision')} ↗</a>`
+        : `<a data-r10-revision-link data-r10-route-version="${esc(r10ArchivedVersion)}" href="${esc(r10RevisionHref(r10ArchivedVersion))}">${t('r10 历史版','Archived R10')} ${esc(r10ArchivedVersion)} ↗</a>` : ''}
       <a id="release-history-link" href="./report-history.html">${t('历史报告','Report archive')} ↗</a>
       </div>
     </div>${baselineFallback?`<p class="baseline-fallback" role="status">${t('链接中的基线版本无效，已显示固定送测 B0。','The baseline in the link is unknown. Showing the fixed submission B0.')}</p>`:''}
@@ -997,6 +997,9 @@
       if(selectedController)url.searchParams.set('controlplane',selectedController);
       else url.searchParams.delete('controlplane');
       history.replaceState(null,'',url);
+      root.querySelectorAll('[data-r10-route-version]').forEach(link=>{
+        link.setAttribute('href',r10RevisionHref(link.dataset.r10RouteVersion));
+      });
       renderControllerPanel();
     });
     root.querySelector('#comparison-baseline-select')?.addEventListener('change',event=>{
@@ -2758,7 +2761,7 @@
       <span>${t('历史 R10 与所选版本 B0 补丁版 · MMLU-Pro 200 / out256','Archived R10 and patched B0 for the selected version · MMLU-Pro 200 / out256')}
       · ${t('有效算力比','Effective-compute ratio')} <strong>${esc(formatFtInterval(ftPair.B1_over_B0_effective_compute_interval))}×</strong></span>
       <a href="${esc(comparisonEvidence)}">${t('专项报告与原件','Supplemental report and evidence')} ↗</a></p>`:
-      archivedPair?`<p class="comparison-meta" data-b0-ft-archive><a href="${esc(r10RevisionHref(r10ArchivedVersion))}">
+      archivedPair?`<p class="comparison-meta" data-b0-ft-archive><a data-r10-route-version="${esc(r10ArchivedVersion)}" href="${esc(r10RevisionHref(r10ArchivedVersion))}">
       ${t('查看历史 R10 与此 B0 补丁版的 F/T 对照','View archived R10 against this patched B0')} ↗</a></p>`:'';
     const comparisonDetail=ftPair?'<div data-r10-patched-b0-ft><p><strong>R10 '+
       esc(formatFtInterval(r10PatchedFt.B1.tflops_per_card_interval))+' TFLOP/s/'+t('卡','card')+'</strong> · '+
