@@ -23,7 +23,7 @@
   en.title = 'Request Throttling Controller | vLLM-HUST';
   zh.title = `${zh['control-title']} · 引擎控制面 | vLLM-HUST`;
   window.vllmHustPageDict = {en, zh};
-  let publication, selected, data, latest;
+  let publication, selected, data, latest, distributedPair;
   const {
     controllerFixedProfilesPath,controllerComputePath,controllerStreamingPath,
     readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerNativeCompute,
@@ -114,6 +114,15 @@
           `<p class="control-scope">${t('当前发布源的原生参考效率待核验。','Native reference efficiency is awaiting verification in the current publication.')}</p>`}`:''}
       ${serviceCompute}
       <details class="control-details"><summary>${t('变更记录与适用边界','Changelog and boundaries')}</summary><ul>${e.changelog.map(v=>`<li><strong>${esc(v.date)}</strong> ${esc(t(v.zh,v.en))}</li>`).join('')}</ul></details>`;
+    if(distributedPair){
+      const {direct,controller}=distributedPair.arms;
+      const change=100*(controller.makespan_seconds/direct.makespan_seconds-1);
+      const report=`https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${publication.commit}/reports/controller-35b-two-devbox-20261125/README.md`;
+      root.insertAdjacentHTML('beforeend',`<h3>${t('独立实验 · 35B 双 devbox','Independent experiment · 35B on two devboxes')}</h3>
+        <p>${t('两个 TP2 实例，112 个三轮 program，固定顺序各跑一次。完整批次从直连到默认限流层','Two TP2 replicas, 112 three-turn programs, one fixed-order pair. Batch time, direct to default controller')}
+        ${num(direct.makespan_seconds)} → ${num(controller.makespan_seconds)} s (+${num(change)}%).</p>
+        <a href="${report}">${t('逐请求数据、分层图和适用范围','Per-request records, figures and scope')} ↗</a>`);
+    }
     document.getElementById('control-release').addEventListener('change',event=>{selected=event.target.value;render();document.getElementById('control-release').focus();});
     root.dataset.loaded=selected;root.setAttribute('aria-busy','false');
   }
@@ -122,6 +131,15 @@
     if(publication.repository!=='vLLM-HUST/vllm-hust-benchmark' || publication.status!=='published-source' || !/^[a-f0-9]{40}$/.test(publication.commit))throw Error('Unpublished source');
     const path='data/controller-product-results-v1.json';
     data=validate(await readPublishedJson(publication,path,await fetch('./'+path,{cache:'no-cache'})));
+    const pairPath='data/controller-35b-two-devbox-20261125.json';
+    if(publication.files.some(file=>file.website_path===pairPath)){
+      try {
+        const pair=await readPublishedJson(publication,pairPath,await fetch('./'+pairPath,{cache:'no-cache'}));
+        if(pair.schema!=='controller-two-devbox-pair/v1'||pair.pairs!==1||
+          ![pair.arms.direct,pair.arms.controller].every(arm=>arm.sessions_completed===112&&arm.rounds_succeeded===336&&arm.rounds_failed===0&&Number.isFinite(arm.makespan_seconds)&&arm.makespan_seconds>0))throw Error('Incomplete distributed pair');
+        distributedPair=pair;
+      } catch(error){console.warn('Distributed session evidence rejected',error);}
+    }
     const entry=data.releases.find(row=>row.id==='r8');
     if(entry){
       const optional=(label,promise)=>promise.catch(error=>{
