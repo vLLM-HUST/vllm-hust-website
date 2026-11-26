@@ -11,6 +11,69 @@ from playwright.sync_api import expect, sync_playwright
 from verify_product_homepages_browser import CONTRAST
 
 
+def check_r10_and_result_updates(page, components, release_history, lang):
+    r10 = next(entry for entry in release_history["entries"] if entry["id"] == "r10")
+    box = page.locator("#r10-mods")
+    expect(box).to_be_visible()
+    expect(box).to_contain_text(r10["r10_revision"]["pypi_version"])
+    expect(box.locator("[data-r10-component]")).to_have_count(len(r10["mods"]))
+    assert len(r10["mods"]) == 11
+    ids = box.locator("[data-r10-component]").evaluate_all(
+        "nodes => nodes.map(node => node.dataset.r10Component)"
+    )
+    assert ids == [
+        "vllm-hust-extension-manager",
+        "betterscale",
+        "prefill-microflow",
+        "kv-materialization-arrival-control",
+        "hust-m01-correction",
+        "hust-joint-packed",
+        "sealed-serving-warmup",
+        "guarded-progress-async",
+        "capacity-tuning",
+        "short-prefill-tail",
+        "state-page-copy",
+    ]
+    for component_id in ids:
+        expect(box.locator(f'[data-r10-component="{component_id}"]')).to_have_attribute(
+            "href", f"#{component_id}"
+        )
+
+    for component_id, evidence_path, values in (
+        ("diffspec", "/diffspec/README.md", ("48b1828", "24", "1294c95")),
+        ("prefix-router-migration", "/prefix-router/README.md", ("47.88%", "174.80")),
+    ):
+        panel = page.locator(f"#{component_id} > .plugin-public-effect")
+        expect(panel).to_be_visible()
+        effect = components[component_id]
+        expect(panel.locator("p")).to_have_text(effect[f"public_effect_{lang}"])
+        assert effect["public_effect_url"].endswith(evidence_path)
+        expect(panel.locator("a")).to_have_attribute(
+            "href", effect["public_effect_url"]
+        )
+        for value in values:
+            expect(panel).to_contain_text(value)
+
+    search = page.locator("[data-plugin-search]")
+    search.fill("DiffSpec")
+    expect(page.locator("#diffspec")).to_be_visible()
+    expect(page.locator("#prefix-router-migration")).to_have_count(0)
+    search.fill("Prefix Router")
+    expect(
+        page.locator("#prefix-router-migration > .plugin-public-effect")
+    ).to_be_visible()
+    expect(page.locator("#diffspec")).to_have_count(0)
+    box.locator('[data-r10-component="state-page-copy"]').click()
+    expect(page.locator("#state-page-copy")).to_be_visible()
+    expect(search).to_have_value("")
+    page.locator('[data-product-filter="control-plane"]').click()
+    expect(box).to_be_hidden()
+    page.locator('[data-product-filter="engine"]').click()
+    expect(box).to_be_visible()
+    page.locator('[data-product-filter="all"]').click()
+    return {"release": r10["release"], "enabled": ids, "result_panels": 2}
+
+
 def check_product_views(page, taxonomy):
     """Product browsing must preserve identities, results and legacy guide links."""
     search = page.locator("[data-plugin-search]")
@@ -242,6 +305,7 @@ def check_engine_catalog_consistency(page, context, base_url, components):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
+    parser.add_argument("--channel", help="Use an installed Chromium browser channel")
     parser.add_argument(
         "--output", type=Path, default=Path("output/playwright/plugin-effects")
     )
@@ -263,7 +327,7 @@ def main():
             f"--host-resolver-rules=MAP {host} {args.host_ip}",
         ]
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(args=launch_args)
+        browser = pw.chromium.launch(args=launch_args, channel=args.channel)
         for width in (390, 1440):
             for lang in ("zh", "en"):
                 for theme in ("light", "dark"):
@@ -289,6 +353,7 @@ def main():
                     payloads = {}
                     for name in (
                         "ecosystem.json",
+                        "engine-release-history-v1.json",
                         "plugin-performance.json",
                         "mod-taxonomy.json",
                         "plugin-workshop-metadata.json",
@@ -417,6 +482,12 @@ def main():
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth + 1"
                     )
+                    catalog_updates = check_r10_and_result_updates(
+                        page,
+                        components,
+                        payloads["engine-release-history-v1.json"],
+                        lang,
+                    )
                     assert not errors, errors
                     stem = f"{width}-{lang}-{theme}"
                     muxpd = page.locator("#muxpd")
@@ -441,6 +512,7 @@ def main():
                             "language": lang,
                             "theme": theme,
                             "cards": checked,
+                            "catalog_updates": catalog_updates,
                             "people_cards": people_checked,
                             "manifest_sha256": hashlib.sha256(manifest_raw).hexdigest(),
                             "source_commit": manifest["commit"],

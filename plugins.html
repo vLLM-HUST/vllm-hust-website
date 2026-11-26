@@ -67,6 +67,11 @@
       <div class="mod-product-actions"><button type="button" data-product-filter="all" aria-pressed="true"><span class="lang-en">All products</span><span class="lang-zh">全部产品</span></button><span data-product-view-note></span></div>
     </section>
 
+    <section id="r10-mods" class="content-panel" aria-labelledby="r10-mods-title" data-frozen-r10 data-source="./data/engine-release-history-v1.json" hidden>
+      <h2 id="r10-mods-title"><span class="lang-en">Official R10 enabled components</span><span class="lang-zh">正式 R10 启用组件</span></h2>
+      <div data-frozen-r10-content></div>
+    </section>
+
     <section id="plugin-catalog" class="plugin-controls" aria-label="MOD filters">
 <label>
 <span id="plugins-search-label">Search</span>
@@ -724,12 +729,11 @@ Research code can evolve without permanent forks or a universal plugin abstracti
 <span class="lang-zh">面向长序列的推测执行</span>
 </h3>
 <p>
-<span class="lang-en">DiffSpec 48b1828 now targets the pinned Qwen3.5-35B-A3B and Specforge Eagle3 pair on Ascend TP4 PIECEWISE execution. The committed-query retrieval implementation is merged, while functional and performance qualification for this exact pair remains pending.</span>
-<span class="lang-zh">DiffSpec 48b1828 现面向固定版本的 Qwen3.5-35B-A3B 与 Specforge Eagle3 组合，使用 Ascend TP4 PIECEWISE 执行。已合并 committed-query retrieval 实现，但该精确组合的功能与性能资格验证仍待完成。
-</span>
+<span class="lang-en">DiffSpec 48b1828 passed a scoped TP4 PIECEWISE functional regression for the pinned Qwen3.5-35B-A3B and Specforge Eagle3 pair. The catalog links the new regression and labels the performance evidence with its October 30 frozen implementation.</span>
+<span class="lang-zh">DiffSpec 48b1828 已完成固定 Qwen3.5-35B-A3B 与 Specforge Eagle3 的 TP4 PIECEWISE 专项功能回归。目录提供本轮回归证据，历史性能标明 10 月 30 日冻结实现。</span>
 </p>
 <div class="highlight-links">
-<a href="https://github.com/vLLM-HUST/vllm-ascend-hust-diffspec">DiffSpec ↗</a>
+<a href="#diffspec">DiffSpec ↗</a>
 </div>
 </article>
 
@@ -1037,7 +1041,7 @@ Open <a href="./data/ecosystem.json">the canonical registry mirror</a>.</p>
 </script>
 <script src="./assets/plugin-performance.js?v=mod-review-20261110"></script>
 <script src="./assets/ecosystem-catalog.js?v=catalog-audit-20261105"></script>
-<script src="./assets/plugins-page.js?v=catalog-component-links-20261123">
+<script src="./assets/plugins-page.js?v=frozen-r10-catalog-20261126">
 </script>
 </body>
 </html>
