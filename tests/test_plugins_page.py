@@ -636,15 +636,19 @@ def test_versioned_contracts_are_separate_from_existing_surfaces() -> None:
     assert "Ascend 4e57439e" in diffspec["summary_en"]
     assert "Specforge Eagle3" in diffspec["summary_en"]
     assert (
-        "Qwen/Qwen3.5-35B-A3B@59d61f3c — qualification pending"
+        "Qwen/Qwen3.5-35B-A3B@59d61f3c — scoped functional regression passed"
         in diffspec["compatibility"]["models"]
     )
     assert (
         "jiapingW/Qwen3.5-35B-A3B-Eagle3-Specforge@d07a277e — required draft"
         in diffspec["compatibility"]["models"]
     )
-    assert "no benchmark-custodied" in diffspec["public_effect_en"]
-    assert diffspec["public_effect_status"] == "pending"
+    assert diffspec["functional_compatibility"]["status"] == "passed"
+    assert diffspec["effectiveness_qualifications"][0]["status"] == "pending"
+    assert diffspec["public_effect_status"] == "functional"
+    assert diffspec["public_effect_url"].endswith("/diffspec/README.md")
+    assert "1294c95" in diffspec["public_effect_en"]
+    assert "remain unverified" in diffspec["public_effect_en"]
     assert vspec["integration_contracts"] == [
         "vllm_hust.extension_manifest.v0.3-experimental"
     ]
@@ -1053,6 +1057,7 @@ def test_every_workshop_mod_publishes_an_evidence_linked_effect() -> None:
         assert item["public_effect_status"] in {
             "measured",
             "validated",
+            "functional",
             "preview",
             "pending",
             "inconclusive",
@@ -1195,7 +1200,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=catalog-attribution-20261119" in PAGE
-    assert "plugins-page.js?v=catalog-component-links-20261123" in PAGE
+    assert "plugins-page.js?v=frozen-r10-catalog-20261126" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
