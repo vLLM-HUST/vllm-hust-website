@@ -22,6 +22,7 @@
   <main class="site-shell entry-main"><nav class="benchmark-tabs" aria-label="Evaluation workflow"><a href="./dataset-introductions.html" data-i18n-common="navDatasetGuide">1. 指定数据集测试</a><a href="./b0-b1.html" data-i18n-common="navComparison">2. B0/B1 大纲对比</a><a href="./serving-plan.html" data-i18n-common="navServingPlan">产能与成本</a></nav>
     <header><div class="guide-topbar"><h1 id="entry-title">测试数据集</h1><div class="prompt-download"><div class="download-buttons"><button id="download-test-prompt" type="button" disabled>下载 AI 测试提示词 ↓</button><a id="engine-page-link" class="secondary-download" href="./engine.html">引擎与下载 →</a></div><span id="prompt-download-status" role="status" aria-live="polite"></span></div></div><p id="entry-lead">MOD 效果测试：用同一基础配置关闭 / 启用目标 MOD，按冻结数据范围比较 B0 / B1。</p></header>
 <p class="plan-entry"><a href="./test-plan.html" data-plan-zh="课题四送测方案 V2：固定 B0 对比送测时最新 B1" data-plan-en="Topic 4 plan V2: fixed B0 vs B1 pinned at submission">课题四送测方案 V2：固定 B0 对比送测时最新 B1</a></p>
+    <section id="dataset-current-results" class="guide-note" aria-live="polite"></section>
     <p id="standard-status" role="status">加载中…</p>
     <section id="standard-content" hidden>
       <section id="test-modes" aria-label="测试模式"><div id="test-mode-cards" class="test-mode-cards"></div></section>
@@ -32,7 +33,6 @@
       <div class="scroll"><table><thead><tr><th data-summary-copy="dataset">数据集</th><th data-summary-copy="tasks">固定任务</th><th data-summary-copy="requests">每臂请求</th><th data-summary-copy="purpose">用途</th></tr></thead><tbody id="standard-rows"></tbody></table></div>
       <details id="test-mode-notes-panel"><summary data-summary-copy="notes">运行说明</summary><div id="test-mode-notes"></div><p id="test-mode-provenance"></p><p id="standard-title"></p><p id="standard-provenance"></p></details>
     </section>
-    <section id="dataset-current-results" class="guide-note" aria-live="polite"></section>
     <details id="upstream-guides"><summary data-summary-copy="upstream">原始数据集与工具</summary>
     <nav class="entry-jump" aria-label="Quickstarts"><a href="#designated" id="entry-jump-basic">指定五项数据集</a><a href="#special" id="entry-jump-special">2. Special scoring</a><a href="#sandbox" id="entry-jump-sandbox">3. Agent sandboxes</a><a hidden href="#all-sources" id="entry-all-link">All 118 sources</a></nav>
     <section id="designated" aria-label="Project-designated datasets"><div id="designated-cards" class="focus-cards"></div></section>
@@ -53,9 +53,9 @@
   </main>
   <footer class="site-footer"><span id="footer-copy">Dataset sources, test instructions and evaluation tools.</span></footer>
   <script src="./assets/site.js?v=public-audit-20261101&amp;ui=product-workspace-20261118-r1"></script>
-  <script src="./assets/dataset-test-prompt.js?v=engine-page-link-20261118"></script>
-  <script src="./assets/dataset-test-summary.js?v=engine-page-link-20261118"></script>
-  <script src="./assets/project-milestones.js?v=20261115-v1"></script><script src="./assets/dataset-current-results.js?v=r6-archive-link-20261121"></script>
+  <script src="./assets/dataset-test-prompt.js?v=historical-reference-20261126"></script>
+  <script src="./assets/dataset-test-summary.js?v=historical-reference-20261126"></script>
+  <script src="./assets/dataset-current-results.js?v=current-acceptance-20261126"></script>
   <script src="./assets/dataset-standard.js?v=mod-target-20261113"></script>
   <script src="./assets/dataset-entrypoints.js?v=mod-target-20261113"></script>
 <script src="./assets/test-plan.js?v=topic4-v2-20261119"></script></body>

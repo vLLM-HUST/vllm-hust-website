@@ -117,7 +117,7 @@ ${invariants}
 ## 6. 交付证据与结论
 交付本轮 B0/B1 定义与实际命令、MOD/基础引擎/依赖提交、配置差异、启用证据、模型/硬件/judge 身份、冻结输入与校验、原始 SSE/时间戳、评分、设备采样、清理、失败和未执行阶段，以及可复算报告。
 逐项列出所选范围和两臂计划/实际/成功/失败/截断/未决/未完成数；质量、吞吐、TTFT/TPOT、连续 C8、成本与额外开销；MOD 收益/回退及条件。不能借参考 Engine 的历史成绩证明待测 MOD 达标。
-MOD 机制收益和项目四项目标验收分开。若同时申请项目验收，按相应大纲核对 3.4.1 有效算力、3.4.2 吞吐与时延、3.4.3 数据集与长稳、3.4.4 成本的正式基线、门槛与适用条件，未测项明确保留。
+MOD 机制收益和项目四项目标验收分开。若同时申请项目验收，按课题四送测方案 V2 核对 4.1 有效算力、4.2 性能与质量、4.3 上下文稳定性和 4.4 成本与利用率的固定基线、门槛与适用条件，未测项明确保留。
 执行指南：https://vllm-hust.sage.org.ai/dataset-standard.html
 项目验收入口：https://vllm-hust.sage.org.ai/b0-b1.html
 `;
@@ -169,9 +169,10 @@ From this pair compute throughput change (B1/B0−1), TTFT/TPOT improvement (1�
 ## 6. Deliver
 Provide actual B0/B1 definitions and commands, MOD/base-engine/dependency commits, differences, activation evidence, model/hardware/judge identities, frozen inputs/checks, raw SSE/timestamps, grading, device samples, cleanup, failed/unexecuted stages and recomputable reports.
 List selected scope and both arms' planned/executed/success/failure/truncation/unresolved/unfinished counts; quality, throughput, TTFT/TPOT, C8, costs and overhead; MOD gains/regressions and conditions. Do not use historical reference Engine measurements to certify the target MOD.
-Keep mechanism effects separate from project acceptance. If project acceptance is requested, verify the formal baseline, thresholds and applicability for 3.4.1 compute, 3.4.2 throughput/latency, 3.4.3 datasets/stability and 3.4.4 cost. Retain unmeasured targets.
+Keep mechanism effects separate from project acceptance. If project acceptance is requested, use Topic 4 plan V2 to verify the fixed baseline, thresholds and scope for 4.1 effective compute, 4.2 performance and quality, 4.3 context stability and 4.4 cost and utilization. Retain unmeasured targets.
 Guide: https://vllm-hust.sage.org.ai/dataset-standard.html
-Project targets: https://vllm-hust.sage.org.ai/b0-b1.html
+Topic 4 plan V2: https://vllm-hust.sage.org.ai/test-plan.html
+Official results: https://vllm-hust.sage.org.ai/b0-b1.html
 `;
     }
 
@@ -187,7 +188,7 @@ ${identities}
 先读取上述固定版本的 README、执行器和协议。使用独立目录准备该版本，不覆盖其他工作或静默升级到最新 main。核对标准与运行指南的版本绑定、SHA256 和附件校验；加载失败或不匹配时停止，不凭记忆补写标准。每轮另记实际 B0/B1、执行提交、模型、硬件、judge 身份。协议冻结本身不是测试完成。
 
 ## 2. 先确认范围
-下载脚本固定恢复当前 r6 执行器。五数据集、有效算力参考、长上下文和多租户专项按各自执行记录入账，最终报告逐项展示结论。
+这个引导脚本用于复跑历史 Engine r6，执行工具版本为 r7。五数据集、有效算力参考、长上下文和多租户专项按各自执行记录入账，最终报告逐项展示结论。
 已确认：35B 模型适用；理论峰值按同工况独立参考解释；有效算力只选 MMLU200 标定；吞吐/时延或成本目标可由同一固定数据集同时满足该项全部条件，五项结果仍须披露。不要重新要求用户确认这些口径。
 默认执行完整五项测试。只有用户明确要求联调/快速检查时才选 MMLU200，并明确它不能替代五项完整验收。“全量”是项目冻结的五项范围，不是五个上游数据集的原始全集。
 ${field(guide, 'scope')}
@@ -252,7 +253,7 @@ ${identities}
 Read the pinned README, runner and protocols first. Prepare an isolated checkout; preserve unrelated work and do not silently upgrade to main. Verify version bindings, SHA256 and protocol artifacts before execution. Stop on any mismatch. Record actual B0/B1, execution commit, model, hardware and judge independently for each campaign.
 
 ## 2. Choose the scope
-The download restores the current pinned r6 runner. Record five-profile inference, compute reference, context and multi-tenant supplements separately and report each target from its actual execution evidence.
+This bootstrap reproduces the archived Engine r6 setup with execution tools r7. Record five-profile inference, compute reference, context and multi-tenant supplements separately and report each target from its actual execution evidence.
 Already confirmed: the 35B model scope; theoretical peak means an independent same-workload reference; calibrate compute on MMLU200 only; one fixed profile satisfying all conditions of a performance or cost target is sufficient, with all five results disclosed. Do not request these confirmations again.
 Run all five profiles by default. Use MMLU200 alone only when the user explicitly requests a quick integration check; it cannot replace full acceptance. Full means the project-frozen scope, not all upstream items.
 ${field(guide, 'scope')}
