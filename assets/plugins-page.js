@@ -5,6 +5,7 @@
   const search = document.querySelector("[data-plugin-search]");
   const modelSelect = document.querySelector("[data-plugin-model]");
   const more = document.querySelector("[data-plugin-more]");
+  const frozenR10Root = document.querySelector("[data-frozen-r10]");
   const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
   const phaseFilters = document.querySelector("[data-phase-filters]");
   const phaseDescription = document.querySelector("[data-phase-description]");
@@ -16,6 +17,7 @@
   if (!catalog || !status || !filters || !search) return;
 
   let registry;
+  let frozenR10;
   let performanceResults = new Map();
   let performanceData;
   let frontierData;
@@ -28,6 +30,20 @@
   let workloadNavigation = { traits: {}, plugins: {} };
   let modTaxonomy = {};
   let selectedType = "extensions";
+  const r10CatalogIds = new Map([
+    ["Extension Manager", "vllm-hust-extension-manager"],
+    ["BetterScale", "betterscale"],
+    ["Microflow", "prefill-microflow"],
+    ["KV materialization", "kv-materialization-arrival-control"],
+    ["M01 correction", "hust-m01-correction"],
+    ["Packed host state", "hust-joint-packed"],
+    ["Sealed serving warmup", "sealed-serving-warmup"],
+    ["Guarded progress async", "guarded-progress-async"],
+    ["Capacity tuning", "capacity-tuning"],
+    ["Short prefill tail", "short-prefill-tail"],
+    ["state-page-copy", "state-page-copy"],
+  ]);
+
   const productIds = ['all', 'engine', 'control-plane', 'continuum'];
   const requestedProduct = new URLSearchParams(location.search).get('product');
   let selectedProduct = productIds.includes(requestedProduct) ? requestedProduct : 'all';
@@ -469,6 +485,42 @@
     document.querySelectorAll('.plugin-controls, .workload-navigation').forEach(node => { node.hidden = planned; });
     document.querySelectorAll('.workshop-scope-note').forEach(node => { node.hidden = !['all', 'engine'].includes(selectedProduct); });
     if (modelSelect) modelSelect.closest('label').hidden = ['continuum', 'control-plane'].includes(selectedProduct);
+    renderFrozenR10();
+  }
+
+  function renderFrozenR10() {
+    if (!frozenR10Root) return;
+    const ids = frozenR10?.mods?.map(name => r10CatalogIds.get(name));
+    const catalogById = new Map(registry?.components.map(item => [item.id, item]));
+    const version = frozenR10?.r10_revision?.pypi_version;
+    const releaseUrl = frozenR10?.release_url;
+    const resolved = ids?.length === r10CatalogIds.size && new Set(ids).size === ids.length
+      && ids.every(id => catalogById.has(id)) && version && releaseUrl;
+    frozenR10Root.hidden = !resolved || !["all", "engine"].includes(selectedProduct);
+    if (frozenR10Root.hidden) return;
+    const zh = language() === "zh";
+    const label = zh ? `${version} · ${ids.length} 个启用组件` : `${version} · ${ids.length} enabled components`;
+    const title = element("p", "", label);
+    const scope = element("p", "", zh
+      ? "正式评测覆盖整套组合。各组件卡片标明自己的证据范围。"
+      : "The formal benchmark covers the full composition. Each card states its own evidence scope.");
+    const components = element("nav", "mod-reference-links");
+    components.setAttribute("aria-label", zh ? "正式 R10 启用组件" : "Official R10 enabled components");
+    for (const id of ids) {
+      const component = catalogById.get(id);
+      const link = element("a", "", local(component, "name"));
+      link.href = `#${id}`;
+      link.dataset.r10Component = id;
+      components.append(link);
+    }
+    const sources = element("nav", "mod-reference-links");
+    sources.setAttribute("aria-label", zh ? "R10 发行与评测" : "R10 release and benchmark");
+    const release = element("a", "", zh ? "正式发行记录 ↗" : "Official release ↗");
+    release.href = releaseUrl;
+    const benchmark = element("a", "", zh ? "R10 整机对照 ↗" : "R10 system comparison ↗");
+    benchmark.href = "./b0-b1.html?release=r10";
+    sources.append(release, benchmark);
+    frozenR10Root.querySelector("[data-frozen-r10-content]").replaceChildren(title, scope, components, sources);
   }
 
   function resetCatalogFilters() {
@@ -2114,6 +2166,9 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     fetchModTaxonomy(catalog.dataset.taxonomy),
+    (frozenR10Root ? fetch(frozenR10Root.dataset.source, { cache: "no-cache" })
+      .then(response => response.ok ? response.json() : null)
+      .catch(() => null) : Promise.resolve(null)),
     Promise.all([
       fetch("./data/mod-test-evidence.json?v=mod-catalog-20261106", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("MOD evidence unavailable"); return response.json(); }),
       fetch("./data/mod-result-bindings.json?v=mod-catalog-20261106", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("MOD result bindings unavailable"); return response.json(); })
@@ -2123,7 +2178,7 @@ vllm-hust-ext extension check ${extensionId}`
       fetch("./data/leaderboard_frontier.json?v=ecpa-final-20261009", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("Benchmark settings unavailable"); return response.json(); })
     ]).then(([data, frontier]) => ({ data, frontier })).catch(() => null)
   ])
-    .then(([payload, metadata, navigation, taxonomy, resultPublication, performance]) => {
+    .then(([payload, metadata, navigation, taxonomy, releaseHistory, resultPublication, performance]) => {
       if (payload.schema_version !== "1.0" || payload.canonical_owner !== "vLLM-HUST/vllm-hust-benchmark" || !Array.isArray(payload.components)) {
         throw new Error("unsupported ecosystem registry");
       }
@@ -2143,6 +2198,7 @@ vllm-hust-ext extension check ${extensionId}`
         throw new Error("unsupported MOD result publication");
       }
       registry = payload;
+      frozenR10 = releaseHistory?.entries?.find(entry => entry.id === "r10");
       modTaxonomy = taxonomy.components;
       modEvidence = resultPublication.evidence;
       modResultBindings = resultPublication.bindings;
