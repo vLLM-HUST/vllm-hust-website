@@ -792,6 +792,44 @@ def assert_paired_version(page, root, entry, catalog):
     page.keyboard.press("Escape")
 
 
+def assert_full_acceptance(root, entry, lang):
+    acceptance = entry["full_acceptance"]
+    block = root.locator("#submission-v2")
+    expect(block).to_have_attribute("data-full-acceptance", entry["id"])
+    rows = block.locator("table tbody tr")
+    expect(rows).to_have_count(4)
+    for index, target in enumerate(("4.1", "4.2", "4.3", "4.4")):
+        cells = rows.nth(index).locator("th, td")
+        expect(cells.nth(0)).to_have_text(target)
+        for col, gate in ((1, "milestone"), (2, "final")):
+            assert acceptance["targets"][target][gate]["met"]
+            expect(cells.nth(col)).to_have_text(
+                "达成目标" if lang == "zh" else "Target met"
+            )
+    for model in acceptance["models"]:
+        expect(block).to_contain_text(model["name"])
+    expect(block).to_contain_text(
+        "已验证兼容入口" if lang == "zh" else "Compatibility entry points verified"
+    )
+    expect(
+        block.locator(f'a[href="{acceptance["install_manifest_url"]}"]')
+    ).to_be_visible()
+    expect(block.locator(f'a[href="{acceptance["report_url"]}"]')).to_be_visible()
+    label = (
+        "Terminal-Bench 2.1 离线请求回放 · 并发 8"
+        if lang == "zh"
+        else "Terminal-Bench 2.1 offline request replay · concurrency 8"
+    )
+    chart = root.locator('[data-metric="output_tokens_per_second"]')
+    for phase in ("4096", "16384", "32768"):
+        row = chart.locator(f'[data-profile="real-context-{phase}-formal"]')
+        expect(row.locator(".chart-workload-label")).to_contain_text(label)
+        expect(row).to_have_attribute("data-card-comparison", "matched")
+    supplement = root.locator("#context-tenant-supplement")
+    expect(supplement.locator("[data-workload=terminal-replay]")).to_contain_text(label)
+    expect(supplement.locator("tbody tr")).to_have_count(5)
+
+
 def assert_submission_assessment(page, root, entry, url, lang):
     descriptor = entry["submission_assessment"]
     response = page.request.get(url + "/" + descriptor["path"])
@@ -967,6 +1005,8 @@ def verify(url, output):
                         "model_integration"
                     ):
                         assert_paired_version(page, root, current, catalog)
+                    if current.get("full_acceptance"):
+                        assert_full_acceptance(root, current, lang)
                     if current.get("submission_assessment"):
                         assert_submission_assessment(page, root, current, url, lang)
                     if current.get("r10_revision") and not current.get(

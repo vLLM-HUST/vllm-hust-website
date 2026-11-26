@@ -567,7 +567,7 @@
     const archived=catalog.archived_r10;
     return [...catalog.entries,...(archived?[archived]:[])]
       .filter(entry=>{
-        const targets=(stableAssessment(entry)||submissionAssessments.get(entry))?.targets;
+        const targets=(entry.full_acceptance||stableAssessment(entry)||submissionAssessments.get(entry))?.targets;
         return (!family||entry.id===family)&&!isFrozenCandidate(entry)&&
           ['4.1','4.2','4.3','4.4'].every(id=>
             targets?.[id]?.milestone?.met===true&&targets[id].final?.met===true);
@@ -754,6 +754,7 @@
             if (![arm.output_tokens_per_second,arm.mean_ttft_ms,arm.mean_tpot_ms,arm.output_tokens,arm.duration_seconds,arm.requests].every(v=>Number.isFinite(v)&&v>0) || !Number.isInteger(arm.failed) || arm.failed<0 || !close(arm.output_tokens/arm.duration_seconds,arm.output_tokens_per_second)) throw Error('Inconsistent release measurement');
           }
         }
+        if(entry.full_acceptance)validateFullAcceptance(entry);
         await validateVersionSupplement(entry, publication);
         if(entry.r10_revision)validateR10Revision(entry);
         await validateVersionComputeReference(entry, publication);
@@ -1009,6 +1010,12 @@
     }
   }
   function versionComputeReferenceDetails(entry, showSupplement=true) {
+    if(entry.full_acceptance){
+      const result=entry.full_acceptance;
+      return `<p>MMLU-Pro · BF16 · TP2 · ${t('三轮原生同步计时与合格参考分母复算','Three native synchronized runs and a qualified reference denominator')}.</p>
+        <p>${t('有效算力效率下界','Effective compute efficiency lower bound')} ≥ ${computeBound(result.targets['4.1'].efficiency_lower_percent)}%</p>
+        <p><a href="${esc(result.evidence_url)}">${t('必要算量、同步计时和分母统计','Necessary work, synchronized timing and denominator statistics')} ↗</a></p>`;
+    }
     const a=entry.compute_reference;
     if(!a)return fixedBaselineCompute()+`<p>${t('本版 B1 尚未发布有效算力核算。','Compute accounting for this B1 is unpublished.')}</p>`;
     const submission=a.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs';
@@ -1481,7 +1488,73 @@
         ]))}
     </details>`;
   }
+  function validateFullAcceptance(entry) {
+    const data=entry.full_acceptance;
+    const ids=['4.1','4.2','4.3','4.4'];
+    const evidence=entry.sources.find(source=>source.url===data.evidence_url);
+    const number=value=>typeof value==='number'||typeof value==='string'&&value.trim()!=='' ? Number(value) : NaN;
+    const hasValues=(object, keys)=>keys.every(key=>Number.isFinite(number(object?.[key]))&&number(object[key])>0);
+    const context=entry.measurements.filter(row=>row.workload==='terminal-replay-c8');
+    if(entry.publication_status!=='stable'||!/^\d{4}\.\d{2}\.\d{2}\.\d+$/.test(data.pypi_version)||
+       !data.scheduler_profile||!data.measured_release||!evidence||evidence.sha256!==data.evidence_sha256||
+       !entry.sources.some(source=>source.url===data.report_url)||
+       sealedContextWorkload(data.context_input_sha256)?.datasets?.join()!=='Terminal-Bench 2.1'||
+       data.models?.length!==3||data.models[0]?.scope!=='full-acceptance'||
+       !data.models.slice(1).every(model=>model.name&&model.scope==='compatibility-verified')||
+       !ids.every(id=>['milestone','final'].every(stage=>typeof data.targets?.[id]?.[stage]?.met==='boolean'))||
+       !hasValues(data.targets['4.1'],['efficiency_lower_percent'])||
+       !hasValues(data.targets['4.3'].measured_window_ratios,['throughput','ttft_p95','ttft_p99','tpot_p95','tpot_p99'])||
+       !hasValues(data.targets['4.3'],['throughput_spread_limit','ttft_spread_limit','tpot_spread_limit'])||
+       !hasValues(data.targets['4.4'],['four_tenant_cost_reduction_percent','four_tenant_ai_core_mean_percent'])||
+       context.length!==3||!Number.isInteger(data.context_window_seconds)||data.context_window_seconds<=0||
+       data.context_windows?.length!==5||data.context_windows.some((row,index)=>row.index!==index||
+         !Number.isInteger(row.requests)||row.requests<=0||!hasValues(row,['throughput'])||
+         !hasValues(row.ttft,['p95','p99'])||!hasValues(row.tpot,['p95','p99'])))throw Error('Invalid full release acceptance');
+    const final=data.targets['4.3'];
+    const windows=data.context_windows;
+    const spread=values=>Math.max(...values)/Math.min(...values);
+    const decision=spread(windows.map(row=>row.throughput))<=number(final.throughput_spread_limit)&&
+      ['p95','p99'].every(tail=>spread(windows.map(row=>row.ttft[tail]))<=number(final.ttft_spread_limit)&&
+        spread(windows.map(row=>row.tpot[tail]))<=number(final.tpot_spread_limit));
+    if(decision!==final.final.met)throw Error('Unexpected context window decision');
+  }
+  function fullAcceptanceTable(entry) {
+    const result=entry.full_acceptance, targets=result.targets, model=result.models[0].name;
+    const compatibility=result.models.slice(1).map(item=>item.name).join(' / ');
+    const status=met=>met?t('达成目标','Target met'):t('未达成目标','Target not met');
+    const pct=value=>Number(value).toFixed(2)+'%';
+    const ratio=value=>Number(value).toFixed(6)+'×';
+    const spread=targets['4.3'].measured_window_ratios;
+    const mmlu=entry.measurements.find(row=>row.id==='mmlu').arms;
+    const details=[
+      t('有效算力效率下界 ','Effective compute efficiency lower bound ')+pct(targets['4.1'].efficiency_lower_percent),
+      'MMLU-Pro · '+Number(mmlu[1].output_tokens_per_second/mmlu[0].output_tokens_per_second).toFixed(3)+'× · '+
+        t('答对 ','Correct ')+mmlu.map(arm=>arm.correct+'/'+arm.requests).join(' → '),
+      '32K · TPOT P95 / P99 '+ratio(spread.tpot_p95)+' / '+ratio(spread.tpot_p99)+
+        ' · '+t('上限 ','limit ')+targets['4.3'].tpot_spread_limit+'× · '+
+        t('吞吐波动 ','throughput spread ')+ratio(spread.throughput)+' ≤ '+targets['4.3'].throughput_spread_limit+'×',
+      t('四租户单位成本下降 ','Four-tenant unit cost reduction ')+pct(targets['4.4'].four_tenant_cost_reduction_percent)+
+        ' · AI Core '+pct(targets['4.4'].four_tenant_ai_core_mean_percent)
+    ];
+    return `<section class="submission-assessment" id="submission-v2" data-full-acceptance="${esc(entry.id)}">
+      <div class="section-heading"><h2>${t('4.1–4.4 正式验收','Formal 4.1–4.4 acceptance')}</h2></div>
+      <p>${esc(model)} · ${esc(result.scheduler_profile)} ·
+        ${t('完成全量验收','Full acceptance completed')}</p>
+      <p>${esc(compatibility)} · ${t('已验证兼容入口','Compatibility entry points verified')}</p>
+      ${table(t(['项目','里程碑','结题','结题实测'],['Target','Milestone','Final','Final measurement']),
+        Object.entries(targets).map(([id,row],i)=>[id,status(row.milestone.met),status(row.final.met),details[i]]))}
+      <p><a href="${esc(result.report_url)}">${t('完整验收报告','Full acceptance report')} ↗</a> ·
+        <a href="${esc(result.evidence_url)}">${t('机器可读证据','Machine-readable evidence')} ↗</a> ·
+        <a href="${esc(result.pypi_url)}">PyPI ${esc(result.pypi_version)} ↗</a> ·
+        <a href="${esc(result.install_manifest_url)}">${t('安装清单','Installation manifest')} ↗</a></p>
+      <details data-rental-cost><summary>${t('4.4 公开月租折算','4.4 published rental estimate')}</summary>
+        <p><a href="${esc(targets['4.4'].published_rental_url)}">${t('公开租金来源','Published rental rate')} ↗</a> ·
+        <a href="${esc(result.evidence_url)}">${t('逐臂成本和利用率','Per-arm cost and utilization')} ↗</a></p>
+      </details>
+    </section>`;
+  }
   function v2Assessment(entry, rows) {
+    if(entry.full_acceptance)return fullAcceptanceTable(entry);
     if(entry.r10_revision&&!submissionAssessments.has(entry)){
       const release=entry.r10_revision;
       const result=release.assessment_4_3;
@@ -1610,7 +1683,22 @@
         n(arm.mean_ttft_ms/1000),n(arm.mean_tpot_ms),n(arm.ttft_p95_ms)+' / '+n(arm.ttft_p99_ms)
       ])));
   }
+  function fullAcceptanceContext(entry) {
+    const result=entry.full_acceptance;
+    const windows=result.context_windows;
+    return `<div class="supplement-workload-label" data-workload="terminal-replay" role="note">
+      <strong>4K–8K · 16K–24K · 32K–48K</strong><span>${terminalReplayWorkloadLabel()}</span></div>
+      <h3>${t('32K–48K 的 B1 五个提交窗','Five B1 submission windows at 32K–48K')} · ${result.context_window_seconds}s</h3>
+      ${table(t(['提交窗','请求','吞吐 / token/s','TTFT P95 / ms','TTFT P99 / ms','TPOT P95 / ms','TPOT P99 / ms'],
+        ['Window','Requests','Throughput / token/s','TTFT P95 / ms','TTFT P99 / ms','TPOT P95 / ms','TPOT P99 / ms']),
+        windows.map(row=>[row.index+1,row.requests,n(row.throughput),n(row.ttft.p95),n(row.ttft.p99),n(row.tpot.p95),n(row.tpot.p99)]))}
+      <p><a href="${esc(result.evidence_url)}">${t('两臂全部窗口和四租户记录','All windows for both arms and four-tenant records')} ↗</a></p>`;
+  }
   function versionSupplement(entry, rows, values, control) {
+    if(entry.full_acceptance)return `<section id="context-tenant-supplement" data-source-release="${esc(entry.id)}">
+      <div class="section-heading"><h2>${t('上下文与四租户补测','Context and four-tenant supplement')}</h2>
+      <button type="button" data-detail="supplement">${t('范围、窗口与原件','Scope, windows and evidence')} ↗</button></div>
+      ${fullAcceptanceContext(entry)}</section>`;
     const stable=stableAssessment(entry);
     if(stable){
       const cost=stable.targets['4.4'].four_tenant;
@@ -1659,6 +1747,7 @@
       ${t('相对 2026.11.21.10','vs 2026.11.21.10')} ${n(change)}%</p></div>`;
   }
   function versionSupplementDetails(entry, contextRows) {
+    if(entry.full_acceptance)return fullAcceptanceContext(entry);
     const a=entry.context_tenant_supplement;
     if(!a)return /^r[1-9][0-9]*$/.test(entry.id)?fixedBaselineContext()+publishedContextTable(contextRows):null;
     const dataset=sealedContextWorkload(a.protocol.input_sha256)?.datasets.join(' · ')||contextWorkloadLabel(a);
@@ -1680,7 +1769,12 @@
       const arms=Object.fromEntries(row.arms.map((arm,i)=>[i?'B1':'B0',{...arm,relative_cost_per_token:row.arms[0].output_tokens_per_second/arm.output_tokens_per_second}]));
       const changes_percent=Object.fromEntries(['output_tokens_per_second','mean_ttft_ms','mean_tpot_ms','relative_cost_per_token'].map(key=>[key,100*(arms.B1[key]/arms.B0[key]-1)]));
       const cards=cardComparison(row.arms[0].physical_cards,row.arms[1].physical_cards);
-      return {id:row.id,label:row.label,arms,changes_percent,...cards,workloadLabel:cardComparisonLabel(cards)};
+      const replay=row.workload==='terminal-replay-c8'?terminalReplayWorkloadLabel():
+        row.workload==='terminal-replay-c24'?t('Terminal-Bench 2.1 离线请求回放 · 四租户 · 并发 24',
+          'Terminal-Bench 2.1 offline request replay · four tenants · concurrency 24'):'';
+      return {id:row.id,label:row.label,arms,changes_percent,...cards,
+        ...(replay?{workloadKind:'fixed-data-context',workloadSource:sealedContextWorkload(entry.full_acceptance?.context_input_sha256)}:{}),
+        workloadLabel:[replay,cardComparisonLabel(cards)].filter(Boolean).join(' · ')};
     });
     rows.push(...versionSupplementRows(entry));
     if(entry.id==='r8')for(const row of r8Rows())if(!rows.some(old=>old.id===row.id))rows.push({...row,label:row.id==='4096-formal'?'4K / C8':'16K / C8'});
@@ -2686,8 +2780,14 @@
       milestone_met:compute.milestone.met,
       final_numeric_met:compute.final.met
     }:null);
-    const values=[reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
+    const full=entry.full_acceptance?.targets;
+    const values=[full?'≥'+computeBound(full['4.1'].efficiency_lower_percent)+'%':reference?'≥'+computeBound(reference.arms.B1.efficiency_lower_percent)+'%':'—',throughput?n(throughput)+'×':'—',context?n(context.arms.B1.output_tokens_per_second/context.arms.B0.output_tokens_per_second)+'×':'—',throughput?n(100*(sr?1/throughput-1:1-1/throughput))+'%':'—'];
     const notes=[reference?(reference.accepted_scope==='topic4_submission_v2_fixed200_max256_three_formal_runs'?t('MMLU200/out256 · 三轮效率下界','MMLU200/out256 · three-run efficiency lower bound'):t('本轮完整回答参考效率下界','Current full-answer reference efficiency lower bound')):t('B0 核算见详情；本版 B1 尚未发布','B0 accounting in details; current B1 unpublished'),throughput?(sr?t('同卡场景最高吞吐比','Highest matched-card throughput ratio'):t('已发布场景最高吞吐比','Highest published throughput ratio')):t('固定 B0 已保留；本版 B1 暂无测量','Fixed B0 retained; current B1 measurements unpublished'),context?t(`16K 相对 ${roles.B0} 吞吐`,`16K throughput vs ${roles.B0}`):t('固定 B0 已保留；本版 B1 暂无补测','Fixed B0 retained; current B1 supplement unpublished'),throughput?t('同费率单位token成本降低','Lower token cost at equal rates'):t('本版 B1 成本与利用率尚未汇总','Current B1 cost and utilization are unpublished')];
+    if(full){
+      notes[0]=t('三轮原生同步计时 · 合格参考分母','Three native synchronized runs · qualified reference denominator');
+      values[3]=n(Number(full['4.4'].four_tenant_cost_reduction_percent))+'%';
+      notes[3]=t('四租户单位成本下降 · 公开月租折算','Four-tenant unit cost reduction · published rental estimate');
+    }
     const observation=singleArmObservation(entry);
     if(observation){notes[1]=t('固定 B0 与本版 B1 原值见下图','Fixed B0 and current B1 measurements below');notes[2]=t('B0 原测记录及本版 B1 4K/16K 实测见下方','Original B0 and current B1 4K/16K measurements below');notes[3]=t('本版 B1 成本与利用率尚未汇总','Current B1 cost and utilization are unpublished');}
     document.getElementById('comparison-title').textContent=sr?t(`B1-r8 / B1-${entry.id} 实测对比`,`B1-r8 / B1-${entry.id} measured comparison`):observation?t(`B0 / B1 ${entry.id} 测试记录`,`B0 / B1 ${entry.id} test records`):t(`B0 / B1 ${entry.id} 实测对比`,`B0 / B1 ${entry.id} measured comparison`);
@@ -2697,7 +2797,8 @@
     const scope=attempt?reason:observation?t(`固定 B0 保留原测记录；B1 书生实测：${observation.workloads.map(row=>row.label_zh).join('、')}。模型与工况分别标注。`,`Fixed B0 observations are retained. Current B1 Intern measurements: ${observation.workloads.map(row=>row.label_en).join(', ')}. Models and workloads are labeled separately.`):t(entry.scope_zh,entry.scope_en);
     const costNote=sr&&throughput?t('同卡场景的同费率成本变化','Matched-card equal-rate cost change'):notes[3];
     const cardNames=sr?names():comparisonSummaryNames();
-    const cardScope=[null,peak?.label,[context?.label,context?.crossCard?cardComparisonLabel(context):''].filter(Boolean).join(' · '),peak?.label];
+    if(full)cardNames[3]=t('四租户成本降幅','Four-tenant cost reduction');
+    const cardScope=[null,peak?.label,[context?.label,context?.crossCard?cardComparisonLabel(context):''].filter(Boolean).join(' · '),full?null:peak?.label];
     const coverageNote=!attempt&&!sr&&entry.id!=='r5'?`<p class="release-coverage-summary">${fixedPairSummary(originalRows)}${entry.publication_status==='frozen-candidate'?' · '+t('冻结候选','Frozen candidate'):''}</p>`:'';
     if(entry.id==='r9'){
       for(const row of rows.filter(r=>fixedProfiles.some(([id])=>id===r.id)&&!r.arms&&!r.observation)){
@@ -2801,7 +2902,7 @@
     const contextSources={
       B0:sealedContextWorkload(baseline.context_input_sha256||
                               (originalBaselineSelected()?fixedBaseline.context?.protocol?.input_sha256:null)),
-      B1:sealedContextWorkload(entry.context_tenant_supplement?.protocol?.input_sha256)
+      B1:sealedContextWorkload(entry.context_tenant_supplement?.protocol?.input_sha256||entry.full_acceptance?.context_input_sha256)
     };
     const baselineProfiles=new Map((observed?.profiles||[]).map(row=>[row.id,row]));
     const sourceIds=new Set(sourceRows.map(row=>row.id));

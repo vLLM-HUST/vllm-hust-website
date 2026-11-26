@@ -66,11 +66,23 @@ def verify_stable_install_manifest(release, stable):
     assert receipt["release"] == release["release"]
     filename = f"vllm_hust_engine-{stable['pypi_version']}.tar.gz"
     prefix = url.rsplit("/", 1)[0] + "/"
-    if release.get("r10_revision"):
+    if release.get("r10_revision") or release.get("full_acceptance"):
         assert receipt["version"] == stable["pypi_version"]
-        assert receipt["installer_cli_verified"] and receipt["serve_dry_run"]
-        assert receipt["capture_3072"] and not receipt["model_loaded"]
-        assert not receipt["reserved_devices"] and receipt["runtime_files"] > 0
+        assert receipt["serve_dry_run"]
+        if release.get("full_acceptance"):
+            assert receipt["arm64_clean_install"]
+            assert receipt["source_commit"] == stable["published_source_commit"]
+            assert not receipt["model_started"] and not receipt["devices_reserved"]
+            assert set(receipt["verified_profiles"]) == {
+                "qwen35",
+                "qwen9b",
+                "intern-s2",
+            }
+            assert 1536 in receipt["capture_sizes_include"]
+        else:
+            assert receipt["installer_cli_verified"]
+            assert receipt["capture_3072"] and not receipt["model_loaded"]
+            assert not receipt["reserved_devices"] and receipt["runtime_files"] > 0
         assert re.fullmatch(
             r"[a-f0-9]{64}", receipt["installed_files_canonical_sha256"]
         )
@@ -156,7 +168,11 @@ async def verify(args):
     release = next(
         row for row in catalog["entries"] if row["id"] == catalog["default_release"]
     )
-    stable = release.get("r10_revision") or release["stable_evidence"]
+    stable = (
+        release.get("full_acceptance")
+        or release.get("r10_revision")
+        or release["stable_evidence"]
+    )
     verify_stable_install_manifest(release, stable)
     receipts = []
     async with async_playwright() as pw:

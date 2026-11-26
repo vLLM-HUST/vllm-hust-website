@@ -49,26 +49,28 @@
 
 </div>
 
-</div><aside aria-label="Stable B1 r10" class="product-diagram engine-profile">
-<div class="diagram-caption"><span class="lang-zh">默认稳定版配置</span><span class="lang-en">Default stable configuration</span></div><div class="engine-profile-top"><strong>B1 r10</strong><time datetime="2026-11-24">2026-11-24</time></div>
+</div><aside aria-label="Stable B1 r11" class="product-diagram engine-profile">
+<div class="diagram-caption"><span class="lang-zh">默认稳定版配置</span><span class="lang-en">Default stable configuration</span></div><div class="engine-profile-top"><strong>B1 r11</strong><time datetime="2026-11-26">2026-11-26</time></div>
 <div class="engine-layer"><span id="engine-model-label">Model</span><strong>Qwen3.5-35B-A3B · BF16</strong></div>
-<div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>3072-token mixed FULL capture · E36/R54 · MTP2</strong></div>
+<div class="engine-layer"><span id="engine-runtime-label">Combination</span><strong>steady-mixed-1536 · FULL capture · E36/R54 · MTP2</strong></div>
 <div class="engine-layer"><span id="engine-hardware-label">Hardware</span><strong>2 × Ascend 910B2 · TP2</strong></div>
-<p class="engine-mod-chips"><a href="./b0-b1.html?release=r10" id="engine-mod-badge-link" style="color:inherit">r10 configuration and measurements ↗</a></p>
+<p class="engine-mod-chips"><a href="./b0-b1.html?release=r11" id="engine-mod-badge-link" style="color:inherit">r11 configuration and measurements ↗</a></p>
+<p data-r11-model-scope><span class="lang-zh">Qwen3.5-35B-A3B 的 4.1–4.4 全部达标。Qwen3.5-9B 和 Intern-S2 已验证兼容入口。</span><span class="lang-en">Qwen3.5-35B-A3B meets all 4.1–4.4 targets. Compatibility entry points were verified for Qwen3.5-9B and Intern-S2.</span></p>
 </aside></section><section aria-label="Engine capabilities" class="product-capabilities"><article><h3><span class="lang-zh">安装与服务</span><span class="lang-en">Install &amp; serve</span></h3><p><span class="lang-zh">自动准备独立环境，安装引擎并启动推理服务。</span><span class="lang-en">Prepare a private environment, install the engine and serve inference.</span></p></article><article><h3><span class="lang-zh">优化执行</span><span class="lang-en">Optimized execution</span></h3><p><span class="lang-zh">组合执行图、调度与 KV 数据通路优化。</span><span class="lang-en">Combined graph, scheduling and KV data-path optimizations.</span></p></article><article><h3><span class="lang-zh">MOD 扩展</span><span class="lang-en">Extend with MODs</span></h3><p><span class="lang-zh">组合和验证新优化，保留各版本的配置与结果。</span><span class="lang-en">Build and validate optimizations while retaining each version’s configuration and results.</span></p></article></section><section class="product-workspace" id="workflow"><div class="section-heading"><p class="product-eyebrow"><span class="lang-zh">开始使用</span><span class="lang-en">GET STARTED</span></p><h2><span class="lang-zh">安装，运行，继续优化。</span><span class="lang-en">Install. Run. Build on it.</span></h2></div><div class="product-start-grid"><section aria-labelledby="engine-install-title" class="engine-section" id="install-runtime" style="scroll-margin-top:96px">
 <h2 id="engine-install-title">Install and serve</h2>
-<p id="engine-install-copy">The installer selects the latest stable release from PyPI. The current default is r10 with 3072-token mixed capture (2026.11.24.10). It prepares an isolated Python environment and verifies the engine files.</p>
+<p id="engine-install-copy">The installer selects the latest stable release from PyPI. The current default is R11 (2026.11.26.11) with steady-mixed-1536. It prepares an isolated Python environment and verifies the engine files.</p>
 <pre style="max-width:100%;overflow-x:auto;padding:16px;border:1px solid var(--engine-line);border-radius:8px"><code id="engine-install-command">git clone https://github.com/DeepLinkNext/DeepLinkEngine.git
 cd DeepLinkEngine
 python deeplink.py install --out /workspace/deeplink-install
 python deeplink.py serve --installation /workspace/deeplink-install \
   --model /models/Qwen3.5-35B-A3B --physical-devices "$DEEPLINK_PHYSICAL_DEVICES"</code></pre>
 <p class="engine-note" id="engine-install-scope">Prepare the Ascend driver, CANN and model weights first. Set DEEPLINK_PHYSICAL_DEVICES to the two assigned card IDs, separated by a comma. Installation records the selected version; serving reuses it.</p>
-<details><summary id="engine-install-details">Environment and direct r10 installation</summary>
+<details><summary id="engine-install-details">Environment and direct R11 installation</summary>
 <p id="engine-install-deps">Use Linux ARM64, CPython 3.12, CANN 9.1.0, two Ascend 910B2 cards, Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0 and Transformers 5.14.1. Prepare the vendor dependencies first for direct installation.</p>
-<p id="engine-install-sdk-note">The r10 manifest pins Engine 2026.11.24.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.</p>
-<p><a href="https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-3072-pip-requirements.txt" id="engine-install-source">r10 hash-locked installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.24.10/">PyPI 2026.11.24.10</a></p>
-<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-cache-dir --force-reinstall --no-deps -r https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r10-v1/r10-3072-pip-requirements.txt
+<p id="engine-install-sdk-note">The R11 manifest pins Engine 2026.11.26.11 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.</p>
+<p><a href="https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r11-v1/r11-pip-requirements.txt" id="engine-install-source">R11 hash-locked installation manifest ↗</a> · <a href="https://pypi.org/project/vllm-hust-engine/2026.11.26.11/">PyPI 2026.11.26.11</a> · <a href="https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r11-v1/arm64-clean-install.json"><span class="lang-zh">ARM64 安装验收</span><span class="lang-en">ARM64 installation verification</span> ↗</a>
+ · <a href="https://github.com/vLLM-HUST/vllm-hust-engine/releases/tag/full-answer-b1-20261126-r11"><span class="lang-zh">正式发行及执行日志（需仓库权限）</span><span class="lang-en">Release and execution logs (repository access required)</span> ↗</a></p>
+<pre style="max-width:100%;overflow-x:auto"><code>python -m pip install --no-cache-dir --force-reinstall --no-deps -r https://github.com/vLLM-HUST/vllm-hust-website/releases/download/engine-wheels-r11-v1/r11-pip-requirements.txt
 vllm-hust-engine verify</code></pre>
 </details>
 </section><section aria-labelledby="engine-try-title" class="engine-section" id="try-r8">
@@ -305,12 +307,12 @@ python run_all.py --config evaluation.json</code></pre>
   "en": {
     "title": "vLLM-HUST Engine | Install and serve",
     "engine-install-title": "Install and serve",
-    "engine-install-copy": "The installer selects the latest stable release from PyPI. The current default is r10 with 3072-token mixed capture (2026.11.24.10). It prepares an isolated Python environment and verifies the engine files.",
+    "engine-install-copy": "The installer selects the latest stable release from PyPI. The current default is R11 (2026.11.26.11) with steady-mixed-1536. It prepares an isolated Python environment and verifies the engine files.",
     "engine-install-scope": "Prepare the Ascend driver, CANN and model weights first. Set DEEPLINK_PHYSICAL_DEVICES to the two assigned card IDs, separated by a comma. Installation records the selected version; serving reuses it.",
-    "engine-install-details": "Environment and direct r10 installation",
+    "engine-install-details": "Environment and direct R11 installation",
     "engine-install-deps": "Use Linux ARM64, CPython 3.12, CANN 9.1.0, two Ascend 910B2 cards, Torch 2.13.0+cpu, Torch-NPU 2.13.0rc1, Triton-Ascend 3.6.0 and Transformers 5.14.1. Prepare the vendor dependencies first for direct installation.",
-    "engine-install-sdk-note": "The r10 manifest pins Engine 2026.11.24.10 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.",
-    "engine-install-source": "r10 hash-locked installation manifest ↗",
+    "engine-install-sdk-note": "The R11 manifest pins Engine 2026.11.26.11 and all three ARM64 runtime wheels. pip checks all four hashes. The command preserves the prepared vendor dependencies and starts no model. The automatic installer accepts --engine-version VERSION, including 2026.11.19.9.post1 for r9.",
+    "engine-install-source": "R11 hash-locked installation manifest ↗",
     "sr1-shortcut": "SR experiment details ↗",
     "engine-kicker": "Ascend serving stack",
     "engine-owner": "Lead: Shuhao Zhang (张书豪)",
@@ -382,7 +384,7 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-try-title": "Tests and reports",
     "engine-try-copy": "To run the test matrix, set the model, physical device IDs, cache and a new output directory in evaluation.json, then run the command below. See the guide for first runs and reuse of completed results.",
     "engine-try-scope": "The full run includes all five fixed profiles, the compute reference, 4K/16K/32K and four tenants. Cache cleanup and warmup run automatically; logs follow in the terminal. The repository guide also describes MMLU200 quick mode.",
-    "engine-mod-badge-link": "r10 configuration and measurements ↗",
+    "engine-mod-badge-link": "r11 configuration and measurements ↗",
     "engine-mod-badge-copy": "Each r8 badge marks inclusion in the frozen release; it is not an independent speedup claim.",
     "engine-current-title": "Historical B0 → r8 · 4K / 16K continuous load",
     "engine-current-caption": "C8 closed loop · 871 measured requests · one run per arm. The five-profile results are available on the B0/B1 comparison page.",
@@ -398,12 +400,12 @@ python run_all.py --config evaluation.json</code></pre>
   "zh": {
     "title": "vLLM-HUST Engine | 安装与服务",
     "engine-install-title": "安装与服务",
-    "engine-install-copy": "安装器从 PyPI 选择最新稳定版。当前默认是 r10 3072 token 混合图（2026.11.24.10），自动准备独立 Python 环境并校验引擎文件。",
+    "engine-install-copy": "安装器从 PyPI 选择最新稳定版。当前默认是 R11（2026.11.26.11），采用 steady-mixed-1536，自动准备独立 Python 环境并校验引擎文件。",
     "engine-install-scope": "先准备昇腾驱动、CANN 和模型权重，将 DEEPLINK_PHYSICAL_DEVICES 设置为实际分配的两个物理卡号，以逗号分隔。安装会记录所选版本，启动服务时沿用该版本。",
-    "engine-install-details": "运行环境与 r10 直接安装",
+    "engine-install-details": "运行环境与 R11 直接安装",
     "engine-install-deps": "准备 Linux ARM64、CPython 3.12、CANN 9.1.0、双 Ascend 910B2，以及 Torch 2.13.0+cpu、Torch-NPU 2.13.0rc1、Triton-Ascend 3.6.0 和 Transformers 5.14.1。直接安装前先准备供应商依赖。",
-    "engine-install-sdk-note": "r10 清单固定 Engine 2026.11.24.10 和三个 ARM64 运行时 wheel，pip 核验全部四包哈希。安装沿用预先准备的供应商依赖，不启动模型。自动安装器支持 --engine-version VERSION，r9 对应 2026.11.19.9.post1。",
-    "engine-install-source": "r10 哈希锁定安装清单 ↗",
+    "engine-install-sdk-note": "R11 清单固定 Engine 2026.11.26.11 和三个 ARM64 运行时 wheel，pip 核验全部四包哈希。安装沿用预先准备的供应商依赖，不启动模型。自动安装器支持 --engine-version VERSION，r9 对应 2026.11.19.9.post1。",
+    "engine-install-source": "R11 哈希锁定安装清单 ↗",
     "sr1-shortcut": "SR 系列实验详情 ↗",
     "engine-kicker": "Ascend 推理服务栈",
     "engine-owner": "负责人：张书豪",
@@ -475,7 +477,7 @@ python run_all.py --config evaluation.json</code></pre>
     "engine-try-title": "测试与报告",
     "engine-try-copy": "需要测试时，在 evaluation.json 中填写模型、两张物理卡、缓存和新的输出目录，再运行下方命令。首次运行与已有结果复用见测试指南。",
     "engine-try-scope": "完整测试包含固定五项、有效算力参考、4K/16K/32K 和四租户；自动清理缓存并预热，终端持续显示日志。MMLU200 快速模式见仓库测试指南。",
-    "engine-mod-badge-link": "r10 配置与实测 ↗",
+    "engine-mod-badge-link": "r11 配置与实测 ↗",
     "engine-mod-badge-copy": "统一r8标识表示本版已包含；各MOD的独立加速比例不作相加。",
     "engine-current-title": "历史 B0 → r8 · 4K / 16K 连续负载",
     "engine-current-caption": "C8闭环 · 正式测量871请求 · 每臂一次。固定五项配对结果见 B0/B1 对比页面。",
