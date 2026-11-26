@@ -812,7 +812,10 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert ".repository-portfolio {" in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' not in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
-    assert "project.kind === kind && productView(project.primary) === product" in SCRIPT
+    assert (
+        "visible.filter(project => productView(project.primary) === product)" in SCRIPT
+    )
+    assert "remaining.filter(project => project.kind === kind)" in SCRIPT
 
 
 def test_workshop_supports_phase_first_scenario_discovery() -> None:
