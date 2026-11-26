@@ -975,16 +975,23 @@ def main():
                     )
                     manifest_url = (
                         "https://github.com/vLLM-HUST/vllm-hust-website/releases/download/"
-                        "engine-wheels-r10-v1/r10-3072-pip-requirements.txt"
+                        "engine-wheels-r11-v1/r11-pip-requirements.txt"
                     )
                     expect(page.locator("#engine-install-source")).to_have_attribute(
                         "href", manifest_url
                     )
                     expect(page.locator("#engine-install-copy")).to_contain_text(
-                        "2026.11.24.10"
+                        "2026.11.26.11"
                     )
                     expect(page.locator("#engine-install-source")).to_contain_text(
-                        "r10 哈希锁定" if language == "zh" else "r10 hash-locked"
+                        "R11 哈希锁定" if language == "zh" else "R11 hash-locked"
+                    )
+                    scope = page.locator("[data-r11-model-scope]")
+                    for model in ("Qwen3.5-35B-A3B", "Qwen3.5-9B", "Intern-S2"):
+                        expect(scope).to_contain_text(model)
+                    expect(scope).to_contain_text("4.1–4.4")
+                    expect(page.locator("#engine-mod-badge-link")).to_have_attribute(
+                        "href", "./b0-b1.html?release=r11"
                     )
                     manual = page.locator("#install-runtime details pre").text_content()
                     assert (
@@ -994,7 +1001,7 @@ def main():
                     )
                     assert "vllm-hust-engine verify" in manual
                     expect(page.locator(".engine-profile-top strong")).to_have_text(
-                        "B1 r10"
+                        "B1 r11"
                     )
                     expect(
                         page.locator(".engine-profile .diagram-caption")

@@ -5,6 +5,7 @@
   const search = document.querySelector("[data-plugin-search]");
   const modelSelect = document.querySelector("[data-plugin-model]");
   const more = document.querySelector("[data-plugin-more]");
+  const frozenR11Root = document.querySelector("[data-frozen-r11]");
   const frozenR10Root = document.querySelector("[data-frozen-r10]");
   const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
   const phaseFilters = document.querySelector("[data-phase-filters]");
@@ -17,6 +18,7 @@
   if (!catalog || !status || !filters || !search) return;
 
   let registry;
+  let frozenR11;
   let frozenR10;
   let performanceResults = new Map();
   let performanceData;
@@ -485,7 +487,50 @@
     document.querySelectorAll('.plugin-controls, .workload-navigation').forEach(node => { node.hidden = planned; });
     document.querySelectorAll('.workshop-scope-note').forEach(node => { node.hidden = !['all', 'engine'].includes(selectedProduct); });
     if (modelSelect) modelSelect.closest('label').hidden = ['continuum', 'control-plane'].includes(selectedProduct);
+    renderFrozenR11();
     renderFrozenR10();
+  }
+
+  function renderFrozenR11() {
+    if (!frozenR11Root) return;
+    const release = frozenR11?.full_acceptance;
+    const byId = new Map(registry?.components.map(item => [item.id, item]));
+    const components = release?.enabled_components;
+    const resolved = components?.length && new Set(components.map(item => item.id)).size === components.length
+      && components.every(item => byId.has(item.id));
+    frozenR11Root.hidden = !resolved || !["all", "engine"].includes(selectedProduct);
+    if (frozenR11Root.hidden) return;
+    const zh = language() === "zh";
+    const title = element("p", "", zh
+      ? `${release.pypi_version} · ${release.scheduler_profile} · ${components.length} 个组件（含按条件启用）`
+      : `${release.pypi_version} · ${release.scheduler_profile} · ${components.length} components (including conditional entries)`);
+    const full = release.models.find(model => model.scope === "full-acceptance").name;
+    const compatible = release.models.filter(model => model.scope === "compatibility-verified").map(model => model.name).join(" / ");
+    const scope = element("p", "", zh
+      ? `${full} 的 4.1–4.4 全部达标。 ${compatible} 已验证兼容入口。`
+      : `${full} meets all 4.1–4.4 targets. Compatibility entry points were verified for ${compatible}.`);
+    const navigation = element("nav", "mod-reference-links");
+    navigation.setAttribute("aria-label", zh ? "正式 R11 启用组件" : "Official R11 enabled components");
+    const conditions = {
+      "intern-s2-only": zh ? "仅 Intern-S2" : "Intern-S2 only",
+      "qualified-owned-state": zh ? "仅符合条件的自有状态" : "Qualified owned state only",
+    };
+    for (const item of components) {
+      const name = local(byId.get(item.id), "name");
+      const label = [name, conditions[item.condition]].filter(Boolean).join(" · ");
+      const link = element("a", "", label);
+      link.href = `#${item.id}`;
+      link.dataset.r11Component = item.id;
+      navigation.append(link);
+    }
+    const sources = element("nav", "mod-reference-links");
+    sources.setAttribute("aria-label", zh ? "R11 发行与评测" : "R11 release and benchmark");
+    const benchmark = element("a", "", zh ? "R11 整机对照 ↗" : "R11 system comparison ↗");
+    benchmark.href = "./b0-b1.html?release=r11";
+    const evidence = element("a", "", zh ? "35B 完整验收报告 ↗" : "Full 35B acceptance report ↗");
+    evidence.href = release.report_url;
+    sources.append(benchmark, evidence);
+    frozenR11Root.querySelector("[data-frozen-r11-content]").replaceChildren(title, scope, navigation, sources);
   }
 
   function renderFrozenR10() {
@@ -2198,6 +2243,7 @@ vllm-hust-ext extension check ${extensionId}`
         throw new Error("unsupported MOD result publication");
       }
       registry = payload;
+      frozenR11 = releaseHistory?.entries?.find(entry => entry.id === "r11");
       frozenR10 = releaseHistory?.entries?.find(entry => entry.id === "r10");
       modTaxonomy = taxonomy.components;
       modEvidence = resultPublication.evidence;

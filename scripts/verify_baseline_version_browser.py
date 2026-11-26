@@ -8,7 +8,7 @@ from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--base-url", default="http://127.0.0.1:8000")
@@ -516,6 +516,15 @@ def verify_stable_default(page, catalog):
     )
     base = args.base_url.rstrip("/") + "/b0-b1.html"
     page.goto(base)
+    if entry.get("full_acceptance"):
+        block = page.locator("#submission-v2")
+        expect(block).to_have_attribute("data-full-acceptance", entry["id"])
+        assert page.locator("#comparison-release-select").input_value() == entry["id"]
+        assert (
+            page.locator("#comparison-baseline-select").input_value()
+            == catalog["baseline"]["id"]
+        )
+        return
     archive = catalog.get("archived_r10")
     if entry.get("r10_revision") and not entry.get("submission_assessment"):
         stable_version = archive["stable_evidence"]["pypi_version"]

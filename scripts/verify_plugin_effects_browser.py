@@ -12,6 +12,32 @@ from verify_product_homepages_browser import CONTRAST
 
 
 def check_r10_and_result_updates(page, components, release_history, lang):
+    r11 = next(
+        (entry for entry in release_history["entries"] if entry["id"] == "r11"), None
+    )
+    if r11:
+        latest = page.locator("#r11-mods")
+        release = r11["full_acceptance"]
+        expect(latest).to_be_visible()
+        expect(latest).to_contain_text(release["pypi_version"])
+        expect(latest).to_contain_text(release["scheduler_profile"])
+        ids = [item["id"] for item in release["enabled_components"]]
+        assert len(ids) == 12
+        expect(latest.locator("[data-r11-component]")).to_have_count(len(ids))
+        for component in ids:
+            link = latest.locator(f'[data-r11-component="{component}"]')
+            expect(link).to_have_attribute("href", f"#{component}")
+        expect(latest.locator('[data-r11-component="intern-s2"]')).to_contain_text(
+            "仅 Intern-S2" if lang == "zh" else "Intern-S2 only"
+        )
+        expect(
+            latest.locator('[data-r11-component="state-page-copy"]')
+        ).to_contain_text(
+            "仅符合条件的自有状态" if lang == "zh" else "Qualified owned state only"
+        )
+        latest.locator('[data-r11-component="intern-s2"]').click()
+        expect(page.locator("#intern-s2")).to_be_visible()
+
     r10 = next(entry for entry in release_history["entries"] if entry["id"] == "r10")
     box = page.locator("#r10-mods")
     expect(box).to_be_visible()
