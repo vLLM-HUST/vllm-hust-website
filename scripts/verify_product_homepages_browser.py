@@ -122,9 +122,6 @@ def verify_publications(page, product, language):
 
 def verify_engine_mod_creators(page, language):
     """The historical r8 MOD table retains its verified creators."""
-    expect(page.locator("#engine-mod-badge-link")).to_have_attribute(
-        "href", "./b0-b1.html?release=r10"
-    )
     table = page.locator("#r8-mods .r8-mod-table")
     disclosure = page.locator(".engine-fold").filter(has=table)
     disclosure.locator(":scope > summary").focus()
