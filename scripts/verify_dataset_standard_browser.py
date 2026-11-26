@@ -35,19 +35,18 @@ def check_prompt_download(page, language, target="mod"):
         "max_output_tokens=16384",
         "judge_max_tokens=8192",
         "tool_choice=none",
-        "3.4.1",
-        "3.4.2",
-        "3.4.3",
-        "3.4.4",
     ):
         assert required in content, required
     if target == "mod":
+        for section in range(1, 5):
+            assert re.search(rf"(?<![.0-9])4\.{section}(?![.0-9])", content)
         assert "test_target: own_mod" in content
         assert "selected_scope: full" in content
         assert "selected_profiles: mmlu,hle,frontier,swe,terminal" in content
         assert "--b1-python" not in content
         assert "MOD" in content
     else:
+        assert all(f"3.4.{section}" in content for section in range(1, 5))
         assert "test_target: reference-engine" in content
         assert "--datasets mmlu,hle,frontier,swe,terminal" in content
         assert "--b1-python /path/to/fixed-b1-sdk/bin/python" in content
@@ -137,20 +136,41 @@ with sync_playwright() as play:
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 page.goto(url, wait_until="networkidle")
                 page.wait_for_selector("#standard-content:not([hidden])")
-                page.wait_for_selector("#dataset-current-results[data-loaded]")
-                current = page.locator("#dataset-current-results")
-                current.locator("details").evaluate("element => element.open = true")
-                milestone = current.locator("li").first
-                assert "MMLU200/out256" in milestone.inner_text()
-                text = milestone.locator("p").first.inner_text()
-                assert text.endswith("Target met")
-                assert "未达成目标" not in text and "Target not met" not in text
-                current.locator("details").evaluate("element => element.open = false")
-                assert "full-answer-b1-20261113-r6" in current.inner_text()
+                current = page.locator("#dataset-current-results[data-loaded]")
+                current.wait_for()
+                catalog = page.request.get(
+                    urljoin(url, "data/engine-release-history-v1.json")
+                ).json()
+                release = next(
+                    row
+                    for row in catalog["entries"]
+                    if row["id"] == catalog["default_release"]
+                )
+                assert current.get_attribute("data-loaded") == release["id"]
+                assert release["id"].upper() in current.locator("h2").inner_text()
+                assert current.locator(
+                    'a[href="./b0-b1.html?release=' + release["id"] + '"]'
+                ).is_visible()
+                acceptance = release["full_acceptance"]
+                assert acceptance["models"][0]["name"] in current.inner_text()
+                for model in acceptance["models"][1:]:
+                    assert model["name"] in current.inner_text()
+                assert "Compatibility entry points verified" in current.inner_text()
+                assert "All 4.1–4.4 final targets met" in current.inner_text()
+                current.locator("summary").click()
+                for index, decision in enumerate(current.locator("li").all(), 1):
+                    id_ = f"4.{index}"
+                    status = (
+                        "Target met"
+                        if acceptance["targets"][id_]["final"]["met"]
+                        else "Target not met"
+                    )
+                    assert decision.inner_text() == f"{id_} · {status}"
                 assert current.locator("li").count() == 4
+                current.locator("summary").click()
                 assert "B0: 672/672" in current.inner_text()
                 assert "B1: 672/672" in current.inner_text()
-                assert "用户未确认" not in current.inner_text()
+                assert not re.search(r"\br6\b", current.inner_text(), re.I)
                 check_engine_link(page, "en")
                 assert page.locator("#standard-rows tr").count() == 5
                 assert (
@@ -166,8 +186,18 @@ with sync_playwright() as play:
                 assert not re.search(
                     r"[\u4e00-\u9fff]", page.locator("main").inner_text()
                 )
-                assert "2–3" in page.locator("#test-mode-quick").inner_text()
-                assert "12–16" in page.locator("#test-mode-full").inner_text()
+                for mode, time in (("quick", "2–3"), ("full", "12–16")):
+                    card = page.locator(f"#test-mode-{mode}")
+                    if name == "entry":
+                        assert time not in card.inner_text()
+                        assert (
+                            time
+                            in card.locator(
+                                ".entry-reference-command .duration"
+                            ).text_content()
+                        )
+                    else:
+                        assert time in card.inner_text()
                 if name == "standard":
                     assert "200 / 12032" in rows[0] and "200 / 1811" in rows[1]
                     assert "160 / 160" in rows[2]
@@ -394,17 +424,23 @@ with sync_playwright() as play:
     page.close()
     for kind in ("bytes", "population", "missing-target"):
         page = browser.new_page()
-        summary = "data/five-datasets-r6-20261114/summary-public-v3.json"
+        summary = "data/engine-release-history-v1.json"
         body = page.request.get(urljoin(args.url, summary)).body()
         manifest = page.request.get(
             urljoin(args.url, "data/benchmark-source-manifest.json")
         ).json()
         if kind != "bytes":
             value = json.loads(body)
+            release = next(
+                row for row in value["entries"] if row["id"] == value["default_release"]
+            )
             if kind == "population":
-                value["datasets"][0]["arms"]["B1"]["successful"] -= 1
+                row = next(
+                    row for row in release["measurements"] if row["id"] == "mmlu"
+                )
+                row["arms"][1]["requests"] -= 1
             else:
-                del value["formal_targets"]["3.4.1"]
+                del release["full_acceptance"]["targets"]["4.1"]
             body = json.dumps(value).encode()
             for entry in manifest["files"]:
                 if entry["website_path"] == summary:
