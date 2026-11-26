@@ -799,7 +799,7 @@ def assert_full_acceptance(root, entry, lang):
     rows = block.locator("table tbody tr")
     expect(rows).to_have_count(4)
     for index, target in enumerate(("4.1", "4.2", "4.3", "4.4")):
-        cells = rows.nth(index).locator("td")
+        cells = rows.nth(index).locator("th, td")
         expect(cells.nth(0)).to_have_text(target)
         for col, gate in ((1, "milestone"), (2, "final")):
             assert acceptance["targets"][target][gate]["met"]
