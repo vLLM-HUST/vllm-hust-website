@@ -23,7 +23,7 @@
   en.title = 'Request Throttling Controller | vLLM-HUST';
   zh.title = `${zh['control-title']} · 引擎控制面 | vLLM-HUST`;
   window.vllmHustPageDict = {en, zh};
-  let publication, selected, data, latest, distributedPair;
+  let publication, selected, data, latest, distributedPair, budgetStudy;
   const {
     controllerFixedProfilesPath,controllerComputePath,controllerStreamingPath,
     readPublishedJson,loadControllerFixedProfiles,loadControllerCompute,loadControllerNativeCompute,
@@ -114,6 +114,27 @@
           `<p class="control-scope">${t('当前发布源的原生参考效率待核验。','Native reference efficiency is awaiting verification in the current publication.')}</p>`}`:''}
       ${serviceCompute}
       <details class="control-details"><summary>${t('变更记录与适用边界','Changelog and boundaries')}</summary><ul>${e.changelog.map(v=>`<li><strong>${esc(v.date)}</strong> ${esc(t(v.zh,v.en))}</li>`).join('')}</ul></details>`;
+    if(budgetStudy){
+      const batch=budgetStudy.batch, windowArms=budgetStudy.window;
+      const speedup=batch.direct.makespan_s/batch.limited.makespan_s;
+      const stepRatio=windowArms.limited.request_success_total/windowArms.direct.request_success_total;
+      document.getElementById('control-highlight').textContent=
+        t('35B 单实例 TP2 · C48 · 收紧调度预算：','35B single TP2 replica · C48 · tuned scheduler budget: ')+
+        num(speedup)+'× '+t('完整批次加速','full-batch speedup')+' · '+num(stepRatio)+'× '+t('前 600 秒完成步数','completed steps in the first 600 s');
+      const arms=['direct','default','limited'];
+      const columns=[t('指标','Metric'),t('直连','Direct'),t('默认限流层','Default controller'),t('收紧调度预算','Tuned budget')];
+      const report=`https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/${publication.commit}/reports/controller-35b-c48-budget-20261126/README.md`;
+      root.insertAdjacentHTML('afterbegin',`<h3>${t('35B 长上下文 · 调度预算实验','35B long-context scheduler budget experiment')}</h3>
+        <p>${t('一个 TP2 热实例，48 个 program，约 40k 初始上下文。候选预算 327,680 tokens，每臂一次。','One hot TP2 replica, 48 programs, about 40k initial context, candidate budget 327,680 tokens. One run per arm.')}</p>
+        ${table(columns,[
+          [t('3 轮完整批次（秒）','Full three-turn batch (s)'),...arms.map(k=>num(batch[k].makespan_s))],
+          [t('完整批次输出 tokens/s','Full-batch output tokens/s'),...arms.map(k=>num(batch[k].output_tokens_sec))],
+          [t('输入 token 缓存复用率','Cached input tokens'),...arms.map(k=>num(batch[k].cache_served_pct)+'%')],
+          [t('独立 16 轮负载 · 前 600 秒成功步数','Separate 16-turn workload · successful steps in first 600 s'),...arms.map(k=>num(windowArms[k].request_success_total,0))]
+        ])}
+        <p>${t('限时组各自续接真实输出。候选在窗口内让 18/48 个 program 完成首轮，11 个跑完 16 轮。','In the windowed run, each arm continued its own outputs. With the tuned budget, 18/48 programs finished a first turn and 11 finished all 16 turns.')}
+        <a href="${report}">${t('查看报告与逐请求证据','Report and per-request evidence')} ↗</a></p>`);
+    }
     if(distributedPair){
       const {direct,controller}=distributedPair.arms;
       const change=100*(controller.makespan_seconds/direct.makespan_seconds-1);
@@ -139,6 +160,16 @@
           ![pair.arms.direct,pair.arms.controller].every(arm=>arm.sessions_completed===112&&arm.rounds_succeeded===336&&arm.rounds_failed===0&&Number.isFinite(arm.makespan_seconds)&&arm.makespan_seconds>0))throw Error('Incomplete distributed pair');
         distributedPair=pair;
       } catch(error){console.warn('Distributed session evidence rejected',error);}
+    }
+    const budgetPath='data/controller-35b-c48-budget-20261126.json';
+    if(publication.files.some(file=>file.website_path===budgetPath)){
+      try {
+        const v=await readPublishedJson(publication,budgetPath,await fetch('./'+budgetPath,{cache:'no-cache'}));
+        if(v.schema!=='controller-35b-budget/v1'||v.tp!==2||v.replicas!==1||v.programs!==48||v.batch_rounds!==3||v.window_seconds!==600||
+          !['direct','default','limited'].every(k=>v.batch[k].failures===0&&v.batch[k].output_tokens===v.batch.direct.output_tokens&&
+            Number.isFinite(v.batch[k].makespan_s)&&v.batch[k].makespan_s>0&&v.window[k].request_success_total>0))throw Error('Invalid scheduler budget comparison');
+        budgetStudy=v;
+      } catch(error){console.warn('Scheduler budget evidence rejected',error);}
     }
     const entry=data.releases.find(row=>row.id==='r8');
     if(entry){
