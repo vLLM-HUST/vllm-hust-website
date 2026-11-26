@@ -12,31 +12,51 @@ from verify_product_homepages_browser import CONTRAST
 
 
 def check_r10_and_result_updates(page, components, release_history, lang):
-    r11 = next(
-        (entry for entry in release_history["entries"] if entry["id"] == "r11"), None
+    entry = next(
+        row
+        for row in release_history["entries"]
+        if row["id"] == release_history["default_release"]
     )
-    if r11:
-        latest = page.locator("#r11-mods")
-        release = r11["full_acceptance"]
-        expect(latest).to_be_visible()
-        expect(latest).to_contain_text(release["pypi_version"])
-        expect(latest).to_contain_text(release["scheduler_profile"])
-        ids = [item["id"] for item in release["enabled_components"]]
-        assert len(ids) == 12
-        expect(latest.locator("[data-r11-component]")).to_have_count(len(ids))
-        for component in ids:
-            link = latest.locator(f'[data-r11-component="{component}"]')
-            expect(link).to_have_attribute("href", f"#{component}")
-        expect(latest.locator('[data-r11-component="intern-s2"]')).to_contain_text(
-            "仅 Intern-S2" if lang == "zh" else "Intern-S2 only"
+    latest = page.locator("#r11-mods")
+    release = entry["full_acceptance"]
+    expect(latest).to_be_visible()
+    expect(latest).to_contain_text(release["pypi_version"])
+    expect(latest).to_contain_text(release["scheduler_profile"])
+    enabled = sorted(
+        release["enabled_components"], key=lambda item: bool(item.get("condition"))
+    )
+    ids = [item["id"] for item in enabled]
+    assert len(ids) == 12
+    expect(latest.locator("[data-release-component]")).to_have_count(len(ids))
+    engine = page.locator('[data-product-scope="engine"]')
+    pinned = engine.locator(".plugin-category").first
+    expect(pinned).to_have_attribute("data-pinned-release", entry["id"])
+    assert (
+        pinned.locator(".plugin-card").evaluate_all(
+            "cards => cards.map(card => card.id)"
         )
+        == ids
+    )
+    for component in ids:
+        link = latest.locator(f'[data-release-component="{component}"]')
+        expect(link).to_have_attribute("href", f"#{component}")
+        expect(page.locator(f"#{component}")).to_have_count(1)
+        expect(pinned.locator(f"#{component} .release-component")).to_contain_text(
+            entry["id"].upper()
+        )
+    for component, zh, en in [
+        ("intern-s2", "仅 Intern-S2", "Intern-S2 only"),
+        ("state-page-copy", "仅符合条件的自有状态", "Qualified owned state only"),
+    ]:
+        label = zh if lang == "zh" else en
         expect(
-            latest.locator('[data-r11-component="state-page-copy"]')
-        ).to_contain_text(
-            "仅符合条件的自有状态" if lang == "zh" else "Qualified owned state only"
+            latest.locator(f'[data-release-component="{component}"]')
+        ).to_contain_text(label)
+        expect(pinned.locator(f"#{component} .release-component")).to_contain_text(
+            label
         )
-        latest.locator('[data-r11-component="intern-s2"]').click()
-        expect(page.locator("#intern-s2")).to_be_visible()
+    latest.locator('[data-release-component="intern-s2"]').click()
+    expect(page.locator("#intern-s2")).to_be_visible()
 
     r10 = next(entry for entry in release_history["entries"] if entry["id"] == "r10")
     box = page.locator("#r10-mods")
@@ -83,6 +103,7 @@ def check_r10_and_result_updates(page, components, release_history, lang):
     search = page.locator("[data-plugin-search]")
     search.fill("DiffSpec")
     expect(page.locator("#diffspec")).to_be_visible()
+    expect(page.locator("[data-pinned-release]")).to_have_count(0)
     expect(page.locator("#prefix-router-migration")).to_have_count(0)
     search.fill("Prefix Router")
     expect(
@@ -94,8 +115,10 @@ def check_r10_and_result_updates(page, components, release_history, lang):
     expect(search).to_have_value("")
     page.locator('[data-product-filter="control-plane"]').click()
     expect(box).to_be_hidden()
+    expect(page.locator("[data-pinned-release]")).to_have_count(0)
     page.locator('[data-product-filter="engine"]').click()
     expect(box).to_be_visible()
+    expect(pinned).to_have_attribute("data-pinned-release", entry["id"])
     page.locator('[data-product-filter="all"]').click()
     return {"release": r10["release"], "enabled": ids, "result_panels": 2}
 
@@ -601,6 +624,16 @@ def main():
                     )
                     assert not errors, errors
                     context.close()
+        page = browser.new_page()
+        page.route(
+            "**/data/engine-release-history-v1.json",
+            lambda route: route.fulfill(body="{}", content_type="application/json"),
+        )
+        page.goto(args.url.rstrip("/") + "/plugins.html")
+        expect(page.locator("#diffspec")).to_be_visible()
+        expect(page.locator("#r11-mods")).to_be_hidden()
+        expect(page.locator("[data-pinned-release]")).to_have_count(0)
+        page.close()
         browser.close()
     (args.output / "verification.json").write_text(
         json.dumps(receipts, ensure_ascii=False, indent=2) + "\n"

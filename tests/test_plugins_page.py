@@ -329,7 +329,7 @@ def test_catalog_groups_related_components_without_erasing_contracts() -> None:
     assert "function catalogProjects()" in SCRIPT
     assert "function projectComponentsPanel(items, primaryId)" in SCRIPT
     assert "copy().projectComponents" in SCRIPT
-    assert "renderCard(project.primary, project.items)" in SCRIPT
+    assert "renderCard(project.primary, project.items, project.releaseItems)" in SCRIPT
     assert "card.dataset.projectComponentCount = String(projectItems.length)" in SCRIPT
     assert ".plugin-project-components" in STYLES
     assert 'entries: "个项目"' in SCRIPT
@@ -812,7 +812,10 @@ def test_workshop_view_opens_on_a_typed_mod_catalog() -> None:
     assert ".repository-portfolio {" in STYLES
     assert 'body[data-page="plugins"] .repository-portfolio' not in STYLES
     assert 'body[data-page="plugins"] .workshop-grid' in STYLES
-    assert "project.kind === kind && productView(project.primary) === product" in SCRIPT
+    assert (
+        "visible.filter(project => productView(project.primary) === product)" in SCRIPT
+    )
+    assert "remaining.filter(project => project.kind === kind)" in SCRIPT
 
 
 def test_workshop_supports_phase_first_scenario_discovery() -> None:
@@ -1200,7 +1203,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=catalog-attribution-20261119" in PAGE
-    assert "plugins-page.js?v=frozen-r11-catalog-20261126" in PAGE
+    assert "plugins-page.js?v=current-release-pinned-20261126" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES

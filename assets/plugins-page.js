@@ -5,7 +5,7 @@
   const search = document.querySelector("[data-plugin-search]");
   const modelSelect = document.querySelector("[data-plugin-model]");
   const more = document.querySelector("[data-plugin-more]");
-  const frozenR11Root = document.querySelector("[data-frozen-r11]");
+  const currentReleaseRoot = document.querySelector("[data-current-release]");
   const frozenR10Root = document.querySelector("[data-frozen-r10]");
   const workloadNavigationRoot = document.querySelector("[data-workload-navigation]");
   const phaseFilters = document.querySelector("[data-phase-filters]");
@@ -18,7 +18,8 @@
   if (!catalog || !status || !filters || !search) return;
 
   let registry;
-  let frozenR11;
+  let currentRelease;
+  let currentComponents = new Map();
   let frozenR10;
   let performanceResults = new Map();
   let performanceData;
@@ -487,50 +488,54 @@
     document.querySelectorAll('.plugin-controls, .workload-navigation').forEach(node => { node.hidden = planned; });
     document.querySelectorAll('.workshop-scope-note').forEach(node => { node.hidden = !['all', 'engine'].includes(selectedProduct); });
     if (modelSelect) modelSelect.closest('label').hidden = ['continuum', 'control-plane'].includes(selectedProduct);
-    renderFrozenR11();
+    renderCurrentRelease();
     renderFrozenR10();
   }
 
-  function renderFrozenR11() {
-    if (!frozenR11Root) return;
-    const release = frozenR11?.full_acceptance;
-    const byId = new Map(registry?.components.map(item => [item.id, item]));
-    const components = release?.enabled_components;
-    const resolved = components?.length && new Set(components.map(item => item.id)).size === components.length
-      && components.every(item => byId.has(item.id));
-    frozenR11Root.hidden = !resolved || !["all", "engine"].includes(selectedProduct);
-    if (frozenR11Root.hidden) return;
+  function releaseCondition(condition) {
     const zh = language() === "zh";
+    if (condition === "intern-s2-only") return zh ? "仅 Intern-S2" : "Intern-S2 only";
+    if (condition === "qualified-owned-state") return zh ? "仅符合条件的自有状态" : "Qualified owned state only";
+    return condition ? (zh ? "按条件启用" : "Conditionally enabled") : "";
+  }
+
+  function renderCurrentRelease() {
+    if (!currentReleaseRoot) return;
+    currentReleaseRoot.hidden = !currentComponents.size || !["all", "engine"].includes(selectedProduct);
+    if (currentReleaseRoot.hidden) return;
+    const release = currentRelease.full_acceptance;
+    const id = currentRelease.id.toUpperCase();
+    const zh = language() === "zh";
+    const byId = new Map(registry.components.map(item => [item.id, item]));
     const title = element("p", "", zh
-      ? `${release.pypi_version} · ${release.scheduler_profile} · ${components.length} 个组件（含按条件启用）`
-      : `${release.pypi_version} · ${release.scheduler_profile} · ${components.length} components (including conditional entries)`);
+      ? `${id} · ${release.pypi_version} · ${release.scheduler_profile} · ${currentComponents.size} 个组件（含按条件启用）`
+      : `${id} · ${release.pypi_version} · ${release.scheduler_profile} · ${currentComponents.size} components (including conditional entries)`);
     const full = release.models.find(model => model.scope === "full-acceptance").name;
     const compatible = release.models.filter(model => model.scope === "compatibility-verified").map(model => model.name).join(" / ");
+    const allMet = ["4.1", "4.2", "4.3", "4.4"].every(goal => release.targets?.[goal]?.final?.met === true);
     const scope = element("p", "", zh
-      ? `${full} 的 4.1–4.4 全部达标。 ${compatible} 已验证兼容入口。`
-      : `${full} meets all 4.1–4.4 targets. Compatibility entry points were verified for ${compatible}.`);
+      ? `${full} ${allMet ? "的 4.1–4.4 全部达标" : "的逐项验收见报告"}。`
+      : `${full} ${allMet ? "meets all 4.1–4.4 targets" : "has individual decisions in the acceptance report"}.`);
+    if (compatible) scope.append(zh
+      ? ` ${compatible} 已验证兼容入口。`
+      : ` Compatibility entry points were verified for ${compatible}.`);
     const navigation = element("nav", "mod-reference-links");
-    navigation.setAttribute("aria-label", zh ? "正式 R11 启用组件" : "Official R11 enabled components");
-    const conditions = {
-      "intern-s2-only": zh ? "仅 Intern-S2" : "Intern-S2 only",
-      "qualified-owned-state": zh ? "仅符合条件的自有状态" : "Qualified owned state only",
-    };
-    for (const item of components) {
-      const name = local(byId.get(item.id), "name");
-      const label = [name, conditions[item.condition]].filter(Boolean).join(" · ");
+    navigation.setAttribute("aria-label", zh ? `${id} 启用组件` : `${id} enabled components`);
+    for (const item of currentComponents.values()) {
+      const label = [local(byId.get(item.id), "name"), releaseCondition(item.condition)].filter(Boolean).join(" · ");
       const link = element("a", "", label);
       link.href = `#${item.id}`;
-      link.dataset.r11Component = item.id;
+      link.dataset.releaseComponent = item.id;
       navigation.append(link);
     }
     const sources = element("nav", "mod-reference-links");
-    sources.setAttribute("aria-label", zh ? "R11 发行与评测" : "R11 release and benchmark");
-    const benchmark = element("a", "", zh ? "R11 整机对照 ↗" : "R11 system comparison ↗");
-    benchmark.href = "./b0-b1.html?release=r11";
-    const evidence = element("a", "", zh ? "35B 完整验收报告 ↗" : "Full 35B acceptance report ↗");
+    sources.setAttribute("aria-label", zh ? `${id} 发行与评测` : `${id} release and benchmark`);
+    const benchmark = element("a", "", zh ? `${id} 整机对照 ↗` : `${id} system comparison ↗`);
+    benchmark.href = `./b0-b1.html?release=${currentRelease.id}`;
+    const evidence = element("a", "", zh ? "完整验收报告 ↗" : "Full acceptance report ↗");
     evidence.href = release.report_url;
     sources.append(benchmark, evidence);
-    frozenR11Root.querySelector("[data-frozen-r11-content]").replaceChildren(title, scope, navigation, sources);
+    currentReleaseRoot.querySelector("[data-current-release-content]").replaceChildren(title, scope, navigation, sources);
   }
 
   function renderFrozenR10() {
@@ -1781,7 +1786,7 @@ vllm-hust-ext extension check ${extensionId}`
     return panel;
   }
 
-  function renderCard(item, projectItems = [item]) {
+  function renderCard(item, projectItems = [item], releaseItems = []) {
     const isUpstreamFork = item.repository_relationship === "upstream_sync_fork";
     const taxonomy = taxonomyProfile(item);
     const card = element(
@@ -1805,6 +1810,18 @@ vllm-hust-ext extension check ${extensionId}`
       badge(taxonomyLabel("kind", taxonomy.kind), `taxonomy-kind kind-${taxonomy.kind}`),
       badge(taxonomyLabel("lifecycle", taxonomy.lifecycle), `taxonomy-lifecycle lifecycle-${taxonomy.lifecycle}`)
     );
+    if (releaseItems.length) {
+      const zh = language() === "zh";
+      const releaseId = currentRelease.id.toUpperCase();
+      if (releaseItems.length === 1 && releaseItems[0].id === item.id) {
+        const condition = releaseCondition(releaseItems[0].condition);
+        badges.prepend(badge([condition ? releaseId : (zh ? `${releaseId} 启用` : `${releaseId} enabled`), condition]
+          .filter(Boolean).join(" · "), "release-component"));
+      } else {
+        badges.prepend(badge(zh ? `${releaseId} 启用 ${releaseItems.length} 项` : `${releaseItems.length} enabled in ${releaseId}`,
+          "release-component"));
+      }
+    }
     if (isUpstreamFork) badges.prepend(badge(copy().forkBadge, "upstream-fork"));
     top.append(badges);
 
@@ -2059,6 +2076,7 @@ vllm-hust-ext extension check ${extensionId}`
       return matchesComponent && matchesModel;
     }).map((project) => ({
       ...project,
+      releaseItems: project.items.map(item => currentComponents.get(item.id)).filter(Boolean),
       kind: selectedType === "extensions"
         ? taxonomyProfile(project.primary).kind
         : selectedType
@@ -2071,7 +2089,7 @@ vllm-hust-ext extension check ${extensionId}`
     let target = catalog;
     const appendGroup = (title, items, kind) => {
       if (!items.length) return;
-      items.sort((leftProject, rightProject) => {
+      if (kind !== "current-release") items.sort((leftProject, rightProject) => {
         const left = leftProject.primary;
         const right = rightProject.primary;
         if (isPerformanceCandidate(left) && isPerformanceCandidate(right)) {
@@ -2084,9 +2102,10 @@ vllm-hust-ext extension check ${extensionId}`
       });
       const section = element("section", `plugin-category plugin-category-${kind}`);
       section.append(element("h2", "plugin-category-title", title));
+      if (kind === "current-release") section.dataset.pinnedRelease = currentRelease.id;
       const grid = element("div", "plugin-grid workshop-grid");
       items.forEach((project) => {
-        const card = renderCard(project.primary, project.items);
+        const card = renderCard(project.primary, project.items, project.releaseItems);
         card.querySelector('.plugin-technical-details').open = expandedCards.has(card.id);
         grid.append(card);
       });
@@ -2119,8 +2138,17 @@ vllm-hust-ext extension check ${extensionId}`
         header.append(link);
       }
       section.append(header); target = section;
+      const pinned = matches.filter(project => project.releaseItems.length);
+      if (pinned.length) {
+        const rank = project => Math.min(...project.releaseItems.map(item => item.rank));
+        pinned.sort((left, right) => rank(left) - rank(right));
+        const id = currentRelease.id.toUpperCase();
+        appendGroup(language() === "zh" ? `${id} · 当前 Release 启用组件` : `${id} · Current release components`,
+          pinned, "current-release");
+      }
+      const remaining = matches.filter(project => !project.releaseItems.length);
       groups.forEach(([kind, title]) => {
-        appendGroup(title, visible.filter((project) => project.kind === kind && productView(project.primary) === product), kind);
+        appendGroup(title, remaining.filter(project => project.kind === kind), kind);
       });
       if (showPlan) section.append(continuumPlan());
       catalog.append(section);
@@ -2197,6 +2225,51 @@ vllm-hust-ext extension check ${extensionId}`
     return taxonomy;
   }
 
+  async function loadReleaseHistory(path) {
+    const options = {cache: "no-store"};
+    const [source, response] = await Promise.all([
+      fetch("./data/benchmark-source-manifest.json", options),
+      fetch(path, options)
+    ]);
+    if (!source.ok || !response.ok) throw new Error("Release publication unavailable");
+    const manifest = await source.json();
+    if (manifest.repository !== "vLLM-HUST/vllm-hust-benchmark" ||
+        manifest.status !== "published-source" || !/^[a-f0-9]{40}$/.test(manifest.commit)) {
+      throw new Error("Invalid release publication identity");
+    }
+    const rows = manifest.files.filter(item => item.website_path === path.replace(/^\.\//, ""));
+    const raw = await response.arrayBuffer();
+    const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", raw)),
+      byte => byte.toString(16).padStart(2, "0")).join("");
+    if (rows.length !== 1 || rows[0].sha256 !== digest || rows[0].bytes !== raw.byteLength) {
+      throw new Error("Release catalog checksum mismatch");
+    }
+    const value = JSON.parse(new TextDecoder().decode(raw));
+    if (value.schema !== "vllm-hust-engine-release-history/v1" ||
+        !Array.isArray(value.entries) || !value.order?.includes(value.default_release)) {
+      throw new Error("Invalid release catalog");
+    }
+    return value;
+  }
+
+  function selectCurrentRelease(history) {
+    if (!history || !/^r[1-9][0-9]*$/.test(history.default_release)) return;
+    const candidates = history.entries.filter(entry => entry.id === history.default_release
+      && entry.publication_status === "stable" && entry.release?.endsWith("-" + entry.id));
+    if (candidates.length !== 1) return;
+    const [entry] = candidates;
+    const release = entry.full_acceptance;
+    const stack = release?.enabled_components;
+    if (!stack?.length || new Set(stack.map(item => item.id)).size !== stack.length ||
+        !release.models?.some(model => model.scope === "full-acceptance")) return;
+    const publicEngineIds = new Set(registry.components.filter(item => isWorkshopMod(item)
+      && productView(item) === "engine").map(item => item.id));
+    const components = stack.filter(item => publicEngineIds.has(item.id));
+    components.sort((left, right) => Number(Boolean(left.condition)) - Number(Boolean(right.condition)));
+    currentRelease = entry;
+    currentComponents = new Map(components.map((item, rank) => [item.id, {...item, rank}]));
+  }
+
   Promise.all([
     fetch(catalog.dataset.source, { cache: "no-cache" }).then((response) => {
       if (!response.ok) throw new Error(`ecosystem registry request failed: ${response.status}`);
@@ -2211,9 +2284,7 @@ vllm-hust-ext extension check ${extensionId}`
       return response.json();
     }),
     fetchModTaxonomy(catalog.dataset.taxonomy),
-    (frozenR10Root ? fetch(frozenR10Root.dataset.source, { cache: "no-cache" })
-      .then(response => response.ok ? response.json() : null)
-      .catch(() => null) : Promise.resolve(null)),
+    (currentReleaseRoot ? loadReleaseHistory(currentReleaseRoot.dataset.source).catch(() => null) : Promise.resolve(null)),
     Promise.all([
       fetch("./data/mod-test-evidence.json?v=mod-catalog-20261106", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("MOD evidence unavailable"); return response.json(); }),
       fetch("./data/mod-result-bindings.json?v=mod-catalog-20261106", { cache: "no-cache" }).then(response => { if (!response.ok) throw new Error("MOD result bindings unavailable"); return response.json(); })
@@ -2243,9 +2314,9 @@ vllm-hust-ext extension check ${extensionId}`
         throw new Error("unsupported MOD result publication");
       }
       registry = payload;
-      frozenR11 = releaseHistory?.entries?.find(entry => entry.id === "r11");
-      frozenR10 = releaseHistory?.entries?.find(entry => entry.id === "r10");
+      frozenR10 = releaseHistory?.entries.find(entry => entry.id === "r10");
       modTaxonomy = taxonomy.components;
+      selectCurrentRelease(releaseHistory);
       modEvidence = resultPublication.evidence;
       modResultBindings = resultPublication.bindings;
       indexModResults();
@@ -2337,6 +2408,11 @@ vllm-hust-ext extension check ${extensionId}`
     try {
       id = decodeURIComponent(location.hash.slice(1));
     } catch {
+      return;
+    }
+    const releasePanel = [currentReleaseRoot, frozenR10Root].find(panel => panel?.id === id);
+    if (releasePanel && !releasePanel.hidden) {
+      releasePanel.scrollIntoView();
       return;
     }
     const project = catalogProjects().find(({ items }) => items.some(item => item.id === id));
