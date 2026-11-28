@@ -35,14 +35,12 @@ def test_labels_titles_and_footer_use_bilingual_public_copy() -> None:
 
 
 def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
-    assert "我们的重点是各类 MOD 插件优化。" in HOME
-    assert "部分 MOD 还需要修改 vLLM 或昇腾后端" in HOME
-    assert "Our focus is optimization through MOD plugins." in HOME
-    assert "Some MODs also need changes to vLLM or its Ascend backend" in HOME
+    assert "vLLM 与昇腾分支为 MOD 优化提供引擎适配。" in HOME
+    assert "The vLLM and Ascend forks support MOD optimizations." in HOME
     section = HOME.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
     for repo in ("vllm-hust", "vllm-ascend-hust"):
         assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
-    assert 'href="./plugins.html"' in section
+    assert 'href="./plugins.html#plugin-catalog"' in section
     assert 'href="./mod-results.html"' not in section
     assert "SINGLE · COMBINATION · COMPATIBILITY" not in section
     assert "https://github.com/vLLM-HUST/vllm-hust-benchmark" in HOME
@@ -177,20 +175,20 @@ def test_mobile_navigation_uses_compact_accessible_disclosure() -> None:
 
 
 def test_homepage_section_index_links_to_existing_primary_sections() -> None:
-    assert '<nav class="execution-scope" aria-label="Homepage sections">' in HOME
-    for section_id in ("products", "stack", "projects", "ecosystem"):
-        assert f'href="#{section_id}"' in HOME
+    navigation = HOME.split('<nav class="home-section-nav"', 1)[1].split("</nav>", 1)[0]
+    for section_id in ("applications", "products", "stack", "projects", "ecosystem"):
+        assert f'href="#{section_id}"' in navigation
         assert f'id="{section_id}"' in HOME
-    assert ".execution-scope a:focus-visible" in HOME_CSS
+    assert ".home-section-nav a:focus-visible" in HOME_CSS
 
 
-def test_homepage_leads_with_typed_ecosystem_positioning() -> None:
-    assert "Public MODs across the inference lifecycle" in HOME
-    assert "Explore by phase, scenario, platform, and readiness" in HOME
-    assert "activation and performance evidence stay separate" in HOME
-    assert "覆盖推理全生命周期的公开 MOD" in HOME
-    assert "按阶段、场景、平台和成熟度探索" in HOME
-    assert "启用证据与性能证据分开呈现" in HOME
+def test_homepage_leads_with_engine_and_mod_positioning() -> None:
+    assert "LLM inference and MODs for domestic accelerators." in HOME
+    assert "面向国产算力的大模型推理引擎与 MOD 生态。" in HOME
+    assert (
+        "Each MOD lists its activation records and measured results separately." in HOME
+    )
+    assert "目录为每个 MOD 分别列出启用记录与实测结果。" in HOME
 
 
 def test_shared_directory_footer_and_versions_shell_are_site_wide() -> None:

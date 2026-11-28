@@ -71,6 +71,14 @@
       </div>
     </section>
 
+    <nav class="home-section-nav" aria-label="Homepage sections">
+      <a id="scope-applications" href="#applications">Applications</a>
+      <a id="scope-products" href="#products">Products</a>
+      <a id="scope-engine" href="#stack">Integration &amp; benchmarks</a>
+      <a id="scope-projects" href="#projects">Projects</a>
+      <a id="scope-ecosystem" href="#ecosystem">Ecosystem</a>
+    </nav>
+
     <section class="execution-section home-applications" id="applications" aria-labelledby="applications-title">
       <div class="execution-section-head">
         <h2 id="applications-title">Applications</h2>
@@ -106,12 +114,13 @@
     <section class="execution-section execution-dark" id="stack" aria-labelledby="stack-title">
       <div class="execution-section-head">
         <h2 id="stack-title">Engine integration &amp; benchmarks</h2>
-        <p id="stack-summary">vLLM and Ascend forks provide engine support for MODs. The measurement matrix records results by configuration.</p>
+        <p id="stack-summary">The vLLM and Ascend forks support MOD optimizations. Each MOD lists its activation records and measured results separately.</p>
       </div>
       <div class="home-quick-links">
         <a class="execution-button" id="stack-engine-link" href="./engine.html">Engine releases →</a>
         <a class="execution-button" id="stack-core-link" href="https://github.com/vLLM-HUST/vllm-hust">vLLM fork ↗</a>
         <a class="execution-button" id="stack-ascend-link" href="https://github.com/vLLM-HUST/vllm-ascend-hust">Ascend fork ↗</a>
+        <a class="execution-button" id="stack-results-link" href="./plugins.html#plugin-catalog">MOD results →</a>
         <a class="execution-button" id="stack-matrix-link" href="./dataset-validation.html">Measurement matrix →</a>
       </div>
     </section>
@@ -195,6 +204,12 @@
   <script>
     window.vllmHustPageDict = {
       en: {
+        'scope-applications': 'Applications',
+        'scope-products': 'Products',
+        'scope-engine': 'Integration & benchmarks',
+        'scope-projects': 'Projects',
+        'scope-ecosystem': 'Ecosystem',
+        'stack-results-link': 'MOD results →',
         'home-intro': 'LLM inference and MODs for domestic accelerators.',
         'applications-title': 'Applications',
         'home-mate-title': 'Sage Mate',
@@ -209,7 +224,7 @@
         'products-title': 'Open-source products',
         'products-summary': 'Model execution, serving control and agent workspaces with MOD extensions.',
         'stack-title': 'Engine integration & benchmarks',
-        'stack-summary': 'vLLM and Ascend forks provide engine support for MODs. The measurement matrix records results by configuration.',
+        'stack-summary': 'The vLLM and Ascend forks support MOD optimizations. Each MOD lists its activation records and measured results separately.',
         'stack-engine-link': 'Engine releases →',
         'stack-core-link': 'vLLM fork ↗',
         'stack-ascend-link': 'Ascend fork ↗',
@@ -247,6 +262,12 @@
         'footer-copy': 'Inference for domestic compute.'
       },
       zh: {
+        'scope-applications': '应用展示',
+        'scope-products': '开源产品',
+        'scope-engine': '引擎适配与实测',
+        'scope-projects': '工程项目',
+        'scope-ecosystem': '研究生态',
+        'stack-results-link': 'MOD 实测 →',
         'home-intro': '面向国产算力的大模型推理引擎与 MOD 生态。',
         'applications-title': '应用展示',
         'home-mate-title': 'Sage Mate 学术分身',
@@ -261,7 +282,7 @@
         'products-title': '开源产品',
         'products-summary': '覆盖模型执行、服务调度与智能体工作环境，均支持 MOD 扩展。',
         'stack-title': '引擎适配与实测',
-        'stack-summary': 'vLLM 和昇腾分支为 MOD 提供引擎支持，实测矩阵按配置呈现结果。',
+        'stack-summary': 'vLLM 与昇腾分支为 MOD 优化提供引擎适配。目录为每个 MOD 分别列出启用记录与实测结果。',
         'stack-engine-link': '查看引擎版本 →',
         'stack-core-link': 'vLLM 分支 ↗',
         'stack-ascend-link': '昇腾分支 ↗',

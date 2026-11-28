@@ -56,8 +56,10 @@ def test_results_are_rendered_inside_corresponding_mod_cards():
     assert ".replace(/gennova(?:-hust)?[a-z0-9-]*/gi" in script
     assert ".replace(/stateaxis[a-z0-9-]*/gi" in script
     assert 'source.href = "./data/mod-test-evidence.json"' in script
-    assert '<a href="./plugins.html#plugin-catalog"><span>04 / EVIDENCE</span>' in home
-    assert "attached to each corresponding MOD" in home
+    assert 'id="stack-results-link" href="./plugins.html#plugin-catalog"' in home
+    assert (
+        "Each MOD lists its activation records and measured results separately." in home
+    )
 
 
 def test_old_result_url_redirects_to_catalog():
