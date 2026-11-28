@@ -129,7 +129,6 @@ def main():
                             assert top.all_text_contents() == (
                                 [
                                     "产品",
-                                    "项目",
                                     "MOD 目录",
                                     "论文与新闻",
                                     "性能数据",
@@ -139,7 +138,6 @@ def main():
                                 if language == "zh"
                                 else [
                                     "Products",
-                                    "Projects",
                                     "MOD catalog",
                                     "Papers & news",
                                     "Performance data",
@@ -150,9 +148,10 @@ def main():
                             if width == 390:
                                 page.locator("#navToggle").click()
                                 direct = page.locator(".nav-links > a")
-                                expect(direct).to_have_count(2)
-                                boxes = [link.bounding_box() for link in direct.all()]
-                                assert boxes[0]["y"] == boxes[1]["y"]
+                                expect(direct).to_have_count(1)
+                                expect(direct).to_have_attribute(
+                                    "href", "./plugins.html"
+                                )
                             for group in page.locator(".site-nav .nav-group").all():
                                 if group.get_attribute("open") is not None:
                                     group.locator("summary").click()
@@ -417,52 +416,42 @@ def main():
                                 path=OUTPUT / f"{name}-{width}-{language}-{theme}.png"
                             )
                             receipts.append([name, width, language, theme, "PASS"])
-                        # Restored primary links must reach actual preserved sections.
-                        for section_id in ("projects", "stack"):
-                            page.goto(
-                                f"{base}/index.html#{section_id}",
-                                wait_until="networkidle",
-                            )
-                            assert page.locator(f"#{section_id}").is_visible()
-                            if section_id == "projects":
-                                expect(
-                                    page.locator('.nav-links [aria-current="location"]')
-                                ).to_have_attribute("href", "./index.html#projects")
-                            if section_id == "stack":
-                                expect(page.locator("#stack-title")).to_have_text(
-                                    "引擎适配与实测"
-                                    if language == "zh"
-                                    else "Engine integration & benchmarks"
+                        page.goto(f"{base}/index.html#stack", wait_until="networkidle")
+                        assert page.locator("#stack").is_visible()
+                        expect(page.locator("#stack-title")).to_have_text(
+                            "引擎适配与实测"
+                            if language == "zh"
+                            else "Engine integration & benchmarks"
+                        )
+                        expect(page.locator("#stack-summary")).to_contain_text(
+                            "vLLM 与昇腾分支为 MOD 优化提供引擎适配。"
+                            if language == "zh"
+                            else "The vLLM and Ascend forks support MOD optimizations."
+                        )
+                        expect(page.locator("#stack-results-link")).to_have_attribute(
+                            "href", "./plugins.html#plugin-catalog"
+                        )
+                        for repo in ("vllm-hust", "vllm-ascend-hust"):
+                            expect(
+                                page.locator(
+                                    f'#stack a[href="https://github.com/vLLM-HUST/{repo}"]'
                                 )
-                                expect(page.locator("#stack-summary")).to_contain_text(
-                                    "vLLM 与昇腾分支为 MOD 优化提供引擎适配。"
-                                    if language == "zh"
-                                    else "The vLLM and Ascend forks support MOD optimizations."
-                                )
-                                expect(
-                                    page.locator("#stack-results-link")
-                                ).to_have_attribute(
-                                    "href", "./plugins.html#plugin-catalog"
-                                )
-                                for repo in ("vllm-hust", "vllm-ascend-hust"):
-                                    expect(
-                                        page.locator(
-                                            f'#stack a[href="https://github.com/vLLM-HUST/{repo}"]'
-                                        )
-                                    ).to_be_visible()
-                                assert (
-                                    "gennova"
-                                    not in page.locator("body").inner_text().lower()
-                                )
-                                page.locator("#stack").screenshot(
-                                    path=OUTPUT
-                                    / f"engine-{width}-{language}-{theme}.png"
-                                )
-                        # Hash-only navigation updates the current section without a reload.
-                        page.evaluate("location.hash = 'projects'")
+                            ).to_be_visible()
+                        assert (
+                            "gennova" not in page.locator("body").inner_text().lower()
+                        )
+                        page.locator("#stack").screenshot(
+                            path=OUTPUT / f"engine-{width}-{language}-{theme}.png"
+                        )
+                        expect(page.locator("#projects")).to_have_count(0)
                         expect(
-                            page.locator('.nav-links [aria-current="location"]')
-                        ).to_have_attribute("href", "./index.html#projects")
+                            page.locator('.nav-links a[href="./index.html#projects"]')
+                        ).to_have_count(0)
+                        page.evaluate("location.hash = 'projects'")
+                        expect(page).to_have_url(
+                            f"{base}/ecosystem-archive.html#projects"
+                        )
+                        expect(page.locator("#projects #runtime-list")).to_have_count(1)
                         if width == 390:
                             page.locator("#navToggle").click()
                         products = page.locator('[data-nav-group="products"]')

@@ -37,13 +37,14 @@ def test_labels_titles_and_footer_use_bilingual_public_copy() -> None:
 def test_engine_explains_mod_first_focus_and_two_supporting_forks() -> None:
     assert "vLLM 与昇腾分支为 MOD 优化提供引擎适配。" in HOME
     assert "The vLLM and Ascend forks support MOD optimizations." in HOME
-    section = HOME.split('id="stack"', 1)[1].split('id="projects"', 1)[0]
+    section = HOME.split('id="stack"', 1)[1].split('id="ecosystem"', 1)[0]
     for repo in ("vllm-hust", "vllm-ascend-hust"):
         assert f'href="https://github.com/vLLM-HUST/{repo}"' in section
     assert 'href="./plugins.html#plugin-catalog"' in section
     assert 'href="./mod-results.html"' not in section
     assert "SINGLE · COMBINATION · COMPATIBILITY" not in section
-    assert "https://github.com/vLLM-HUST/vllm-hust-benchmark" in HOME
+    archive = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
+    assert "https://github.com/vLLM-HUST/vllm-hust-benchmark" in archive
     assert "gennova" not in HOME.lower()
     assert "Independent inference engine" not in HOME
     assert "独立的推理引擎" not in HOME
@@ -67,7 +68,7 @@ def test_only_performance_navigation_is_reduced_to_three_deliverables() -> None:
     assert (ROOT / "engine.html").is_file()
     for old in ("leaderboard-runs.html", "dataset-validation.html"):
         assert old not in performance
-    for section in ("products", "projects", "stack"):
+    for section in ("products", "stack"):
         href = "./index.html" if section == "products" else f"./index.html#{section}"
         if section != "stack":
             assert href in SITE_JS
@@ -176,10 +177,15 @@ def test_mobile_navigation_uses_compact_accessible_disclosure() -> None:
 
 def test_homepage_section_index_links_to_existing_primary_sections() -> None:
     navigation = HOME.split('<nav class="home-section-nav"', 1)[1].split("</nav>", 1)[0]
-    for section_id in ("applications", "products", "stack", "projects", "ecosystem"):
+    for section_id in ("applications", "products", "stack", "ecosystem"):
         assert f'href="#{section_id}"' in navigation
         assert f'id="{section_id}"' in HOME
     assert ".home-section-nav a:focus-visible" in HOME_CSS
+    assert 'id="projects"' not in HOME
+    assert "./index.html#projects" not in SITE_JS
+    archive = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
+    assert 'id="projects"' in archive
+    assert "location.replace('./ecosystem-archive.html#projects')" in HOME
 
 
 def test_homepage_leads_with_engine_and_mod_positioning() -> None:
