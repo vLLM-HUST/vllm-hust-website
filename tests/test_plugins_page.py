@@ -1203,7 +1203,7 @@ def test_people_are_visible_without_expanding_technical_details() -> None:
 
 def test_dark_surfaces_and_dense_metadata_keep_readable_colors() -> None:
     assert "plugins.css?v=catalog-attribution-20261119" in PAGE
-    assert "plugins-page.js?v=current-release-pinned-20261126" in PAGE
+    assert "plugins-page.js?v=current-release-only-20261128" in PAGE
     assert 'body[data-page="plugins"] .content-panel .highlights-head h2' in STYLES
     assert 'body[data-page="plugins"] .content-panel .highlight-lead h3' in STYLES
     assert 'body[data-page="plugins"] .content-panel .portfolio-head h2' in STYLES
