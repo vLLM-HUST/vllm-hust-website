@@ -70,16 +70,17 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 
 ## Public evaluation entry points
 
-| To look up | Start here |
-| --- | --- |
-| Formal B0/B1 comparison and evidence for each B1 release | [B0/B1 release comparison](https://vllm-hust.sage.org.ai/b0-b1.html) |
-| Designated datasets, test procedure and evaluation clients | [Datasets and test guide](https://vllm-hust.sage.org.ai/dataset-introductions.html) |
-| Published measurements, coverage and evidence by configuration | [Dataset validation matrix](https://vllm-hust.sage.org.ai/dataset-validation.html) |
-| Topic 4 test procedure and historical reports | [Topic 4 test plan](https://vllm-hust.sage.org.ai/test-plan.html), [report archive](https://vllm-hust.sage.org.ai/report-history.html) |
+| To look up                                                     | Start here                                                                                                                             |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Formal B0/B1 comparison and evidence for each B1 release       | [B0/B1 release comparison](https://vllm-hust.sage.org.ai/b0-b1.html)                                                                   |
+| Designated datasets, test procedure and evaluation clients     | [Datasets and test guide](https://vllm-hust.sage.org.ai/dataset-introductions.html)                                                    |
+| Published measurements, coverage and evidence by configuration | [Dataset validation matrix](https://vllm-hust.sage.org.ai/dataset-validation.html)                                                     |
+| Topic 4 test procedure and historical reports                  | [Topic 4 test plan](https://vllm-hust.sage.org.ai/test-plan.html), [report archive](https://vllm-hust.sage.org.ai/report-history.html) |
 
 For a reproducible citation, record the selected release, the applicable test configuration and the
-linked evidence. The site's [deployment provenance](https://vllm-hust.sage.org.ai/deployment-provenance.json)
-records the presentation and benchmark source revisions serving those links.
+linked evidence. The site's
+[deployment provenance](https://vllm-hust.sage.org.ai/deployment-provenance.json) records the
+presentation and benchmark source revisions serving those links.
 
 ## Architecture And Planning Notes
 
