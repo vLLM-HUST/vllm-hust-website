@@ -630,18 +630,6 @@ body[data-page="home"] .lang-toggle {
 .execution-home-compact .execution-architecture strong { margin-top: 0; font-size: 20px; }
 .execution-home-compact .execution-architecture small { line-height: 1.45; }
 .home-quick-links { display: flex; flex-wrap: wrap; gap: 10px; }
-.home-repositories > summary {
-  padding: 14px 16px;
-  border: 1px solid var(--exec-line);
-  border-radius: 4px;
-  background: var(--exec-white);
-  cursor: pointer;
-  font-weight: 700;
-}
-.home-repositories > summary:hover { border-color: var(--exec-muted); }
-.home-repositories > summary:focus-visible { outline: 3px solid #075b72; outline-offset: 3px; }
-.home-repositories[open] .runtime-list { margin-top: 18px; }
-
 @media (max-width: 760px) {
   .execution-home-compact .execution-hero { padding: 35px 16px 28px; }
   .execution-home-compact .execution-hero h1 { font-size: 44px; }
