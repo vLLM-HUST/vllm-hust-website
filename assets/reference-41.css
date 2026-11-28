@@ -1,0 +1,17 @@
+.reference-41 {
+  margin-block: 1.75rem;
+  padding: 1.15rem;
+  border: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  border-radius: .75rem;
+}
+.reference-41 h2 { margin-block: 0 .55rem; }
+.reference-41 details { margin-block: .9rem; }
+.reference-41 summary { cursor: pointer; font-weight: 600; padding-block: .35rem; }
+.reference-41 .reference-41-table { overflow-x: auto; }
+.reference-41 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.reference-41 :is(th, td) {
+  border-bottom: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  padding: .55rem .65rem;
+  text-align: start;
+  white-space: nowrap;
+}

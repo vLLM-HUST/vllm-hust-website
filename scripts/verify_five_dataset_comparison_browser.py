@@ -2020,6 +2020,34 @@ def verify(url, output):
                         "rejected": altered,
                     }
                 )
+        publication = context.request.get(url + "/data/benchmark-source-manifest.json").json()
+        public_files = {entry["website_path"]: entry for entry in publication["files"]}
+        nine_b_path = "data/qwen35-9b-reference-41.json"
+        if nine_b_path in public_files:
+            for tamper in (False, True):
+                page = context.new_page()
+                if tamper:
+                    page.route(
+                        "**/" + nine_b_path,
+                        lambda route: route.fulfill(json={"tampered": True}),
+                    )
+                with page.expect_response(lambda response: response.url.endswith(nine_b_path)):
+                    page.goto(url + "/b0-b1.html")
+                panel = page.locator("#qwen35-9b-reference-41")
+                if tamper:
+                    expect(panel).to_be_hidden()
+                    expect(panel.locator("tbody tr")).to_have_count(0)
+                else:
+                    expect(panel).to_be_visible()
+                    expect(panel.locator("table").first.locator("tbody tr")).to_have_count(2)
+                    panel.locator("summary").click()
+                    expect(panel.locator("details tbody tr")).to_have_count(6)
+                    expect(panel.locator("details")).to_have_attribute("open", "")
+                    page.evaluate("document.documentElement.lang = 'en'")
+                    expect(panel.locator("h2")).to_contain_text("independent reference lower bound")
+                    expect(panel.locator("details")).to_have_attribute("open", "")
+                page.close()
+                checks.append({"qwen_9b_reference": True, "rejected_tamper": tamper})
         browser.close()
     (output / "verification.json").write_text(json.dumps(checks, indent=2) + "\n")
     print(f"Verified {len(checks)} chart/dialog/source cases")
