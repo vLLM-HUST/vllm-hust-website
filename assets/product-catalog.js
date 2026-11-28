@@ -21,6 +21,13 @@
                 zh: '在新标签页体验 Sage Mate',
             }),
         }),
+        'research-report': Object.freeze({
+            url: 'https://lab.sage.org.ai/auto-research-report-website/',
+            ariaLabel: Object.freeze({
+                en: 'Open Auto Research Report in a new tab',
+                zh: '在新标签页打开自动研报系统',
+            }),
+        }),
     });
 
     function currentLanguage() {
