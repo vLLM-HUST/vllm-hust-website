@@ -388,7 +388,7 @@ RESEARCH_URL = "https://lab.sage.org.ai/auto-research-report-website/"
 
 
 def verify_home_product_navigation(browser, args, rows):
-    """Check the home application row and the separate open-source products."""
+    """Check application, product and evaluation entry points on the homepage."""
     for width in (390, 1440):
         for theme in ("light", "dark"):
             context = browser.new_context(
@@ -488,6 +488,35 @@ def verify_home_product_navigation(browser, args, rows):
                     expect(
                         page.locator(f'#products a[href="./{slug}.html"]')
                     ).to_have_count(1)
+                expect(page.locator("#home-data-cta")).to_have_attribute(
+                    "href", "./b0-b1.html"
+                )
+                evidence = page.locator(".home-evidence-card")
+                expect(evidence).to_have_count(3)
+                expect(evidence.locator("strong")).to_have_text(
+                    ["B0/B1 正式版本对照", "指定数据集与测试指南", "数据集实测矩阵"]
+                    if language == "zh"
+                    else [
+                        "B0/B1 release comparison",
+                        "Datasets & test guide",
+                        "Dataset validation matrix",
+                    ]
+                )
+                for card, href in zip(
+                    evidence.all(),
+                    (
+                        "./b0-b1.html",
+                        "./dataset-introductions.html",
+                        "./dataset-validation.html",
+                    ),
+                    strict=True,
+                ):
+                    expect(card).to_have_attribute("href", href)
+                    card.focus()
+                    assert (
+                        card.evaluate("el => getComputedStyle(el).outlineStyle")
+                        == "solid"
+                    )
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= innerWidth + 1"
                 )
@@ -497,6 +526,8 @@ def verify_home_product_navigation(browser, args, rows):
                     ".home-app-card h3",
                     ".home-app-card p",
                     ".home-app-link",
+                    ".home-evidence-card strong",
+                    ".home-evidence-card p",
                 ):
                     for node in page.locator(selector).all():
                         assert node.evaluate(CONTRAST) >= 4.5, (

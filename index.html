@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="./assets/brand/vllm-hust-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&family=Sora:wght@600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css?v=benchmarks-ia-20261003-clarity2-20261025-nav-20261029" />
-  <link rel="stylesheet" href="./assets/home.css?v=0.3.7-public-pages-20261024-research-card-20261118&amp;ui=home-applications-20261128-r2" />
+  <link rel="stylesheet" href="./assets/home.css?v=0.3.7-public-pages-20261024-research-card-20261118&amp;ui=home-evidence-20261128-r1" />
 </head>
 <body data-page="home">
   <nav class="site-nav">
@@ -65,7 +65,7 @@
         <p id="home-intro" class="execution-kicker">LLM inference and MODs for domestic accelerators.</p>
         <div class="execution-actions">
           <a id="home-primary-cta" class="execution-button primary" href="./plugins.html#plugin-catalog">Explore the MOD catalog →</a>
-          <a id="home-data-cta" class="execution-button quiet" href="./dataset-introductions.html">Datasets &amp; evaluation →</a>
+          <a id="home-data-cta" class="execution-button quiet" href="./b0-b1.html">B0/B1 comparison →</a>
           <a id="home-github-cta" class="execution-button quiet" href="https://github.com/vLLM-HUST" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
         </div>
       </div>
@@ -113,14 +113,26 @@
     <section class="execution-section execution-dark" id="stack" aria-labelledby="stack-title">
       <div class="execution-section-head">
         <h2 id="stack-title">Engine integration &amp; benchmarks</h2>
-        <p id="stack-summary">The vLLM and Ascend forks support MOD optimizations. Each MOD lists its activation records and measured results separately.</p>
+        <p id="stack-summary">Find the formal release comparison, the test procedure or the results for a specific model and configuration.</p>
+      </div>
+      <div class="home-card-grid home-evidence-grid">
+        <a class="home-evidence-card" href="./b0-b1.html" aria-labelledby="stack-comparison-title" aria-describedby="stack-comparison-copy">
+          <strong id="stack-comparison-title">B0/B1 release comparison</strong><span aria-hidden="true">→</span>
+          <p id="stack-comparison-copy">Compare B1 release evidence against the fixed B0 and inspect the supporting records for each metric.</p>
+        </a>
+        <a class="home-evidence-card" href="./dataset-introductions.html" aria-labelledby="stack-dataset-title" aria-describedby="stack-dataset-copy">
+          <strong id="stack-dataset-title">Datasets &amp; test guide</strong><span aria-hidden="true">→</span>
+          <p id="stack-dataset-copy">Find the designated datasets, client entry points and the procedure for rerunning a test.</p>
+        </a>
+        <a class="home-evidence-card" id="stack-matrix-link" href="./dataset-validation.html" aria-labelledby="stack-matrix-title" aria-describedby="stack-matrix-copy">
+          <strong id="stack-matrix-title">Dataset validation matrix</strong><span aria-hidden="true">→</span>
+          <p id="stack-matrix-copy">Browse published measurements by model and test configuration, including coverage and evidence.</p>
+        </a>
       </div>
       <div class="home-quick-links">
-        <a class="execution-button" id="stack-engine-link" href="./engine.html">Engine releases →</a>
         <a class="execution-button" id="stack-core-link" href="https://github.com/vLLM-HUST/vllm-hust">vLLM fork ↗</a>
         <a class="execution-button" id="stack-ascend-link" href="https://github.com/vLLM-HUST/vllm-ascend-hust">Ascend fork ↗</a>
-        <a class="execution-button" id="stack-results-link" href="./plugins.html#plugin-catalog">MOD results →</a>
-        <a class="execution-button" id="stack-matrix-link" href="./dataset-validation.html">Measurement matrix →</a>
+        <a class="execution-button" id="stack-results-link" href="./plugins.html#plugin-catalog">MOD catalog &amp; results →</a>
       </div>
     </section>
 
@@ -159,7 +171,7 @@
         'scope-products': 'Products',
         'scope-engine': 'Integration & benchmarks',
         'scope-ecosystem': 'Ecosystem',
-        'stack-results-link': 'MOD results →',
+        'stack-results-link': 'MOD catalog & results →',
         'home-intro': 'LLM inference and MODs for domestic accelerators.',
         'applications-title': 'Applications',
         'home-mate-title': 'Sage Mate',
@@ -174,13 +186,17 @@
         'products-title': 'Open-source products',
         'products-summary': 'Model execution, serving control and agent workspaces with MOD extensions.',
         'stack-title': 'Engine integration & benchmarks',
-        'stack-summary': 'The vLLM and Ascend forks support MOD optimizations. Each MOD lists its activation records and measured results separately.',
-        'stack-engine-link': 'Engine releases →',
+        'stack-summary': 'Find the formal release comparison, the test procedure or the results for a specific model and configuration.',
+        'stack-comparison-title': 'B0/B1 release comparison',
+        'stack-comparison-copy': 'Compare B1 release evidence against the fixed B0 and inspect the supporting records for each metric.',
+        'stack-dataset-title': 'Datasets & test guide',
+        'stack-dataset-copy': 'Find the designated datasets, client entry points and the procedure for rerunning a test.',
+        'stack-matrix-title': 'Dataset validation matrix',
+        'stack-matrix-copy': 'Browse published measurements by model and test configuration, including coverage and evidence.',
         'stack-core-link': 'vLLM fork ↗',
         'stack-ascend-link': 'Ascend fork ↗',
-        'stack-matrix-link': 'Measurement matrix →',
         'ecosystem-title': 'Research ecosystem',
-        'home-data-cta': 'Datasets & evaluation →',
+        'home-data-cta': 'B0/B1 comparison →',
         'ecosystem-details-link': 'Explore the ecosystem →',
         "core-engine-description": "Frozen, reproducible optimization bundles for model inference.",
         "core-engine-owner": "Lead: Shuhao Zhang",
@@ -204,7 +220,7 @@
         'scope-products': '开源产品',
         'scope-engine': '引擎适配与实测',
         'scope-ecosystem': '研究生态',
-        'stack-results-link': 'MOD 实测 →',
+        'stack-results-link': 'MOD 目录与实测 →',
         'home-intro': '面向国产算力的大模型推理引擎与 MOD 生态。',
         'applications-title': '应用展示',
         'home-mate-title': 'Sage Mate 学术分身',
@@ -219,13 +235,17 @@
         'products-title': '开源产品',
         'products-summary': '覆盖模型执行、服务调度与智能体工作环境，均支持 MOD 扩展。',
         'stack-title': '引擎适配与实测',
-        'stack-summary': 'vLLM 与昇腾分支为 MOD 优化提供引擎适配。目录为每个 MOD 分别列出启用记录与实测结果。',
-        'stack-engine-link': '查看引擎版本 →',
+        'stack-summary': '查看正式版本对照、测试方法，或按模型与配置查询已发布的实测记录。',
+        'stack-comparison-title': 'B0/B1 正式版本对照',
+        'stack-comparison-copy': '以固定 B0 为基线查看各 B1 版本，并追溯各项指标的原始证据。',
+        'stack-dataset-title': '指定数据集与测试指南',
+        'stack-dataset-copy': '查找指定数据集、评测客户端入口和复测流程。',
+        'stack-matrix-title': '数据集实测矩阵',
+        'stack-matrix-copy': '按模型与测试配置查看已发布结果、测量覆盖和来源。',
         'stack-core-link': 'vLLM 分支 ↗',
         'stack-ascend-link': '昇腾分支 ↗',
-        'stack-matrix-link': '查看实测矩阵 →',
         'ecosystem-title': '研究生态',
-        'home-data-cta': '数据下载与评测 →',
+        'home-data-cta': '查看 B0/B1 对照 →',
         'ecosystem-details-link': '查看生态详情 →',
         "core-engine-description": "冻结可复现的优化组合，执行模型推理。",
         "core-engine-owner": "负责人：张书豪",
