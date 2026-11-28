@@ -11,7 +11,7 @@ from playwright.sync_api import expect, sync_playwright
 from verify_product_homepages_browser import CONTRAST
 
 
-def check_r10_and_result_updates(page, components, release_history, lang):
+def check_current_release_and_result_updates(page, components, release_history, lang):
     entry = next(
         row
         for row in release_history["entries"]
@@ -20,6 +20,7 @@ def check_r10_and_result_updates(page, components, release_history, lang):
     latest = page.locator("#r11-mods")
     release = entry["full_acceptance"]
     expect(latest).to_be_visible()
+    expect(page.locator("#r10-mods, [data-r10-component]")).to_have_count(0)
     expect(latest).to_contain_text(release["pypi_version"])
     expect(latest).to_contain_text(release["scheduler_profile"])
     enabled = sorted(
@@ -58,33 +59,6 @@ def check_r10_and_result_updates(page, components, release_history, lang):
     latest.locator('[data-release-component="intern-s2"]').click()
     expect(page.locator("#intern-s2")).to_be_visible()
 
-    r10 = next(entry for entry in release_history["entries"] if entry["id"] == "r10")
-    box = page.locator("#r10-mods")
-    expect(box).to_be_visible()
-    expect(box).to_contain_text(r10["r10_revision"]["pypi_version"])
-    expect(box.locator("[data-r10-component]")).to_have_count(len(r10["mods"]))
-    assert len(r10["mods"]) == 11
-    ids = box.locator("[data-r10-component]").evaluate_all(
-        "nodes => nodes.map(node => node.dataset.r10Component)"
-    )
-    assert ids == [
-        "vllm-hust-extension-manager",
-        "betterscale",
-        "prefill-microflow",
-        "kv-materialization-arrival-control",
-        "hust-m01-correction",
-        "hust-joint-packed",
-        "sealed-serving-warmup",
-        "guarded-progress-async",
-        "capacity-tuning",
-        "short-prefill-tail",
-        "state-page-copy",
-    ]
-    for component_id in ids:
-        expect(box.locator(f'[data-r10-component="{component_id}"]')).to_have_attribute(
-            "href", f"#{component_id}"
-        )
-
     for component_id, evidence_path, values in (
         ("diffspec", "/diffspec/README.md", ("48b1828", "24", "1294c95")),
         ("prefix-router-migration", "/prefix-router/README.md", ("47.88%", "174.80")),
@@ -110,17 +84,17 @@ def check_r10_and_result_updates(page, components, release_history, lang):
         page.locator("#prefix-router-migration > .plugin-public-effect")
     ).to_be_visible()
     expect(page.locator("#diffspec")).to_have_count(0)
-    box.locator('[data-r10-component="state-page-copy"]').click()
+    latest.locator('[data-release-component="state-page-copy"]').click()
     expect(page.locator("#state-page-copy")).to_be_visible()
     expect(search).to_have_value("")
     page.locator('[data-product-filter="control-plane"]').click()
-    expect(box).to_be_hidden()
+    expect(latest).to_be_hidden()
     expect(page.locator("[data-pinned-release]")).to_have_count(0)
     page.locator('[data-product-filter="engine"]').click()
-    expect(box).to_be_visible()
+    expect(latest).to_be_visible()
     expect(pinned).to_have_attribute("data-pinned-release", entry["id"])
     page.locator('[data-product-filter="all"]').click()
-    return {"release": r10["release"], "enabled": ids, "result_panels": 2}
+    return {"release": entry["release"], "enabled": ids, "result_panels": 2}
 
 
 def check_product_views(page, taxonomy):
@@ -531,7 +505,7 @@ def main():
                     assert page.evaluate(
                         "document.documentElement.scrollWidth <= innerWidth + 1"
                     )
-                    catalog_updates = check_r10_and_result_updates(
+                    catalog_updates = check_current_release_and_result_updates(
                         page,
                         components,
                         payloads["engine-release-history-v1.json"],
