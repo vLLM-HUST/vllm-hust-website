@@ -489,7 +489,7 @@ def verify_home_product_navigation(browser, args, rows):
                         page.locator(f'#products a[href="./{slug}.html"]')
                     ).to_have_count(1)
                 expect(page.locator("#home-data-cta")).to_have_attribute(
-                    "href", "./b0-b1.html"
+                    "href", "./dataset-introductions.html"
                 )
                 evidence = page.locator(".home-evidence-card")
                 expect(evidence).to_have_count(3)
