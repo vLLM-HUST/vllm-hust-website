@@ -388,7 +388,7 @@ RESEARCH_URL = "https://lab.sage.org.ai/auto-research-report-website/"
 
 
 def verify_home_product_navigation(browser, args, rows):
-    """The three product lines own the homepage; apps stay in ecosystem details."""
+    """Check the home application row and the separate open-source products."""
     for width in (390, 1440):
         for theme in ("light", "dark"):
             context = browser.new_context(
@@ -412,10 +412,69 @@ def verify_home_product_navigation(browser, args, rows):
                     ["Engine", "Control Plane", "Continuum"]
                 )
                 expect(
-                    page.locator(
-                        "#products .product-card, #product-research, [data-product-id]"
-                    )
+                    page.locator("#products .product-card, #products [data-product-id]")
                 ).to_have_count(0)
+                apps = page.locator("#applications .home-app-card")
+                expect(apps).to_have_count(3)
+                expect(apps.locator("h3")).to_have_text(
+                    [
+                        "Sage Mate 学术分身" if language == "zh" else "Sage Mate",
+                        "vLLM-HUST Workstation",
+                        "自动研报系统" if language == "zh" else "Auto Research Report",
+                    ]
+                )
+                expect(page.locator("#applications-title")).to_have_text(
+                    "应用展示" if language == "zh" else "Applications"
+                )
+                page.keyboard.press("Tab")
+                for card, (app_id, url) in zip(
+                    apps.all(),
+                    (
+                        ("sage-mate", "https://twin.sage.org.ai/"),
+                        ("workstation", "https://ws.sage.org.ai/"),
+                        ("research-report", RESEARCH_URL),
+                    ),
+                    strict=True,
+                ):
+                    link = card.locator("a")
+                    expect(link).to_have_count(1)
+                    expect(link).to_have_attribute("data-product-id", app_id)
+                    expect(link).to_have_attribute("href", url)
+                    expect(link).to_have_attribute("target", "_blank")
+                    assert {"noopener", "noreferrer"} <= set(
+                        (link.get_attribute("rel") or "").split()
+                    )
+                    link.focus()
+                    assert (
+                        link.evaluate(
+                            "el => getComputedStyle(el, '::after').outlineStyle"
+                        )
+                        == "solid"
+                    )
+                boxes = apps.evaluate_all(
+                    "cards => cards.map(card => { const r = card.getBoundingClientRect(); "
+                    "return {top: r.top, left: r.left, width: r.width, height: r.height}; })"
+                )
+                assert (
+                    max(box["width"] for box in boxes)
+                    - min(box["width"] for box in boxes)
+                    <= 1
+                )
+                if width > 760:
+                    assert len({box["top"] for box in boxes}) == 1
+                    assert len({box["height"] for box in boxes}) == 1
+                    assert boxes[0]["left"] < boxes[1]["left"] < boxes[2]["left"]
+                else:
+                    assert len({box["left"] for box in boxes}) == 1
+                    assert boxes[0]["top"] < boxes[1]["top"] < boxes[2]["top"]
+                assert page.locator(".execution-hero").bounding_box()["height"] <= 390
+                assert (
+                    page.locator("#applications").bounding_box()["y"]
+                    < page.locator("#products").bounding_box()["y"]
+                )
+                page.locator("#applications").screenshot(
+                    path=str(args.output / f"home-apps-{width}-{theme}-{language}.png")
+                )
                 expect(
                     page.locator('.nav-links > a[href="./engine.html"]')
                 ).to_have_count(0)
@@ -435,7 +494,9 @@ def verify_home_product_navigation(browser, args, rows):
                 for selector in (
                     ".core-product p",
                     ".core-product-link",
-                    ".core-product-kicker",
+                    ".home-app-card h3",
+                    ".home-app-card p",
+                    ".home-app-link",
                 ):
                     for node in page.locator(selector).all():
                         assert node.evaluate(CONTRAST) >= 4.5, (

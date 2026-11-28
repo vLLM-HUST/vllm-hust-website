@@ -60,39 +60,13 @@ _该区块由 `data/version_meta.json` 驱动，运行 `python scripts/sync_vers
 - Consistency/stale check: `bash scripts/check_stale_versions.sh`
 - 维护说明：`docs/VERSION_METADATA.md`
 
-## Website Workstation Embed
+## 首页应用展示
 
-首页现在支持把远端 `vllm-hust-workstation` 作为一个可配置面板展示出来，适合把部署在远端算力节点上的 workstation 直接呈现到 website 界面。
+- [Sage Mate 学术分身](https://twin.sage.org.ai/) 提供研究方向、课题组和公开资料问答。
+- [vLLM-HUST Workstation](https://ws.sage.org.ai/) 提供模型服务、对话与实时推理指标。
+- [自动研报系统](https://lab.sage.org.ai/auto-research-report-website/) 提供推理研究日报、技术专题和按题调研。
 
-- 配置文件：`data/workstation_embed.json`
-- 加载脚本：`assets/workstation-embed.js`
-- 展示方式：`embed`（iframe 内嵌）或 `link`（仅提供打开入口）
-
-示例：
-
-```json
-{
-	"enabled": true,
-	"mode": "embed",
-	"workstation_url": "https://ws.sage.org.ai",
-	"backend_url": "https://api.sage.org.ai",
-	"docs_url": "./docs/CLOUDFLARE_SETUP.md",
-	"label_zh": "vLLM-HUST 工作站",
-	"label_en": "vLLM-HUST Workstation"
-}
-```
-
-注意：
-
-- `website` 是静态站点，不代理 workstation API；要展示远端控制台，需要 workstation 自己对外可访问。
-- 若 website 走 HTTPS，则 workstation 也必须走 HTTPS，否则浏览器会阻止 iframe 混合内容。
-- 如果生产环境要限制可嵌入来源，请在 workstation 侧配置 `APP_FRAME_ANCESTORS`。
-
-推荐的 `sage.org.ai` 域名拆分：
-
-- `vllm-hust.sage.org.ai`：GitHub Pages 静态官网
-- `ws.sage.org.ai`：远端节点上的 `vllm-hust-workstation`
-- `api.sage.org.ai`：远端节点上的 `vllm-hust` OpenAI 兼容接口
+三个应用在首页并列展示，入口地址由 `assets/product-catalog.js` 维护。生态详情页保留各应用的介绍。
 
 ## Architecture And Planning Notes
 

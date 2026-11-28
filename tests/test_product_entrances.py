@@ -5,9 +5,27 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+HOME = (ROOT / "index.html").read_text(encoding="utf-8")
 INDEX = (ROOT / "ecosystem-archive.html").read_text(encoding="utf-8")
 CATALOG = (ROOT / "assets" / "product-catalog.js").read_text(encoding="utf-8")
 HOME_CSS = (ROOT / "assets" / "home.css").read_text(encoding="utf-8")
+
+
+def test_homepage_exposes_three_apps_separately_from_open_source_products() -> None:
+    section = HOME.split('id="applications"', 1)[1].split("</section>", 1)[0]
+    apps = (
+        ("sage-mate", "https://twin.sage.org.ai/"),
+        ("workstation", "https://ws.sage.org.ai/"),
+        ("research-report", "https://lab.sage.org.ai/auto-research-report-website/"),
+    )
+    assert section.count('<article class="home-app-card ') == len(apps)
+    for app_id, url in apps:
+        assert f'data-product-id="{app_id}" href="{url}"' in section
+        assert CATALOG.count(url) == 1
+    assert HOME.index('class="execution-hero"') < HOME.index('id="applications"')
+    assert HOME.index('id="applications"') < HOME.index('id="products"')
+    assert 'class="execution-metrics"' not in HOME
+    assert 'class="plugin-path"' not in HOME
 
 
 def test_product_names_urls_and_actions_are_release_catalogued() -> None:

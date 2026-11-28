@@ -514,12 +514,11 @@ body[data-page="home"] .lang-toggle {
   .product-card-research { --product-accent: #425bc9; }
 }
 
-/* The homepage presents the three products; application cards live in the ecosystem detail page. */
+/* Open-source product cards on the homepage. */
 .core-product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .core-product { display: flex; flex-direction: column; min-width: 0; padding: 30px 24px; border: 1px solid var(--product-border); border-top: 4px solid var(--exec-amber); background: var(--product-surface); color: var(--product-text); }
 .core-product-control { border-top-color: var(--exec-cyan); }
 .core-product-memory { border-top-color: #9aafff; }
-.core-product-kicker { color: var(--product-copy); font: 11px ui-monospace, monospace; letter-spacing: .06em; }
 .core-product h3 { color: var(--product-text); font-family: "Sora", "Inter", sans-serif; font-size: 32px; margin: 26px 0 12px; }
 .core-product p { color: var(--product-copy); font-size: 15px; line-height: 1.8; margin: 8px 0; }
 .core-product .core-product-role { color: var(--product-text); font-weight: 700; }
@@ -527,3 +526,131 @@ body[data-page="home"] .lang-toggle {
 .core-product-link { color: var(--product-text); font-weight: 700; font-size: 14px; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--product-border); min-height: 44px; }
 .core-product-link:focus-visible { outline: 3px solid var(--exec-cyan); outline-offset: 5px; }
 @media (max-width: 900px) { .core-product-grid { grid-template-columns: 1fr; } .core-product h3 { font-size: 28px; } }
+
+/* Homepage overview and application entrances. */
+.execution-home-compact .execution-hero {
+  min-height: 0;
+  padding-top: 76px;
+  padding-bottom: 46px;
+}
+.execution-home-compact .execution-hero h1 { font-size: 80px; line-height: 1; }
+.execution-home-compact .execution-kicker { margin: 14px 0 0; font-size: 24px; line-height: 1.45; }
+.execution-home-compact .execution-actions { margin-top: 24px; }
+.execution-home-compact .execution-section { padding-block: 46px; }
+.execution-home-compact .execution-section-head { margin-bottom: 23px; gap: 16px 36px; }
+.execution-home-compact .execution-section-head h2 { font-size: 37px; line-height: 1.15; }
+.execution-home-compact .execution-section-head > p { font-size: 15px; line-height: 1.55; }
+
+.home-section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 23px;
+  padding: 4px max(4vw, calc((100vw - var(--exec-max)) / 2));
+  border-bottom: 1px solid var(--exec-line);
+  background: var(--exec-paper);
+}
+.home-section-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  color: #263d38;
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+}
+.home-section-nav a:hover { text-decoration: underline; }
+.home-section-nav a:focus-visible { outline: 2px solid #075b72; outline-offset: 2px; }
+
+.home-applications {
+  --app-bg: #e9efeb;
+  --app-surface: #fff;
+  --app-ink: #152421;
+  --app-copy: #40524d;
+  --app-line: #aebdb5;
+  --app-link: #154e4c;
+  color: var(--app-ink);
+  background: var(--app-bg);
+}
+
+.home-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.home-app-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 22px 23px 14px;
+  border: 1px solid var(--app-line);
+  border-top: 4px solid var(--app-accent);
+  border-radius: 5px;
+  background: var(--app-surface);
+}
+.home-app-mate { --app-accent: #ba7626; }
+.home-app-workstation { --app-accent: #248a86; }
+.home-app-research { --app-accent: #5369bb; }
+.home-app-card h3 { margin: 0; color: var(--app-ink); font-size: 21px; line-height: 1.3; overflow-wrap: anywhere; }
+.home-app-card p { margin: 10px 0 4px; color: var(--app-copy); font-size: 14px; line-height: 1.55; }
+.home-app-card:hover, .home-app-card:focus-within { border-color: var(--app-accent); }
+.home-app-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: auto;
+  color: var(--app-link);
+  font-size: 14px;
+  font-weight: 750;
+  text-decoration: none;
+}
+.home-app-link::after { content: ""; position: absolute; inset: 0; border-radius: 5px; }
+.home-app-link:hover { color: var(--app-link); text-decoration: underline; }
+.home-app-link:focus-visible { outline: none; }
+.home-app-link:focus-visible::after { outline: 3px solid var(--app-link); outline-offset: 3px; }
+@media (prefers-color-scheme: dark) {
+  .home-section-nav { border-color: #344240; background: #142021; }
+  .home-section-nav a { color: #dde9e5; }
+  .home-section-nav a:focus-visible { outline-color: #9be5e1; }
+  .home-applications {
+    --app-bg: #111819;
+    --app-surface: #192526;
+    --app-ink: #f8fbf9;
+    --app-copy: #c6d3cd;
+    --app-line: #536462;
+    --app-link: #9be5e1;
+  }
+  .home-app-mate { --app-accent: var(--exec-amber); }
+  .home-app-workstation { --app-accent: var(--exec-cyan); }
+  .home-app-research { --app-accent: #9aafff; }
+}
+
+.execution-home-compact .core-product { padding: 22px; }
+.execution-home-compact .core-product h3 { margin: 0 0 8px; font-size: 25px; }
+.execution-home-compact .core-product .core-product-owner { margin: 9px 0 13px; }
+.execution-home-compact .execution-architecture a { min-height: 0; padding: 17px 19px; }
+.execution-home-compact .execution-architecture strong { margin-top: 0; font-size: 20px; }
+.execution-home-compact .execution-architecture small { line-height: 1.45; }
+.home-quick-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.home-repositories > summary {
+  padding: 14px 16px;
+  border: 1px solid var(--exec-line);
+  border-radius: 4px;
+  background: var(--exec-white);
+  cursor: pointer;
+  font-weight: 700;
+}
+.home-repositories > summary:hover { border-color: var(--exec-muted); }
+.home-repositories > summary:focus-visible { outline: 3px solid #075b72; outline-offset: 3px; }
+.home-repositories[open] .runtime-list { margin-top: 18px; }
+
+@media (max-width: 760px) {
+  .execution-home-compact .execution-hero { padding: 35px 16px 28px; }
+  .execution-home-compact .execution-hero h1 { font-size: 44px; }
+  .execution-home-compact .execution-kicker { font-size: 17px; }
+  .execution-home-compact .execution-actions { margin-top: 15px; }
+  .execution-home-compact .execution-actions .execution-button { min-height: 44px; padding: 9px 12px; font-size: 14px; }
+  .execution-home-compact .execution-section { padding-block: 33px; }
+  .execution-home-compact .execution-section-head h2 { font-size: 29px; }
+  .home-section-nav { column-gap: 14px; padding-inline: 16px; }
+  .home-card-grid { grid-template-columns: 1fr; gap: 12px; }
+  .home-app-card { padding: 16px 17px 5px; }
+}
