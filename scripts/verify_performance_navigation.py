@@ -429,16 +429,20 @@ def main():
                                     page.locator('.nav-links [aria-current="location"]')
                                 ).to_have_attribute("href", "./index.html#projects")
                             if section_id == "stack":
-                                expect(page.locator("#stack-title")).to_contain_text(
-                                    "vLLM-HUST"
+                                expect(page.locator("#stack-title")).to_have_text(
+                                    "引擎适配与实测"
+                                    if language == "zh"
+                                    else "Engine integration & benchmarks"
                                 )
                                 expect(page.locator("#stack-summary")).to_contain_text(
-                                    "我们的重点是各类 MOD 插件优化。"
+                                    "vLLM 与昇腾分支为 MOD 优化提供引擎适配。"
                                     if language == "zh"
-                                    else "Our focus is optimization through MOD plugins."
+                                    else "The vLLM and Ascend forks support MOD optimizations."
                                 )
-                                expect(page.locator("#stack-detail")).to_contain_text(
-                                    "vLLM-Ascend-HUST"
+                                expect(
+                                    page.locator("#stack-results-link")
+                                ).to_have_attribute(
+                                    "href", "./plugins.html#plugin-catalog"
                                 )
                                 for repo in ("vllm-hust", "vllm-ascend-hust"):
                                     expect(
